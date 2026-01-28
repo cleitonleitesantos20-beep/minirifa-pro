@@ -9,7 +9,7 @@
     <style>
         .beta-header { background: #ffaa00; color: #000; font-size: 0.6rem; padding: 4px; font-weight: bold; text-align: center; width: 100%; border-radius: 4px; margin-bottom: 10px; }
         
-        /* Patrocinadores Fixos */
+        /* Patrocinadores */
         .ads-frame { width: 100%; height: 60px; border: 1px dashed #333; display: flex; align-items: center; justify-content: center; color: #444; font-size: 0.7rem; font-family: 'Orbitron'; background: #0a0a0a; border-radius: 8px; margin: 10px 0; }
 
         /* XP e Nível */
@@ -67,18 +67,18 @@
         </div>
 
         <div class="card">
-            <h4>🎰 RASPADINHA (+2 XP)</h4>
+            <h4>🎰 RASPADINHA (+0.05 XP)</h4>
             <div id="scratch-box" class="scratch-area" onclick="playScratch()">CLIQUE PARA RASPAR</div>
         </div>
 
         <div class="card">
-            <h4>⛏️ MINERAÇÃO PIXEL (+5 XP)</h4>
+            <h4>⛏️ MINERAÇÃO PIXEL (+0.10 XP)</h4>
             <div id="mining-status" class="mining-canvas"></div>
             <button id="btn-mine" onclick="startMining()" class="btn-primary">MINERAR AGORA</button>
         </div>
 
         <div class="card">
-            <h4>📱 MISSÕES SOCIAIS (+5 XP)</h4>
+            <h4>📱 MISSÕES SOCIAIS (+0.25 XP)</h4>
             <button id="ad-ins" onclick="visitAd('https://instagram.com/suacontaouloja', 'lastIns')" class="btn-outline" style="width:100%; margin-bottom:8px; font-size: 0.7rem;">INSTAGRAM @suacontaouloja</button>
             <button id="ad-tik" onclick="visitAd('https://tiktok.com/@suacontaouloja', 'lastTik')" class="btn-outline" style="width:100%; margin-bottom:8px; font-size: 0.7rem;">TIKTOK @suacontaouloja</button>
             <button id="ad-fac" onclick="visitAd('https://facebook.com/suacontaouloja', 'lastFac')" class="btn-outline" style="width:100%; font-size: 0.7rem;">FACEBOOK @suacontaouloja</button>
@@ -124,9 +124,8 @@
             document.getElementById('xp-status').innerText = `${(xp % 100).toFixed(4)}/100 XP`;
 
             const hoje = new Date().toISOString().split('T')[0];
-            // Travas Diárias
             if(userData.lastScratch === hoje) {
-                document.getElementById('scratch-box').innerText = "✅ JÁ RASPADO HOJE";
+                document.getElementById('scratch-box').innerText = "✅ CONCLUÍDO HOJE";
                 document.getElementById('scratch-box').style.pointerEvents = "none";
             }
             if(userData.lastMine === hoje) document.getElementById('btn-mine').disabled = true;
@@ -139,11 +138,13 @@
             const xp = userData.xp || 0;
             const up = Math.floor((xp + qtd) / 100) > Math.floor(xp / 100);
             let d = { xp: increment(qtd) };
-            if(up) { d.saldo = increment(0.10); alert("NÍVEL UP! +R$ 0.10"); }
+            if(up) { 
+                d.saldo = increment(0.10); 
+                alert("NÍVEL UP! +R$ 0.10"); 
+            }
             await updateDoc(doc(db, "usuarios", user.uid), d);
         }
 
-        // --- TRON RUNNER GAME ---
         window.startGame = () => {
             const canvas = document.getElementById('game-canvas');
             const cube = document.getElementById('cube');
@@ -170,7 +171,6 @@
                     if(!gameRunning) { clearInterval(move); obs.remove(); return; }
                     pos += 5; obs.style.right = pos + 'px';
 
-                    // Colisão (Design Tron)
                     if(pos > 280 && pos < 315 && (cube.style.bottom === '0px' || !cube.style.bottom)) {
                         gameRunning = false;
                         alert("CONEXÃO PERDIDA! XP: " + (score * 0.0001).toFixed(4));
@@ -195,9 +195,9 @@
             box.innerText = "DESCRIPTOGRAFANDO...";
             setTimeout(async () => {
                 await updateDoc(doc(db, "usuarios", user.uid), { lastScratch: hoje });
-                await addXP(2);
+                await addXP(0.05); // Reduzido
                 box.classList.remove('scratch-active');
-                box.innerText = "COMPLETO +2 XP";
+                box.innerText = "COMPLETO +0.05 XP";
             }, 2000);
         };
 
@@ -214,7 +214,7 @@
             }
             setTimeout(async () => {
                 await updateDoc(doc(db, "usuarios", user.uid), { lastMine: hoje });
-                await addXP(5);
+                await addXP(0.10); // Reduzido
                 location.reload();
             }, 5000);
         };
@@ -222,7 +222,7 @@
         window.visitAd = async (url, field) => {
             const hoje = new Date().toISOString().split('T')[0];
             window.open(url, '_blank');
-            let u = {}; u[field] = hoje; u.xp = increment(5);
+            let u = {}; u[field] = hoje; u.xp = increment(0.25); // Reduzido
             await updateDoc(doc(db, "usuarios", user.uid), u);
         };
     </script>
