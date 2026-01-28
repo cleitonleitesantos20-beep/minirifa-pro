@@ -109,13 +109,13 @@ onAuthStateChanged(auth, (user) => {
         });
 
         // Ranking
-        const qRanking = query(collection(db, "usuarios"), orderBy("indicacoesSemana", "desc"), limit(3));
-        onSnapshot(qRanking, (snap) => {
-            let html = "";
-            snap.forEach(u => {
-                html += `<p><span>${u.data().nome}</span> <b>${u.data().indicacoesSemana || 0} pts</b></p>`;
-            });
-            document.getElementById('ranking-lista').innerHTML = html;
+       
+<div class="ranking-container">
+    <h3>🏆 TOP INDICADORES</h3>
+    <div id="ranking-lista">
+        </div>
+</div>
+
         });
 
     } else {
@@ -255,3 +255,4 @@ slider.addEventListener('mousemove', (e) => {
     const walk = (x - startX) * 2; 
     slider.scrollLeft = scrollLeft - walk;
 });
+
