@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RoboSorteio - Oficial</title>
+    <title>RoboSorteio v2.0</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
 </head>
@@ -16,23 +16,31 @@
     <div class="ads-block">SUA PROPAGANDA AQUI</div>
 
     <div class="container">
+        
         <div id="auth-section">
-            <h2 class="neon-text">Acessar Sistema</h2>
-            <input type="text" id="reg-nome" placeholder="Nome Completo">
-            <input type="email" id="email" placeholder="Seu e-mail">
-            <input type="password" id="senha" placeholder="Sua senha">
-            <input type="text" id="ref-code" placeholder="Código de Indicação (Opcional)">
-            <button onclick="login()" class="btn-main">ENTRAR</button>
-            <button onclick="cadastrar()" class="btn-sec">CRIAR CONTA</button>
+            <div class="auth-card">
+                <h2 class="neon-text">SISTEMA DE ACESSO</h2>
+                <input type="email" id="email" placeholder="E-mail">
+                <input type="password" id="senha" placeholder="Senha">
+                <button onclick="login()" class="btn-main">ENTRAR NO SISTEMA</button>
+                
+                <div class="divider">OU CADASTRE-SE</div>
+                
+                <input type="text" id="reg-nome" placeholder="Nome Completo">
+                <input type="text" id="ref-code" placeholder="Código de Indicação">
+                <button onclick="cadastrar()" class="btn-sec">CRIAR NOVA CONTA</button>
+            </div>
         </div>
 
         <div id="tela-rifa" class="hidden">
             <div class="user-dashboard">
-                <p>Usuário: <b id="user-display">...</b></p>
-                <p>Meu Código: <b id="meu-codigo-txt" class="neon-blue">...</b></p>
+                <div class="user-header">
+                    <span>Olá, <b id="user-display">...</b></span>
+                    <button onclick="sair()" class="btn-logout">SAIR</button>
+                </div>
                 
                 <div class="pontos-wallet">
-                    💰 SALDO: R$ <span id="saldo-pontos">0.00</span>
+                    R$ <span id="saldo-pontos">0.00</span>
                 </div>
 
                 <div class="ganhos-grid">
@@ -41,29 +49,39 @@
                 </div>
                 
                 <div id="timer-video" class="hidden">
-                    📺 ASSISTINDO... AGUARDE <span id="segundos">30</span>s
+                    📺 AGUARDE <span id="segundos">30</span>s PARA GANHAR
                 </div>
-                
-                <p class="info-meta">Indicações: <span id="ponto-semana">0</span></p>
+
+                <div class="user-info-footer">
+                    <p>Meu Código: <b id="meu-codigo-txt">...</b></p>
+                    <p>Vendas: <b id="ponto-semana">0</b></p>
+                </div>
             </div>
 
             <div class="fase-container">
-                <h3 class="section-title">🔢 Arraste para o lado</h3>
+                <h3 class="section-title">🔢 ESCOLHA SEUS NÚMEROS</h3>
                 <div class="fases-wrapper">
+                    
                     <div class="fase-slide" id="fase1-section">
+                        <div class="valor-premio">PRÊMIO: R$ 100,00</div>
                         <span class="fase-badge">FASE 1 (1-50)</span>
                         <div id="grid-fase1" class="grid-numeros"></div>
                     </div>
+
                     <div class="fase-slide locked" id="fase2-ui">
                         <div class="lock-overlay">🔒 META: 50 VENDAS</div>
+                        <div class="valor-premio">PRÊMIO: R$ 220,00</div>
                         <span class="fase-badge">FASE 2 (51-100)</span>
                         <div id="grid-fase2" class="grid-numeros"></div>
                     </div>
+
                     <div class="fase-slide locked" id="fase3-ui">
                         <div class="lock-overlay">🔒 META: 100 VENDAS</div>
+                        <div class="valor-premio">PRÊMIO: R$ 330,00</div>
                         <span class="fase-badge">FASE 3 (101-150)</span>
                         <div id="grid-fase3" class="grid-numeros"></div>
                     </div>
+
                 </div>
             </div>
 
@@ -71,19 +89,18 @@
                 <div class="pay-card">
                     <p>Números: <span id="num-selecionados">...</span></p>
                     <p>Total: <b>R$ <span id="total-pagar">0,00</span></b></p>
-                    <button onclick="gerarPix()" class="btn-pix">PAGAR VIA PIX (R$ 7,00/cada)</button>
+                    <button onclick="gerarPix()" class="btn-pix">PAGAR VIA PIX (R$ 7,00/CADA)</button>
                 </div>
             </div>
 
-            <div class="sorteio-container">
-                <div id="area-resultado" class="quadro-vazio">DATA DO SORTEIO...</div>
-            </div>
+            <div id="area-resultado" class="quadro-data">DATA DO SORTEIO...</div>
 
             <div class="ranking-container">
-                <h3 class="neon-purple">🏆 TOP INDICADORES</h3>
-                <div id="ranking-lista" class="ranking-list"></div>
+                <h3>🏆 TOP VENDEDORES</h3>
+                <div id="ranking-lista"></div>
             </div>
         </div>
+
     </div>
 
     <div class="ads-block">SUA PROPAGANDA AQUI</div>
