@@ -18,32 +18,38 @@ const db = getFirestore(app);
 let user = null;
 let selected = [];
 
-// === AUTH ===
 window.login = async () => {
     try {
         await signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('senha').value);
-    } catch (e) { alert("Erro no login: " + e.code); }
+    } catch (e) { alert("Erro: " + e.message); }
 };
 
 window.cadastrar = async () => {
     const nome = document.getElementById('nome').value;
     const email = document.getElementById('email').value;
     const senha = document.getElementById('senha').value;
+    
     if(!nome || !email || !senha) return alert("Preencha tudo!");
     
     try {
         const res = await createUserWithEmailAndPassword(auth, email, senha);
         const code = nome.substring(0,3).toUpperCase() + Math.floor(Math.random()*1000);
+        
         await setDoc(doc(db, "usuarios", res.user.uid), {
-            nome, email, saldo: 0, meuCodigo: code, indicadoPor: document.getElementById('ref').value, vendasTotais: 0, indicacoesSemana: 0
+            nome: nome,
+            email: email,
+            saldo: 0,
+            meuCodigo: code,
+            indicadoPor: document.getElementById('ref').value || "",
+            vendasTotais: 0,
+            indicacoesSemana: 0
         });
         location.reload();
-    } catch (e) { alert("Erro: " + e.message); }
+    } catch (e) { alert("Erro ao criar: " + e.message); }
 };
 
 window.sair = () => signOut(auth);
 
-// === APP LOGIC ===
 onAuthStateChanged(auth, (u) => {
     if (u) {
         user = u;
@@ -53,11 +59,18 @@ onAuthStateChanged(auth, (u) => {
         onSnapshot(doc(db, "usuarios", u.uid), (snap) => {
             const d = snap.data();
             if(!d) return;
-            document.getElementById('u-nome').innerText = d.nome;
-            document.getElementById('u-saldo').innerText = d.saldo.toFixed(2);
-            document.getElementById('u-code').innerText = d.meuCodigo;
-            document.getElementById('u-vendas').innerText = d.vendasTotais;
-            renderGrids(d.vendasTotais);
+
+            const nome = d.nome || "Usuário";
+            const saldo = d.saldo || 0;
+            const codigo = d.meuCodigo || "...";
+            const vendas = d.vendasTotais || 0; 
+
+            document.getElementById('u-nome').innerText = nome;
+            document.getElementById('u-saldo').innerText = saldo.toFixed(2);
+            document.getElementById('u-code').innerText = codigo;
+            document.getElementById('u-vendas').innerText = vendas; 
+            
+            renderGrids(vendas); 
         });
         loadRank();
     } else {
@@ -66,56 +79,46 @@ onAuthStateChanged(auth, (u) => {
     }
 });
 
-// === EARN ===
 window.checkin = async () => {
     await updateDoc(doc(db, "usuarios", user.uid), { saldo: increment(0.05) });
-    alert("+ R$ 0,05!");
+    alert("Check-in realizado!");
 };
 
 window.video = () => {
-    const btn = document.getElementById('btn-video');
-    const timer = document.getElementById('video-timer');
-    let t = 30;
-    btn.classList.add('hidden');
-    timer.classList.remove('hidden');
-    
-    const i = setInterval(async () => {
-        t--;
-        document.getElementById('timer').innerText = t;
-        if(t <= 0) {
-            clearInterval(i);
-            await updateDoc(doc(db, "usuarios", user.uid), { saldo: increment(0.10) });
-            timer.classList.add('hidden');
-            btn.classList.remove('hidden');
-            alert("+ R$ 0,10!");
-        }
-    }, 1000);
+    document.getElementById('btn-video').classList.add('hidden');
+    document.getElementById('video-timer').classList.remove('hidden');
+    setTimeout(async () => {
+        await updateDoc(doc(db, "usuarios", user.uid), { saldo: increment(0.10) });
+        document.getElementById('video-timer').classList.add('hidden');
+        document.getElementById('btn-video').classList.remove('hidden');
+        alert("Vídeo assistido!");
+    }, 5000); 
 };
 
-// === GAME ===
 function renderGrids(vendas) {
     const configs = [
-        {id: 'grid-1', min: 1, max: 50, lock: false},
-        {id: 'grid-2', min: 51, max: 100, lock: vendas < 50, ui: 'fase-2'},
-        {id: 'grid-3', min: 101, max: 150, lock: vendas < 100, ui: 'fase-3'}
+        {id: 'grid-1', cardId: 'card-fase1', min: 1, max: 50, locked: false},
+        {id: 'grid-2', cardId: 'card-fase2', min: 51, max: 100, locked: vendas < 50}, 
+        {id: 'grid-3', cardId: 'card-fase3', min: 101, max: 150, locked: vendas < 100}
     ];
 
     configs.forEach(c => {
         const el = document.getElementById(c.id);
-        el.innerHTML = "";
+        const card = document.getElementById(c.cardId);
         
-        // Controle do Cadeado
-        if(c.ui) {
-            const ui = document.getElementById(c.ui);
-            if(c.lock) ui.querySelector('.lock').style.display = 'flex';
-            else ui.querySelector('.lock').style.display = 'none';
+        if(!el || !card) return; 
+
+        if(c.locked) {
+            card.classList.add('fase-locked'); 
+        } else {
+            card.classList.remove('fase-locked');
         }
 
+        el.innerHTML = "";
         for(let i=c.min; i<=c.max; i++) {
             const btn = document.createElement('button');
             btn.className = `num ${selected.includes(i) ? 'selected' : ''}`;
             btn.innerText = i;
-            if(c.lock) btn.disabled = true;
             btn.onclick = () => toggleNum(i);
             el.appendChild(btn);
         }
@@ -126,30 +129,40 @@ function toggleNum(n) {
     if(selected.includes(n)) selected = selected.filter(x => x !== n);
     else selected.push(n);
     
-    const total = selected.length * 7;
     document.getElementById('sel-nums').innerText = selected.join(', ');
-    document.getElementById('total-val').innerText = total.toFixed(2);
+    document.getElementById('total-val').innerText = (selected.length * 7).toFixed(2);
     
     if(selected.length > 0) document.getElementById('checkout').classList.remove('hidden');
     else document.getElementById('checkout').classList.add('hidden');
     
-    // Re-render para manter estilo visual sem recarregar tudo
     document.querySelectorAll('.num').forEach(b => {
-        if(selected.includes(parseInt(b.innerText))) b.classList.add('selected');
+        const val = parseInt(b.innerText);
+        if(selected.includes(val)) b.classList.add('selected');
         else b.classList.remove('selected');
     });
 }
 
-// === RANKING & PIX ===
 function loadRank() {
-    onSnapshot(query(collection(db, "usuarios"), orderBy("indicacoesSemana", "desc"), limit(3)), (snap) => {
+    const q = query(collection(db, "usuarios"), orderBy("indicacoesSemana", "desc"), limit(3));
+    onSnapshot(q, (snap) => {
         let html = "";
         const icons = ["🥇","🥈","🥉"];
+        
         snap.docs.forEach((d, i) => {
-            html += `<p><span>${icons[i]} ${d.data().nome}</span> <b>${d.data().indicacoesSemana} pts</b></p>`;
+            const dados = d.data();
+            const nome = dados.nome || "Anônimo";
+            const pts = dados.indicacoesSemana || 0; 
+            
+            html += `
+                <p>
+                    <span>${icons[i]} ${nome}</span> 
+                    <b>${pts} pts</b>
+                </p>`;
         });
+        
+        if(html === "") html = "<p style='text-align:center'>Sem dados ainda...</p>";
         document.getElementById('rank-list').innerHTML = html;
     });
 }
 
-window.pix = () => alert(`Gerando PIX de R$ ${(selected.length * 7).toFixed(2)}...`);
+window.pix = () => alert("Gerando PIX...");
