@@ -42,15 +42,20 @@
                     <span>Olá, <b id="u-nome">...</b></span>
                     <button onclick="sair()" class="btn-small">SAIR</button>
                 </div>
-                <div class="saldo">R$ <span id="u-saldo">0.00</span></div>
-                <div class="saldo">R$ <span id="u-saldo">0.00</span></div>
+                
+                <div class="saldo" style="margin: 20px 0 10px 0;">
+                    <small style="display:block; font-size: 0.8rem; color: var(--neon); font-family: 'Orbitron';">SALDO ATUAL</small>
+                    R$ <span id="u-saldo">0.00</span>
+                </div>
 
-<button onclick="window.location.href='central.html'" class="btn-outline" style="margin-bottom: 15px; border-color: #ffd700; color: #ffd700;">⚙️ CENTRAL IA (GANHAR XP E $) </button>
+                <button onclick="window.location.href='central.html'" class="btn-outline" style="margin-bottom: 20px; border-color: #ffd700; color: #ffd700; border-width: 2px;">🎮 MINIGAMES $$$</button>
+
                 <div class="actions">
                     <button onclick="checkin()" id="btn-checkin">📍 CHECK-IN (+0.05)</button>
                     <button onclick="video()" id="btn-video">📺 VÍDEO (+0.10)</button>
                 </div>
                 <div id="video-timer" class="hidden">Aguarde <span id="timer">30</span>s...</div>
+                
                 <div class="stats">
                     <p>CÓDIGO: <span id="u-code">...</span></p>
                     <p>INDICAÇÕES: <span id="u-vendas">0</span></p>
@@ -90,10 +95,9 @@
             <div class="regras">
                 <h4>⚖️ REGRAS E FUNCIONAMENTO</h4>
                 <p>• <b>Sistema:</b> Criado por um Robô com IA Autônoma.</p>
-                <p>• <b>Ganhos:</b> Faça check-in e veja vídeos (1x ao dia cada) para acumular saldo.</p>
+                <p>• <b>Ganhos:</b> Faça check-in, veja vídeos e jogue minigames para acumular saldo.</p>
                 <p>• <b>Valores:</b> Números da sorte custam R$ 7,00 cada.</p>
-                <p>• <b>Saques:</b> No momento não há opção de saque, apenas acúmulo de saldo para uso interno.</p>
-                <p>• <b>Indicação:</b> Ganhe pontos no ranking e bônus ao indicar novos usuários.</p>
+                <p>• <b>Saques:</b> Em breve via IA.</p>
             </div>
         </div>
     </div>
@@ -101,4 +105,3 @@
     <script src="app.js" type="module"></script>
 </body>
 </html>
-
