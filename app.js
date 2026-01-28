@@ -14,7 +14,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
-let user, userData;
+let user, userData, selecionados = [];
 
 window.cadastrar = async () => {
     const nome = document.getElementById('nome').value;
@@ -50,19 +50,39 @@ onAuthStateChanged(auth, (u) => {
             userData = snap.data();
             if (userData) render();
         });
+    } else {
+        document.getElementById('auth-screen').classList.remove('hidden');
+        document.getElementById('app-screen').classList.add('hidden');
     }
 });
 
 function render() {
-    document.getElementById('u-nome').innerText = userData.nome;
-    document.getElementById('u-saldo').innerText = userData.saldo.toFixed(2);
-    document.getElementById('u-code').innerText = userData.meuCodigo;
-    document.getElementById('u-vendas').innerText = userData.vendas;
+    document.getElementById('u-nome').innerText = userData.nome || "Usuário";
+    document.getElementById('u-saldo').innerText = (userData.saldo || 0).toFixed(2);
+    document.getElementById('u-code').innerText = userData.meuCodigo || "---";
+    document.getElementById('u-vendas').innerText = userData.vendas || 0; // Correção bug undefined
 }
+
+window.selectNum = (fase, n, el) => {
+    const id = `${fase}-${n}`;
+    if(selecionados.includes(id)) {
+        selecionados = selecionados.filter(x => x !== id);
+        el.classList.remove('selected');
+    } else {
+        selecionados.push(id);
+        el.classList.add('selected');
+    }
+    const checkout = document.getElementById('checkout');
+    if(selecionados.length > 0) {
+        checkout.classList.remove('hidden');
+        document.getElementById('sel-nums').innerText = selecionados.length + " números";
+        document.getElementById('total-val').innerText = (selecionados.length * 7).toFixed(2);
+    } else { checkout.classList.add('hidden'); }
+};
 
 window.checkin = async () => {
     const hoje = new Date().toISOString().split('T')[0];
-    if (userData.lastCheckin === hoje) return alert("IA: Check-in já realizado hoje.");
+    if (userData.lastCheckin === hoje) return alert("IA: Já realizado hoje.");
     await updateDoc(doc(db, "usuarios", user.uid), { saldo: increment(0.01), lastCheckin: hoje });
     alert("Check-in: +R$ 0,01");
 };
@@ -86,11 +106,15 @@ async function finalizarVideo(hoje) {
     alert("Vídeo: +R$ 0,02");
 }
 
-// Inicializa grids
-[1, 2].forEach(f => {
+window.pix = () => alert("IA: Gerando PIX de R$ " + document.getElementById('total-val').innerText);
+
+// Inicialização dos Grids
+[1, 2, 3, 4].forEach(f => {
     const grid = document.getElementById(`grid-${f}`);
     if(grid) for(let i=1; i<=30; i++) {
-        const b = document.createElement('div'); b.className = 'num-btn'; b.innerText = i;
+        const b = document.createElement('div');
+        b.className = 'num-btn'; b.innerText = i;
+        b.onclick = () => window.selectNum(f, i, b);
         grid.appendChild(b);
     }
 });
