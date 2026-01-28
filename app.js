@@ -79,7 +79,7 @@ onAuthStateChanged(auth, async (user) => {
 });
 /* === FIM DA AUTENTICAÇÃO === */
 
-/* === INÍCIO LÓGICA DE GANHOS === */
+/* === INÍCIO LÓGICA DE GANHOS (CHECK-IN E VÍDEO) === */
 window.fazerCheckin = async () => {
     await updateDoc(doc(db, "usuarios", usuarioAtual.uid), {
         saldo: increment(0.05)
@@ -106,7 +106,7 @@ window.assistirPropaganda = () => {
 };
 /* === FIM LÓGICA DE GANHOS === */
 
-/* === INÍCIO GRIDS E SELEÇÃO === */
+/* === INÍCIO GRIDS E SELEÇÃO DE NÚMEROS === */
 function gerarGrids(vendas) {
     const gridsConfigs = [
         { id: 'grid-fase1', min: 1, max: 50 },
@@ -157,7 +157,14 @@ function atualizarCheckout() {
 }
 /* === FIM GRIDS E SELEÇÃO === */
 
-/* === INÍCIO LÓGICA DE RANKING === */
+/* === INÍCIO LÓGICA DE PAGAMENTO PIX === */
+window.gerarPix = async () => {
+    // Espaço para integração de API de pagamento futuramente
+    alert("Função de gerar PIX para os números: " + numerosSelecionados.join(', '));
+};
+/* === FIM LÓGICA DE PAGAMENTO PIX === */
+
+/* === INÍCIO LÓGICA DE RANKING PREMIADO === */
 function carregarRanking() {
     const q = query(collection(db, "usuarios"), orderBy("indicacoesSemana", "desc"), limit(3));
     onSnapshot(q, (snap) => {
@@ -173,6 +180,6 @@ function carregarRanking() {
         if (lista) lista.innerHTML = html;
     });
 }
-/* === FIM LÓGICA DE RANKING === */
+/* === FIM LÓGICA DE RANKING PREMIADO === */
 
 /* === FIM DO APP.JS COMPLETO === */
