@@ -1,108 +1,121 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RoboSorteioIA</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-</head>
-<body>
-    <div class="header-info">
-        <div id="meta-banner">🤖 ROBOSORTEIO</div>
-    </div>
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+import { getFirestore, doc, setDoc, updateDoc, collection, query, orderBy, limit, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-    <div class="container">
-        <div id="auth-section">
-            <div class="auth-card">
-                <div class="chamada-lucro">
-                    🚀 ENTRE AGORA PODENDO GANHAR ATÉ <b>R$ 345,00</b> POR MÊS!
-                </div>
-                <h2 class="neon-text" style="text-align: center; margin-bottom: 15px;">ACESSO</h2>
-                <input type="email" id="email" placeholder="Seu e-mail">
-                <input type="password" id="senha" placeholder="Sua senha">
-                <button onclick="login()" class="btn-main">ENTRAR NO LOGIN</button>
-                <div class="divider">OU CRIE SUA CONTA</div>
-                <input type="text" id="reg-nome" placeholder="Nome Completo">
-                <input type="text" id="ref-code" placeholder="Código de Indicação (Opcional)">
-                <button onclick="cadastrar()" class="btn-sec">CADASTRAR</button>
-            </div>
-        </div>
+const firebaseConfig = {
+    apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8",
+    authDomain: "minharifadigital.firebaseapp.com",
+    projectId: "minharifadigital",
+    storageBucket: "minharifadigital.firebasestorage.app",
+    messagingSenderId: "59630725905",
+    appId: "1:59630725905:web:396c8cfca385dc3d957ab0"
+};
 
-        <div id="tela-rifa" class="hidden">
-            <div class="ads-slider-container topo">
-                <div class="ads-track">
-                    <div class="ad-slide">🚀 AUMENTE SEUS GANHOS HOJE!</div>
-                    <div class="ad-slide">💎 COMPRE COTAS E GANHE PRÊMIOS</div>
-                    <div class="ad-slide">SEU ANÚNCIO AQUI</div>
-                    <div class="ad-slide">⚡ SORTEIO SEGURO</div>
-                </div>
-            </div>
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-            <div class="user-dashboard">
-                <div class="user-header">
-                    <span>Olá, <b id="user-display">...</b></span>
-                    <button onclick="sair()" class="btn-logout">SAIR</button>
-                </div>
-                <div class="pontos-wallet">R$ <span id="saldo-pontos">0.00</span></div>
-                <div class="ganhos-grid">
-                    <button onclick="fazerCheckin()" id="btn-checkin">📍 CHECK-IN (R$ 0,05)</button>
-                    <button onclick="assistirPropaganda()" id="btn-video">📺 VÍDEO (R$ 0,10)</button>
-                </div>
-                <div id="timer-video" class="hidden">
-                    📺 AGUARDE <span id="segundos">30</span>s...
-                </div>
-                <div class="user-info-footer">
-                    <p>CÓDIGO: <b id="meu-codigo-txt" style="color: var(--neon-blue);">...</b></p>
-                    <p>VENDAS: <b id="ponto-semana" style="color: var(--neon-green);">0</b></p>
-                </div>
-            </div>
+let usuarioAtual = null;
+let numerosSelecionados = [];
 
-            <div class="fase-container">
-                <div class="fases-wrapper">
-                    <div class="fase-slide" id="fase1-section">
-                        <div class="valor-premio">PRÊMIO: R$ 100,00</div>
-                        <span class="fase-badge">FASE 1 (1-50)</span>
-                        <div id="grid-fase1" class="grid-numeros"></div>
-                    </div>
-                    <div class="fase-slide locked" id="fase2-ui">
-                        <div class="lock-overlay">🔒 META: 50 VENDAS PARA LIBERAR</div>
-                        <div class="valor-premio">PRÊMIO: R$ 220,00</div>
-                        <span class="fase-badge">FASE 2 (51-100)</span>
-                        <div id="grid-fase2" class="grid-numeros"></div>
-                    </div>
-                    <div class="fase-slide locked" id="fase3-ui">
-                        <div class="lock-overlay">🔒 META: 100 VENDAS PARA LIBERAR</div>
-                        <div class="valor-premio">PRÊMIO: R$ 330,00</div>
-                        <span class="fase-badge">FASE 3 (101-150)</span>
-                        <div id="grid-fase3" class="grid-numeros"></div>
-                    </div>
-                </div>
-            </div>
+window.cadastrar = async () => {
+    const nome = document.getElementById('reg-nome').value;
+    const email = document.getElementById('email').value;
+    const senha = document.getElementById('senha').value;
+    const refCode = document.getElementById('ref-code').value;
+    if (!nome || !email || !senha) return alert("Preencha os campos!");
+    try {
+        const res = await createUserWithEmailAndPassword(auth, email, senha);
+        const meuCodigo = nome.substring(0, 3).toUpperCase() + Math.floor(1000 + Math.random() * 9000);
+        await setDoc(doc(db, "usuarios", res.user.uid), {
+            nome, email, saldo: 0, meuCodigo, indicadoPor: refCode || null, indicacoesSemana: 0, vendasTotais: 0
+        });
+        location.reload();
+    } catch (e) { alert(e.message); }
+};
 
-            <div id="payment-area" class="hidden">
-                <div class="pay-card">
-                    <p>Números Selecionados: <span id="num-selecionados" style="color: var(--neon-blue);">...</span></p>
-                    <p style="font-size: 1.2rem; margin: 10px 0;">Total: <b style="color: var(--neon-green);">R$ <span id="total-pagar">0,00</span></b></p>
-                    <button onclick="gerarPix()" class="btn-pix">GERAR PAGAMENTO PIX</button>
-                </div>
-            </div>
+window.login = async () => {
+    const email = document.getElementById('email').value;
+    const senha = document.getElementById('senha').value;
+    try { await signInWithEmailAndPassword(auth, email, senha); } catch (e) { alert("Erro no login"); }
+};
 
-            <div id="area-resultado" class="quadro-data">AGUARDANDO SORTEIO...</div>
+window.sair = () => signOut(auth).then(() => location.reload());
 
-            <div class="ranking-container">
-                <h3>🏆 TOP INDICADORES</h3>
-                <div id="ranking-lista"></div>
-            </div>
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        usuarioAtual = user;
+        document.getElementById('auth-section').classList.add('hidden');
+        document.getElementById('tela-rifa').classList.remove('hidden');
+        onSnapshot(doc(db, "usuarios", user.uid), (d) => {
+            const data = d.data();
+            document.getElementById('user-display').innerText = data.nome;
+            document.getElementById('saldo-pontos').innerText = data.saldo.toFixed(2);
+            document.getElementById('meu-codigo-txt').innerText = data.meuCodigo;
+            document.getElementById('ponto-semana').innerText = data.vendasTotais;
+            gerarGrids(data.vendasTotais);
+        });
+        carregarRanking();
+    }
+});
 
-            <div class="regras-container">
-                <h4>⚖️ REGRAS E FUNCIONAMENTO</h4>
-                <p>• <b>Cotas:</b> R$ 7,00 por número.</p>
-                <p>• <b>Indicações:</b> Ganhe R$ 1,00 por compra de indicado.</p>
-                <p>• <b>Saques:</b> Mínimo R$ 50,00.</p>
-            </div>
-        </div>
-    </div>
-    <script src="app.js" type="module"></script>
-</body>
-</html>
+window.fazerCheckin = async () => {
+    await updateDoc(doc(db, "usuarios", usuarioAtual.uid), { saldo: increment(0.05) });
+    alert("Saldo atualizado!");
+};
+
+window.assistirPropaganda = () => {
+    let tempo = 30;
+    document.getElementById('btn-video').disabled = true;
+    document.getElementById('timer-video').classList.remove('hidden');
+    const inter = setInterval(async () => {
+        tempo--;
+        document.getElementById('segundos').innerText = tempo;
+        if (tempo <= 0) {
+            clearInterval(inter);
+            await updateDoc(doc(db, "usuarios", usuarioAtual.uid), { saldo: increment(0.10) });
+            document.getElementById('timer-video').classList.add('hidden');
+            document.getElementById('btn-video').disabled = false;
+        }
+    }, 1000);
+};
+
+function gerarGrids(vendas) {
+    const configs = [{id:'grid-fase1',m:1,x:50},{id:'grid-fase2',m:51,x:100},{id:'grid-fase3',m:101,x:150}];
+    configs.forEach(c => {
+        const el = document.getElementById(c.id);
+        if(!el) return;
+        el.innerHTML = "";
+        for(let i=c.m; i<=c.x; i++) {
+            const b = document.createElement('button');
+            b.className = 'num';
+            b.innerText = i;
+            if(numerosSelecionados.includes(i)) b.classList.add('selecionado');
+            b.onclick = () => {
+                if(numerosSelecionados.includes(i)) numerosSelecionados = numerosSelecionados.filter(n=>n!==i);
+                else numerosSelecionados.push(i);
+                gerarGrids(vendas);
+                document.getElementById('payment-area').classList.toggle('hidden', numerosSelecionados.length === 0);
+                document.getElementById('num-selecionados').innerText = numerosSelecionados.join(', ');
+                document.getElementById('total-pagar').innerText = (numerosSelecionados.length * 7).toFixed(2);
+            };
+            el.appendChild(b);
+        }
+    });
+    document.getElementById('fase2-ui').classList.toggle('locked', vendas < 50);
+    document.getElementById('fase3-ui').classList.toggle('locked', vendas < 100);
+}
+
+function carregarRanking() {
+    const q = query(collection(db, "usuarios"), orderBy("indicacoesSemana", "desc"), limit(3));
+    onSnapshot(q, (s) => {
+        let h = "";
+        const icons = ["🥇","🥈","🥉"];
+        s.forEach((d, i) => {
+            h += `<p>${icons[i]} ${d.data().nome} <b>${d.data().indicacoesSemana} pts</b></p>`;
+        });
+        document.getElementById('ranking-lista').innerHTML = h;
+    });
+}
+
+window.gerarPix = () => alert("Redirecionando para PIX...");
