@@ -15,140 +15,141 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-let usuarioAtual = null;
-let numerosSelecionados = [];
+let user = null;
+let selected = [];
+
+// === AUTH ===
+window.login = async () => {
+    try {
+        await signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('senha').value);
+    } catch (e) { alert("Erro no login: " + e.code); }
+};
 
 window.cadastrar = async () => {
-    const nome = document.getElementById('reg-nome').value;
+    const nome = document.getElementById('nome').value;
     const email = document.getElementById('email').value;
     const senha = document.getElementById('senha').value;
-    const refCode = document.getElementById('ref-code').value;
-
-    if (!nome || !email || !senha) return alert("Preencha os campos!");
+    if(!nome || !email || !senha) return alert("Preencha tudo!");
+    
     try {
         const res = await createUserWithEmailAndPassword(auth, email, senha);
-        const meuCodigo = nome.substring(0, 3).toUpperCase() + Math.floor(1000 + Math.random() * 9000);
+        const code = nome.substring(0,3).toUpperCase() + Math.floor(Math.random()*1000);
         await setDoc(doc(db, "usuarios", res.user.uid), {
-            nome, email, saldo: 0, meuCodigo, indicadoPor: refCode || null, indicacoesSemana: 0, vendasTotais: 0
+            nome, email, saldo: 0, meuCodigo: code, indicadoPor: document.getElementById('ref').value, vendasTotais: 0, indicacoesSemana: 0
         });
         location.reload();
-    } catch (e) { alert("Erro ao cadastrar: " + e.message); }
+    } catch (e) { alert("Erro: " + e.message); }
 };
 
-window.login = async () => {
-    const email = document.getElementById('email').value;
-    const senha = document.getElementById('senha').value;
-    try { await signInWithEmailAndPassword(auth, email, senha); } catch (e) { alert("Dados incorretos."); }
-};
+window.sair = () => signOut(auth);
 
-window.sair = () => signOut(auth).then(() => location.reload());
-
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        usuarioAtual = user;
-        document.getElementById('auth-section').classList.add('hidden');
-        document.getElementById('tela-rifa').classList.remove('hidden');
-        onSnapshot(doc(db, "usuarios", user.uid), (d) => {
-            const data = d.data();
-            if(data) {
-                document.getElementById('user-display').innerText = data.nome;
-                document.getElementById('saldo-pontos').innerText = data.saldo.toFixed(2);
-                document.getElementById('meu-codigo-txt').innerText = data.meuCodigo;
-                document.getElementById('ponto-semana').innerText = data.vendasTotais;
-                gerarGrids(data.vendasTotais);
-            }
+// === APP LOGIC ===
+onAuthStateChanged(auth, (u) => {
+    if (u) {
+        user = u;
+        document.getElementById('auth-screen').classList.add('hidden');
+        document.getElementById('app-screen').classList.remove('hidden');
+        
+        onSnapshot(doc(db, "usuarios", u.uid), (snap) => {
+            const d = snap.data();
+            if(!d) return;
+            document.getElementById('u-nome').innerText = d.nome;
+            document.getElementById('u-saldo').innerText = d.saldo.toFixed(2);
+            document.getElementById('u-code').innerText = d.meuCodigo;
+            document.getElementById('u-vendas').innerText = d.vendasTotais;
+            renderGrids(d.vendasTotais);
         });
-        carregarRanking();
+        loadRank();
+    } else {
+        document.getElementById('auth-screen').classList.remove('hidden');
+        document.getElementById('app-screen').classList.add('hidden');
     }
 });
 
-window.fazerCheckin = async () => {
-    try {
-        await updateDoc(doc(db, "usuarios", usuarioAtual.uid), { saldo: increment(0.05) });
-        alert("Check-in: +R$ 0,05");
-    } catch (e) { console.error(e); }
+// === EARN ===
+window.checkin = async () => {
+    await updateDoc(doc(db, "usuarios", user.uid), { saldo: increment(0.05) });
+    alert("+ R$ 0,05!");
 };
 
-window.assistirPropaganda = () => {
-    let tempo = 30;
+window.video = () => {
     const btn = document.getElementById('btn-video');
-    const timerArea = document.getElementById('timer-video');
-    btn.disabled = true;
-    timerArea.classList.remove('hidden');
+    const timer = document.getElementById('video-timer');
+    let t = 30;
+    btn.classList.add('hidden');
+    timer.classList.remove('hidden');
     
-    const inter = setInterval(async () => {
-        tempo--;
-        document.getElementById('segundos').innerText = tempo;
-        if (tempo <= 0) {
-            clearInterval(inter);
-            await updateDoc(doc(db, "usuarios", usuarioAtual.uid), { saldo: increment(0.10) });
-            timerArea.classList.add('hidden');
-            btn.disabled = false;
-            alert("Vídeo: +R$ 0,10");
+    const i = setInterval(async () => {
+        t--;
+        document.getElementById('timer').innerText = t;
+        if(t <= 0) {
+            clearInterval(i);
+            await updateDoc(doc(db, "usuarios", user.uid), { saldo: increment(0.10) });
+            timer.classList.add('hidden');
+            btn.classList.remove('hidden');
+            alert("+ R$ 0,10!");
         }
     }, 1000);
 };
 
-function gerarGrids(vendas) {
+// === GAME ===
+function renderGrids(vendas) {
     const configs = [
-        {id:'grid-fase1', min:1, max:50},
-        {id:'grid-fase2', min:51, max:100},
-        {id:'grid-fase3', min:101, max:150}
+        {id: 'grid-1', min: 1, max: 50, lock: false},
+        {id: 'grid-2', min: 51, max: 100, lock: vendas < 50, ui: 'fase-2'},
+        {id: 'grid-3', min: 101, max: 150, lock: vendas < 100, ui: 'fase-3'}
     ];
 
-    configs.forEach(conf => {
-        const container = document.getElementById(conf.id);
-        if(!container) return;
-        container.innerHTML = "";
-        for(let i = conf.min; i <= conf.max; i++) {
+    configs.forEach(c => {
+        const el = document.getElementById(c.id);
+        el.innerHTML = "";
+        
+        // Controle do Cadeado
+        if(c.ui) {
+            const ui = document.getElementById(c.ui);
+            if(c.lock) ui.querySelector('.lock').style.display = 'flex';
+            else ui.querySelector('.lock').style.display = 'none';
+        }
+
+        for(let i=c.min; i<=c.max; i++) {
             const btn = document.createElement('button');
-            btn.className = 'num';
+            btn.className = `num ${selected.includes(i) ? 'selected' : ''}`;
             btn.innerText = i;
-            if(numerosSelecionados.includes(i)) btn.classList.add('selecionado');
-            btn.onclick = () => {
-                if(numerosSelecionados.includes(i)) {
-                    numerosSelecionados = numerosSelecionados.filter(n => n !== i);
-                } else {
-                    numerosSelecionados.push(i);
-                }
-                atualizarCheckout();
-                gerarGrids(vendas);
-            };
-            container.appendChild(btn);
+            if(c.lock) btn.disabled = true;
+            btn.onclick = () => toggleNum(i);
+            el.appendChild(btn);
         }
     });
-
-    document.getElementById('fase2-ui').classList.toggle('locked', vendas < 50);
-    document.getElementById('fase3-ui').classList.toggle('locked', vendas < 100);
 }
 
-function atualizarCheckout() {
-    const area = document.getElementById('payment-area');
-    if (numerosSelecionados.length > 0) {
-        area.classList.remove('hidden');
-        document.getElementById('num-selecionados').innerText = numerosSelecionados.join(', ');
-        document.getElementById('total-pagar').innerText = (numerosSelecionados.length * 7).toFixed(2);
-    } else {
-        area.classList.add('hidden');
-    }
-}
-
-function carregarRanking() {
-    const q = query(collection(db, "usuarios"), orderBy("indicacoesSemana", "desc"), limit(3));
-    onSnapshot(q, (snap) => {
-        let h = "";
-        const icons = ["🥇","🥈","🥉"];
-        let i = 0;
-        snap.forEach(d => {
-            const u = d.data();
-            // Correção do undefined: usa fallback caso o nome não exista
-            const nomeExibicao = u.nome || "Usuário";
-            h += `<p><span>${icons[i] || ""} ${nomeExibicao}</span> <b>${u.indicacoesSemana || 0} pts</b></p>`;
-            i++;
-        });
-        const listEl = document.getElementById('ranking-lista');
-        if(listEl) listEl.innerHTML = h;
+function toggleNum(n) {
+    if(selected.includes(n)) selected = selected.filter(x => x !== n);
+    else selected.push(n);
+    
+    const total = selected.length * 7;
+    document.getElementById('sel-nums').innerText = selected.join(', ');
+    document.getElementById('total-val').innerText = total.toFixed(2);
+    
+    if(selected.length > 0) document.getElementById('checkout').classList.remove('hidden');
+    else document.getElementById('checkout').classList.add('hidden');
+    
+    // Re-render para manter estilo visual sem recarregar tudo
+    document.querySelectorAll('.num').forEach(b => {
+        if(selected.includes(parseInt(b.innerText))) b.classList.add('selected');
+        else b.classList.remove('selected');
     });
 }
 
-window.gerarPix = () => alert("Redirecionando para o pagamento...");
+// === RANKING & PIX ===
+function loadRank() {
+    onSnapshot(query(collection(db, "usuarios"), orderBy("indicacoesSemana", "desc"), limit(3)), (snap) => {
+        let html = "";
+        const icons = ["🥇","🥈","🥉"];
+        snap.docs.forEach((d, i) => {
+            html += `<p><span>${icons[i]} ${d.data().nome}</span> <b>${d.data().indicacoesSemana} pts</b></p>`;
+        });
+        document.getElementById('rank-list').innerHTML = html;
+    });
+}
+
+window.pix = () => alert(`Gerando PIX de R$ ${(selected.length * 7).toFixed(2)}...`);
