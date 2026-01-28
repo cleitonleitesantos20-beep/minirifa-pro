@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RoboSorteio v2.0</title>
+    <title>RoboSorteio v2.0 - Oficial</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
 </head>
@@ -13,26 +13,29 @@
         <div id="meta-banner">🤖 ROBOSORTEIO</div>
     </div>
 
-    <div class="ads-block">SUA PROPAGANDA AQUI</div>
-
     <div class="container">
         
         <div id="auth-section">
             <div class="auth-card">
-                <h2 class="neon-text">SISTEMA DE ACESSO</h2>
-                <input type="email" id="email" placeholder="E-mail">
-                <input type="password" id="senha" placeholder="Senha">
-                <button onclick="login()" class="btn-main">ENTRAR NO SISTEMA</button>
+                <div class="chamada-lucro">
+                    🚀 ENTRE AGORA E GANHE ATÉ <b>R$ 345,00</b> POR mês!
+                </div>
+
+                <h2 class="neon-text" style="text-align: center; margin-bottom: 15px;">ACESSO</h2>
+                <input type="email" id="email" placeholder="Seu e-mail">
+                <input type="password" id="senha" placeholder="Sua senha">
+                <button onclick="login()" class="btn-main">ENTRAR NO LOGIN</button>
                 
-                <div class="divider">OU CADASTRE-SE</div>
+                <div class="divider">OU CRIE SUA CONTA</div>
                 
                 <input type="text" id="reg-nome" placeholder="Nome Completo">
-                <input type="text" id="ref-code" placeholder="Código de Indicação">
-                <button onclick="cadastrar()" class="btn-sec">CRIAR NOVA CONTA</button>
+                <input type="text" id="ref-code" placeholder="Código de Indicação (Opcional)">
+                <button onclick="cadastrar()" class="btn-sec">CADASTRAR</button>
             </div>
         </div>
 
         <div id="tela-rifa" class="hidden">
+            
             <div class="user-dashboard">
                 <div class="user-header">
                     <span>Olá, <b id="user-display">...</b></span>
@@ -49,17 +52,17 @@
                 </div>
                 
                 <div id="timer-video" class="hidden">
-                    📺 AGUARDE <span id="segundos">30</span>s PARA GANHAR
+                    📺 AGUARDE <span id="segundos">30</span>s...
                 </div>
 
                 <div class="user-info-footer">
-                    <p>Meu Código: <b id="meu-codigo-txt">...</b></p>
-                    <p>Vendas: <b id="ponto-semana">0</b></p>
+                    <p>CÓDIGO: <b id="meu-codigo-txt" style="color: var(--neon-blue);">...</b></p>
+                    <p>VENDAS: <b id="ponto-semana" style="color: var(--neon-green);">0</b></p>
                 </div>
             </div>
 
             <div class="fase-container">
-                <h3 class="section-title">🔢 ESCOLHA SEUS NÚMEROS</h3>
+                <h3 style="text-align: center; font-size: 0.8rem; color: #555; margin-top: 20px;">🔢 DESLIZE PARA ESCOLHER A FASE</h3>
                 <div class="fases-wrapper">
                     
                     <div class="fase-slide" id="fase1-section">
@@ -69,14 +72,14 @@
                     </div>
 
                     <div class="fase-slide locked" id="fase2-ui">
-                        <div class="lock-overlay">🔒 META: 50 VENDAS</div>
+                        <div class="lock-overlay">🔒 META: 50 VENDAS PARA LIBERAR</div>
                         <div class="valor-premio">PRÊMIO: R$ 220,00</div>
                         <span class="fase-badge">FASE 2 (51-100)</span>
                         <div id="grid-fase2" class="grid-numeros"></div>
                     </div>
 
                     <div class="fase-slide locked" id="fase3-ui">
-                        <div class="lock-overlay">🔒 META: 100 VENDAS</div>
+                        <div class="lock-overlay">🔒 META: 100 VENDAS PARA LIBERAR</div>
                         <div class="valor-premio">PRÊMIO: R$ 330,00</div>
                         <span class="fase-badge">FASE 3 (101-150)</span>
                         <div id="grid-fase3" class="grid-numeros"></div>
@@ -87,23 +90,39 @@
 
             <div id="payment-area" class="hidden">
                 <div class="pay-card">
-                    <p>Números: <span id="num-selecionados">...</span></p>
-                    <p>Total: <b>R$ <span id="total-pagar">0,00</span></b></p>
-                    <button onclick="gerarPix()" class="btn-pix">PAGAR VIA PIX (R$ 7,00/CADA)</button>
+                    <p>Números Selecionados: <span id="num-selecionados" style="color: var(--neon-blue);">...</span></p>
+                    <p style="font-size: 1.2rem; margin: 10px 0;">Total: <b style="color: var(--neon-green);">R$ <span id="total-pagar">0,00</span></b></p>
+                    <button onclick="gerarPix()" class="btn-pix">GERAR PAGAMENTO PIX</button>
                 </div>
             </div>
 
-            <div id="area-resultado" class="quadro-data">DATA DO SORTEIO...</div>
+            <div id="area-resultado" class="quadro-data">AGUARDANDO SORTEIO...</div>
 
             <div class="ranking-container">
-                <h3>🏆 TOP VENDEDORES</h3>
+                <h3>🏆 TOP INDICADORES</h3>
                 <div id="ranking-lista"></div>
+            </div>
+
+            <div class="ads-slider-container">
+                <div class="ads-track">
+                    <div class="ad-slide">💸 GANHE DINHEIRO INDICANDO AMIGOS</div>
+                    <div class="ad-slide">📺 SUA PROPAGANDAS</div>
+                    <div class="ad-slide">🍀 SORTEIOS VIA LOTERIA FEDERAL</div>
+                    <div class="ad-slide">🚀 ROBOSORTEIO: A MELHOR PLATAFORMA</div>
+                </div>
+            </div>
+
+            <div class="regras-container">
+                <h4>⚖️ REGRAS E FUNCIONAMENTO</h4>
+                <p>• <b>Dinâmica:</b> O usuário escolhe cotas de R$ 7,00. Os sorteios ocorrem mensalmente.</p>
+                <p>• <b>Indicações:</b> Ganhe <b>R$ 1,00</b> de saldo real sempre que um indicado fizer a 1ª compra.</p>
+                <p>• <b>Saques:</b> O valor mínimo para retirada via PIX é de R$ 50,00.</p>
+                <p>• <b>Propagandas:</b> Limite de 1 vídeo por dia para bonificação de saldo acumulado.</p>
+                <p>• <b>Termos:</b> Ao usar o RoboSorteio, você concorda com nossos termos de uso e políticas de privacidade.</p>
             </div>
         </div>
 
     </div>
-
-    <div class="ads-block">SUA PROPAGANDA AQUI</div>
 
     <script src="app.js" type="module"></script>
 </body>
