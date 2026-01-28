@@ -3,91 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MiniRifaProRobo | IA Autônoma</title>
+    <title>MiniRifa Pro - Evolutiva</title>
+    <link rel="stylesheet" href="style.css">
     <style>
-        :root { --neon: #00f2ff; --bg: #050505; --card: #111; --robo: #7000ff; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
-        
-        .navbar { display: flex; justify-content: center; gap: 15px; padding: 15px; background: #000; border-bottom: 1px solid #222; }
-        .nav-link { color: var(--neon); text-decoration: none; font-size: 0.75rem; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-
-        .layout { display: flex; max-width: 1000px; margin: 20px auto; padding: 10px; gap: 20px; align-items: flex-start; }
-        
-        /* GEOMETRIA ROBÓTICA MÍNIMA [cite: 2026-01-25] */
-        .lado-robo { flex: 0.5; text-align: center; }
-        .robo-geo { 
-            width: 40px; height: 40px; background: var(--robo); border-radius: 8px; 
-            margin: 0 auto 10px; position: relative; box-shadow: 0 0 15px var(--robo); 
-            animation: pulse 2s infinite;
-        }
-        .robo-geo::before { 
-            content: ''; position: absolute; top: 12px; left: 8px; 
-            width: 6px; height: 6px; background: var(--neon); border-radius: 50%; 
-            box-shadow: 18px 0 var(--neon); 
-        }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-        
-        .lado-conteudo { flex: 2; width: 100%; }
-        .card { background: var(--card); padding: 20px; border-radius: 10px; border: 1px solid #333; }
-        
-        input { width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #444; color: var(--neon); border-radius: 5px; box-sizing: border-box; }
-        .btn { width: 100%; padding: 15px; background: var(--neon); color: #000; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        
-        .grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; margin: 15px 0; }
-        .num { aspect-ratio: 1; background: #1a1a1d; border: 1px solid #333; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; border-radius: 3px; cursor: pointer; }
-        .num.selected { background: var(--neon); color: #000; box-shadow: 0 0 10px var(--neon); }
-        .num.sold { background: #ff2a2a; opacity: 0.3; cursor: not-allowed; }
-
-        /* RESPONSIVIDADE CELULAR [cite: 2026-01-25] */
-        @media (max-width: 600px) {
-            .layout { flex-direction: column; align-items: center; }
-            .grid { grid-template-columns: repeat(5, 1fr); width: 100%; }
-            .lado-robo { order: -1; margin-bottom: 20px; }
-            h1 { font-size: 1.2rem; }
-        }
+        /* Estilo rápido para garantir o funcionamento das novas funções */
+        .num { width: 40px; height: 40px; border: 1px solid #ccc; display: inline-flex; align-items: center; justify-content: center; margin: 5px; cursor: pointer; border-radius: 5px; }
+        .selected { background-color: #28a745 !important; color: white; border-color: #1e7e34; }
+        .sold { background-color: #dc3545; color: white; cursor: not-allowed; opacity: 0.6; }
+        .info-card { background: #f4f4f4; padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid #007bff; }
+        .banner-chamativo { background: linear-gradient(90deg, #ff8c00, #ff0000); color: white; padding: 10px; text-align: center; font-weight: bold; border-radius: 5px; margin-bottom: 20px; }
+        .grid-container { display: flex; flex-wrap: wrap; justify-content: center; max-width: 500px; margin: 0 auto; }
+        section { margin-bottom: 30px; }
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <a class="nav-link" onclick="mostrarTela('cadastro')">Cadastro</a>
-        <a class="nav-link" onclick="mostrarTela('login')">Login</a>
-        <a class="nav-link" id="btnSair" style="display:none">Sair</a>
-    </nav>
 
-    <div class="layout">
-        <div class="lado-robo">
-            <div class="robo-geo"></div>
-            <p style="color: var(--neon); font-size: 0.7rem; line-height: 1.4;">
-                <b>MiniRifa-IA:</b><br>Sistema Beta Autônomo ativo.<br>Operação segura 24h. [cite: 2026-01-25]
-            </p>
+    <header style="text-align: center; padding: 20px;">
+        <h1>🤖 MiniRifa Pro</h1>
+        <p>A única rifa que cresce com você!</p>
+    </header>
+
+    <main>
+        <div class="banner-chamativo">
+            🔥 META EVOLUTIVA: Se batermos 50 números em 10 dias, o PRÊMIO DOBRA e abrimos +50!
         </div>
 
-        <div class="lado-conteudo">
-            <div id="tela-cadastro" class="card">
-                <h3>Perfil Permanente</h3>
-                <input type="text" id="reg-nome" placeholder="Nome">
-                <input type="email" id="reg-email" placeholder="E-mail">
-                <input type="password" id="reg-senha" placeholder="Senha">
-                <button class="btn" onclick="registrarUsuario()">SALVAR PERFIL PRO</button>
+        <section id="informativo">
+            <div class="info-card">
+                <h4>📢 Como Funciona:</h4>
+                <p>• <b>Indique amigos:</b> A cada 3 indicados que comprarem, você ganha 1 número grátis!</p>
+                <p>• <b>Plano Mensal:</b> Assine e ganhe <b>20% de desconto</b> em todas as suas compras.</p>
+                <p>• <b>Sorteio:</b> Ocorre automaticamente após o preenchimento dos números.</p>
+            </div>
+        </section>
+
+        <section id="auth-area">
+            <div id="tela-cadastro" style="display: block; max-width: 400px; margin: 0 auto; text-align: center;">
+                <h3>Criar Conta Pro</h3>
+                <input type="text" id="reg-nome" placeholder="Seu Nome Completo" style="width: 100%; margin: 5px 0;"><br>
+                <input type="text" id="reg-tel" placeholder="Telefone com DDD" style="width: 100%; margin: 5px 0;"><br>
+                <input type="email" id="reg-email" placeholder="Seu melhor E-mail" style="width: 100%; margin: 5px 0;"><br>
+                <input type="password" id="reg-senha" placeholder="Crie uma Senha" style="width: 100%; margin: 5px 0;"><br>
+                <input type="text" id="reg-indicacao" placeholder="Código de Indicação (Opcional)" style="width: 100%; margin: 5px 0;"><br>
+                <button onclick="registrarUsuario()" style="padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 5px; width: 100%;">Registrar e Ganhar Bônus</button>
+                <p>Já tem conta? <a href="#" onclick="mostrarTela('login')">Fazer Login</a></p>
             </div>
 
-            <div id="tela-login" class="card" style="display:none">
-                <h3>Acessar</h3>
-                <input type="email" id="log-email" placeholder="E-mail">
-                <input type="password" id="log-senha" placeholder="Senha">
-                <button class="btn" onclick="fazerLogin()">ENTRAR</button>
+            <div id="tela-login" style="display: none; max-width: 400px; margin: 0 auto; text-align: center;">
+                <h3>Entrar no Sistema</h3>
+                <input type="email" id="log-email" placeholder="E-mail" style="width: 100%; margin: 5px 0;"><br>
+                <input type="password" id="log-senha" placeholder="Senha" style="width: 100%; margin: 5px 0;"><br>
+                <button onclick="fazerLogin()" style="padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; width: 100%;">Entrar</button>
+                <p>Não tem conta? <a href="#" onclick="mostrarTela('cadastro')">Criar Conta</a></p>
+            </div>
+        </section>
+
+        <section id="tela-rifa" style="display:none; text-align: center;">
+            <div class="info-card">
+                <h4>Bem-vindo, <span id="user-display">...</span>!</h4>
+                <p>Seu Código de Indicação: <b id="meu-codigo-txt" style="color: #007bff;">---</b></p>
+                <button id="btnSair" style="background: #ccc; border: none; padding: 5px 10px; border-radius: 5px;">Sair</button>
             </div>
 
-            <div id="tela-rifa" style="display:none">
-                <div class="grid" id="gridRifa"></div>
-                <div class="card">
-                    <p style="font-size:0.8rem">Usuário: <b id="user-display"></b></p>
-                    <p>Total: <b id="total">R$ 0,00</b></p>
-                    <button class="btn" id="btnPagar">GERAR PIX</button>
+            <h3>Escolha seus Números:</h3>
+            <div id="gridRifa" class="grid-container">
                 </div>
+
+            <div style="margin-top: 20px; padding: 15px; background: #eee; border-radius: 10px;">
+                <p>Selecionados: <b id="qtd">0</b></p>
+                <p>Valor Total: <b id="total" style="font-size: 20px;">R$ 0,00</b></p>
+                
+                <div style="margin: 15px 0; background: #fff; padding: 10px; border: 1px dashed #28a745;">
+                    <input type="checkbox" id="check-plano"> 
+                    <label for="check-plano"><b>💎 Ativar Plano Mensal (-20% de Desconto)</b></label>
+                    <p style="font-size: 11px; color: #666;">O desconto será aplicado no valor final do PIX.</p>
+                </div>
+
+                <button id="btnPagar" style="padding: 15px 30px; background: #28a745; color: white; border: none; border-radius: 5px; font-weight: bold; font-size: 18px; cursor: pointer;">
+                    🚀 GERAR PIX E PARTICIPAR
+                </button>
             </div>
-        </div>
-    </div>
+        </section>
+    </main>
+
     <script type="module" src="app.js"></script>
 </body>
 </html>
