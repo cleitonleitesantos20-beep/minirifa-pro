@@ -14,35 +14,22 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
-
-let user = null;
-let userData = null;
+let user, userData;
 
 window.cadastrar = async () => {
     const nome = document.getElementById('nome').value;
     const email = document.getElementById('email').value;
     const senha = document.getElementById('senha').value;
     const ref = document.getElementById('ref').value;
-
-    if (!nome || !email || !senha) return alert("Preencha tudo!");
-
+    if (!nome || !email || !senha) return alert("Preencha os campos!");
     try {
         const res = await createUserWithEmailAndPassword(auth, email, senha);
         const meuCodigo = Math.random().toString(36).substring(2, 7).toUpperCase();
-
-        await setDoc(doc(db, "usuarios", res.user.uid), {
-            nome, email, meuCodigo, saldo: 0, xp: 0, vendas: 0
-        });
-
+        await setDoc(doc(db, "usuarios", res.user.uid), { nome, email, meuCodigo, saldo: 0, xp: 0, vendas: 0 });
         if (ref) {
             const q = query(collection(db, "usuarios"), where("meuCodigo", "==", ref));
             const snap = await getDocs(q);
-            if (!snap.empty) {
-                await updateDoc(doc(db, "usuarios", snap.docs[0].id), {
-                    saldo: increment(0.10), // Indicação R$ 0,10
-                    vendas: increment(1)
-                });
-            }
+            if (!snap.empty) { await updateDoc(doc(db, "usuarios", snap.docs[0].id), { saldo: increment(0.10), vendas: increment(1) }); }
         }
         location.reload();
     } catch (e) { alert(e.message); }
@@ -51,7 +38,7 @@ window.cadastrar = async () => {
 window.login = async () => {
     const email = document.getElementById('email').value;
     const senha = document.getElementById('senha').value;
-    try { await signInWithEmailAndPassword(auth, email, senha); } catch (e) { alert(e.message); }
+    try { await signInWithEmailAndPassword(auth, email, senha); } catch (e) { alert("Erro: " + e.message); }
 };
 
 onAuthStateChanged(auth, (u) => {
@@ -75,24 +62,20 @@ function render() {
 
 window.checkin = async () => {
     const hoje = new Date().toISOString().split('T')[0];
-    if (userData.lastCheckin === hoje) return alert("Já realizado hoje!");
+    if (userData.lastCheckin === hoje) return alert("IA: Check-in já realizado hoje.");
     await updateDoc(doc(db, "usuarios", user.uid), { saldo: increment(0.01), lastCheckin: hoje });
     alert("Check-in: +R$ 0,01");
 };
 
 window.video = () => {
     const hoje = new Date().toISOString().split('T')[0];
-    if (userData.lastVideo === hoje) return alert("Limite atingido!");
-    let tempo = 30;
+    if (userData.lastVideo === hoje) return alert("IA: Limite diário atingido.");
     document.getElementById('btn-video').disabled = true;
     document.getElementById('video-timer').classList.remove('hidden');
-    const timer = setInterval(() => {
-        tempo--;
-        document.getElementById('timer').innerText = tempo;
-        if (tempo <= 0) {
-            clearInterval(timer);
-            finalizarVideo(hoje);
-        }
+    let tempo = 30;
+    const interval = setInterval(() => {
+        tempo--; document.getElementById('timer').innerText = tempo;
+        if (tempo <= 0) { clearInterval(interval); finalizarVideo(hoje); }
     }, 1000);
 };
 
@@ -103,12 +86,11 @@ async function finalizarVideo(hoje) {
     alert("Vídeo: +R$ 0,02");
 }
 
-// Grids Fiel 4.1
-for (let f = 1; f <= 3; f++) {
+// Inicializa grids
+[1, 2].forEach(f => {
     const grid = document.getElementById(`grid-${f}`);
-    for (let i = 1; i <= 30; i++) {
-        const b = document.createElement('div');
-        b.className = 'num-btn'; b.innerText = i;
+    if(grid) for(let i=1; i<=30; i++) {
+        const b = document.createElement('div'); b.className = 'num-btn'; b.innerText = i;
         grid.appendChild(b);
     }
-}
+});
