@@ -27,7 +27,6 @@
         </div>
 
         <div id="app-screen" class="hidden">
-            
             <div class="slider">
                 <div class="track">
                     <div>🚀 IA AUTÔNOMA ATIVA</div>
@@ -38,9 +37,9 @@
             </div>
 
             <div class="card dashboard">
-                <div class="top-row">
+                <div class="top-row" style="display: flex; justify-content: space-between; align-items: center;">
                     <span>Olá, <b id="u-nome">...</b></span>
-                    <button onclick="sair()" class="btn-small">SAIR</button>
+                    <button onclick="window.location.href='config.html'" style="background:none; border:none; color:var(--neon); font-size:1.4rem; cursor:pointer;">⚙️</button>
                 </div>
                 
                 <div class="saldo" style="margin: 20px 0 10px 0;">
@@ -48,15 +47,13 @@
                     R$ <span id="u-saldo">0.00</span>
                 </div>
 
-                <button onclick="window.location.href='central.html'" class="btn-outline" style="margin-bottom: 20px; border-color: #ffd700; color: #ffd700; border-width: 2px; width: 100%; font-family: 'Orbitron';">🎮 MINIGAMES $$$</button>
+                <button onclick="window.location.href='central.html'" class="btn-outline" style="margin-bottom: 20px; border-color: #ffd700; color: #ffd700; border-width: 2px; width: 100%;">🎮 MINIGAMES $$$</button>
 
                 <div class="actions">
                     <button onclick="checkin()" id="btn-checkin">📍 CHECK-IN (+0.01)</button>
                     <button onclick="video()" id="btn-video">📺 VÍDEO (+0.02)</button>
                 </div>
-                <div id="video-timer" class="hidden" style="color: var(--neon); font-size: 0.8rem; margin-top: 5px;">
-                    Processando dados: <span id="timer">30</span>s...
-                </div>
+                <div id="video-timer" class="hidden">Processando: <span id="timer">30</span>s...</div>
                 
                 <div class="stats">
                     <p>CÓDIGO: <span id="u-code">...</span></p>
@@ -69,16 +66,12 @@
                     <div class="badge">FASE 1 (R$ 100,00)</div>
                     <div id="grid-1" class="grid"></div>
                 </div>
-                
                 <div class="fase-card" id="card-fase2" style="opacity: 0.5;">
-                    <div class="lock-msg">🔒 50 INDICAÇÕES NECESSÁRIAS</div>
-                    <div class="badge">FASE 2 (R$ 220,00)</div>
+                    <div class="lock-msg">🔒 50 INDICAÇÕES</div>
                     <div id="grid-2" class="grid"></div>
                 </div>
-                
                 <div class="fase-card" id="card-fase3" style="opacity: 0.5;">
-                    <div class="lock-msg">🔒 100 INDICAÇÕES NECESSÁRIAS</div>
-                    <div class="badge">FASE 3 (R$ 330,00)</div>
+                    <div class="lock-msg">🔒 100 INDICAÇÕES</div>
                     <div id="grid-3" class="grid"></div>
                 </div>
             </div>
@@ -89,22 +82,13 @@
                 <button onclick="pix()" class="btn-pix">PAGAR COM PIX</button>
             </div>
 
-            <div class="card ranking">
-                <h3>🏆 TOP INDICADORES</h3>
-                <div id="rank-list" style="font-size: 0.8rem; color: #888;">Sincronizando Ranking...</div>
-            </div>
-            
             <div class="regras">
-                <h4>⚖️ REGRAS E FUNCIONAMENTO</h4>
-                <p>• <b>Check-in:</b> R$ 0,01 por dia.</p>
-                <p>• <b>Vídeos:</b> R$ 0,02 por propaganda completa.</p>
-                <p>• <b>Indicação:</b> R$ 0,10 por novo usuário ativo.</p>
-                <p>• <b>XP:</b> Jogue Minigames para subir de nível.</p>
-                <p>• <b>Nível IA:</b> Cada nível atingido libera R$ 0,10 de bônus.</p>
+                <h4>⚖️ REGRAS</h4>
+                <p>• Check-in: R$ 0,01 | Vídeo: R$ 0,02</p>
+                <p>• Indicação: R$ 0,10 | Bônus Nível: R$ 0,10</p>
             </div>
         </div>
     </div>
-
     <script src="app.js" type="module"></script>
 </body>
 </html>
