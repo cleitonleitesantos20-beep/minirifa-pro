@@ -277,3 +277,71 @@ html, body {
 #payment-area { margin: 20px 0; }
 .pay-card { background: #1a1c26; border: 1px solid var(--neon-green); padding: 15px; border-radius: 10px; text-align: center; }
 .btn-pix { background: var(--neon-green); color: #000; border: none; width: 100%; padding: 15px; font-family: 'Orbitron'; font-weight: bold; cursor: pointer; border-radius: 5px; }
+
+/* =========================================
+   8. RANKING E EXTRAS (FALTANTES)
+   ========================================= */
+.ranking-container {
+    border: 1px solid var(--neon-purple);
+    padding: 15px;
+    border-radius: 10px;
+    margin: 25px 0;
+    background: rgba(188, 19, 254, 0.05);
+}
+
+.ranking-container h3 {
+    color: var(--neon-purple);
+    font-family: 'Orbitron';
+    font-size: 0.85rem;
+    margin-bottom: 12px;
+    text-align: center;
+    text-shadow: 0 0 5px var(--neon-purple);
+}
+
+#ranking-lista p {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #1a1a1a;
+    font-size: 0.9rem;
+}
+
+#ranking-lista b {
+    color: var(--neon-green);
+}
+
+.fase-badge {
+    display: block;
+    background: var(--neon-blue);
+    color: #000;
+    font-size: 0.7rem;
+    font-weight: bold;
+    text-align: center;
+    padding: 5px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    font-family: 'Orbitron';
+}
+
+.quadro-data {
+    text-align: center;
+    padding: 15px;
+    border: 1px solid #222;
+    margin: 20px 0;
+    font-family: 'Orbitron';
+    color: var(--neon-blue);
+    font-size: 0.75rem;
+    border-radius: 8px;
+    background: rgba(0, 242, 255, 0.02);
+}
+
+/* AJUSTE PARA DISPOSITIVOS MÓVEIS */
+@media (max-width: 400px) {
+    .num {
+        padding: 10px 0;
+        font-size: 0.8rem;
+    }
+    .pontos-wallet {
+        font-size: 1.8rem;
+    }
+}
