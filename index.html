@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiniRifaProRobo | IA Autônoma</title>
+    <style>
+        :root { --neon: #00f2ff; --bg: #050505; --card: #111; --robo: #7000ff; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
+        
+        .navbar { display: flex; justify-content: center; gap: 15px; padding: 15px; background: #000; border-bottom: 1px solid #222; }
+        .nav-link { color: var(--neon); text-decoration: none; font-size: 0.75rem; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+
+        .layout { display: flex; max-width: 1000px; margin: 20px auto; padding: 10px; gap: 20px; align-items: flex-start; }
+        
+        /* GEOMETRIA ROBÓTICA MÍNIMA [cite: 2026-01-25] */
+        .lado-robo { flex: 0.5; text-align: center; }
+        .robo-geo { 
+            width: 40px; height: 40px; background: var(--robo); border-radius: 8px; 
+            margin: 0 auto 10px; position: relative; box-shadow: 0 0 15px var(--robo); 
+            animation: pulse 2s infinite;
+        }
+        .robo-geo::before { 
+            content: ''; position: absolute; top: 12px; left: 8px; 
+            width: 6px; height: 6px; background: var(--neon); border-radius: 50%; 
+            box-shadow: 18px 0 var(--neon); 
+        }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        
+        .lado-conteudo { flex: 2; width: 100%; }
+        .card { background: var(--card); padding: 20px; border-radius: 10px; border: 1px solid #333; }
+        
+        input { width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #444; color: var(--neon); border-radius: 5px; box-sizing: border-box; }
+        .btn { width: 100%; padding: 15px; background: var(--neon); color: #000; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        
+        .grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; margin: 15px 0; }
+        .num { aspect-ratio: 1; background: #1a1a1d; border: 1px solid #333; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; border-radius: 3px; cursor: pointer; }
+        .num.selected { background: var(--neon); color: #000; box-shadow: 0 0 10px var(--neon); }
+        .num.sold { background: #ff2a2a; opacity: 0.3; cursor: not-allowed; }
+
+        /* RESPONSIVIDADE CELULAR [cite: 2026-01-25] */
+        @media (max-width: 600px) {
+            .layout { flex-direction: column; align-items: center; }
+            .grid { grid-template-columns: repeat(5, 1fr); width: 100%; }
+            .lado-robo { order: -1; margin-bottom: 20px; }
+            h1 { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a class="nav-link" onclick="mostrarTela('cadastro')">Cadastro</a>
+        <a class="nav-link" onclick="mostrarTela('login')">Login</a>
+        <a class="nav-link" id="btnSair" style="display:none">Sair</a>
+    </nav>
+
+    <div class="layout">
+        <div class="lado-robo">
+            <div class="robo-geo"></div>
+            <p style="color: var(--neon); font-size: 0.7rem; line-height: 1.4;">
+                <b>MiniRifa-IA:</b><br>Sistema Beta Autônomo ativo.<br>Operação segura 24h. [cite: 2026-01-25]
+            </p>
+        </div>
+
+        <div class="lado-conteudo">
+            <div id="tela-cadastro" class="card">
+                <h3>Perfil Permanente</h3>
+                <input type="text" id="reg-nome" placeholder="Nome">
+                <input type="email" id="reg-email" placeholder="E-mail">
+                <input type="password" id="reg-senha" placeholder="Senha">
+                <button class="btn" onclick="registrarUsuario()">SALVAR PERFIL PRO</button>
+            </div>
+
+            <div id="tela-login" class="card" style="display:none">
+                <h3>Acessar</h3>
+                <input type="email" id="log-email" placeholder="E-mail">
+                <input type="password" id="log-senha" placeholder="Senha">
+                <button class="btn" onclick="fazerLogin()">ENTRAR</button>
+            </div>
+
+            <div id="tela-rifa" style="display:none">
+                <div class="grid" id="gridRifa"></div>
+                <div class="card">
+                    <p style="font-size:0.8rem">Usuário: <b id="user-display"></b></p>
+                    <p>Total: <b id="total">R$ 0,00</b></p>
+                    <button class="btn" id="btnPagar">GERAR PIX</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="app.js"></script>
+</body>
+</html>
