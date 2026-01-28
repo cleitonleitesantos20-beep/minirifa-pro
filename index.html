@@ -63,12 +63,22 @@
                 </div>
             </div>
 
-            <div class="fases-scroll">
-                <div class="fase-card"><div class="badge">FASE 1 (R$ 100)</div><div id="grid-1" class="grid"></div></div>
-                <div class="fase-card" style="opacity:0.5;"><div class="lock-msg">🔒 FASE 2 (R$ 220)<br>50 INDICAÇÕES</div><div id="grid-2" class="grid"></div></div>
-                <div class="fase-card" style="opacity:0.5;"><div class="lock-msg">🔒 FASE 3 (R$ 350)<br>100 INDICAÇÕES</div><div id="grid-3" class="grid"></div></div>
-                <div class="fase-card" style="opacity:0.5;"><div class="lock-msg">🔒 FASE 4 (R$ 500)<br>250 INDICAÇÕES</div><div id="grid-4" class="grid"></div></div>
-            </div>
+           <div class="fases-scroll">
+    <div class="fase-card" id="fase-card-1">
+        <div class="badge">FASE 1 (R$ 110,00)</div>
+        <div id="grid-1" class="grid"></div>
+    </div>
+
+    <div class="fase-card locked" id="fase-card-2" style="opacity:0.4;">
+        <div class="lock-msg">🔒 FASE 2 (R$ 220,00)<br>Complete a Fase 1</div>
+        <div id="grid-2" class="grid"></div>
+    </div>
+
+    <div class="fase-card locked" id="fase-card-3" style="opacity:0.4;">
+        <div class="lock-msg">🔒 FASE 3 (R$ 350,00)<br>Complete a Fase 2</div>
+        <div id="grid-3" class="grid"></div>
+    </div>
+</div>
 
             <div id="checkout" class="hidden card">
                 <p>Selecionados: <span id="sel-nums" style="color:#00f2ff"></span></p>
@@ -89,3 +99,4 @@
     <script src="app.js" type="module"></script>
 </body>
 </html>
+
