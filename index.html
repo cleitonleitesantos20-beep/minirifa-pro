@@ -14,7 +14,7 @@
     <div class="container">
         <div id="auth-screen">
             <div class="card">
-                <div class="banner-lucro">🚀 GANHE ATÉ <b>R$ 345,00/MÊS</b></div>
+                <div class="banner-lucro">🚀 GANHE ATÉ <b>R$ 25,00/MÊS</b></div>
                 <h2>ACESSO</h2>
                 <input type="email" id="email" placeholder="E-mail">
                 <input type="password" id="senha" placeholder="Senha">
@@ -48,13 +48,15 @@
                     R$ <span id="u-saldo">0.00</span>
                 </div>
 
-                <button onclick="window.location.href='central.html'" class="btn-outline" style="margin-bottom: 20px; border-color: #ffd700; color: #ffd700; border-width: 2px;">🎮 MINIGAMES $$$</button>
+                <button onclick="window.location.href='central.html'" class="btn-outline" style="margin-bottom: 20px; border-color: #ffd700; color: #ffd700; border-width: 2px; width: 100%; font-family: 'Orbitron';">🎮 MINIGAMES $$$</button>
 
                 <div class="actions">
-                    <button onclick="checkin()" id="btn-checkin">📍 CHECK-IN (+0.05)</button>
-                    <button onclick="video()" id="btn-video">📺 VÍDEO (+0.10)</button>
+                    <button onclick="checkin()" id="btn-checkin">📍 CHECK-IN (+0.01)</button>
+                    <button onclick="video()" id="btn-video">📺 VÍDEO (+0.02)</button>
                 </div>
-                <div id="video-timer" class="hidden">Aguarde <span id="timer">30</span>s...</div>
+                <div id="video-timer" class="hidden" style="color: var(--neon); font-size: 0.8rem; margin-top: 5px;">
+                    Processando dados: <span id="timer">30</span>s...
+                </div>
                 
                 <div class="stats">
                     <p>CÓDIGO: <span id="u-code">...</span></p>
@@ -68,13 +70,13 @@
                     <div id="grid-1" class="grid"></div>
                 </div>
                 
-                <div class="fase-card" id="card-fase2">
+                <div class="fase-card" id="card-fase2" style="opacity: 0.5;">
                     <div class="lock-msg">🔒 50 INDICAÇÕES NECESSÁRIAS</div>
                     <div class="badge">FASE 2 (R$ 220,00)</div>
                     <div id="grid-2" class="grid"></div>
                 </div>
                 
-                <div class="fase-card" id="card-fase3">
+                <div class="fase-card" id="card-fase3" style="opacity: 0.5;">
                     <div class="lock-msg">🔒 100 INDICAÇÕES NECESSÁRIAS</div>
                     <div class="badge">FASE 3 (R$ 330,00)</div>
                     <div id="grid-3" class="grid"></div>
@@ -89,15 +91,16 @@
 
             <div class="card ranking">
                 <h3>🏆 TOP INDICADORES</h3>
-                <div id="rank-list">Carregando...</div>
+                <div id="rank-list" style="font-size: 0.8rem; color: #888;">Sincronizando Ranking...</div>
             </div>
             
             <div class="regras">
                 <h4>⚖️ REGRAS E FUNCIONAMENTO</h4>
-                <p>• <b>Sistema:</b> Criado por um Robô com IA Autônoma.</p>
-                <p>• <b>Ganhos:</b> Faça check-in, veja vídeos e jogue minigames para acumular saldo.</p>
-                <p>• <b>Valores:</b> Números da sorte custam R$ 7,00 cada.</p>
-                <p>• <b>Saques:</b> Em breve via IA.</p>
+                <p>• <b>Check-in:</b> R$ 0,01 por dia.</p>
+                <p>• <b>Vídeos:</b> R$ 0,02 por propaganda completa.</p>
+                <p>• <b>Indicação:</b> R$ 0,10 por novo usuário ativo.</p>
+                <p>• <b>XP:</b> Jogue Minigames para subir de nível.</p>
+                <p>• <b>Nível IA:</b> Cada nível atingido libera R$ 0,10 de bônus.</p>
             </div>
         </div>
     </div>
