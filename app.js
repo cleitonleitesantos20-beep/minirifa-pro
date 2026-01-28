@@ -16,10 +16,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 let user = null;
-let userData = null;
 let selected = [];
-
-const getToday = () => new Date().toISOString().split('T')[0];
 
 window.login = async () => {
     try {
@@ -31,17 +28,24 @@ window.cadastrar = async () => {
     const nome = document.getElementById('nome').value;
     const email = document.getElementById('email').value;
     const senha = document.getElementById('senha').value;
+    
     if(!nome || !email || !senha) return alert("Preencha tudo!");
     
     try {
         const res = await createUserWithEmailAndPassword(auth, email, senha);
         const code = nome.substring(0,3).toUpperCase() + Math.floor(Math.random()*1000);
+        
         await setDoc(doc(db, "usuarios", res.user.uid), {
-            nome, email, saldo: 0, meuCodigo: code, indicadoPor: document.getElementById('ref').value || "", 
-            vendasTotais: 0, indicacoesSemana: 0, lastCheckin: "", lastVideo: ""
+            nome: nome,
+            email: email,
+            saldo: 0,
+            meuCodigo: code,
+            indicadoPor: document.getElementById('ref').value || "",
+            vendasTotais: 0,
+            indicacoesSemana: 0
         });
         location.reload();
-    } catch (e) { alert("Erro: " + e.message); }
+    } catch (e) { alert("Erro ao criar: " + e.message); }
 };
 
 window.sair = () => signOut(auth);
@@ -51,19 +55,22 @@ onAuthStateChanged(auth, (u) => {
         user = u;
         document.getElementById('auth-screen').classList.add('hidden');
         document.getElementById('app-screen').classList.remove('hidden');
+        
         onSnapshot(doc(db, "usuarios", u.uid), (snap) => {
-            userData = snap.data();
-            if(!userData) return;
-            document.getElementById('u-nome').innerText = userData.nome || "Usuário";
-            document.getElementById('u-saldo').innerText = (userData.saldo || 0).toFixed(2);
-            document.getElementById('u-code').innerText = userData.meuCodigo || "...";
-            document.getElementById('u-vendas').innerText = userData.vendasTotais || 0; 
-            
-            // Trava visual de botões
-            document.getElementById('btn-checkin').disabled = userData.lastCheckin === getToday();
-            document.getElementById('btn-video').disabled = userData.lastVideo === getToday();
+            const d = snap.data();
+            if(!d) return;
 
-            renderGrids(userData.vendasTotais || 0); 
+            const nome = d.nome || "Usuário";
+            const saldo = d.saldo || 0;
+            const codigo = d.meuCodigo || "...";
+            const vendas = d.vendasTotais || 0; 
+
+            document.getElementById('u-nome').innerText = nome;
+            document.getElementById('u-saldo').innerText = saldo.toFixed(2);
+            document.getElementById('u-code').innerText = codigo;
+            document.getElementById('u-vendas').innerText = vendas; 
+            
+            renderGrids(vendas); 
         });
         loadRank();
     } else {
@@ -73,36 +80,19 @@ onAuthStateChanged(auth, (u) => {
 });
 
 window.checkin = async () => {
-    if(userData.lastCheckin === getToday()) return alert("Você já fez o check-in hoje!");
-    await updateDoc(doc(db, "usuarios", user.uid), { 
-        saldo: increment(0.05),
-        lastCheckin: getToday()
-    });
-    alert("+ R$ 0,05!");
+    await updateDoc(doc(db, "usuarios", user.uid), { saldo: increment(0.05) });
+    alert("Check-in realizado!");
 };
 
 window.video = () => {
-    if(userData.lastVideo === getToday()) return alert("Você já assistiu o vídeo hoje!");
-    const btn = document.getElementById('btn-video');
-    const timer = document.getElementById('video-timer');
-    let t = 30;
-    btn.classList.add('hidden');
-    timer.classList.remove('hidden');
-    
-    const i = setInterval(async () => {
-        t--;
-        document.getElementById('timer').innerText = t;
-        if(t <= 0) {
-            clearInterval(i);
-            await updateDoc(doc(db, "usuarios", user.uid), { 
-                saldo: increment(0.10),
-                lastVideo: getToday()
-            });
-            timer.classList.add('hidden');
-            btn.classList.remove('hidden');
-            alert("+ R$ 0,10!");
-        }
-    }, 1000);
+    document.getElementById('btn-video').classList.add('hidden');
+    document.getElementById('video-timer').classList.remove('hidden');
+    setTimeout(async () => {
+        await updateDoc(doc(db, "usuarios", user.uid), { saldo: increment(0.10) });
+        document.getElementById('video-timer').classList.add('hidden');
+        document.getElementById('btn-video').classList.remove('hidden');
+        alert("Vídeo assistido!");
+    }, 5000); 
 };
 
 function renderGrids(vendas) {
@@ -111,11 +101,19 @@ function renderGrids(vendas) {
         {id: 'grid-2', cardId: 'card-fase2', min: 51, max: 100, locked: vendas < 50}, 
         {id: 'grid-3', cardId: 'card-fase3', min: 101, max: 150, locked: vendas < 100}
     ];
+
     configs.forEach(c => {
         const el = document.getElementById(c.id);
         const card = document.getElementById(c.cardId);
+        
         if(!el || !card) return; 
-        c.locked ? card.classList.add('fase-locked') : card.classList.remove('fase-locked');
+
+        if(c.locked) {
+            card.classList.add('fase-locked'); 
+        } else {
+            card.classList.remove('fase-locked');
+        }
+
         el.innerHTML = "";
         for(let i=c.min; i<=c.max; i++) {
             const btn = document.createElement('button');
@@ -130,11 +128,17 @@ function renderGrids(vendas) {
 function toggleNum(n) {
     if(selected.includes(n)) selected = selected.filter(x => x !== n);
     else selected.push(n);
+    
     document.getElementById('sel-nums').innerText = selected.join(', ');
     document.getElementById('total-val').innerText = (selected.length * 7).toFixed(2);
-    selected.length > 0 ? document.getElementById('checkout').classList.remove('hidden') : document.getElementById('checkout').classList.add('hidden');
+    
+    if(selected.length > 0) document.getElementById('checkout').classList.remove('hidden');
+    else document.getElementById('checkout').classList.add('hidden');
+    
     document.querySelectorAll('.num').forEach(b => {
-        selected.includes(parseInt(b.innerText)) ? b.classList.add('selected') : b.classList.remove('selected');
+        const val = parseInt(b.innerText);
+        if(selected.includes(val)) b.classList.add('selected');
+        else b.classList.remove('selected');
     });
 }
 
@@ -143,13 +147,22 @@ function loadRank() {
     onSnapshot(q, (snap) => {
         let html = "";
         const icons = ["🥇","🥈","🥉"];
-        const fixedPts = [15, 10, 5]; // Pontuação fixa solicitada
         
         snap.docs.forEach((d, i) => {
-            html += `<p><span>${icons[i]} ${d.data().nome || "Anônimo"}</span> <b>${fixedPts[i]} pts</b></p>`;
+            const dados = d.data();
+            const nome = dados.nome || "Anônimo";
+            const pts = dados.indicacoesSemana || 0; 
+            
+            html += `
+                <p>
+                    <span>${icons[i]} ${nome}</span> 
+                    <b>${pts} pts</b>
+                </p>`;
         });
-        document.getElementById('rank-list').innerHTML = html || "<p>Carregando...</p>";
+        
+        if(html === "") html = "<p style='text-align:center'>Sem dados ainda...</p>";
+        document.getElementById('rank-list').innerHTML = html;
     });
 }
 
-window.pix = () => alert("Acúmulo de saldo registrado.");
+window.pix = () => alert("Gerando PIX...");
