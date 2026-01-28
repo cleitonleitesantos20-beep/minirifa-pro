@@ -7,19 +7,25 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        body { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #000; }
-        .login-box { width: 100%; max-width: 350px; padding: 20px; }
+        body { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #000; padding: 20px; }
+        .login-box { width: 100%; max-width: 400px; }
         .tab-container { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab-btn { flex: 1; padding: 10px; background: #111; border: 1px solid #333; color: #555; font-size: 0.7rem; }
+        .tab-btn { flex: 1; padding: 12px; background: #111; border: 1px solid #333; color: #555; font-size: 0.75rem; font-family: 'Orbitron'; cursor: pointer; }
         .tab-btn.active { border-color: var(--neon); color: var(--neon); background: rgba(0,242,255,0.05); }
+        .banner-lucro-fix { background: var(--green); color: #000; font-size: 0.8rem; padding: 10px; text-align: center; font-weight: bold; border-radius: 8px; margin-bottom: 20px; display: block !important; visibility: visible !important; opacity: 1 !important; }
+        .footer-legal { font-size: 0.6rem; color: #444; text-align: justify; margin-top: 25px; line-height: 1.2; border-top: 1px solid #222; padding-top: 15px; }
+        .footer-legal b { color: #666; }
     </style>
 </head>
 <body>
 
     <div class="login-box">
-        <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="font-family: 'Orbitron'; color: var(--neon); font-size: 1.4rem;">ROBOSORTEIO IA</h1>
-            <p style="font-size: 0.8rem; color: #666;">AUTENTICAÇÃO NECESSÁRIA</p>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h1 style="font-family: 'Orbitron'; color: var(--neon); font-size: 1.5rem; letter-spacing: 2px;">ROBOSORTEIO IA</h1>
+        </div>
+
+        <div class="banner-lucro-fix">
+            🚀 GANHE ATÉ <b>R$ 450,00/MÊS</b> COM TAREFAS
         </div>
 
         <div class="tab-container">
@@ -27,18 +33,30 @@
             <button onclick="toggleTab('cad')" id="tab-c" class="tab-btn">CADASTRAR</button>
         </div>
 
-        <div id="form-login" class="card">
-            <input type="email" id="l-email" placeholder="E-mail">
-            <input type="password" id="l-senha" placeholder="Senha">
-            <button onclick="login()" class="btn-primary">ACESSAR PAINEL</button>
+        <div id="form-login">
+            <div class="card">
+                <input type="email" id="l-email" placeholder="Seu e-mail cadastrado">
+                <input type="password" id="l-senha" placeholder="Sua senha">
+                <button onclick="handleLogin()" class="btn-primary" id="btn-entrar">ACESSAR MINHA CONTA</button>
+            </div>
         </div>
 
-        <div id="form-cad" class="card hidden">
-            <input type="text" id="c-nome" placeholder="Seu Nome">
-            <input type="email" id="c-email" placeholder="E-mail">
-            <input type="password" id="c-senha" placeholder="Senha">
-            <input type="text" id="c-ref" placeholder="Código de Indicação">
-            <button onclick="cadastrar()" class="btn-outline">CRIAR CONTA AGORA</button>
+        <div id="form-cad" class="hidden">
+            <div class="card">
+                <input type="text" id="c-nome" placeholder="Nome Completo">
+                <input type="email" id="c-email" placeholder="E-mail principal">
+                <input type="password" id="c-senha" placeholder="Criar Senha (min. 6 dígitos)">
+                <input type="text" id="c-ref" placeholder="Código de Convite (Opcional)">
+                <button onclick="handleCadastrar()" class="btn-outline" id="btn-cad">CRIAR CONTA GRATUITA</button>
+            </div>
+        </div>
+
+        <div class="footer-legal">
+            <b>TERMOS E CONFORMIDADE:</b> Este sistema opera como uma plataforma de recompensas por tarefas e entretenimento digital. 
+            Em conformidade com a <b>LGPD (Lei 13.709/2018)</b>, seus dados estão criptografados. 
+            Os ganhos citados são projeções baseadas no cumprimento integral de tarefas diárias e metas de indicação. 
+            Este site não é uma instituição financeira. Proibido para menores de 18 anos. 
+            Ao continuar, você aceita nossos termos de uso e políticas de cookies.
         </div>
     </div>
 
@@ -60,7 +78,7 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // Se já estiver logado, vai direto pro index
+        // Redireciona se já estiver logado
         onAuthStateChanged(auth, (u) => { if(u) window.location.href = 'index.html'; });
 
         window.toggleTab = (type) => {
@@ -70,31 +88,50 @@
             document.getElementById('tab-c').classList.toggle('active', type === 'cad');
         };
 
-        window.login = async () => {
+        // LOGIN CORRIGIDO (Adicionado bind window)
+        window.handleLogin = async () => {
             const e = document.getElementById('l-email').value;
             const s = document.getElementById('l-senha').value;
-            try { await signInWithEmailAndPassword(auth, e, s); } 
-            catch (err) { alert("Erro: " + err.message); }
+            if(!e || !s) return alert("Preencha e-mail e senha!");
+            
+            try {
+                await signInWithEmailAndPassword(auth, e, s);
+            } catch (err) {
+                alert("Falha no acesso: Verifique seus dados.");
+            }
         };
 
-        window.cadastrar = async () => {
+        // CADASTRO CORRIGIDO (Adicionado bind window)
+        window.handleCadastrar = async () => {
             const n = document.getElementById('c-nome').value;
             const e = document.getElementById('c-email').value;
             const s = document.getElementById('c-senha').value;
             const r = document.getElementById('c-ref').value;
-            if(!n || !e || !s) return alert("Preencha tudo!");
+
+            if(!n || !e || !s) return alert("Preencha todos os campos obrigatórios!");
 
             try {
                 const res = await createUserWithEmailAndPassword(auth, e, s);
                 const code = Math.random().toString(36).substring(2, 7).toUpperCase();
-                await setDoc(doc(db, "usuarios", res.user.uid), { nome: n, email: e, meuCodigo: code, saldo: 0, vendas: 0, xp: 0 });
+                
+                await setDoc(doc(db, "usuarios", res.user.uid), {
+                    nome: n, email: e, meuCodigo: code, saldo: 0, vendas: 0, xp: 0, 
+                    dataCriacao: new Date().toISOString()
+                });
                 
                 if (r) {
                     const q = query(collection(db, "usuarios"), where("meuCodigo", "==", r));
                     const snap = await getDocs(q);
-                    if (!snap.empty) { await updateDoc(doc(db, "usuarios", snap.docs[0].id), { saldo: increment(0.10), vendas: increment(1) }); }
+                    if (!snap.empty) {
+                        await updateDoc(doc(db, "usuarios", snap.docs[0].id), { 
+                            saldo: increment(0.10), 
+                            vendas: increment(1) 
+                        });
+                    }
                 }
-            } catch (err) { alert(err.message); }
+            } catch (err) {
+                alert("Erro ao criar conta: " + err.message);
+            }
         };
     </script>
 </body>
