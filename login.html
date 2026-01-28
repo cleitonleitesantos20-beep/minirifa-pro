@@ -9,54 +9,79 @@
     <style>
         body { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #000; padding: 20px; }
         .login-box { width: 100%; max-width: 400px; }
+        
+        /* Banner de Lucro com visibilidade forçada */
+        .banner-lucro-fix { 
+            background: #00ff88 !important; 
+            color: #000 !important; 
+            font-size: 0.85rem; 
+            padding: 12px; 
+            text-align: center; 
+            font-weight: bold; 
+            border-radius: 8px; 
+            margin-bottom: 20px; 
+            display: block !important;
+            font-family: 'Orbitron', sans-serif;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+
         .tab-container { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab-btn { flex: 1; padding: 12px; background: #111; border: 1px solid #333; color: #555; font-size: 0.75rem; font-family: 'Orbitron'; cursor: pointer; }
-        .tab-btn.active { border-color: var(--neon); color: var(--neon); background: rgba(0,242,255,0.05); }
-        .banner-lucro-fix { background: var(--green); color: #000; font-size: 0.8rem; padding: 10px; text-align: center; font-weight: bold; border-radius: 8px; margin-bottom: 20px; display: block !important; visibility: visible !important; opacity: 1 !important; }
-        .footer-legal { font-size: 0.6rem; color: #444; text-align: justify; margin-top: 25px; line-height: 1.2; border-top: 1px solid #222; padding-top: 15px; }
-        .footer-legal b { color: #666; }
+        .tab-btn { 
+            flex: 1; padding: 12px; background: #111; border: 1px solid #333; 
+            color: #555; font-size: 0.75rem; font-family: 'Orbitron'; cursor: pointer; 
+        }
+        .tab-btn.active { border-color: #00f2ff; color: #00f2ff; background: rgba(0,242,255,0.05); }
+
+        /* Rodapé Legislativo */
+        .footer-legal { 
+            font-size: 0.65rem; color: #555; text-align: justify; 
+            margin-top: 25px; line-height: 1.3; border-top: 1px solid #222; padding-top: 15px; 
+            font-family: 'Rajdhani', sans-serif;
+        }
+        .footer-legal b { color: #888; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
     <div class="login-box">
         <div style="text-align: center; margin-bottom: 20px;">
-            <h1 style="font-family: 'Orbitron'; color: var(--neon); font-size: 1.5rem; letter-spacing: 2px;">ROBOSORTEIO IA</h1>
+            <h1 style="font-family: 'Orbitron'; color: #00f2ff; font-size: 1.6rem; letter-spacing: 2px;">ROBOSORTEIO IA</h1>
         </div>
 
         <div class="banner-lucro-fix">
-            🚀 GANHE ATÉ <b>R$ 450,00/MÊS</b>
+            🚀 GANHE ATÉ <b>R$ 450,00/MÊS</b> COM TAREFAS
         </div>
 
         <div class="tab-container">
-            <button onclick="toggleTab('login')" id="tab-l" class="tab-btn active">ENTRAR</button>
-            <button onclick="toggleTab('cad')" id="tab-c" class="tab-btn">CADASTRAR</button>
+            <button onclick="window.toggleTab('login')" id="tab-l" class="tab-btn active">ENTRAR</button>
+            <button onclick="window.toggleTab('cad')" id="tab-c" class="tab-btn">CADASTRAR</button>
         </div>
 
         <div id="form-login">
             <div class="card">
-                <input type="email" id="l-email" placeholder="Seu e-mail cadastrado">
-                <input type="password" id="l-senha" placeholder="Sua senha">
-                <button onclick="handleLogin()" class="btn-primary" id="btn-entrar">ACESSAR MINHA CONTA</button>
+                <input type="email" id="l-email" placeholder="E-mail">
+                <input type="password" id="l-senha" placeholder="Senha">
+                <button onclick="window.handleLogin()" class="btn-primary" style="margin-top: 10px;">ACESSAR PAINEL</button>
             </div>
         </div>
 
         <div id="form-cad" class="hidden">
             <div class="card">
                 <input type="text" id="c-nome" placeholder="Nome Completo">
-                <input type="email" id="c-email" placeholder="E-mail principal">
-                <input type="password" id="c-senha" placeholder="Criar Senha (min. 6 dígitos)">
+                <input type="email" id="c-email" placeholder="Seu E-mail">
+                <input type="password" id="c-senha" placeholder="Crie uma Senha">
                 <input type="text" id="c-ref" placeholder="Código de Convite (Opcional)">
-                <button onclick="handleCadastrar()" class="btn-outline" id="btn-cad">CRIAR CONTA GRATUITA</button>
+                <button onclick="window.handleCadastrar()" class="btn-outline" style="margin-top: 10px; border-color: #00ff88; color: #00ff88;">CRIAR CONTA GRATUITA</button>
             </div>
         </div>
 
         <div class="footer-legal">
             <b>TERMOS E CONFORMIDADE:</b> Este sistema opera como uma plataforma de recompensas por tarefas e entretenimento digital. 
-            Em conformidade com a <b>LGPD (Lei 13.709/2018)</b>, seus dados estão criptografados. 
+            Em conformidade com a <b>LGPD (Lei 13.709/2018)</b>, todos os dados de utilizador estão criptografados e protegidos. 
             Os ganhos citados são projeções baseadas no cumprimento integral de tarefas diárias e metas de indicação. 
-            Este site não é uma instituição financeira. Proibido para menores de 18 anos. 
-            Ao continuar, você aceita nossos termos de uso e políticas de cookies.
+            Este site não constitui promessa de rendimento fixo ou investimento financeiro. Proibido para menores de 18 anos. 
+            Ao continuar, declara aceitar os nossos <b>Termos de Uso</b> e <b>Políticas de Privacidade</b>.
         </div>
     </div>
 
@@ -78,45 +103,38 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // Redireciona se já estiver logado
-        onAuthStateChanged(auth, (u) => { if(u) window.location.href = 'index.html'; });
-
+        // --- EXPOSIÇÃO DAS FUNÇÕES PARA O HTML ---
         window.toggleTab = (type) => {
-            document.getElementById('form-login').classList.toggle('hidden', type === 'cad');
-            document.getElementById('form-cad').classList.toggle('hidden', type === 'login');
-            document.getElementById('tab-l').classList.toggle('active', type === 'login');
-            document.getElementById('tab-c').classList.toggle('active', type === 'cad');
+            const isCad = type === 'cad';
+            document.getElementById('form-login').classList.toggle('hidden', isCad);
+            document.getElementById('form-cad').classList.toggle('hidden', !isCad);
+            document.getElementById('tab-l').classList.toggle('active', !isCad);
+            document.getElementById('tab-c').classList.toggle('active', isCad);
         };
 
-        // LOGIN CORRIGIDO (Adicionado bind window)
         window.handleLogin = async () => {
             const e = document.getElementById('l-email').value;
             const s = document.getElementById('l-senha').value;
-            if(!e || !s) return alert("Preencha e-mail e senha!");
-            
+            if(!e || !s) return alert("Preencha todos os campos!");
             try {
                 await signInWithEmailAndPassword(auth, e, s);
-            } catch (err) {
-                alert("Falha no acesso: Verifique seus dados.");
-            }
+            } catch (err) { alert("Dados incorretos ou utilizador não encontrado."); }
         };
 
-        // CADASTRO CORRIGIDO (Adicionado bind window)
         window.handleCadastrar = async () => {
             const n = document.getElementById('c-nome').value;
             const e = document.getElementById('c-email').value;
             const s = document.getElementById('c-senha').value;
             const r = document.getElementById('c-ref').value;
 
-            if(!n || !e || !s) return alert("Preencha todos os campos obrigatórios!");
+            if(!n || !e || !s) return alert("Preencha Nome, E-mail e Senha!");
 
             try {
                 const res = await createUserWithEmailAndPassword(auth, e, s);
                 const code = Math.random().toString(36).substring(2, 7).toUpperCase();
                 
                 await setDoc(doc(db, "usuarios", res.user.uid), {
-                    nome: n, email: e, meuCodigo: code, saldo: 0, vendas: 0, xp: 0, 
-                    dataCriacao: new Date().toISOString()
+                    nome: n, email: e, meuCodigo: code, saldo: 0, vendas: 0, xp: 0
                 });
                 
                 if (r) {
@@ -129,10 +147,11 @@
                         });
                     }
                 }
-            } catch (err) {
-                alert("Erro ao criar conta: " + err.message);
-            }
+            } catch (err) { alert("Erro ao cadastrar: " + err.message); }
         };
+
+        // Redirecionamento se já logado
+        onAuthStateChanged(auth, (u) => { if(u) window.location.href = 'index.html'; });
     </script>
 </body>
 </html>
