@@ -2,217 +2,169 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IA Central - RoboSorteio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minigames $$$ - RoboSorteio</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        .xp-section { border: 1px solid var(--neon); background: rgba(0, 242, 255, 0.05); }
-        .xp-bar-container { background: #000; border-radius: 20px; height: 15px; width: 100%; margin: 10px 0; border: 1px solid #333; overflow: hidden; }
-        .xp-fill { background: linear-gradient(90deg, var(--neon), var(--green)); height: 100%; width: 0%; transition: 1s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        
-        .game-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
-        .scratch-area { width: 100%; height: 100px; background: #222; border: 2px dashed #444; display: flex; align-items: center; justify-content: center; border-radius: 12px; cursor: pointer; transition: 0.3s; color: #888; font-family: 'Orbitron'; font-size: 0.8rem; }
-        .scratch-area:hover { border-color: var(--neon); color: #fff; }
-        
-        .mining-box { background: #000; padding: 10px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.7rem; color: var(--green); height: 80px; overflow: hidden; display: none; border: 1px solid #111; }
-        
-        textarea { width: 100%; background: #000; color: #fff; border: 1px solid #333; padding: 12px; border-radius: 8px; font-family: 'Rajdhani'; resize: none; margin-bottom: 10px; }
-        .btn-ad { display: flex; align-items: center; justify-content: space-between; padding: 15px; margin-bottom: 10px; background: #1a1a1d; border: 1px solid #333; border-radius: 8px; color: #fff; text-decoration: none; font-weight: bold; font-size: 0.85rem; }
-        .btn-ad span { color: var(--green); font-size: 0.7rem; }
+        /* 3. Animação da Raspadinha */
+        .scratch-area { 
+            position: relative; overflow: hidden; background: #333; 
+            transition: all 0.5s ease;
+        }
+        .scratch-active { animation: shake 0.5s infinite; background: var(--neon) !important; color: #000 !important; }
+        @keyframes shake {
+            0% { transform: rotate(0deg); } 25% { transform: rotate(2deg); }
+            50% { transform: rotate(0deg); } 75% { transform: rotate(-2deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        /* 4. Animação de Mineração (Pixels Verdes) */
+        .mining-canvas { 
+            width: 100%; height: 100px; background: #000; border-radius: 8px; 
+            display: none; position: relative; overflow: hidden;
+        }
+        .pixel {
+            position: absolute; width: 8px; height: 8px; background: #00ff00;
+            box-shadow: 0 0 5px #00ff00;
+        }
+
+        .btn-ad:disabled { opacity: 0.5; filter: grayscale(1); pointer-events: none; }
     </style>
 </head>
 <body>
 
-    <div class="header">⚙️ CENTRAL DE EXPANSÃO IA</div>
+    <div class="header">⚙️ MINIGAMES $$$</div>
 
     <div class="container">
-        <button onclick="window.location.href='index.html'" class="btn-small" style="float:none; margin-bottom: 20px; border-color: var(--neon); color: var(--neon);">⬅ VOLTAR AO PAINEL</button>
-
-        <div class="card xp-section">
-            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
-                <div>
-                    <p style="font-size: 0.7rem; color: var(--neon);">SISTEMA EVOLUTIVO</p>
-                    <h2 style="font-family: 'Orbitron';">NÍVEL <span id="lvl-display">1</span></h2>
-                </div>
-                <div style="text-align: right;">
-                    <span id="xp-text" style="font-size: 0.8rem; font-weight: bold;">0/100 XP</span>
-                </div>
-            </div>
-            <div class="xp-bar-container">
-                <div id="xp-bar" class="xp-fill"></div>
-            </div>
-            <p style="font-size: 0.65rem; color: #666; text-align: center;">A cada novo nível, a IA injeta <b>R$ 0,10</b> no seu saldo.</p>
-        </div>
+        <button onclick="window.location.href='index.html'" class="btn-small">⬅ VOLTAR</button>
 
         <div class="card">
-            <h3 style="font-size: 0.9rem; margin-bottom: 10px;">🔗 SEU LINK DE CONVITE</h3>
-            <input type="text" id="share-link" readonly style="margin-bottom: 10px; font-size: 0.7rem; color: var(--neon);">
-            <button onclick="copyLink()" class="btn-outline">COPIAR LINK</button>
-        </div>
-
-        <div class="game-grid">
-            <div class="card">
-                <h4 style="margin-bottom: 10px; font-size: 0.8rem;">🎰 RASPADEIRA IA (DIÁRIA)</h4>
-                <div id="scratch-box" class="scratch-area" onclick="playScratch()">CLIQUE PARA RASPAR</div>
-            </div>
-
-            <div class="card">
-                <h4 style="margin-bottom: 10px; font-size: 0.8rem;">⛏️ MINERAÇÃO DE CÓDIGO</h4>
-                <div id="mining-status" class="mining-box"></div>
-                <button id="btn-mine" onclick="startMining()" class="btn-primary">INICIAR (0.03 + 5XP)</button>
+            <h2 style="font-family: 'Orbitron';">NÍVEL <span id="lvl-display">1</span></h2>
+            <div style="background:#111; height:10px; border-radius:10px; margin:10px 0;">
+                <div id="xp-bar" style="background:var(--neon); height:100%; width:0%; transition:1s;"></div>
             </div>
         </div>
 
         <div class="card">
-            <h4 style="margin-bottom: 15px; font-size: 0.8rem; color: #ffd700;">💎 PATROCINADORES (GANHE XP)</h4>
-            <a href="#" onclick="visitAd('https://google.com')" class="btn-ad">VISITAR SITE PARCEIRO 1 <span>+5 XP</span></a>
-            <a href="#" onclick="visitAd('https://google.com')" class="btn-ad">VER OFERTA EXCLUSIVA 2 <span>+5 XP</span></a>
+            <h4>🎰 RASPADEIRA $$$</h4>
+            <div id="scratch-box" class="scratch-area" onclick="playScratch()" style="height:80px; display:flex; align-items:center; justify-content:center; border-radius:10px; border:2px dashed #555;">
+                RASPAR AGORA
+            </div>
         </div>
 
         <div class="card">
-            <h4 style="margin-bottom: 10px; font-size: 0.8rem;">🐞 SUPORTE E BUGS</h4>
-            <textarea id="fb-text" rows="3" placeholder="Algo não funcionou? Relate aqui para a IA..."></textarea>
-            <button onclick="sendFeedback()" class="btn-outline">ENVIAR RELATÓRIO</button>
+            <h4>⛏️ MINERAÇÃO PIXEL</h4>
+            <div id="mining-status" class="mining-canvas"></div>
+            <button id="btn-mine" onclick="startMining()" class="btn-primary">MINERAR (R$ 0.03)</button>
+        </div>
+
+        <div class="card">
+            <h4>💎 LOJAS PARCEIRAS (1X AO DIA)</h4>
+            <button id="ad-1" onclick="visitAd('https://shopee.com.br', 'ad-1')" class="btn-ad" style="width:100%; margin-bottom:10px; padding:15px; background:#1a1a1a; color:#fff; border:1px solid #333; border-radius:8px;">🛒 ACESSAR SHOPEE (+5 XP)</button>
+            <button id="ad-2" onclick="visitAd('https://www.mercadolivre.com.br', 'ad-2')" class="btn-ad" style="width:100%; padding:15px; background:#1a1a1a; color:#fff; border:1px solid #333; border-radius:8px;">📦 MERCADO LIVRE (+5 XP)</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, updateDoc, increment, setDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, increment } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8",
-            authDomain: "minharifadigital.firebaseapp.com",
-            projectId: "minharifadigital",
-            storageBucket: "minharifadigital.firebasestorage.app",
-            messagingSenderId: "59630725905",
-            appId: "1:59630725905:web:396c8cfca385dc3d957ab0"
-        };
-
+        const firebaseConfig = { /* Seu Config Aqui */ };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
-        let user = null;
-        let userData = null;
+        let user, userData;
 
         onAuthStateChanged(auth, (u) => {
             if (u) {
                 user = u;
                 onSnapshot(doc(db, "usuarios", u.uid), (snap) => {
                     userData = snap.data();
-                    if(!userData) return;
-                    
-                    // Link Afiliado
-                    document.getElementById('share-link').value = window.location.origin + "/index.html?ref=" + userData.meuCodigo;
-
-                    // Lógica de Nível e XP
-                    const xpTotal = userData.xp || 0;
-                    const level = Math.floor(xpTotal / 100) + 1;
-                    const xpAtual = xpTotal % 100;
-                    
-                    document.getElementById('lvl-display').innerText = level;
-                    document.getElementById('xp-text').innerText = `${xpAtual}/100 XP`;
-                    document.getElementById('xp-bar').style.width = xpAtual + "%";
-
-                    // Trava visual games
-                    const hoje = new Date().toISOString().split('T')[0];
-                    if(userData.lastScratch === hoje) {
-                        document.getElementById('scratch-box').innerText = "✅ CONCLUÍDO HOJE";
-                        document.getElementById('scratch-box').style.pointerEvents = "none";
-                    }
-                    if(userData.lastMine === hoje) {
-                        document.getElementById('btn-mine').disabled = true;
-                        document.getElementById('btn-mine').innerText = "LIMITADO (1X DIA)";
-                    }
+                    atualizarInterface();
                 });
-            } else { window.location.href = 'index.html'; }
+            }
         });
 
-        // SISTEMA DE RECOMPENSA POR NÍVEL
-        async function ganharXP(qtd) {
-            const xpAntigo = userData.xp || 0;
-            const novoXP = xpAntigo + qtd;
-            const levelAntigo = Math.floor(xpAntigo / 100);
-            const levelNovo = Math.floor(novoXP / 100);
+        function atualizarInterface() {
+            const xp = userData.xp || 0;
+            const lvl = Math.floor(xp / 100) + 1;
+            document.getElementById('lvl-display').innerText = lvl;
+            document.getElementById('xp-bar').style.width = (xp % 100) + "%";
 
-            let updates = { xp: increment(qtd) };
-
-            if (levelNovo > levelAntigo) {
-                const bonus = (levelNovo - levelAntigo) * 0.10;
-                updates.saldo = increment(bonus);
-                alert(`🚀 NÍVEL UP! Você alcançou o nível ${levelNovo + 1} e a IA te enviou R$ ${bonus.toFixed(2)}!`);
-            }
-
-            await updateDoc(doc(db, "usuarios", user.uid), updates);
+            const hoje = new Date().toISOString().split('T')[0];
+            // Bloqueio patrocinadores
+            if(userData.lastAd1 === hoje) document.getElementById('ad-1').disabled = true;
+            if(userData.lastAd2 === hoje) document.getElementById('ad-2').disabled = true;
         }
 
+        // 3. Lógica Raspadinha com Animação
         window.playScratch = async () => {
             const hoje = new Date().toISOString().split('T')[0];
-            if(userData.lastScratch === hoje) return;
-            
-            document.getElementById('scratch-box').innerText = "💰 +R$ 0.03";
-            await updateDoc(doc(db, "usuarios", user.uid), {
-                saldo: increment(0.03),
-                lastScratch: hoje
-            });
-            await ganharXP(2);
+            if(userData.lastScratch === hoje) return alert("Volte amanhã!");
+
+            const box = document.getElementById('scratch-box');
+            box.classList.add('scratch-active');
+            box.innerText = "RASPANDO...";
+
+            setTimeout(async () => {
+                box.classList.remove('scratch-active');
+                box.innerText = "✨ GANHOU R$ 0.03";
+                await updateDoc(doc(db, "usuarios", user.uid), {
+                    saldo: increment(0.03),
+                    xp: increment(2),
+                    lastScratch: hoje
+                });
+            }, 2000);
         };
 
+        // 4. Lógica Mineração (Pixel Art)
         window.startMining = () => {
             const hoje = new Date().toISOString().split('T')[0];
-            if(userData.lastMine === hoje) return;
+            if(userData.lastMine === hoje) return alert("Já minerou hoje!");
 
+            const canvas = document.getElementById('mining-status');
             const btn = document.getElementById('btn-mine');
-            const box = document.getElementById('mining-status');
             btn.style.display = 'none';
-            box.style.display = 'block';
+            canvas.style.display = 'block';
 
-            let ciclo = 0;
-            const timer = setInterval(() => {
-                box.innerText += `> SEARCHING_BLOCK_${Math.random().toString(16).toUpperCase().slice(2,6)}\n`;
-                box.scrollTop = box.scrollHeight;
-                ciclo++;
-                if(ciclo > 15) {
-                    clearInterval(timer);
-                    finalizarMineracao(hoje);
-                }
-            }, 800);
+            // Criar pixels quebrando
+            for(let i=0; i<30; i++) {
+                setTimeout(() => {
+                    const p = document.createElement('div');
+                    p.className = 'pixel';
+                    p.style.left = Math.random() * 90 + "%";
+                    p.style.top = Math.random() * 90 + "%";
+                    canvas.appendChild(p);
+                    // Animação de "quebra"
+                    p.animate([
+                        { transform: 'scale(1)', opacity: 1 },
+                        { transform: 'scale(0) translateY(20px)', opacity: 0 }
+                    ], 1000);
+                }, i * 200);
+            }
+
+            setTimeout(async () => {
+                await updateDoc(doc(db, "usuarios", user.uid), {
+                    saldo: increment(0.03),
+                    xp: increment(5),
+                    lastMine: hoje
+                });
+                alert("Bloco minerado! +R$ 0.03");
+                location.reload();
+            }, 6000);
         };
 
-        async function finalizarMineracao(data) {
-            await updateDoc(doc(db, "usuarios", user.uid), {
-                saldo: increment(0.03),
-                lastMine: data
-            });
-            await ganharXP(5);
-            alert("Mineração finalizada com sucesso!");
-            location.reload();
-        }
-
-        window.visitAd = async (url) => {
+        // 5. Patrocinadores com Limite
+        window.visitAd = async (url, adId) => {
+            const hoje = new Date().toISOString().split('T')[0];
             window.open(url, '_blank');
-            await ganharXP(5);
-        };
-
-        window.sendFeedback = async () => {
-            const msg = document.getElementById('fb-text').value;
-            if(!msg) return alert("Escreva algo antes de enviar.");
-            await setDoc(doc(db, "feedbacks", Date.now().toString()), {
-                usuario: user.email,
-                mensagem: msg,
-                data: new Date().toLocaleString()
-            });
-            alert("Feedback enviado para análise da IA!");
-            document.getElementById('fb-text').value = "";
-        };
-
-        window.copyLink = () => {
-            const link = document.getElementById('share-link');
-            link.select();
-            document.execCommand("copy");
-            alert("Link de indicação copiado!");
+            
+            let update = { xp: increment(5) };
+            update[adId === 'ad-1' ? 'lastAd1' : 'lastAd2'] = hoje;
+            
+            await updateDoc(doc(db, "usuarios", user.uid), update);
+            alert("Você ganhou 5 XP!");
         };
     </script>
 </body>
