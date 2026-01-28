@@ -3,89 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MiniRifa Pro - Evolutiva</title>
-    <link rel="stylesheet" href="style.css">
+    <title>MiniRifa Pro - Sistema Evolutivo VIP</title>
     <style>
-        /* Estilo rápido para garantir o funcionamento das novas funções */
-        .num { width: 40px; height: 40px; border: 1px solid #ccc; display: inline-flex; align-items: center; justify-content: center; margin: 5px; cursor: pointer; border-radius: 5px; }
-        .selected { background-color: #28a745 !important; color: white; border-color: #1e7e34; }
-        .sold { background-color: #dc3545; color: white; cursor: not-allowed; opacity: 0.6; }
-        .info-card { background: #f4f4f4; padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid #007bff; }
-        .banner-chamativo { background: linear-gradient(90deg, #ff8c00, #ff0000); color: white; padding: 10px; text-align: center; font-weight: bold; border-radius: 5px; margin-bottom: 20px; }
-        .grid-container { display: flex; flex-wrap: wrap; justify-content: center; max-width: 500px; margin: 0 auto; }
-        section { margin-bottom: 30px; }
+        :root { --primary: #007bff; --success: #28a745; --gold: #ffc107; --dark: #1a1a1a; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; margin: 0; padding: 0; }
+        header { background: var(--dark); color: white; text-align: center; padding: 20px; border-bottom: 4px solid var(--gold); }
+        
+        .container { max-width: 600px; margin: 20px auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        
+        /* Banner Evolutivo */
+        .evolution-banner { background: linear-gradient(90deg, #ff8c00, #ffc107); color: #000; padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; margin-bottom: 20px; border: 2px solid #000; }
+        
+        /* Box de Regras */
+        .rules-box { background: #e9ecef; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; line-height: 1.6; }
+        .rules-box h3 { margin-top: 0; color: var(--primary); }
+
+        /* Inputs e Botões */
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        .btn-pix { background: var(--success); color: white; }
+        .btn-card { background: var(--primary); color: white; }
+        .btn-auth { background: var(--dark); color: white; }
+
+        /* Grid da Rifa */
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)); gap: 8px; margin: 20px 0; }
+        .num { height: 45px; display: flex; align-items: center; justify-content: center; background: #fff; border: 2px solid #dee2e6; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .num.selected { background: var(--gold); border-color: #e0a800; color: #000; }
+        .num.sold { background: #ced4da; color: #6c757d; cursor: not-allowed; text-decoration: line-through; }
+
+        /* Checkout */
+        .checkout-area { border-top: 2px dashed #ddd; padding-top: 20px; margin-top: 20px; }
+        .card-form { background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #007bff; margin-top: 15px; }
+        
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <header style="text-align: center; padding: 20px;">
-        <h1>🤖 MiniRifa Pro</h1>
-        <p>A única rifa que cresce com você!</p>
-    </header>
+<header>
+    <h1>🤖 MiniRifa Pro Evolutiva</h1>
+    <div id="meta-banner" class="evolution-banner">
+        🚀 META ATUAL: <span id="vendas-contagem">0</span> / <span id="meta-max">50</span> NÚMEROS
+    </div>
+</header>
 
-    <main>
-        <div class="banner-chamativo">
-            🔥 META EVOLUTIVA: Se batermos 50 números em 10 dias, o PRÊMIO DOBRA e abrimos +50!
+<div class="container">
+    <section class="rules-box">
+        <h3>📢 Regras do Jogo</h3>
+        <p>• <b>Evolução:</b> Se atingirmos 50 números em até 20 dias, liberamos mais 50 e o prêmio aumenta!</p>
+        <p>• <b>Indicação:</b> A cada 3 amigos indicados que comprarem, você ganha <b>1 número grátis</b>.</p>
+        <p>• <b>Plano VIP:</b> No Cartão, você paga mensalmente com <b>20% de desconto</b> fixo.</p>
+    </section>
+
+    <div id="auth-section">
+        <div id="tela-cadastro">
+            <h3>🎁 Cadastre-se e ganhe seu código</h3>
+            <input type="text" id="reg-nome" placeholder="Nome Completo">
+            <input type="text" id="reg-tel" placeholder="Telefone (WhatsApp)">
+            <input type="email" id="reg-email" placeholder="E-mail">
+            <input type="password" id="reg-senha" placeholder="Crie uma Senha">
+            <input type="text" id="reg-indicacao" placeholder="Código de quem te indicou (Opcional)">
+            <button class="btn-auth" onclick="registrarUsuario()">CRIAR MINHA CONTA VIP</button>
+            <p style="text-align:center">Já tem conta? <a href="#" onclick="alternarAuth()">Fazer Login</a></p>
         </div>
 
-        <section id="informativo">
-            <div class="info-card">
-                <h4>📢 Como Funciona:</h4>
-                <p>• <b>Indique amigos:</b> A cada 3 indicados que comprarem, você ganha 1 número grátis!</p>
-                <p>• <b>Plano Mensal:</b> Assine e ganhe <b>20% de desconto</b> em todas as suas compras.</p>
-                <p>• <b>Sorteio:</b> Ocorre automaticamente após o preenchimento dos números.</p>
-            </div>
-        </section>
+        <div id="tela-login" class="hidden">
+            <h3>Acessar Painel</h3>
+            <input type="email" id="log-email" placeholder="E-mail">
+            <input type="password" id="log-senha" placeholder="Senha">
+            <button class="btn-auth" onclick="fazerLogin()">ENTRAR</button>
+            <p style="text-align:center">Não tem conta? <a href="#" onclick="alternarAuth()">Cadastrar</a></p>
+        </div>
+    </div>
 
-        <section id="auth-area">
-            <div id="tela-cadastro" style="display: block; max-width: 400px; margin: 0 auto; text-align: center;">
-                <h3>Criar Conta Pro</h3>
-                <input type="text" id="reg-nome" placeholder="Seu Nome Completo" style="width: 100%; margin: 5px 0;"><br>
-                <input type="text" id="reg-tel" placeholder="Telefone com DDD" style="width: 100%; margin: 5px 0;"><br>
-                <input type="email" id="reg-email" placeholder="Seu melhor E-mail" style="width: 100%; margin: 5px 0;"><br>
-                <input type="password" id="reg-senha" placeholder="Crie uma Senha" style="width: 100%; margin: 5px 0;"><br>
-                <input type="text" id="reg-indicacao" placeholder="Código de Indicação (Opcional)" style="width: 100%; margin: 5px 0;"><br>
-                <button onclick="registrarUsuario()" style="padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 5px; width: 100%;">Registrar e Ganhar Bônus</button>
-                <p>Já tem conta? <a href="#" onclick="mostrarTela('login')">Fazer Login</a></p>
-            </div>
+    <div id="tela-rifa" class="hidden">
+        <div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center;">
+            Olá, <b id="user-display">...</b>! 👋<br>
+            Seu Código de Indicação: <b id="meu-codigo-txt" style="color: #d9480f;">---</b><br>
+            <small>Indicações Validadas: <span id="ponto-indicacao">0/3</span></small>
+        </div>
 
-            <div id="tela-login" style="display: none; max-width: 400px; margin: 0 auto; text-align: center;">
-                <h3>Entrar no Sistema</h3>
-                <input type="email" id="log-email" placeholder="E-mail" style="width: 100%; margin: 5px 0;"><br>
-                <input type="password" id="log-senha" placeholder="Senha" style="width: 100%; margin: 5px 0;"><br>
-                <button onclick="fazerLogin()" style="padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; width: 100%;">Entrar</button>
-                <p>Não tem conta? <a href="#" onclick="mostrarTela('cadastro')">Criar Conta</a></p>
-            </div>
-        </section>
+        <h3>Escolha seus números:</h3>
+        <div id="gridRifa" class="grid-container"></div>
 
-        <section id="tela-rifa" style="display:none; text-align: center;">
-            <div class="info-card">
-                <h4>Bem-vindo, <span id="user-display">...</span>!</h4>
-                <p>Seu Código de Indicação: <b id="meu-codigo-txt" style="color: #007bff;">---</b></p>
-                <button id="btnSair" style="background: #ccc; border: none; padding: 5px 10px; border-radius: 5px;">Sair</button>
-            </div>
+        <div class="checkout-area">
+            <p style="font-size: 18px;">Números: <b id="qtd">0</b> | Total: <b id="total" style="color: var(--success);">R$ 0,00</b></p>
+            
+            <button class="btn-pix" id="btnPagarPix" onclick="pagarPix()">🚀 PAGAR AGORA VIA PIX</button>
 
-            <h3>Escolha seus Números:</h3>
-            <div id="gridRifa" class="grid-container">
+            <div class="card-form">
+                <h4>💳 Assinar Plano Mensal (-20% OFF)</h4>
+                <p style="font-size: 12px; color: #666;">O valor mensal será descontado automaticamente do seu cartão.</p>
+                <input type="text" id="card-num" placeholder="Número do Cartão">
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="card-date" placeholder="MM/AA">
+                    <input type="text" id="card-cvv" placeholder="CVV">
                 </div>
-
-            <div style="margin-top: 20px; padding: 15px; background: #eee; border-radius: 10px;">
-                <p>Selecionados: <b id="qtd">0</b></p>
-                <p>Valor Total: <b id="total" style="font-size: 20px;">R$ 0,00</b></p>
-                
-                <div style="margin: 15px 0; background: #fff; padding: 10px; border: 1px dashed #28a745;">
-                    <input type="checkbox" id="check-plano"> 
-                    <label for="check-plano"><b>💎 Ativar Plano Mensal (-20% de Desconto)</b></label>
-                    <p style="font-size: 11px; color: #666;">O desconto será aplicado no valor final do PIX.</p>
-                </div>
-
-                <button id="btnPagar" style="padding: 15px 30px; background: #28a745; color: white; border: none; border-radius: 5px; font-weight: bold; font-size: 18px; cursor: pointer;">
-                    🚀 GERAR PIX E PARTICIPAR
-                </button>
+                <button class="btn-card" onclick="assinarPlano()">ATIVAR ASSINATURA VIP</button>
             </div>
-        </section>
-    </main>
+            
+            <button onclick="logout()" style="background:none; color: #999; text-decoration: underline; font-size: 12px; border:none; margin-top: 20px;">Sair da Conta</button>
+        </div>
+    </div>
+</div>
 
-    <script type="module" src="app.js"></script>
+<script type="module" src="app.js"></script>
+<script>
+    // Função simples para trocar entre Login e Cadastro
+    function alternarAuth() {
+        document.getElementById('tela-cadastro').classList.toggle('hidden');
+        document.getElementById('tela-login').classList.toggle('hidden');
+    }
+</script>
 </body>
 </html>
