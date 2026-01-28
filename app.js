@@ -1,162 +1,141 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, onSnapshot, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, doc, onSnapshot, updateDoc, increment, collection, query, orderBy, limit, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// --- CONFIGURAÇÃO FIREBASE (Mantenha a sua aqui) ---
-const firebaseConfig = {
-  apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8",
-  authDomain: "minharifadigital.firebaseapp.com",
-  projectId: "minharifadigital",
-  storageBucket: "minharifadigital.firebasestorage.app",
-  messagingSenderId: "59630725905",
-  appId: "1:59630725905:web:396c8cfca385dc3d957ab0"
-};
-
+// --- CONFIGURAÇÃO ---
+const firebaseConfig = { /* COLE SUAS CHAVES AQUI */ };
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
 let selecionados = [];
-const PRECO_UNITARIO = 5.00;
+const PRECO_UNITARIO = 10.00;
 
-// --- 1. CADASTRO COM SISTEMA DE INDICAÇÃO ---
-window.registrarUsuario = async () => {
+// --- 1. MONITORAMENTO DA RIFA E FASES ---
+onSnapshot(doc(db, "config", "sorteio"), (snap) => {
+    if (snap.exists()) {
+        const d = snap.data();
+        const vendidos = d.vendidos || 0;
+        document.getElementById('vendas-contagem').innerText = vendidos;
+        document.getElementById('data-txt').innerText = d.dataSorteio || "31/01 às 20h";
+
+        // Lógica de Desbloqueio Visual
+        if (vendidos >= 50) {
+            document.getElementById('fase2-ui').classList.remove('locked');
+            document.getElementById('meta-max').innerText = "100";
+        } else {
+            document.getElementById('fase2-ui').classList.add('locked');
+            document.getElementById('meta-max').innerText = "50";
+        }
+        renderizarGrids(vendidos);
+    }
+});
+
+// --- 2. RANKING TOP 3 ---
+const qRanking = query(collection(db, "usuarios"), orderBy("indicacoesVendas", "desc"), limit(3));
+onSnapshot(qRanking, (snap) => {
+    let html = "";
+    let cont = 1;
+    snap.forEach(u => {
+        html += `<p><b>${cont}º</b> ${u.data().nome} — ${u.data().indicacoesVendas || 0} vendas</p>`;
+        cont++;
+    });
+    document.getElementById('ranking-lista').innerHTML = html || "Aguardando indicações...";
+});
+
+// --- 3. AUTENTICAÇÃO E PERFIL ---
+window.cadastrar = async () => {
     const nome = document.getElementById('reg-nome').value;
-    const email = document.getElementById('reg-email').value;
-    const senha = document.getElementById('reg-senha').value;
-    const tel = document.getElementById('reg-tel').value;
-    const quemIndicou = document.getElementById('reg-indicacao').value;
-
-    if(!nome || !email || !senha) return alert("Preencha os campos obrigatórios!");
+    const email = document.getElementById('email').value;
+    const senha = document.getElementById('senha').value;
+    const ref = document.getElementById('ref-code').value;
 
     try {
         const res = await createUserWithEmailAndPassword(auth, email, senha);
-        const meuCod = res.user.uid.substring(0, 5).toUpperCase();
+        const meuCod = nome.substring(0,3).toUpperCase() + Math.floor(1000 + Math.random() * 9000);
         
         await setDoc(doc(db, "usuarios", res.user.uid), {
-            nome, email, telefone: tel,
-            meuCodigo: meuCod,
-            indicadoPor: quemIndicou || null,
-            indicacoesVendas: 0,
-            planoAtivo: false
+            nome, email, meuCodigo: meuCod, indicacoesVendas: 0, quemMeIndicou: ref || null, pontosCheckin: 0
         });
-        alert("Conta VIP Criada! Seu código: " + meuCod);
-        location.reload();
-    } catch (e) { alert("Erro ao cadastrar: " + e.message); }
+        alert("Conta criada com sucesso!");
+    } catch (e) { alert("Erro: " + e.message); }
 };
 
-// --- 2. LOGIN E LOGOUT ---
-window.fazerLogin = async () => {
-    const email = document.getElementById('log-email').value;
-    const senha = document.getElementById('log-senha').value;
+window.login = async () => {
+    const email = document.getElementById('email').value;
+    const senha = document.getElementById('senha').value;
     try { await signInWithEmailAndPassword(auth, email, senha); } 
-    catch (e) { alert("Dados inválidos!"); }
+    catch (e) { alert("Erro ao entrar: " + e.message); }
 };
 
-window.logout = () => signOut(auth).then(() => location.reload());
-
-// --- 3. MONITOR DE SESSÃO E EVOLUÇÃO DA RIFA ---
-onAuthStateChanged(auth, async (user) => {
+onAuthStateChanged(auth, (user) => {
     if (user) {
-        const uSnap = await getDoc(doc(db, "usuarios", user.uid));
-        if (uSnap.exists()) {
-            const uDados = uSnap.data();
-            
-            // Correção do undefined: Se não existir, mostra "Sem Código" ou 0
-            document.getElementById('user-display').innerText = uDados.nome || "Usuário";
-            document.getElementById('meu-codigo-txt').innerText = uDados.meuCodigo || "GERANDO...";
-            document.getElementById('ponto-indicacao').innerText = `${uDados.indicacoesVendas || 0}/3`;
-            
-            document.getElementById('auth-section').classList.add('hidden');
-            document.getElementById('tela-rifa').classList.remove('hidden');
-
-            // Atualiza a Meta no topo
-            onSnapshot(doc(db, "config", "sorteio"), (doc) => {
-                if(doc.exists()){
-                    const totalNumeros = doc.data().total || 50;
-                    const vendidos = doc.data().vendidos || 0;
-                    document.getElementById('vendas-contagem').innerText = vendidos;
-                    document.getElementById('meta-max').innerText = totalNumeros;
-                    desenharRifa(totalNumeros);
-                }
-            });
-        }
+        onSnapshot(doc(db, "usuarios", user.uid), (uSnap) => {
+            if (uSnap.exists()) {
+                const d = uSnap.data();
+                document.getElementById('user-display').innerText = d.nome;
+                document.getElementById('meu-codigo-txt').innerText = d.meuCodigo;
+                document.getElementById('ponto-indicacao').innerText = `${d.indicacoesVendas || 0}/3`;
+                document.getElementById('auth-section').classList.add('hidden');
+                document.getElementById('tela-rifa').classList.remove('hidden');
+            }
+        });
     }
 });
-// --- 4. LÓGICA DO GRID DA RIFA ---
-function desenharRifa(qtd) {
-    const grid = document.getElementById('gridRifa');
-    grid.innerHTML = '';
-    for (let i = 1; i <= qtd; i++) {
-        const div = document.createElement('div');
-        div.className = 'num';
-        div.innerText = i;
-        if(selecionados.includes(i)) div.classList.add('selected');
 
-        div.onclick = () => {
-            if (selecionados.includes(i)) {
-                selecionados = selecionados.filter(x => x !== i);
-                div.classList.remove('selected');
-            } else {
-                selecionados.push(i);
-                div.classList.add('selected');
-            }
-            atualizarValores();
-        };
-        grid.appendChild(div);
+// --- 4. CHECK-IN DIÁRIO ---
+window.fazerCheckin = async () => {
+    const user = auth.currentUser;
+    const hoje = new Date().toLocaleDateString();
+    const uRef = doc(db, "usuarios", user.uid);
+    const uSnap = await getDoc(uRef);
+
+    if (uSnap.data().ultimoCheckin === hoje) {
+        alert("Você já garantiu o check-in de hoje! 📅");
+    } else {
+        await updateDoc(uRef, { ultimoCheckin: hoje, pontosCheckin: increment(1) });
+        alert("📍 Check-in realizado! Acompanhe o site diariamente.");
+    }
+};
+
+// --- 5. LÓGICA DA RIFA (DESENHAR NÚMEROS) ---
+function renderizarGrids(vendidosTotais) {
+    const g1 = document.getElementById('grid-fase1');
+    const g2 = document.getElementById('grid-fase2');
+    g1.innerHTML = ""; g2.innerHTML = "";
+
+    for (let i = 1; i <= 100; i++) {
+        const btn = document.createElement('button');
+        btn.innerText = i;
+        btn.className = i <= vendidosTotais ? 'num vendido' : 'num';
+        btn.onclick = () => selecionar(i);
+        
+        if (i <= 50) g1.appendChild(btn);
+        else g2.appendChild(btn);
     }
 }
 
-function atualizarValores() {
-    const total = selecionados.length * PRECO_UNITARIO;
-    document.getElementById('qtd').innerText = selecionados.length;
-    document.getElementById('total').innerText = "R$ " + total.toFixed(2);
+function selecionar(n) {
+    const idx = selecionados.indexOf(n);
+    if (idx > -1) selecionados.splice(idx, 1);
+    else selecionados.push(n);
+    
+    document.getElementById('payment-area').classList.remove('hidden');
+    document.getElementById('num-selecionados').innerText = selecionados.join(', ');
+    document.getElementById('total-pagar').innerText = (selecionados.length * PRECO_UNITARIO).toFixed(2);
 }
 
-// --- 5. PAGAMENTO HÍBRIDO (PIX E CARTÃO) ---
-
-// PAGAR AVULSO (PIX)
-window.pagarPix = async () => {
-    if (selecionados.length === 0) return alert("Selecione números primeiro!");
-    
-    try {
-        const res = await fetch('https://minirifa-pro.onrender.com/gerar-pix', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                nome: document.getElementById('user-display').innerText,
-                numeros: selecionados,
-                total: document.getElementById('total').innerText
-            })
-        });
-        const d = await res.json();
-        prompt("PIX GERADO! Copie o código abaixo:", d.copy_paste);
-    } catch (e) { alert("Servidor offline. Tente em instantes."); }
+// --- 6. INTEGRAÇÃO COM O ROBÔ (RENDER) ---
+window.gerarPix = async () => {
+    const res = await fetch("https://seu-servidor.onrender.com/gerar-pix", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            nome: document.getElementById('user-display').innerText,
+            numeros: selecionados,
+            total: selecionados.length * PRECO_UNITARIO
+        })
+    });
+    const data = await res.json();
+    alert("Copie o PIX: " + data.copy_paste);
 };
-
-// ASSINAR PLANO (CARTÃO)
-window.assinarPlano = async () => {
-    const cardData = {
-        numero: document.getElementById('card-num').value,
-        vencimento: document.getElementById('card-date').value,
-        cvv: document.getElementById('card-cvv').value
-    };
-
-    if(!cardData.numero || !cardData.cvv) return alert("Preencha os dados do cartão!");
-
-    try {
-        const res = await fetch('https://minirifa-pro.onrender.com/assinar-plano', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                nome: document.getElementById('user-display').innerText,
-                email: auth.currentUser.email,
-                cartao: cardData,
-                valorPlano: 30.00 // Exemplo de valor fixo mensal
-            })
-        });
-        const d = await res.json();
-        alert(d.msg);
-    } catch (e) { alert("Erro ao processar assinatura."); }
-};
-
