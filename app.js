@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { getFirestore, doc, onSnapshot, updateDoc, increment, collection, query, where, getDocs, setDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-import { getFirestore, doc, setDoc, updateDoc, collection, query, orderBy, limit, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8",
@@ -12,146 +12,166 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
 let user = null;
 let userData = null;
-let selected = [];
 
-// Função para pegar a data atual formatada (YYYY-MM-DD)
-const getToday = () => new Date().toISOString().split('T')[0];
-
-window.login = async () => {
-    try {
-        await signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('senha').value);
-    } catch (e) { alert("Erro de Acesso: Verifique e-mail e senha."); }
-};
-
+// --- AUTH ---
 window.cadastrar = async () => {
     const nome = document.getElementById('nome').value;
     const email = document.getElementById('email').value;
     const senha = document.getElementById('senha').value;
-    if(!nome || !email || !senha) return alert("Preencha todos os campos!");
-    
+    const ref = document.getElementById('ref').value;
+
+    if (!nome || !email || !senha) return alert("Preencha os campos!");
+
     try {
         const res = await createUserWithEmailAndPassword(auth, email, senha);
-        const code = nome.substring(0,3).toUpperCase() + Math.floor(Math.random()*1000);
+        const meuCodigo = Math.random().toString(36).substring(2, 7).toUpperCase();
+
         await setDoc(doc(db, "usuarios", res.user.uid), {
-            nome, email, saldo: 0, meuCodigo: code, indicadoPor: document.getElementById('ref').value || "", 
-            vendasTotais: 0, indicacoesSemana: 0, lastCheckin: "", lastVideo: ""
+            nome, email, meuCodigo,
+            saldo: 0, xp: 0, vendas: 0,
+            criadoEm: new Date().toISOString()
         });
+
+        // BÔNUS DE INDICAÇÃO REDUZIDO (R$ 0.10)
+        if (ref) {
+            const q = query(collection(db, "usuarios"), where("meuCodigo", "==", ref));
+            const snap = await getDocs(q);
+            if (!snap.empty) {
+                await updateDoc(doc(db, "usuarios", snap.docs[0].id), {
+                    saldo: increment(0.10),
+                    vendas: increment(1)
+                });
+            }
+        }
         location.reload();
-    } catch (e) { alert("Erro ao criar conta."); }
+    } catch (e) { alert("Erro ao cadastrar: " + e.message); }
 };
 
-window.sair = () => signOut(auth);
+window.login = async () => {
+    const email = document.getElementById('email').value;
+    const senha = document.getElementById('senha').value;
+    try {
+        await signInWithEmailAndPassword(auth, email, senha);
+    } catch (e) { alert("Erro: " + e.message); }
+};
+
+window.sair = () => signOut(auth).then(() => location.reload());
 
 onAuthStateChanged(auth, (u) => {
     if (u) {
         user = u;
         document.getElementById('auth-screen').classList.add('hidden');
         document.getElementById('app-screen').classList.remove('hidden');
+        
         onSnapshot(doc(db, "usuarios", u.uid), (snap) => {
             userData = snap.data();
-            if(!userData) return;
-            document.getElementById('u-nome').innerText = userData.nome || "Usuário";
-            document.getElementById('u-saldo').innerText = (userData.saldo || 0).toFixed(2);
-            document.getElementById('u-code').innerText = userData.meuCodigo || "...";
-            document.getElementById('u-vendas').innerText = userData.vendasTotais || 0; 
-            
-            // Controle de travas diárias
-            document.getElementById('btn-checkin').disabled = userData.lastCheckin === getToday();
-            document.getElementById('btn-video').disabled = userData.lastVideo === getToday();
-
-            renderGrids(userData.vendasTotais || 0); 
+            if (userData) renderApp();
         });
-        loadRank();
-    } else {
-        document.getElementById('auth-screen').classList.remove('hidden');
-        document.getElementById('app-screen').classList.add('hidden');
     }
 });
 
+function renderApp() {
+    document.getElementById('u-nome').innerText = userData.nome;
+    document.getElementById('u-saldo').innerText = userData.saldo.toFixed(2);
+    document.getElementById('u-code').innerText = userData.meuCodigo;
+    document.getElementById('u-vendas').innerText = userData.vendas;
+}
+
+// --- GANHOS REDUZIDOS (ECONOMIA DE RETENÇÃO) ---
+
 window.checkin = async () => {
-    if(userData.lastCheckin === getToday()) return alert("Check-in já realizado hoje!");
-    await updateDoc(doc(db, "usuarios", user.uid), { 
-        saldo: increment(0.05),
-        lastCheckin: getToday()
+    const hoje = new Date().toISOString().split('T')[0];
+    if (userData.lastCheckin === hoje) return alert("IA: Check-in já realizado hoje.");
+
+    await updateDoc(doc(db, "usuarios", user.uid), {
+        saldo: increment(0.01), // Reduzido para 0.01
+        lastCheckin: hoje
     });
-    alert("Check-in: + R$ 0,05!");
+    alert("IA: Check-in confirmado +R$ 0,01");
 };
 
 window.video = () => {
-    if(userData.lastVideo === getToday()) return alert("Vídeo já assistido hoje!");
+    const hoje = new Date().toISOString().split('T')[0];
+    if (userData.lastVideo === hoje) return alert("IA: Limite de vídeos diários atingido.");
+
     const btn = document.getElementById('btn-video');
-    const timer = document.getElementById('video-timer');
-    let t = 30;
-    btn.classList.add('hidden');
-    timer.classList.remove('hidden');
-    
-    const i = setInterval(async () => {
-        t--;
-        document.getElementById('timer').innerText = t;
-        if(t <= 0) {
-            clearInterval(i);
-            await updateDoc(doc(db, "usuarios", user.uid), { 
-                saldo: increment(0.10),
-                lastVideo: getToday()
-            });
-            timer.classList.add('hidden');
-            btn.classList.remove('hidden');
-            alert("Vídeo: + R$ 0,10!");
+    const timerBox = document.getElementById('video-timer');
+    const timerVal = document.getElementById('timer');
+
+    btn.disabled = true;
+    timerBox.classList.remove('hidden');
+    let tempo = 30;
+
+    const contagem = setInterval(() => {
+        tempo--;
+        timerVal.innerText = tempo;
+        if (tempo <= 0) {
+            clearInterval(contagem);
+            finalizarVideo(hoje);
         }
     }, 1000);
 };
 
-function renderGrids(vendas) {
-    const configs = [
-        {id: 'grid-1', cardId: 'card-fase1', min: 1, max: 50, locked: false},
-        {id: 'grid-2', cardId: 'card-fase2', min: 51, max: 100, locked: vendas < 50}, 
-        {id: 'grid-3', cardId: 'card-fase3', min: 101, max: 150, locked: vendas < 100}
-    ];
-    configs.forEach(c => {
-        const el = document.getElementById(c.id);
-        const card = document.getElementById(c.cardId);
-        if(!el || !card) return; 
-        c.locked ? card.classList.add('fase-locked') : card.classList.remove('fase-locked');
-        el.innerHTML = "";
-        for(let i=c.min; i<=c.max; i++) {
-            const btn = document.createElement('button');
-            btn.className = `num ${selected.includes(i) ? 'selected' : ''}`;
-            btn.innerText = i;
-            btn.onclick = () => toggleNum(i);
-            el.appendChild(btn);
-        }
+async function finalizarVideo(data) {
+    await updateDoc(doc(db, "usuarios", user.uid), {
+        saldo: increment(0.02), // Reduzido para 0.02
+        lastVideo: data
     });
+    document.getElementById('video-timer').classList.add('hidden');
+    document.getElementById('btn-video').disabled = false;
+    alert("IA: Recompensa processada +R$ 0,02");
 }
 
-function toggleNum(n) {
-    if(selected.includes(n)) selected = selected.filter(x => x !== n);
-    else selected.push(n);
-    document.getElementById('sel-nums').innerText = selected.join(', ');
-    document.getElementById('total-val').innerText = (selected.length * 7).toFixed(2);
-    selected.length > 0 ? document.getElementById('checkout').classList.remove('hidden') : document.getElementById('checkout').classList.add('hidden');
-    document.querySelectorAll('.num').forEach(b => {
-        selected.includes(parseInt(b.innerText)) ? b.classList.add('selected') : b.classList.remove('selected');
-    });
+// --- SISTEMA DE FASES E COMPRA (Fiel 4.1) ---
+
+const fases = [
+    { id: 1, preco: 7, total: 30, ind: 0 },
+    { id: 2, preco: 7, total: 30, ind: 50 },
+    { id: 3, preco: 7, total: 30, ind: 100 }
+];
+
+let selecionados = [];
+
+window.selectNum = (fase, num, el) => {
+    const id = `${fase}-${num}`;
+    if (selecionados.includes(id)) {
+        selecionados = selecionados.filter(i => i !== id);
+        el.classList.remove('selected');
+    } else {
+        selecionados.push(id);
+        el.classList.add('selected');
+    }
+    renderCheckout();
+};
+
+function renderCheckout() {
+    const check = document.getElementById('checkout');
+    if (selecionados.length > 0) {
+        check.classList.remove('hidden');
+        document.getElementById('sel-nums').innerText = selecionados.join(', ');
+        document.getElementById('total-val').innerText = (selecionados.length * 7).toFixed(2);
+    } else {
+        check.classList.add('hidden');
+    }
 }
 
-// RANKING COM AJUSTE VISUAL ($$)
-function loadRank() {
-    const q = query(collection(db, "usuarios"), orderBy("indicacoesSemana", "desc"), limit(3));
-    onSnapshot(q, (snap) => {
-        let html = "";
-        const icons = ["🥇","🥈","🥉"];
-        const fixedPts = [15, 10, 5]; 
-        
-        snap.docs.forEach((d, i) => {
-            html += `<p><span>${icons[i]} ${d.data().nome || "Anônimo"}</span> <b>${fixedPts[i]} $$</b></p>`;
-        });
-        document.getElementById('rank-list').innerHTML = html || "<p>Aguardando ranking...</p>";
-    });
-}
+window.pix = () => {
+    alert("IA: Gerando PIX de R$ " + (selecionados.length * 7).toFixed(2) + "\n\nO Robô está processando sua solicitação...");
+};
 
-window.pix = () => alert("Saldo acumulado com sucesso.");
+// --- RENDERIZAR GRIDS ---
+fases.forEach(f => {
+    const grid = document.getElementById(`grid-${f.id}`);
+    for (let i = 1; i <= f.total; i++) {
+        const btn = document.createElement('div');
+        btn.className = 'num-btn';
+        btn.innerText = i;
+        btn.onclick = () => selectNum(f.id, i, btn);
+        grid.appendChild(btn);
+    }
+});
