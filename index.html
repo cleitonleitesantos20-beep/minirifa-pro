@@ -3,118 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MiniRifa Pro - Sistema Evolutivo VIP</title>
-    <style>
-        :root { --primary: #007bff; --success: #28a745; --gold: #ffc107; --dark: #1a1a1a; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; margin: 0; padding: 0; }
-        header { background: var(--dark); color: white; text-align: center; padding: 20px; border-bottom: 4px solid var(--gold); }
-        
-        .container { max-width: 600px; margin: 20px auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        
-        /* Banner Evolutivo */
-        .evolution-banner { background: linear-gradient(90deg, #ff8c00, #ffc107); color: #000; padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; margin-bottom: 20px; border: 2px solid #000; }
-        
-        /* Box de Regras */
-        .rules-box { background: #e9ecef; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; line-height: 1.6; }
-        .rules-box h3 { margin-top: 0; color: var(--primary); }
-
-        /* Inputs e Botões */
-        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-        button { width: 100%; padding: 15px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
-        .btn-pix { background: var(--success); color: white; }
-        .btn-card { background: var(--primary); color: white; }
-        .btn-auth { background: var(--dark); color: white; }
-
-        /* Grid da Rifa */
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)); gap: 8px; margin: 20px 0; }
-        .num { height: 45px; display: flex; align-items: center; justify-content: center; background: #fff; border: 2px solid #dee2e6; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
-        .num.selected { background: var(--gold); border-color: #e0a800; color: #000; }
-        .num.sold { background: #ced4da; color: #6c757d; cursor: not-allowed; text-decoration: line-through; }
-
-        /* Checkout */
-        .checkout-area { border-top: 2px dashed #ddd; padding-top: 20px; margin-top: 20px; }
-        .card-form { background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #007bff; margin-top: 15px; }
-        
-        .hidden { display: none; }
-    </style>
+    <title>Sua Rifa Milionária</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
 </head>
 <body>
 
-<header>
-    <h1>🤖 MiniRifa Pro Evolutiva</h1>
-    <div id="meta-banner" class="evolution-banner">
-        🚀 META ATUAL: <span id="vendas-contagem">0</span> / <span id="meta-max">50</span> NÚMEROS
+    <div class="header-info">
+        <div id="meta-banner">🚀 META ATUAL: <span id="vendas-contagem">0</span> / <span id="meta-max">50</span></div>
+        <div id="data-sorteio">📅 SORTEIO: <span id="data-txt">Carregando...</span></div>
     </div>
-</header>
 
-<div class="container">
-    <section class="rules-box">
-        <h3>📢 Regras do Jogo</h3>
-        <p>• <b>Evolução:</b> Se atingirmos 50 números em até 10 dias, liberamos mais 50 e o prêmio aumenta de R$ 100,00 para R$ 200,00. Se atingirmos em até 20 dias, liberamos mais 50 números, chegando ao prêmio de R$ 400,00!</p>
-        <p>• <b>Indicação:</b> A cada 3 amigos indicados que comprarem, você ganha <b>1 número grátis</b>.</p>
-        <p>• <b>Plano VIP:</b> No Cartão, você paga mensalmente com <b>20% de desconto</b> fixo.</p>
-    </section>
+    <div class="patrocinador-topo">
+        <span>Parceiro Oficial:</span>
+        <img src="https://via.placeholder.com/100x30?text=Sua+Logo" alt="Logo Patrocinador">
+    </div>
 
-    <div id="auth-section">
-        <div id="tela-cadastro">
-            <h3>🎁 Cadastre-se e ganhe seu código</h3>
+    <div class="container">
+        
+        <div id="auth-section">
+            <h2 id="auth-title">Entrar na Rifa</h2>
             <input type="text" id="reg-nome" placeholder="Nome Completo">
-            <input type="text" id="reg-tel" placeholder="Telefone (WhatsApp)">
-            <input type="email" id="reg-email" placeholder="E-mail">
-            <input type="password" id="reg-senha" placeholder="Crie uma Senha">
-            <input type="text" id="reg-indicacao" placeholder="Código de quem te indicou (Opcional)">
-            <button class="btn-auth" onclick="registrarUsuario()">CRIAR MINHA CONTA VIP</button>
-            <p style="text-align:center">Já tem conta? <a href="#" onclick="alternarAuth()">Fazer Login</a></p>
-        </div>
-
-        <div id="tela-login" class="hidden">
-            <h3>Acessar Painel</h3>
-            <input type="email" id="log-email" placeholder="E-mail">
-            <input type="password" id="log-senha" placeholder="Senha">
-            <button class="btn-auth" onclick="fazerLogin()">ENTRAR</button>
-            <p style="text-align:center">Não tem conta? <a href="#" onclick="alternarAuth()">Cadastrar</a></p>
-        </div>
-    </div>
-
-    <div id="tela-rifa" class="hidden">
-        <div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center;">
-            Olá, <b id="user-display">...</b>! 👋<br>
-            Seu Código de Indicação: <b id="meu-codigo-txt" style="color: #d9480f;">---</b><br>
-            <small>Indicações Validadas: <span id="ponto-indicacao">0/3</span></small>
-        </div>
-
-        <h3>Escolha seus números:</h3>
-        <div id="gridRifa" class="grid-container"></div>
-
-        <div class="checkout-area">
-            <p style="font-size: 18px;">Números: <b id="qtd">0</b> | Total: <b id="total" style="color: var(--success);">R$ 0,00</b></p>
-            
-            <button class="btn-pix" id="btnPagarPix" onclick="pagarPix()">🚀 PAGAR AGORA VIA PIX</button>
-
-            <div class="card-form">
-                <h4>💳 Assinar Plano Mensal (-20% OFF)</h4>
-                <p style="font-size: 12px; color: #666;">O valor mensal será descontado automaticamente do seu cartão.</p>
-                <input type="text" id="card-num" placeholder="Número do Cartão">
-                <div style="display: flex; gap: 10px;">
-                    <input type="text" id="card-date" placeholder="MM/AA">
-                    <input type="text" id="card-cvv" placeholder="CVV">
-                </div>
-                <button class="btn-card" onclick="assinarPlano()">ATIVAR ASSINATURA VIP</button>
+            <input type="email" id="email" placeholder="Seu melhor e-mail">
+            <input type="password" id="senha" placeholder="Sua senha (min. 6 dígitos)">
+            <input type="text" id="ref-code" placeholder="Código de Indicação (Opcional)">
+            <div class="auth-buttons">
+                <button onclick="login()">Entrar</button>
+                <button onclick="cadastrar()">Criar Conta</button>
             </div>
-            
-            <button onclick="logout()" style="background:none; color: #999; text-decoration: underline; font-size: 12px; border:none; margin-top: 20px;">Sair da Conta</button>
+        </div>
+
+        <div id="tela-rifa" class="hidden">
+            <div class="user-dashboard">
+                <p>Olá, <b id="user-display">...</b>! 👋</p>
+                <div class="referral-box">
+                    <p>Seu Código: <b id="meu-codigo-txt" class="highlight">...</b></p>
+                    <p>Indicações: <span id="ponto-indicacao">0/3</span> 🔥</p>
+                </div>
+                <button onclick="fazerCheckin()" id="btn-checkin">📍 Check-in Diário</button>
+            </div>
+
+            <div id="ranking-box" class="ranking-container">
+                <h3>🏆 Ranking de Indicadores</h3>
+                <div id="ranking-lista">Buscando líderes...</div>
+            </div>
+
+            <div class="rules-box">
+                <h3>📢 Regras da Rifa</h3>
+                <ul>
+                    <li><b>Fase 1:</b> 50 Números - Prêmio R$ 100,00</li>
+                    <li><b>Fase 2:</b> 100 Números - Prêmio R$ 200,00 (Bloqueada)</li>
+                    <li><b>Fase 3:</b> 150 Números - Prêmio R$ 400,00 (Bloqueada)</li>
+                </ul>
+            </div>
+
+            <div class="fases-wrapper">
+                <div class="fase-section" id="fase1-ui">
+                    <h4>🔢 Escolha seus números (Fase 1)</h4>
+                    <div id="grid-fase1" class="grid-numeros"></div>
+                </div>
+
+                <div class="fase-section locked" id="fase2-ui">
+                    <div class="lock-overlay">🔒 Alcance 50 vendas para liberar esta fase!</div>
+                    <h4>🔢 Fase 2 (Prêmio Maior)</h4>
+                    <div id="grid-fase2" class="grid-numeros"></div>
+                </div>
+            </div>
+
+            <div id="payment-area" class="hidden">
+                <h3>Finalizar Compra</h3>
+                <p>Números selecionados: <span id="num-selecionados">-</span></p>
+                <p>Total: <b>R$ <span id="total-pagar">0,00</span></b></p>
+                
+                <div class="pay-methods">
+                    <button onclick="gerarPix()" class="btn-pix">Pagar com PIX</button>
+                    <div id="cardPaymentBrick_container"></div> </div>
+            </div>
         </div>
     </div>
-</div>
 
-<script type="module" src="app.js"></script>
-<script>
-    // Função simples para trocar entre Login e Cadastro
-    function alternarAuth() {
-        document.getElementById('tela-cadastro').classList.toggle('hidden');
-        document.getElementById('tela-login').classList.toggle('hidden');
-    }
-</script>
+    <script src="app.js" type="module"></script>
 </body>
 </html>
-
