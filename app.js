@@ -1,8 +1,10 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, doc, onSnapshot, updateDoc, increment, collection, query, orderBy, limit, getDoc, setDoc, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+/* === INÍCIO DO APP.JS COMPLETO === */
 
-// 1. CONFIGURAÇÃO FIREBASE
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, query, where, getDocs, orderBy, limit, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+// CONFIGURAÇÃO FIREBASE
 const firebaseConfig = {
     apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8",
     authDomain: "minharifadigital.firebaseapp.com",
@@ -13,246 +15,164 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
-let selecionados = [];
-const PRECO_UNITARIO = 7.00;
+let usuarioAtual = null;
+let numerosSelecionados = [];
 
-// ==========================================
-// 2. FUNÇÕES DE ACESSO (LOGIN / CADASTRO / SAIR)
-// ==========================================
-
-window.login = async () => {
-    const email = document.getElementById('email').value;
-    const senha = document.getElementById('senha').value;
-    if (!email || !senha) return alert("Por favor, preencha o e-mail e a senha.");
-    
-    try {
-        await signInWithEmailAndPassword(auth, email, senha);
-    } catch (err) {
-        alert("Erro ao entrar: Verifique seus dados.");
-    }
-};
-
+/* === INÍCIO DA AUTENTICAÇÃO E CADASTRO === */
 window.cadastrar = async () => {
     const nome = document.getElementById('reg-nome').value;
     const email = document.getElementById('email').value;
     const senha = document.getElementById('senha').value;
-    const ref = document.getElementById('ref-code').value;
+    const refCodeInput = document.getElementById('ref-code').value;
 
-    if (!nome || !email || !senha) return alert("Preencha todos os campos para cadastro!");
+    if (!nome || !email || !senha) return alert("Preencha os campos!");
 
     try {
         const res = await createUserWithEmailAndPassword(auth, email, senha);
-        const meuCod = nome.substring(0,3).toUpperCase() + Math.floor(1000 + Math.random()*9000);
-        
-        await setDoc(doc(db, "usuarios", res.user.uid), { 
-            nome: nome, 
-            meuCodigo: meuCod, 
-            saldoPontos: 0, 
-            indicacoesSemana: 0, 
-            quemMeIndicou: ref || null, 
-            jaComprou: false,
-            ultimoCheckin: ""
-        });
-        alert("Conta criada com sucesso!");
-    } catch (err) {
-        alert("Erro no cadastro: " + err.message);
-    }
-};
+        const uid = res.user.uid;
+        const meuCodigo = nome.substring(0, 3).toUpperCase() + Math.floor(1000 + Math.random() * 9000);
 
-window.sair = () => {
-    signOut(auth).then(() => {
+        await setDoc(doc(db, "usuarios", uid), {
+            nome: nome,
+            email: email,
+            saldo: 0,
+            meuCodigo: meuCodigo,
+            indicadoPor: refCodeInput || null,
+            indicacoesSemana: 0,
+            vendasTotais: 0
+        });
+
         location.reload();
-    }).catch((error) => {
-        alert("Erro ao sair.");
-    });
+    } catch (e) { alert("Erro ao cadastrar: " + e.message); }
 };
 
-// ==========================================
-// 3. MONITORAMENTO DE ESTADO E DADOS
-// ==========================================
+window.login = async () => {
+    const email = document.getElementById('email').value;
+    const senha = document.getElementById('senha').value;
+    try {
+        await signInWithEmailAndPassword(auth, email, senha);
+    } catch (e) { alert("Erro: " + e.message); }
+};
 
-onAuthStateChanged(auth, (user) => {
-    const areaLogin = document.getElementById('auth-section');
-    const areaApp = document.getElementById('tela-rifa');
+window.sair = () => signOut(auth).then(() => location.reload());
 
+onAuthStateChanged(auth, async (user) => {
     if (user) {
-        areaLogin.classList.add('hidden');
-        areaApp.classList.remove('hidden');
+        usuarioAtual = user;
+        document.getElementById('auth-section').classList.add('hidden');
+        document.getElementById('tela-rifa').classList.remove('hidden');
         
-        // Monitorar dados do usuário Logado
-        onSnapshot(doc(db, "usuarios", user.uid), (s) => {
-            const d = s.data();
-            if (d) {
-                document.getElementById('user-display').innerText = d.nome;
-                document.getElementById('meu-codigo-txt').innerText = d.meuCodigo;
-                document.getElementById('saldo-pontos').innerText = d.saldoPontos.toFixed(2);
-                document.getElementById('ponto-semana').innerText = d.indicacoesSemana || 0;
-            }
+        onSnapshot(doc(db, "usuarios", user.uid), (d) => {
+            const data = d.data();
+            document.getElementById('user-display').innerText = data.nome;
+            document.getElementById('saldo-pontos').innerText = data.saldo.toFixed(2);
+            document.getElementById('meu-codigo-txt').innerText = data.meuCodigo;
+            document.getElementById('ponto-semana').innerText = data.vendasTotais;
+            gerarGrids(data.vendasTotais);
         });
 
-        // Monitorar Sorteio e Fases
-        onSnapshot(doc(db, "config", "sorteio"), (snap) => {
-            const d = snap.data() || { vendidos: 0, numerosComprados: [] };
-            
-            // Lógica de desbloqueio de fases
-            if (d.vendidos >= 50) document.getElementById('fase2-ui').classList.remove('locked');
-            if (d.vendidos >= 100) document.getElementById('fase3-ui').classList.remove('locked');
-            
-            renderizarGrids(d.numerosComprados || []);
-            
-            const agora = new Date();
-            const ultimoDia = new Date(agora.getFullYear(), agora.getMonth() + 1, 0);
-            document.getElementById('area-resultado').innerText = `📅 PRÓXIMO SORTEIO: ${ultimoDia.toLocaleDateString('pt-br')}`;
-        });
-
-        // Ranking
-       
-<div class="ranking-container">
-    <h3>🏆 TOP INDICADORES</h3>
-    <div id="ranking-lista">
-        </div>
-</div>
-
-        });
-
-    } else {
-        areaLogin.classList.remove('hidden');
-        areaApp.classList.add('hidden');
+        carregarRanking();
     }
 });
+/* === FIM DA AUTENTICAÇÃO === */
 
-// ==========================================
-// 4. LÓGICA DE GANHOS (CHECK-IN E VÍDEO)
-// ==========================================
-
+/* === INÍCIO LÓGICA DE GANHOS === */
 window.fazerCheckin = async () => {
-    const user = auth.currentUser;
-    const uRef = doc(db, "usuarios", user.uid);
-    const snap = await getDoc(uRef);
-    const hoje = new Date().toLocaleDateString();
-
-    if (snap.data().ultimoCheckin === hoje) return alert("📍 Você já fez o check-in hoje!");
-
-    await updateDoc(uRef, { 
-        ultimoCheckin: hoje, 
-        saldoPontos: increment(0.05) 
+    await updateDoc(doc(db, "usuarios", usuarioAtual.uid), {
+        saldo: increment(0.05)
     });
-    alert("✅ Bônus de R$ 0,05 adicionado!");
+    alert("Check-in realizado! +R$ 0,05");
 };
 
 window.assistirPropaganda = () => {
     const btn = document.getElementById('btn-video');
-    const timerArea = document.getElementById('timer-video');
-    const segs = document.getElementById('segundos');
+    btn.disabled = true;
+    document.getElementById('timer-video').classList.remove('hidden');
     let tempo = 30;
-
-    btn.classList.add('hidden');
-    timerArea.classList.remove('hidden');
-
-    const contador = setInterval(async () => {
+    const intervalo = setInterval(async () => {
         tempo--;
-        segs.innerText = tempo;
-
+        document.getElementById('segundos').innerText = tempo;
         if (tempo <= 0) {
-            clearInterval(contador);
-            await updateDoc(doc(db, "usuarios", auth.currentUser.uid), { 
-                saldoPontos: increment(0.10) 
-            });
-            timerArea.classList.add('hidden');
-            btn.classList.remove('hidden');
-            alert("📺 Parabéns! Você ganhou R$ 0,10.");
+            clearInterval(intervalo);
+            await updateDoc(doc(db, "usuarios", usuarioAtual.uid), { saldo: increment(0.10) });
+            document.getElementById('timer-video').classList.add('hidden');
+            btn.disabled = false;
+            alert("Vídeo assistido! +R$ 0,10");
         }
     }, 1000);
 };
+/* === FIM LÓGICA DE GANHOS === */
 
-// ==========================================
-// 5. LÓGICA DE RIFAS E COMPRA
-// ==========================================
-
-function renderizarGrids(comprados) {
-    for (let f = 1; f <= 3; f++) {
-        const grid = document.getElementById(`grid-fase${f}`);
-        if (!grid) continue;
-        grid.innerHTML = "";
-        
-        const inicio = (f - 1) * 50 + 1;
-        const fim = f * 50;
-
-        for (let i = inicio; i <= fim; i++) {
+/* === INÍCIO GRIDS E SELEÇÃO === */
+function gerarGrids(vendas) {
+    const gridsConfigs = [
+        { id: 'grid-fase1', min: 1, max: 50 },
+        { id: 'grid-fase2', min: 51, max: 100 },
+        { id: 'grid-fase3', min: 101, max: 150 }
+    ];
+    
+    gridsConfigs.forEach((config) => {
+        const container = document.getElementById(config.id);
+        if (!container) return;
+        container.innerHTML = "";
+        for (let i = config.min; i <= config.max; i++) {
             const btn = document.createElement('button');
+            btn.className = 'num';
             btn.innerText = i;
-            
-            if (comprados.includes(i)) {
-                btn.className = 'num comprado';
-            } else if (selecionados.includes(i)) {
-                btn.className = 'num selecionado';
-            } else {
-                btn.className = 'num';
-            }
-
-            btn.onclick = () => {
-                if (comprados.includes(i)) return;
-                const idx = selecionados.indexOf(i);
-                if (idx > -1) {
-                    selecionados.splice(idx, 1);
-                } else {
-                    selecionados.push(i);
-                }
-                renderizarGrids(comprados);
-                atualizarCheckout();
-            };
-            grid.appendChild(btn);
+            btn.onclick = () => alternarSelecao(i, btn);
+            container.appendChild(btn);
         }
+    });
+
+    if (vendas < 50) document.getElementById('fase2-ui')?.classList.add('locked');
+    else document.getElementById('fase2-ui')?.classList.remove('locked');
+    
+    if (vendas < 100) document.getElementById('fase3-ui')?.classList.add('locked');
+    else document.getElementById('fase3-ui')?.classList.remove('locked');
+}
+
+function alternarSelecao(n, el) {
+    if (numerosSelecionados.includes(n)) {
+        numerosSelecionados = numerosSelecionados.filter(x => x !== n);
+        el.classList.remove('selecionado');
+    } else {
+        numerosSelecionados.push(n);
+        el.classList.add('selecionado');
     }
+    atualizarCheckout();
 }
 
 function atualizarCheckout() {
     const area = document.getElementById('payment-area');
-    if (selecionados.length > 0) {
+    if (numerosSelecionados.length > 0) {
         area.classList.remove('hidden');
-        document.getElementById('num-selecionados').innerText = selecionados.join(', ');
-        document.getElementById('total-pagar').innerText = (selecionados.length * PRECO_UNITARIO).toFixed(2);
+        document.getElementById('num-selecionados').innerText = numerosSelecionados.join(', ');
+        document.getElementById('total-pagar').innerText = (numerosSelecionados.length * 7).toFixed(2);
     } else {
         area.classList.add('hidden');
     }
 }
+/* === FIM GRIDS E SELEÇÃO === */
 
-window.gerarPix = () => {
-    const valor = (selecionados.length * PRECO_UNITARIO).toFixed(2);
-    alert(`💠 PIX COPIADO!\n\nValor: R$ ${valor}\n\nApós o pagamento, envie o comprovante no suporte para liberar seus números.`);
-};
+/* === INÍCIO LÓGICA DE RANKING === */
+function carregarRanking() {
+    const q = query(collection(db, "usuarios"), orderBy("indicacoesSemana", "desc"), limit(3));
+    onSnapshot(q, (snap) => {
+        const premios = ["R$ 15,00", "R$ 10,00", "R$ 5,00"];
+        const icones = ["🥇", "🥈", "🥉"];
+        let html = "";
+        let i = 0;
+        snap.forEach(docSnap => {
+            html += `<p><span>${icones[i]} ${docSnap.data().nome} (${premios[i]})</span> <b>${docSnap.data().indicacoesSemana || 0} pts</b></p>`;
+            i++;
+        });
+        const lista = document.getElementById('ranking-lista');
+        if (lista) lista.innerHTML = html;
+    });
+}
+/* === FIM LÓGICA DE RANKING === */
 
-// ==========================================
-// 6. INTERATIVIDADE: ARRASTE DE MOUSE (PC)
-// ==========================================
-
-const slider = document.querySelector('.fases-wrapper');
-let isDown = false;
-let startX;
-let scrollLeft;
-
-slider.addEventListener('mousedown', (e) => {
-    isDown = true;
-    startX = e.pageX - slider.offsetLeft;
-    scrollLeft = slider.scrollLeft;
-    slider.style.cursor = 'grabbing';
-});
-slider.addEventListener('mouseleave', () => {
-    isDown = false;
-    slider.style.cursor = 'grab';
-});
-slider.addEventListener('mouseup', () => {
-    isDown = false;
-    slider.style.cursor = 'grab';
-});
-slider.addEventListener('mousemove', (e) => {
-    if (!isDown) return;
-    e.preventDefault();
-    const x = e.pageX - slider.offsetLeft;
-    const walk = (x - startX) * 2; 
-    slider.scrollLeft = scrollLeft - walk;
-});
-
+/* === FIM DO APP.JS COMPLETO === */
