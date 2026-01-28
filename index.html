@@ -3,102 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RoboSorteio IA - v5.1</title>
+    <title>RoboSorteio IA - Painel</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
 </head>
 <body>
+
     <div class="header">🤖 ROBOSORTEIO IA</div>
 
     <div class="container">
-        <div id="auth-screen">
-            <div class="card">
-                <div class="banner-lucro">🚀 GANHE ATÉ <b>R$ 25,00/MÊS</b></div>
-                <h2 style="font-family: 'Orbitron'; text-align: center; margin-bottom: 15px;">ACESSO</h2>
-                <input type="email" id="email" placeholder="E-mail">
-                <input type="password" id="senha" placeholder="Senha">
-                <button onclick="login()" class="btn-primary">ENTRAR</button>
-                <div class="sep">OU</div>
-                <input type="text" id="nome" placeholder="Seu Nome">
-                <input type="text" id="ref" placeholder="Código de Indicação (Opcional)">
-                <button onclick="cadastrar()" class="btn-outline">CRIAR CONTA</button>
+        <div class="card dashboard">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span>Olá, <b id="u-nome">...</b></span>
+                <button onclick="window.location.href='config.html'" class="btn-settings">⚙️</button>
+            </div>
+            
+            <div class="saldo">
+                <small style="display:block; font-size: 0.6rem; color: var(--neon);">SALDO ATUAL</small>
+                R$ <span id="u-saldo">0.00</span>
+            </div>
+
+            <button onclick="window.location.href='central.html'" class="btn-outline" style="margin-bottom: 15px; border-color: #ffd700; color: #ffd700;">🎮 MINIGAMES $$$</button>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button onclick="checkin()" class="btn-primary" style="background: #1a1a1a; color: #fff; border: 1px solid #333;">📍 CHECK-IN</button>
+                <button onclick="video()" id="btn-video" class="btn-primary" style="background: #1a1a1a; color: #fff; border: 1px solid #333;">📺 VÍDEO</button>
+            </div>
+            
+            <div id="video-timer" class="hidden" style="text-align:center; margin-top:10px; font-size: 0.7rem; color: var(--neon);">
+                Sincronizando: <span id="timer">30</span>s...
             </div>
         </div>
 
-        <div id="app-screen" class="hidden">
-            <div class="slider">
-                <div class="track">
-                    <div>🚀 IA AUTÔNOMA v5.1 ATIVA</div>
-                    <div>💎 ACUMULE SALDO DIÁRIO</div>
-                    <div>🍀 INDIQUE E GANHE R$ 0,10</div>
-                    <div>📊 RIFAS DE ALTA CONVERSÃO</div>
-                </div>
+        <h4 style="font-family: 'Orbitron'; margin: 20px 0 10px 5px; font-size: 0.8rem; color: var(--neon);">🍀 RIFAS ATIVAS</h4>
+        
+        <div class="fases-scroll">
+            <div class="fase-card" id="fase-card-1">
+                <div class="banner-lucro" style="background: var(--neon); position: relative; margin: -12px -12px 10px -12px; border-radius: 10px 10px 0 0;">FASE 1 - R$ 110,00</div>
+                <div id="grid-1" class="grid"></div>
             </div>
 
-            <div class="card dashboard">
-                <div class="top-row" style="display: flex; justify-content: space-between; align-items: center;">
-                    <span>Olá, <b id="u-nome">...</b></span>
-                    <button onclick="window.location.href='config.html'" class="btn-settings" title="Configurações">⚙️</button>
-                </div>
-                
-                <div class="saldo">
-                    <small style="display:block; font-size: 0.7rem; color: var(--neon); font-family: 'Orbitron';">SALDO TOTAL</small>
-                    R$ <span id="u-saldo">0.00</span>
-                </div>
-
-                <button onclick="window.location.href='central.html'" class="btn-outline" style="margin-bottom: 20px; border-color: #ffd700; color: #ffd700; font-weight: bold;">🎮 MINIGAMES $$$</button>
-
-                <div class="actions" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <button onclick="checkin()" id="btn-checkin" class="btn-primary" style="font-size: 0.7rem; background: #222; color: #fff; border: 1px solid #444;">📍 CHECK-IN (+0.01)</button>
-                    <button onclick="video()" id="btn-video" class="btn-primary" style="font-size: 0.7rem; background: #222; color: #fff; border: 1px solid #444;">📺 VÍDEO (+0.02)</button>
-                </div>
-                
-                <div id="video-timer" class="hidden" style="color:var(--neon); font-size:0.7rem; text-align:center; margin-top:10px;">
-                    Processando dados: <span id="timer">30</span>s...
-                </div>
-                
-                <div class="stats" style="margin-top: 15px;">
-                    <p>CÓDIGO: <span id="u-code">...</span></p>
-                    <p>INDICAÇÕES: <span id="u-vendas">0</span></p>
-                </div>
+            <div class="fase-card" id="fase-card-2">
+                <div class="lock-msg">🔒 FASE 2 - REQUER 50 INDICAÇÕES</div>
+                <div class="banner-lucro" style="background: #333; position: relative; margin: -12px -12px 10px -12px; border-radius: 10px 10px 0 0;">FASE 2 - R$ 220,00</div>
+                <div id="grid-2" class="grid"></div>
             </div>
 
-            <h4 style="font-family: 'Orbitron'; margin: 20px 0 10px 5px; font-size: 0.8rem; color: var(--neon);">🍀 RIFAS DISPONÍVEIS</h4>
-            
-            <div class="fases-scroll">
-                <div class="fase-card" id="fase-card-1">
-                    <div class="badge" style="background: var(--neon); color: #000; padding: 5px 10px; border-radius: 4px; font-weight: bold; font-size: 0.7rem;">FASE 1 (R$ 110,00)</div>
-                    <div id="grid-1" class="grid"></div>
-                </div>
-
-                <div class="fase-card" id="fase-card-2">
-                    <div class="lock-msg">🔒 FASE 2 (R$ 220,00)<br><small>REQUER 50 INDICAÇÕES</small></div>
-                    <div id="grid-2" class="grid"></div>
-                </div>
-
-                <div class="fase-card" id="fase-card-3">
-                    <div class="lock-msg">🔒 FASE 3 (R$ 350,00)<br><small>REQUER 100 INDICAÇÕES</small></div>
-                    <div id="grid-3" class="grid"></div>
-                </div>
+            <div class="fase-card" id="fase-card-3">
+                <div class="lock-msg">🔒 FASE 3 - REQUER 100 INDICAÇÕES</div>
+                <div class="banner-lucro" style="background: #333; position: relative; margin: -12px -12px 10px -12px; border-radius: 10px 10px 0 0;">FASE 3 - R$ 350,00</div>
+                <div id="grid-3" class="grid"></div>
             </div>
+        </div>
 
-            <div id="checkout" class="hidden card" style="margin-top: 20px; border-top: 2px solid var(--green);">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <p style="font-size: 0.7rem; color: #888;">NÚMEROS: <span id="sel-nums" style="color: var(--neon);">0</span></p>
-                        <h3 style="color: var(--green);">R$ <span id="total-val">0.00</span></h3>
-                    </div>
-                    <button onclick="pix()" class="btn-primary" style="width: auto; padding: 10px 20px; background: var(--green);">PAGAR PIX</button>
-                </div>
+        <div id="checkout" class="hidden">
+            <div style="flex-grow: 1;">
+                <p style="font-size: 0.6rem; color: #888;">SELECIONADOS: <b id="sel-nums">0</b></p>
+                <p style="font-size: 1.1rem; font-weight: bold; color: var(--green);">R$ <span id="total-val">0.00</span></p>
             </div>
-
-            <div class="regras">
-                <h4>⚖️ REGRAS v5.1</h4>
-                <p>• Check-in: R$ 0,01 Diário.</p>
-                <p>• Vídeo: R$ 0,02 a cada 30 segundos assistidos.</p>
-                <p>• Indicação: Ganhe R$ 0,10 por cada novo usuário.</p>
-                <p>• Saque: Liberado ao atingir o mínimo de R$ 20,00.</p>
-            </div>
+            <button onclick="pix()" class="btn-primary" style="width: auto; padding: 10px 25px; background: var(--green);">PAGAR PIX</button>
         </div>
     </div>
 
