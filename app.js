@@ -106,22 +106,42 @@ function clicarNumero(n, el) {
 
 document.getElementById('btnPagar').onclick = async () => {
     const user = auth.currentUser;
+    if (!user) return alert("Faça login para comprar!");
+    if (selecionados.length === 0) return alert("Selecione ao menos um número!");
+
     const snap = await getDoc(doc(db, "usuarios", user.uid));
-    const dados = { ...snap.data(), numeros: selecionados, total: document.getElementById('total').innerText };
+    const dadosUsuario = snap.data();
     
+    // Pegamos o valor direto do elemento da tela
+    const valorTexto = document.getElementById('total').innerText;
+
     try {
-      const resposta = await fetch('https://minirifa-pro.onrender.com/gerar-pix', { 
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-        nome: nomeUsuario, // Nome vindo do seu cadastro [cite: 2026-01-25]
-        total: valorTotal,  // Valor acumulado das rifas [cite: 2026-01-25]
-        numeros: numerosEscolhidos
-    })
-});
+        const res = await fetch('https://minirifa-pro.onrender.com/gerar-pix', { 
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                nome: dadosUsuario.nome, // Corrigido: usando o nome do Firebase
+                telefone: dadosUsuario.telefone,
+                total: valorTexto,       // Corrigido: pegando o R$ do HTML
+                numeros: selecionados    // Corrigido: usando sua lista de números
+            })
+        });
+
+        const d = await res.json();
+        
+        if (d.copy_paste) {
+            prompt("🤖 ROBÔ: PIX Gerado com Sucesso!\n\nCopia e cola:", d.copy_paste);
+        } else {
+            alert("Erro ao gerar PIX. Tente novamente.");
+        }
+    } catch (e) { 
+        alert("Servidor Offline ou ainda acordando. Tente novamente em 30 segundos!"); 
+    }
+};
         const d = await res.json();
         prompt("PIX COPIA E COLA:", d.copy_paste);
     } catch (e) { alert("Servidor Offline!"); }
 
 };
+
 
