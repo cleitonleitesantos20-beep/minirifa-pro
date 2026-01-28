@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, doc, onSnapshot, updateDoc, increment, collection, query, orderBy, limit, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, doc, onSnapshot, updateDoc, increment, collection, query, orderBy, limit, getDoc, setDoc, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // 1. CONFIGURAÇÃO FIREBASE
@@ -19,134 +19,143 @@ const auth = getAuth(app);
 let selecionados = [];
 const PRECO_UNITARIO = 7.00;
 
-// 2. SISTEMA DE LOGIN E CADASTRO
+// 2. ACESSO: LOGIN E CADASTRO
 window.login = async () => {
-    const email = document.getElementById('email').value;
-    const senha = document.getElementById('senha').value;
-    try { 
-        await signInWithEmailAndPassword(auth, email, senha); 
-    } catch (e) { alert("Erro ao entrar: " + e.message); }
+    const e = document.getElementById('email').value;
+    const s = document.getElementById('senha').value;
+    try { await signInWithEmailAndPassword(auth, e, s); } catch(err) { alert(err.message); }
 };
 
 window.cadastrar = async () => {
-    const nome = document.getElementById('reg-nome').value;
-    const email = document.getElementById('email').value;
-    const senha = document.getElementById('senha').value;
-    const ref = document.getElementById('ref-code').value;
+    const n = document.getElementById('reg-nome').value;
+    const e = document.getElementById('email').value;
+    const s = document.getElementById('senha').value;
+    const ref = document.getElementById('ref-code').value; // Código de quem indicou
 
     try {
-        const res = await createUserWithEmailAndPassword(auth, email, senha);
-        const meuCod = nome.substring(0,3).toUpperCase() + Math.floor(1000 + Math.random() * 9000);
-        
-        await setDoc(doc(db, "usuarios", res.user.uid), {
-            nome: nome,
-            email: email,
-            meuCodigo: meuCod,
+        const res = await createUserWithEmailAndPassword(auth, e, s);
+        const cod = n.substring(0,3).toUpperCase() + Math.floor(1000 + Math.random()*9000);
+        await setDoc(doc(db, "usuarios", res.user.uid), { 
+            nome: n, 
+            meuCodigo: cod, 
+            saldoPontos: 0, 
             indicacoesSemana: 0,
-            saldoPontos: 0,
-            ultimoCheckin: "",
-            quemMeIndicou: ref || null
+            quemMeIndicou: ref || null,
+            jaComprou: false 
         });
-        alert("Conta criada com sucesso!");
-    } catch (e) { alert("Erro no cadastro: " + e.message); }
+        alert("Robô criado com sucesso!");
+    } catch(err) { alert(err.message); }
 };
 
-// 3. CHECK-IN DIÁRIO (BÔNUS R$ 0,10)
+// 3. GANHOS: CHECK-IN (R$ 0,05) E VÍDEO (R$ 0,10)
 window.fazerCheckin = async () => {
     const user = auth.currentUser;
-    if (!user) return;
     const uRef = doc(db, "usuarios", user.uid);
-    const uSnap = await getDoc(uRef);
+    const snap = await getDoc(uRef);
     const hoje = new Date().toLocaleDateString();
-
-    if (uSnap.data().ultimoCheckin === hoje) {
-        alert("🤖 Você já resgatou seu prêmio de hoje!");
-    } else {
-        await updateDoc(uRef, { 
-            ultimoCheckin: hoje, 
-            saldoPontos: increment(0.10) 
-        });
-        alert("📍 +R$ 0,10 adicionados ao seu saldo!");
-    }
+    
+    if (snap.data().ultimoCheckin === hoje) return alert("🤖 Check-in já feito hoje!");
+    
+    await updateDoc(uRef, { 
+        ultimoCheckin: hoje, 
+        saldoPontos: increment(0.05) // Evolução: 0.05
+    });
+    alert("📍 +R$ 0,05 adicionados!");
 };
 
-// 4. LÓGICA DE DATAS E MONITORAMENTO
-function obterUltimoDiaMes() {
-    const data = new Date();
-    const ultimoDia = new Date(data.getFullYear(), data.getMonth() + 1, 0);
-    return ultimoDia.toLocaleDateString('pt-br');
+window.assistirPropaganda = () => {
+    const btn = document.getElementById('btn-video');
+    const timerArea = document.getElementById('timer-video');
+    const segDisplay = document.getElementById('segundos');
+    let tempo = 30; // 30 segundos de "vídeo"
+
+    btn.classList.add('hidden');
+    timerArea.classList.remove('hidden');
+
+    const intervalo = setInterval(async () => {
+        tempo--;
+        segDisplay.innerText = tempo;
+
+        if (tempo <= 0) {
+            clearInterval(intervalo);
+            const user = auth.currentUser;
+            await updateDoc(doc(db, "usuarios", user.uid), { 
+                saldoPontos: increment(0.10) 
+            });
+            timerArea.classList.add('hidden');
+            btn.classList.remove('hidden');
+            alert("✅ Vídeo assistido! +R$ 0,10 no saldo.");
+        }
+    }, 1000);
+};
+
+// 4. LÓGICA DE INDICAÇÃO (R$ 1,00 AO COMPRAR)
+async function pagarBonusIndicador(uidComprador) {
+    const compradorRef = doc(db, "usuarios", uidComprador);
+    const snap = await getDoc(compradorRef);
+    const d = snap.data();
+
+    if (d.quemMeIndicou && !d.jaComprou) {
+        const q = query(collection(db, "usuarios"), where("meuCodigo", "==", d.quemMeIndicou));
+        const querySnap = await getDocs(q);
+
+        querySnap.forEach(async (docInd) => {
+            await updateDoc(docInd.ref, { 
+                saldoPontos: increment(1.00),
+                indicacoesSemana: increment(1)
+            });
+        });
+        await updateDoc(compradorRef, { jaComprou: true });
+    }
 }
 
+// 5. MONITORAMENTO E INTERFACE
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        // Atualiza perfil e saldo
-        onSnapshot(doc(db, "usuarios", user.uid), (snap) => {
-            const d = snap.data();
+        const agora = new Date();
+        const ultimoDia = new Date(agora.getFullYear(), agora.getMonth() + 1, 0);
+        document.getElementById('area-resultado').innerText = `PRÓXIMO SORTEIO: ${ultimoDia.toLocaleDateString('pt-br')}`;
+
+        onSnapshot(doc(db, "usuarios", user.uid), (s) => {
+            const d = s.data();
             document.getElementById('user-display').innerText = d.nome;
             document.getElementById('meu-codigo-txt').innerText = d.meuCodigo;
+            document.getElementById('saldo-pontos').innerText = d.saldoPontos.toFixed(2);
             document.getElementById('ponto-semana').innerText = d.indicacoesSemana || 0;
-            document.getElementById('saldo-pontos').innerText = (d.saldoPontos || 0).toFixed(2);
-            
             document.getElementById('auth-section').classList.add('hidden');
             document.getElementById('tela-rifa').classList.remove('hidden');
         });
 
-        // Monitora Sorteio, Fases e Números Vendidos
         onSnapshot(doc(db, "config", "sorteio"), (snap) => {
             const d = snap.data() || { vendidos: 0, numerosComprados: [] };
-            const vendidosTotais = d.vendidos || 0;
-            const comprados = d.numerosComprados || [];
-            
-            document.getElementById('area-resultado').innerText = `📅 PRÓXIMO SORTEIO: ${obterUltimoDiaMes()}`;
-            
-            // Desbloqueio de Fases
-            if (vendidosTotais >= 50) document.getElementById('fase2-ui').classList.remove('locked');
-            if (vendidosTotais >= 100) document.getElementById('fase3-ui').classList.remove('locked');
-            
-            renderizarTodasFases(comprados);
+            if (d.vendidos >= 50) document.getElementById('fase2-ui').classList.remove('locked');
+            if (d.vendidos >= 100) document.getElementById('fase3-ui').classList.remove('locked');
+            renderizarGrids(d.numerosComprados || []);
         });
 
-        // Ranking de Indicadores
-        const qRanking = query(collection(db, "usuarios"), orderBy("indicacoesSemana", "desc"), limit(3));
-        onSnapshot(qRanking, (snap) => {
-            let html = "";
-            snap.forEach(u => {
-                html += `<p><span>${u.data().nome}</span> <b>${u.data().indicacoesSemana || 0} vendas</b></p>`;
-            });
-            document.getElementById('ranking-lista').innerHTML = html;
+        const qR = query(collection(db, "usuarios"), orderBy("indicacoesSemana", "desc"), limit(3));
+        onSnapshot(qR, (snap) => {
+            let h = "";
+            snap.forEach(u => { h += `<p><span>${u.data().nome}</span> <b>${u.data().indicacoesSemana || 0} pts</b></p>`; });
+            document.getElementById('ranking-lista').innerHTML = h;
         });
     }
 });
 
-// 5. GRID DE NÚMEROS E CHECKOUT
-function renderizarTodasFases(comprados) {
+// 6. GRIDS E PAGAMENTO
+function renderizarGrids(comprados) {
     for (let f = 1; f <= 3; f++) {
         const grid = document.getElementById(`grid-fase${f}`);
         grid.innerHTML = "";
-        const inicio = (f - 1) * 50 + 1;
-        const fim = f * 50;
-
-        for (let i = inicio; i <= fim; i++) {
+        for (let i = (f-1)*50+1; i <= f*50; i++) {
             const btn = document.createElement('button');
             btn.innerText = i;
-            
-            if (comprados.includes(i)) {
-                btn.className = 'num comprado';
-            } else if (selecionados.includes(i)) {
-                btn.className = 'num selecionado';
-            } else {
-                btn.className = 'num';
-            }
-
+            btn.className = comprados.includes(i) ? 'num comprado' : (selecionados.includes(i) ? 'num selecionado' : 'num');
             btn.onclick = () => {
                 if (comprados.includes(i)) return;
                 const idx = selecionados.indexOf(i);
-                if (idx > -1) {
-                    selecionados.splice(idx, 1);
-                } else {
-                    selecionados.push(i);
-                }
-                renderizarTodasFases(comprados);
+                idx > -1 ? selecionados.splice(idx,1) : selecionados.push(i);
+                renderizarGrids(comprados);
                 atualizarCheckout();
             };
             grid.appendChild(btn);
@@ -159,56 +168,25 @@ function atualizarCheckout() {
     if (selecionados.length > 0) {
         area.classList.remove('hidden');
         document.getElementById('num-selecionados').innerText = selecionados.join(', ');
-        document.getElementById('total-pagar').innerText = (selecionados.length * PRECO_UNITARIO).toFixed(2);
-    } else {
-        area.classList.add('hidden');
-    }
+        document.getElementById('total-pagar').innerText = (selecionados.length * 7).toFixed(2);
+    } else area.classList.add('hidden');
 }
 
-// 6. LÓGICA DE ARRASTAR COM O MOUSE (PC)
+window.gerarPix = async () => {
+    alert("PIX Copiado! Pague R$ " + (selecionados.length * 7).toFixed(2) + " para validar seus números.");
+    // Aqui você chamaria pagarBonusIndicador(auth.currentUser.uid) após a confirmação do pagamento real
+};
+
+// 7. ARRASTE DE MOUSE (PC)
 const slider = document.querySelector('.fases-wrapper');
 let isDown = false; let startX; let scrollLeft;
-
-slider.addEventListener('mousedown', (e) => {
-    isDown = true;
-    startX = e.pageX - slider.offsetLeft;
-    scrollLeft = slider.scrollLeft;
-});
+slider.addEventListener('mousedown', (e) => { isDown = true; startX = e.pageX - slider.offsetLeft; scrollLeft = slider.scrollLeft; });
 slider.addEventListener('mouseleave', () => isDown = false);
 slider.addEventListener('mouseup', () => isDown = false);
 slider.addEventListener('mousemove', (e) => {
-    if (!isDown) return;
+    if(!isDown) return;
     e.preventDefault();
     const x = e.pageX - slider.offsetLeft;
     const walk = (x - startX) * 2;
     slider.scrollLeft = scrollLeft - walk;
 });
-// 7. FUNÇÃO DE PAGAMENTO (GERAR PIX)
-window.gerarPix = async () => {
-    if (selecionados.length === 0) return alert("Selecione ao menos um número!");
-
-    const valorTotal = (selecionados.length * PRECO_UNITARIO).toFixed(2);
-    const user = auth.currentUser;
-
-    // Aqui simulamos a criação do pedido no banco de dados
-    const pedidoId = "PX" + Math.floor(1000 + Math.random() * 9000);
-    
-    // Alerta estilizado simulando o sistema de pagamento
-    const confirmacao = confirm(`🚀 ROBOSORTEIO - PEDIDO ${pedidoId}\n\nVocê selecionou os números: ${selecionados.join(', ')}\nValor Total: R$ ${valorTotal}\n\nDeseja gerar o código PIX Copia e Cola?`);
-
-    if (confirmacao) {
-        // No futuro, aqui você conectará com a API do Mercado Pago ou Efí
-        const pixFake = "00020126580014BR.GOV.BCB.PIX0136suachavepixaqui12345678905204000053039865404" + valorTotal + "5802BR5913ROBOSORTEIO6008BRASILIA62070503***6304E2B1";
-        
-        // Copia automaticamente para a área de transferência
-        navigator.clipboard.writeText(pixFake).then(() => {
-            alert("✅ CÓDIGO PIX COPIADO!\n\nCole no seu banco para pagar R$ " + valorTotal + ".\n\nApós o pagamento, seus números ficarão vermelhos em instantes.");
-            
-            // Limpa a seleção após "gerar" o pix
-            selecionados = [];
-            document.getElementById('payment-area').classList.add('hidden');
-            // Aqui você chamaria a renderização para atualizar o visual
-            // renderizarTodasFases([]); 
-        });
-    }
-};
