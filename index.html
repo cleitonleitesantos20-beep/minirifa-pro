@@ -1,4 +1,3 @@
-/* === INÍCIO DO INDEX COMPLETO === */
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -21,14 +20,11 @@
                 <div class="chamada-lucro">
                     🚀 ENTRE AGORA PODENDO GANHAR ATÉ <b>R$ 345,00</b> POR MÊS!
                 </div>
-
                 <h2 class="neon-text" style="text-align: center; margin-bottom: 15px;">ACESSO</h2>
                 <input type="email" id="email" placeholder="Seu e-mail">
                 <input type="password" id="senha" placeholder="Sua senha">
                 <button onclick="login()" class="btn-main">ENTRAR NO LOGIN</button>
-                
                 <div class="divider">OU CRIE SUA CONTA</div>
-                
                 <input type="text" id="reg-nome" placeholder="Nome Completo">
                 <input type="text" id="ref-code" placeholder="Código de Indicação (Opcional)">
                 <button onclick="cadastrar()" class="btn-sec">CADASTRAR</button>
@@ -37,7 +33,6 @@
 
         <div id="tela-rifa" class="hidden">
             
-            /* === INÍCIO DO CARROSSEL DE PROPAGANDA TOPO === */
             <div class="ads-slider-container topo">
                 <div class="ads-track">
                     <div class="ad-slide">🚀 AUMENTE SEUS GANHOS HOJE!</div>
@@ -46,27 +41,20 @@
                     <div class="ad-slide">⚡ SORTEIO SEGURO</div>
                 </div>
             </div>
-            /* === FIM DO CARROSSEL DE PROPAGANDA TOPO === */
 
             <div class="user-dashboard">
                 <div class="user-header">
                     <span>Olá, <b id="user-display">...</b></span>
                     <button onclick="sair()" class="btn-logout">SAIR</button>
                 </div>
-                
-                <div class="pontos-wallet">
-                    R$ <span id="saldo-pontos">0.00</span>
-                </div>
-
+                <div class="pontos-wallet">R$ <span id="saldo-pontos">0.00</span></div>
                 <div class="ganhos-grid">
                     <button onclick="fazerCheckin()" id="btn-checkin">📍 CHECK-IN (R$ 0,05)</button>
                     <button onclick="assistirPropaganda()" id="btn-video">📺 VÍDEO (R$ 0,10)</button>
                 </div>
-                
                 <div id="timer-video" class="hidden">
                     📺 AGUARDE <span id="segundos">30</span>s...
                 </div>
-
                 <div class="user-info-footer">
                     <p>CÓDIGO: <b id="meu-codigo-txt" style="color: var(--neon-blue);">...</b></p>
                     <p>VENDAS: <b id="ponto-semana" style="color: var(--neon-green);">0</b></p>
@@ -74,29 +62,24 @@
             </div>
 
             <div class="fase-container">
-                <h3 style="text-align: center; font-size: 0.8rem; color: #555; margin-top: 20px;">🔢 DESLIZE PARA ESCOLHER A FASE</h3>
                 <div class="fases-wrapper">
-                    
                     <div class="fase-slide" id="fase1-section">
                         <div class="valor-premio">PRÊMIO: R$ 100,00</div>
                         <span class="fase-badge">FASE 1 (1-50)</span>
                         <div id="grid-fase1" class="grid-numeros"></div>
                     </div>
-
                     <div class="fase-slide locked" id="fase2-ui">
                         <div class="lock-overlay">🔒 META: 50 VENDAS PARA LIBERAR</div>
                         <div class="valor-premio">PRÊMIO: R$ 220,00</div>
                         <span class="fase-badge">FASE 2 (51-100)</span>
                         <div id="grid-fase2" class="grid-numeros"></div>
                     </div>
-
                     <div class="fase-slide locked" id="fase3-ui">
                         <div class="lock-overlay">🔒 META: 100 VENDAS PARA LIBERAR</div>
                         <div class="valor-premio">PRÊMIO: R$ 330,00</div>
                         <span class="fase-badge">FASE 3 (101-150)</span>
                         <div id="grid-fase3" class="grid-numeros"></div>
                     </div>
-
                 </div>
             </div>
 
@@ -110,40 +93,21 @@
 
             <div id="area-resultado" class="quadro-data">AGUARDANDO SORTEIO...</div>
 
-            /* === INÍCIO DO RANKING PREMIADO === */
             <div class="ranking-container">
                 <h3>🏆 TOP INDICADORES</h3>
-                <div id="ranking-lista">
-                    </div>
+                <div id="ranking-lista"></div>
             </div>
-            /* === FIM DO RANKING PREMIADO === */
 
-            /* === INÍCIO DO CARROSSEL DE PROPAGANDA BAIXO === */
-            <div class="ads-slider-container">
-                <div class="ads-track">
-                    <div class="ad-slide">💸 GANHE DINHEIRO INDICANDO AMIGOS</div>
-                    <div class="ad-slide">📺 ASSISTA E GANHE SALDO</div>
-                    <div class="ad-slide">🍀 SORTEIOS VIA LOTERIA FEDERAL</div>
-                    <div class="ad-slide">🚀 ROBOSORTEIO: A MELHOR PLATAFORMA</div>
-                </div>
-            </div>
-            /* === FIM DO CARROSSEL DE PROPAGANDA BAIXO === */
-
-            /* === INÍCIO DAS REGRAS E LEIS === */
             <div class="regras-container">
                 <h4>⚖️ REGRAS E FUNCIONAMENTO</h4>
-                <p>• <b>Dinâmica:</b> O usuário escolhe cotas de R$ 7,00. Os sorteios ocorrem mensalmente.</p>
-                <p>• <b>Indicações:</b> Ganhe <b>R$ 1,00</b> de saldo real sempre que um indicado fizer a 1ª compra.</p>
-                <p>• <b>Saques:</b> O valor mínimo para retirada via PIX é de R$ 50,00.</p>
-                <p>• <b>Propagandas:</b> Limite de 1 vídeo por dia para bonificação de saldo acumulado.</p>
-                <p>• <b>Termos:</b> Em conformidade com a Lei nº 13.019/14 para fins de entretenimento.</p>
+                <p>• <b>Cotas:</b> R$ 7,00 por número.</p>
+                <p>• <b>Indicações:</b> Ganhe R$ 1,00 por compra de indicado.</p>
+                <p>• <b>Saques:</b> Mínimo R$ 15,00.</p>
+                <p>• <b>Termos:</b> Lei nº 13.019/14.</p>
             </div>
-            /* === FIM DAS REGRAS E LEIS === */
-
         </div>
     </div>
 
     <script src="app.js" type="module"></script>
 </body>
 </html>
-/* === FIM DO INDEX COMPLETO === */
