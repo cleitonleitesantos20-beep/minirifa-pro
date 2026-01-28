@@ -2,14 +2,14 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getFirestore, doc, onSnapshot, updateDoc, increment, collection, query, orderBy, limit, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// 1. CONFIGURAÇÃO (SUAS CHAVES)
+// 1. CONFIGURAÇÃO FIREBASE
 const firebaseConfig = {
-  apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8",
-  authDomain: "minharifadigital.firebaseapp.com",
-  projectId: "minharifadigital",
-  storageBucket: "minharifadigital.firebasestorage.app",
-  messagingSenderId: "59630725905",
-  appId: "1:59630725905:web:396c8cfca385dc3d957ab0"
+    apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8",
+    authDomain: "minharifadigital.firebaseapp.com",
+    projectId: "minharifadigital",
+    storageBucket: "minharifadigital.firebasestorage.app",
+    messagingSenderId: "59630725905",
+    appId: "1:59630725905:web:396c8cfca385dc3d957ab0"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -17,21 +17,15 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 let selecionados = [];
-const PRECO_UNITARIO = 7.00; // Valor atualizado para R$ 7,00
+const PRECO_UNITARIO = 7.00;
 
-// 2. UTILITÁRIOS: DATA DO SORTEIO
-function obterUltimoDiaMes() {
-    const data = new Date();
-    const ultimoDia = new Date(data.getFullYear(), data.getMonth() + 1, 0);
-    return ultimoDia.toLocaleDateString('pt-br');
-}
-
-// 3. ACESSO: LOGIN E CADASTRO
+// 2. SISTEMA DE LOGIN E CADASTRO
 window.login = async () => {
     const email = document.getElementById('email').value;
     const senha = document.getElementById('senha').value;
-    try { await signInWithEmailAndPassword(auth, email, senha); } 
-    catch (e) { alert("Falha no login: " + e.message); }
+    try { 
+        await signInWithEmailAndPassword(auth, email, senha); 
+    } catch (e) { alert("Erro ao entrar: " + e.message); }
 };
 
 window.cadastrar = async () => {
@@ -53,11 +47,11 @@ window.cadastrar = async () => {
             ultimoCheckin: "",
             quemMeIndicou: ref || null
         });
-        alert("Conta Robótica criada com sucesso!");
+        alert("Conta criada com sucesso!");
     } catch (e) { alert("Erro no cadastro: " + e.message); }
 };
 
-// 4. CHECK-IN DIÁRIO (R$ 0,10 PROGRESSIVO)
+// 3. CHECK-IN DIÁRIO (BÔNUS R$ 0,10)
 window.fazerCheckin = async () => {
     const user = auth.currentUser;
     if (!user) return;
@@ -66,7 +60,7 @@ window.fazerCheckin = async () => {
     const hoje = new Date().toLocaleDateString();
 
     if (uSnap.data().ultimoCheckin === hoje) {
-        alert("🤖 Sistema: Você já coletou seu bônus hoje!");
+        alert("🤖 Você já resgatou seu prêmio de hoje!");
     } else {
         await updateDoc(uRef, { 
             ultimoCheckin: hoje, 
@@ -76,10 +70,16 @@ window.fazerCheckin = async () => {
     }
 };
 
-// 5. MONITORAMENTO EM TEMPO REAL
+// 4. LÓGICA DE DATAS E MONITORAMENTO
+function obterUltimoDiaMes() {
+    const data = new Date();
+    const ultimoDia = new Date(data.getFullYear(), data.getMonth() + 1, 0);
+    return ultimoDia.toLocaleDateString('pt-br');
+}
+
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        // Dados do Usuário
+        // Atualiza perfil e saldo
         onSnapshot(doc(db, "usuarios", user.uid), (snap) => {
             const d = snap.data();
             document.getElementById('user-display').innerText = d.nome;
@@ -91,34 +91,34 @@ onAuthStateChanged(auth, (user) => {
             document.getElementById('tela-rifa').classList.remove('hidden');
         });
 
-        // Configuração do Sorteio e Fases
+        // Monitora Sorteio, Fases e Números Vendidos
         onSnapshot(doc(db, "config", "sorteio"), (snap) => {
             const d = snap.data() || { vendidos: 0, numerosComprados: [] };
             const vendidosTotais = d.vendidos || 0;
             const comprados = d.numerosComprados || [];
             
-            // Atualiza Data e Fases
             document.getElementById('area-resultado').innerText = `📅 PRÓXIMO SORTEIO: ${obterUltimoDiaMes()}`;
             
+            // Desbloqueio de Fases
             if (vendidosTotais >= 50) document.getElementById('fase2-ui').classList.remove('locked');
             if (vendidosTotais >= 100) document.getElementById('fase3-ui').classList.remove('locked');
             
             renderizarTodasFases(comprados);
         });
 
-        // Ranking Top 3 no Rodapé
+        // Ranking de Indicadores
         const qRanking = query(collection(db, "usuarios"), orderBy("indicacoesSemana", "desc"), limit(3));
         onSnapshot(qRanking, (snap) => {
             let html = "";
             snap.forEach(u => {
                 html += `<p><span>${u.data().nome}</span> <b>${u.data().indicacoesSemana || 0} vendas</b></p>`;
             });
-            document.getElementById('ranking-lista').innerHTML = html || "Aguardando competidores...";
+            document.getElementById('ranking-lista').innerHTML = html;
         });
     }
 });
 
-// 6. RENDERIZAÇÃO E SELEÇÃO (VERDE/VERMELHO)
+// 5. GRID DE NÚMEROS E CHECKOUT
 function renderizarTodasFases(comprados) {
     for (let f = 1; f <= 3; f++) {
         const grid = document.getElementById(`grid-fase${f}`);
@@ -130,7 +130,6 @@ function renderizarTodasFases(comprados) {
             const btn = document.createElement('button');
             btn.innerText = i;
             
-            // Lógica de cores: Vermelho se já foi comprado
             if (comprados.includes(i)) {
                 btn.className = 'num comprado';
             } else if (selecionados.includes(i)) {
@@ -139,27 +138,23 @@ function renderizarTodasFases(comprados) {
                 btn.className = 'num';
             }
 
-            btn.onclick = () => alternarSelecao(i, btn, comprados);
+            btn.onclick = () => {
+                if (comprados.includes(i)) return;
+                const idx = selecionados.indexOf(i);
+                if (idx > -1) {
+                    selecionados.splice(idx, 1);
+                } else {
+                    selecionados.push(i);
+                }
+                renderizarTodasFases(comprados);
+                atualizarCheckout();
+            };
             grid.appendChild(btn);
         }
     }
 }
 
-function alternarSelecao(n, btn, comprados) {
-    if (comprados.includes(n)) return;
-
-    const idx = selecionados.indexOf(n);
-    if (idx > -1) {
-        selecionados.splice(idx, 1);
-        btn.classList.remove('selecionado');
-    } else {
-        selecionados.push(n);
-        btn.classList.add('selecionado');
-    }
-    atualizarInterfaceCheckout();
-}
-
-function atualizarInterfaceCheckout() {
+function atualizarCheckout() {
     const area = document.getElementById('payment-area');
     if (selecionados.length > 0) {
         area.classList.remove('hidden');
@@ -169,3 +164,22 @@ function atualizarInterfaceCheckout() {
         area.classList.add('hidden');
     }
 }
+
+// 6. LÓGICA DE ARRASTAR COM O MOUSE (PC)
+const slider = document.querySelector('.fases-wrapper');
+let isDown = false; let startX; let scrollLeft;
+
+slider.addEventListener('mousedown', (e) => {
+    isDown = true;
+    startX = e.pageX - slider.offsetLeft;
+    scrollLeft = slider.scrollLeft;
+});
+slider.addEventListener('mouseleave', () => isDown = false);
+slider.addEventListener('mouseup', () => isDown = false);
+slider.addEventListener('mousemove', (e) => {
+    if (!isDown) return;
+    e.preventDefault();
+    const x = e.pageX - slider.offsetLeft;
+    const walk = (x - startX) * 2;
+    slider.scrollLeft = scrollLeft - walk;
+});
