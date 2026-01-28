@@ -2,30 +2,29 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Minigames $$$</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        /* Estilos específicos para as novas funções */
-        .scratch-area { width: 100%; height: 80px; background: #222; border: 2px dashed #444; display: flex; align-items: center; justify-content: center; border-radius: 10px; cursor: pointer; color: #888; transition: 0.3s; }
-        
-        /* 3. Animação da Raspadinha */
-        .scratch-active { animation: shake 0.3s infinite; background: var(--neon) !important; color: #000 !important; font-weight: bold; }
-        @keyframes shake {
-            0% { transform: translate(1px, 1px) rotate(0deg); }
-            20% { transform: translate(-1px, -2px) rotate(-1deg); }
-            50% { transform: translate(-3px, 0px) rotate(1deg); }
-            100% { transform: translate(1px, 1px) rotate(0deg); }
-        }
-
-        /* 4. Animação de Pixels da Mineração */
-        .mining-canvas { width: 100%; height: 80px; background: #000; border-radius: 10px; display: none; position: relative; overflow: hidden; border: 1px solid #222; }
-        .pixel { position: absolute; width: 6px; height: 6px; background: #00ff00; box-shadow: 0 0 5px #00ff00; border-radius: 1px; }
-
-        .btn-ad:disabled { opacity: 0.4; pointer-events: none; filter: grayscale(1); }
-        .xp-bar-bg { background: #111; height: 12px; border-radius: 10px; margin-top: 10px; border: 1px solid #333; overflow: hidden; }
+        .xp-container { position: relative; margin-top: 15px; }
+        .xp-bar-bg { background: #111; height: 15px; border-radius: 10px; border: 1px solid #333; overflow: hidden; display: flex; align-items: center; }
         .xp-bar-fill { background: linear-gradient(90deg, var(--neon), #00ff88); height: 100%; width: 0%; transition: 1s ease-out; }
+        .bonus-tag { position: absolute; right: 0; top: -20px; color: var(--green); font-size: 0.7rem; font-weight: bold; font-family: 'Orbitron'; }
+
+        /* Jogo IA Runner */
+        #game-canvas { width: 100%; height: 120px; background: #000; border: 1px solid #222; border-radius: 10px; position: relative; overflow: hidden; display: none; }
+        #robot { position: absolute; bottom: 0; left: 20px; font-size: 20px; transition: bottom 0.3s; }
+        .block { position: absolute; bottom: 0; right: -30px; color: var(--green); font-family: 'Courier New'; font-weight: bold; }
+
+        .scratch-area { width: 100%; height: 60px; background: #222; border: 2px dashed #444; display: flex; align-items: center; justify-content: center; border-radius: 10px; cursor: pointer; color: #888; }
+        .scratch-active { animation: shake 0.3s infinite; background: var(--neon) !important; color: #000 !important; }
+        @keyframes shake { 0% {transform: translate(1px, 1px)} 50% {transform: translate(-2px, -1px)} 100% {transform: translate(1px, 1px)} }
+
+        .mining-canvas { width: 100%; height: 60px; background: #000; border-radius: 10px; display: none; position: relative; overflow: hidden; }
+        .pixel { position: absolute; width: 4px; height: 4px; background: #00ff00; box-shadow: 0 0 5px #00ff00; }
+
+        .ad-space { width: 100%; height: 80px; background: #1a1a1a; border: 1px dashed #444; display: flex; align-items: center; justify-content: center; border-radius: 10px; color: #444; font-family: 'Orbitron'; font-size: 0.8rem; margin-top: 15px; }
     </style>
 </head>
 <body>
@@ -36,40 +35,48 @@
         <button onclick="window.location.href='index.html'" class="btn-small" style="float:none; margin-bottom: 20px;">⬅ VOLTAR</button>
 
         <div class="card">
-            <h2 style="font-family: 'Orbitron'; font-size: 1.2rem;">NÍVEL <span id="lvl-display">1</span></h2>
-            <div class="xp-bar-bg">
-                <div id="xp-bar" class="xp-bar-fill"></div>
+            <h2 style="font-family: 'Orbitron'; font-size: 1rem;">NÍVEL <span id="lvl-display">1</span></h2>
+            <div class="xp-container">
+                <span class="bonus-tag">+ R$ 0,10</span>
+                <div class="xp-bar-bg">
+                    <div id="xp-bar" class="xp-bar-fill"></div>
+                </div>
             </div>
-            <p id="xp-status" style="font-size: 0.7rem; color: #666; margin-top: 5px; text-align: center;">0/100 XP</p>
+            <p id="xp-status" style="font-size: 0.6rem; color: #666; margin-top: 5px; text-align: center;">0/100 XP</p>
         </div>
 
         <div class="card">
-            <h4 style="margin-bottom: 10px;">🎰 RASPADINHA DIÁRIA</h4>
+            <h4>🏃 IA RUNNER (PULAR BLOCOS)</h4>
+            <div id="game-canvas">
+                <div id="robot">🤖</div>
+            </div>
+            <button id="btn-game" onclick="startGame()" class="btn-primary">JOGAR (R$ 0.03 + 5XP)</button>
+        </div>
+
+        <div class="card">
+            <h4>🎰 RASPADINHA DIÁRIA</h4>
             <div id="scratch-box" class="scratch-area" onclick="playScratch()">CLIQUE PARA RASPAR</div>
         </div>
 
         <div class="card">
-            <h4 style="margin-bottom: 10px;">⛏️ MINERAÇÃO PIXEL</h4>
+            <h4>⛏️ MINERAÇÃO PIXEL</h4>
             <div id="mining-status" class="mining-canvas"></div>
-            <button id="btn-mine" onclick="startMining()" class="btn-primary">INICIAR MINERAÇÃO (R$ 0.03)</button>
+            <button id="btn-mine" onclick="startMining()" class="btn-primary">MINERAR (R$ 0.03)</button>
         </div>
 
         <div class="card">
-            <h4 style="margin-bottom: 10px;">💎 LOJAS PARCEIRAS (1X DIA)</h4>
-            <button id="ad-1" onclick="visitAd('https://shopee.com.br', 'ad-1')" class="btn-outline" style="width:100%; margin-bottom:10px;">🛒 ACESSAR SHOPEE (+5 XP)</button>
-            <button id="ad-2" onclick="visitAd('https://www.mercadolivre.com.br', 'ad-2')" class="btn-outline" style="width:100%;">📦 MERCADO LIVRE (+5 XP)</button>
+            <h4>📱 MISSÕES SOCIAIS (5 XP)</h4>
+            <button id="ad-ins" onclick="visitAd('https://instagram.com/suacontaouloja', 'lastIns')" class="btn-outline" style="width:100%; margin-bottom:8px; font-size: 0.7rem;">INSTAGRAM @suacontaouloja</button>
+            <button id="ad-tik" onclick="visitAd('https://tiktok.com/@suacontaouloja', 'lastTik')" class="btn-outline" style="width:100%; margin-bottom:8px; font-size: 0.7rem;">TIKTOK @suacontaouloja</button>
+            <button id="ad-fac" onclick="visitAd('https://facebook.com/suacontaouloja', 'lastFac')" class="btn-outline" style="width:100%; font-size: 0.7rem;">FACEBOOK @suacontaouloja</button>
         </div>
 
-        <div class="card">
-            <h4>🐞 RELATAR BUG</h4>
-            <textarea id="fb-text" placeholder="Descreva o erro..." style="width:100%; background:#000; color:#fff; border:1px solid #333; padding:10px; border-radius:5px; margin-top:10px; font-family:'Rajdhani';"></textarea>
-            <button onclick="sendFeedback()" class="btn-primary" style="margin-top:10px;">ENVIAR</button>
-        </div>
+        <div class="ad-space">SUA PROPAGANDA AQUI</div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, updateDoc, increment, setDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, increment } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -84,120 +91,116 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
-        let user = null;
-        let userData = null;
+        let user, userData, gameInterval;
 
         onAuthStateChanged(auth, (u) => {
             if (u) {
                 user = u;
                 onSnapshot(doc(db, "usuarios", u.uid), (snap) => {
                     userData = snap.data();
-                    if(userData) renderizarDados();
+                    if(userData) render();
                 });
             } else { window.location.href = 'index.html'; }
         });
 
-        function renderizarDados() {
+        function render() {
             const xp = userData.xp || 0;
             const lvl = Math.floor(xp / 100) + 1;
-            const xpLvl = xp % 100;
-            
             document.getElementById('lvl-display').innerText = lvl;
-            document.getElementById('xp-bar').style.width = xpLvl + "%";
-            document.getElementById('xp-status').innerText = `${xpLvl}/100 XP`;
+            document.getElementById('xp-bar').style.width = (xp % 100) + "%";
+            document.getElementById('xp-status').innerText = `${xp % 100}/100 XP`;
 
             const hoje = new Date().toISOString().split('T')[0];
-            if(userData.lastScratch === hoje) document.getElementById('scratch-box').innerText = "✅ JÁ RASPADO";
-            if(userData.lastMine === hoje) {
-                document.getElementById('btn-mine').disabled = true;
-                document.getElementById('btn-mine').innerText = "CONCLUÍDO";
-            }
-            if(userData.lastAd1 === hoje) document.getElementById('ad-1').disabled = true;
-            if(userData.lastAd2 === hoje) document.getElementById('ad-2').disabled = true;
+            if(userData.lastScratch === hoje) document.getElementById('scratch-box').innerText = "✅ CONCLUÍDO";
+            if(userData.lastMine === hoje) document.getElementById('btn-mine').disabled = true;
+            if(userData.lastGame === hoje) document.getElementById('btn-game').disabled = true;
+            if(userData.lastIns === hoje) document.getElementById('ad-ins').disabled = true;
+            if(userData.lastTik === hoje) document.getElementById('ad-tik').disabled = true;
+            if(userData.lastFac === hoje) document.getElementById('ad-fac').disabled = true;
         }
 
-        async function darXP(qtd) {
-            const xpAntigo = userData.xp || 0;
-            const novoXP = xpAntigo + qtd;
-            const lvlAntigo = Math.floor(xpAntigo / 100);
-            const lvlNovo = Math.floor(novoXP / 100);
-
-            let upd = { xp: increment(qtd) };
-            if(lvlNovo > lvlAntigo) {
-                upd.saldo = increment(0.10);
-                alert(`⚡ NÍVEL UP! +R$ 0.10`);
-            }
-            await updateDoc(doc(db, "usuarios", user.uid), upd);
+        async function addXP(qtd) {
+            const xp = userData.xp || 0;
+            const up = Math.floor((xp + qtd) / 100) > Math.floor(xp / 100);
+            let d = { xp: increment(qtd) };
+            if(up) { d.saldo = increment(0.10); alert("NÍVEL UP! +R$ 0.10"); }
+            await updateDoc(doc(db, "usuarios", user.uid), d);
         }
 
+        // --- MINI GAME IA RUNNER ---
+        window.startGame = () => {
+            const canvas = document.getElementById('game-canvas');
+            const btn = document.getElementById('btn-game');
+            canvas.style.display = 'block'; btn.style.display = 'none';
+            
+            let score = 0;
+            canvas.onclick = () => { 
+                const rob = document.getElementById('robot');
+                if(rob.style.bottom === '0px' || !rob.style.bottom) {
+                    rob.style.bottom = '50px';
+                    setTimeout(() => rob.style.bottom = '0px', 300);
+                }
+            };
+
+            gameInterval = setInterval(() => {
+                const block = document.createElement('div');
+                block.className = 'block'; block.innerText = '01';
+                block.style.right = '-30px'; canvas.appendChild(block);
+                
+                let pos = -30;
+                let move = setInterval(() => {
+                    pos += 5; block.style.right = pos + 'px';
+                    if(pos > 350) { clearInterval(move); block.remove(); score++; }
+                    if(score >= 5) { 
+                        clearInterval(gameInterval); clearInterval(move); 
+                        finishGame(); 
+                    }
+                }, 30);
+            }, 2000);
+        };
+
+        async function finishGame() {
+            const hoje = new Date().toISOString().split('T')[0];
+            await updateDoc(doc(db, "usuarios", user.uid), { saldo: increment(0.03), lastGame: hoje });
+            await addXP(5);
+            alert("Você venceu os blocos! +R$ 0.03");
+            location.reload();
+        }
+
+        // --- OUTRAS FUNÇÕES ---
         window.playScratch = async () => {
             const hoje = new Date().toISOString().split('T')[0];
             if(userData.lastScratch === hoje) return;
-
-            const box = document.getElementById('scratch-box');
-            box.classList.add('scratch-active');
-            box.innerText = "RASPANDO...";
-
+            document.getElementById('scratch-box').classList.add('scratch-active');
             setTimeout(async () => {
-                box.classList.remove('scratch-active');
-                box.innerText = "✨ +R$ 0.03";
-                await updateDoc(doc(db, "usuarios", user.uid), {
-                    saldo: increment(0.03),
-                    lastScratch: hoje
-                });
-                await darXP(2);
+                await updateDoc(doc(db, "usuarios", user.uid), { saldo: increment(0.03), lastScratch: hoje });
+                await addXP(2);
             }, 2000);
         };
 
         window.startMining = () => {
             const hoje = new Date().toISOString().split('T')[0];
             if(userData.lastMine === hoje) return;
-
-            const status = document.getElementById('mining-status');
-            const btn = document.getElementById('btn-mine');
-            btn.style.display = 'none';
-            status.style.display = 'block';
-
-            for(let i=0; i<40; i++) {
+            document.getElementById('mining-status').style.display = 'block';
+            for(let i=0; i<30; i++) {
                 setTimeout(() => {
-                    const p = document.createElement('div');
-                    p.className = 'pixel';
-                    p.style.left = Math.random() * 95 + "%";
-                    p.style.top = Math.random() * 85 + "%";
-                    status.appendChild(p);
-                    p.animate([{transform:'scale(0)'},{transform:'scale(1)'},{transform:'scale(0)', opacity:0}], 1500);
-                }, i * 150);
+                    const p = document.createElement('div'); p.className = 'pixel';
+                    p.style.left = Math.random()*95+"%"; p.style.top = Math.random()*80+"%";
+                    document.getElementById('mining-status').appendChild(p);
+                }, i*100);
             }
-
             setTimeout(async () => {
-                await updateDoc(doc(db, "usuarios", user.uid), {
-                    saldo: increment(0.03),
-                    lastMine: hoje
-                });
-                await darXP(5);
-                alert("Mineração Concluída!");
+                await updateDoc(doc(db, "usuarios", user.uid), { saldo: increment(0.03), lastMine: hoje });
+                await addXP(5);
                 location.reload();
-            }, 6000);
+            }, 4000);
         };
 
-        window.visitAd = async (url, id) => {
+        window.visitAd = async (url, field) => {
             const hoje = new Date().toISOString().split('T')[0];
             window.open(url, '_blank');
-            let upd = { xp: increment(5) };
-            upd[id === 'ad-1' ? 'lastAd1' : 'lastAd2'] = hoje;
-            await updateDoc(doc(db, "usuarios", user.uid), upd);
-        };
-
-        window.sendFeedback = async () => {
-            const msg = document.getElementById('fb-text').value;
-            if(!msg) return;
-            await setDoc(doc(db, "feedbacks", Date.now().toString()), {
-                user: user.email,
-                msg: msg,
-                date: new Date().toISOString()
-            });
-            alert("Feedback enviado!");
-            document.getElementById('fb-text').value = "";
+            let u = {}; u[field] = hoje; u.xp = increment(5);
+            await updateDoc(doc(db, "usuarios", user.uid), u);
         };
     </script>
 </body>
