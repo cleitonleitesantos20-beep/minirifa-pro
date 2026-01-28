@@ -59,26 +59,30 @@ window.logout = () => signOut(auth).then(() => location.reload());
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         const uSnap = await getDoc(doc(db, "usuarios", user.uid));
-        const uDados = uSnap.data();
-        
-        document.getElementById('user-display').innerText = uDados.nome;
-        document.getElementById('meu-codigo-txt').innerText = uDados.meuCodigo;
-        document.getElementById('ponto-indicacao').innerText = `${uDados.indicacoesVendas}/3`;
-        document.getElementById('auth-section').classList.add('hidden');
-        document.getElementById('tela-rifa').classList.remove('hidden');
-
-        // Escuta em tempo real a Meta Evolutiva [cite: 2026-01-28]
-        onSnapshot(doc(db, "config", "sorteio"), (doc) => {
-            const totalNumeros = doc.data()?.total || 50;
-            const vendidos = doc.data()?.vendidos || 0;
+        if (uSnap.exists()) {
+            const uDados = uSnap.data();
             
-            document.getElementById('vendas-contagem').innerText = vendidos;
-            document.getElementById('meta-max').innerText = totalNumeros;
-            desenharRifa(totalNumeros);
-        });
+            // Correção do undefined: Se não existir, mostra "Sem Código" ou 0
+            document.getElementById('user-display').innerText = uDados.nome || "Usuário";
+            document.getElementById('meu-codigo-txt').innerText = uDados.meuCodigo || "GERANDO...";
+            document.getElementById('ponto-indicacao').innerText = `${uDados.indicacoesVendas || 0}/3`;
+            
+            document.getElementById('auth-section').classList.add('hidden');
+            document.getElementById('tela-rifa').classList.remove('hidden');
+
+            // Atualiza a Meta no topo
+            onSnapshot(doc(db, "config", "sorteio"), (doc) => {
+                if(doc.exists()){
+                    const totalNumeros = doc.data().total || 50;
+                    const vendidos = doc.data().vendidos || 0;
+                    document.getElementById('vendas-contagem').innerText = vendidos;
+                    document.getElementById('meta-max').innerText = totalNumeros;
+                    desenharRifa(totalNumeros);
+                }
+            });
+        }
     }
 });
-
 // --- 4. LÓGICA DO GRID DA RIFA ---
 function desenharRifa(qtd) {
     const grid = document.getElementById('gridRifa');
@@ -155,3 +159,4 @@ window.assinarPlano = async () => {
         alert(d.msg);
     } catch (e) { alert("Erro ao processar assinatura."); }
 };
+
