@@ -1,185 +1,149 @@
-/* === INÍCIO DO APP.JS COMPLETO === */
+/* === INÍCIO DO INDEX.HTML COMPLETO === */
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RoboSorteioIA</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body>
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, query, where, getDocs, orderBy, limit, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+    <div class="header-info">
+        <div id="meta-banner">🤖 ROBOSORTEIO</div>
+    </div>
 
-// CONFIGURAÇÃO FIREBASE
-const firebaseConfig = {
-    apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8",
-    authDomain: "minharifadigital.firebaseapp.com",
-    projectId: "minharifadigital",
-    storageBucket: "minharifadigital.firebasestorage.app",
-    messagingSenderId: "59630725905",
-    appId: "1:59630725905:web:396c8cfca385dc3d957ab0"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-let usuarioAtual = null;
-let numerosSelecionados = [];
-
-/* === INÍCIO DA AUTENTICAÇÃO E CADASTRO === */
-window.cadastrar = async () => {
-    const nome = document.getElementById('reg-nome').value;
-    const email = document.getElementById('email').value;
-    const senha = document.getElementById('senha').value;
-    const refCodeInput = document.getElementById('ref-code').value;
-
-    if (!nome || !email || !senha) return alert("Preencha os campos!");
-
-    try {
-        const res = await createUserWithEmailAndPassword(auth, email, senha);
-        const uid = res.user.uid;
-        const meuCodigo = nome.substring(0, 3).toUpperCase() + Math.floor(1000 + Math.random() * 9000);
-
-        await setDoc(doc(db, "usuarios", uid), {
-            nome: nome,
-            email: email,
-            saldo: 0,
-            meuCodigo: meuCodigo,
-            indicadoPor: refCodeInput || null,
-            indicacoesSemana: 0,
-            vendasTotais: 0
-        });
-
-        location.reload();
-    } catch (e) { alert("Erro ao cadastrar: " + e.message); }
-};
-
-window.login = async () => {
-    const email = document.getElementById('email').value;
-    const senha = document.getElementById('senha').value;
-    try {
-        await signInWithEmailAndPassword(auth, email, senha);
-    } catch (e) { alert("Erro: " + e.message); }
-};
-
-window.sair = () => signOut(auth).then(() => location.reload());
-
-onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        usuarioAtual = user;
-        document.getElementById('auth-section').classList.add('hidden');
-        document.getElementById('tela-rifa').classList.remove('hidden');
+    <div class="container">
         
-        onSnapshot(doc(db, "usuarios", user.uid), (d) => {
-            const data = d.data();
-            document.getElementById('user-display').innerText = data.nome;
-            document.getElementById('saldo-pontos').innerText = data.saldo.toFixed(2);
-            document.getElementById('meu-codigo-txt').innerText = data.meuCodigo;
-            document.getElementById('ponto-semana').innerText = data.vendasTotais;
-            gerarGrids(data.vendasTotais);
-        });
+        <div id="auth-section">
+            <div class="auth-card">
+                <div class="chamada-lucro">
+                    🚀 ENTRE AGORA PODENDO GANHAR ATÉ <b>R$ 345,00</b> POR MÊS!
+                </div>
 
-        carregarRanking();
-    }
-});
-/* === FIM DA AUTENTICAÇÃO === */
+                <h2 class="neon-text" style="text-align: center; margin-bottom: 15px;">ACESSO</h2>
+                <input type="email" id="email" placeholder="Seu e-mail">
+                <input type="password" id="senha" placeholder="Sua senha">
+                <button onclick="login()" class="btn-main">ENTRAR NO LOGIN</button>
+                
+                <div class="divider">OU CRIE SUA CONTA</div>
+                
+                <input type="text" id="reg-nome" placeholder="Nome Completo">
+                <input type="text" id="ref-code" placeholder="Código de Indicação (Opcional)">
+                <button onclick="cadastrar()" class="btn-sec">CADASTRAR</button>
+            </div>
+        </div>
 
-/* === INÍCIO LÓGICA DE GANHOS (CHECK-IN E VÍDEO) === */
-window.fazerCheckin = async () => {
-    await updateDoc(doc(db, "usuarios", usuarioAtual.uid), {
-        saldo: increment(0.05)
-    });
-    alert("Check-in realizado! +R$ 0,05");
-};
+        <div id="tela-rifa" class="hidden">
+            
+            /* === INÍCIO DO CARROSSEL DE PROPAGANDA TOPO === */
+            <div class="ads-slider-container topo">
+                <div class="ads-track">
+                    <div class="ad-slide">🚀 AUMENTE SEUS GANHOS HOJE!</div>
+                    <div class="ad-slide">💎 COMPRE COTAS E GANHE PRÊMIOS</div>
+                    <div class="ad-slide">SEU ANÚNCIO AQUI</div>
+                    <div class="ad-slide">⚡ SORTEIO SEGURO</div>
+                </div>
+            </div>
+            /* === FIM DO CARROSSEL DE PROPAGANDA TOPO === */
 
-window.assistirPropaganda = () => {
-    const btn = document.getElementById('btn-video');
-    btn.disabled = true;
-    document.getElementById('timer-video').classList.remove('hidden');
-    let tempo = 30;
-    const intervalo = setInterval(async () => {
-        tempo--;
-        document.getElementById('segundos').innerText = tempo;
-        if (tempo <= 0) {
-            clearInterval(intervalo);
-            await updateDoc(doc(db, "usuarios", usuarioAtual.uid), { saldo: increment(0.10) });
-            document.getElementById('timer-video').classList.add('hidden');
-            btn.disabled = false;
-            alert("Vídeo assistido! +R$ 0,10");
-        }
-    }, 1000);
-};
-/* === FIM LÓGICA DE GANHOS === */
+            <div class="user-dashboard">
+                <div class="user-header">
+                    <span>Olá, <b id="user-display">...</b></span>
+                    <button onclick="sair()" class="btn-logout">SAIR</button>
+                </div>
+                
+                <div class="pontos-wallet">
+                    R$ <span id="saldo-pontos">0.00</span>
+                </div>
 
-/* === INÍCIO GRIDS E SELEÇÃO DE NÚMEROS === */
-function gerarGrids(vendas) {
-    const gridsConfigs = [
-        { id: 'grid-fase1', min: 1, max: 50 },
-        { id: 'grid-fase2', min: 51, max: 100 },
-        { id: 'grid-fase3', min: 101, max: 150 }
-    ];
-    
-    gridsConfigs.forEach((config) => {
-        const container = document.getElementById(config.id);
-        if (!container) return;
-        container.innerHTML = "";
-        for (let i = config.min; i <= config.max; i++) {
-            const btn = document.createElement('button');
-            btn.className = 'num';
-            btn.innerText = i;
-            btn.onclick = () => alternarSelecao(i, btn);
-            container.appendChild(btn);
-        }
-    });
+                <div class="ganhos-grid">
+                    <button onclick="fazerCheckin()" id="btn-checkin">📍 CHECK-IN (R$ 0,05)</button>
+                    <button onclick="assistirPropaganda()" id="btn-video">📺 VÍDEO (R$ 0,10)</button>
+                </div>
+                
+                <div id="timer-video" class="hidden">
+                    📺 AGUARDE <span id="segundos">30</span>s...
+                </div>
 
-    if (vendas < 50) document.getElementById('fase2-ui')?.classList.add('locked');
-    else document.getElementById('fase2-ui')?.classList.remove('locked');
-    
-    if (vendas < 100) document.getElementById('fase3-ui')?.classList.add('locked');
-    else document.getElementById('fase3-ui')?.classList.remove('locked');
-}
+                <div class="user-info-footer">
+                    <p>CÓDIGO: <b id="meu-codigo-txt" style="color: var(--neon-blue);">...</b></p>
+                    <p>VENDAS: <b id="ponto-semana" style="color: var(--neon-green);">0</b></p>
+                </div>
+            </div>
 
-function alternarSelecao(n, el) {
-    if (numerosSelecionados.includes(n)) {
-        numerosSelecionados = numerosSelecionados.filter(x => x !== n);
-        el.classList.remove('selecionado');
-    } else {
-        numerosSelecionados.push(n);
-        el.classList.add('selecionado');
-    }
-    atualizarCheckout();
-}
+            <div class="fase-container">
+                <h3 style="text-align: center; font-size: 0.8rem; color: #555; margin-top: 20px;">🔢 DESLIZE PARA ESCOLHER A FASE</h3>
+                <div class="fases-wrapper">
+                    
+                    <div class="fase-slide" id="fase1-section">
+                        <div class="valor-premio">PRÊMIO: R$ 100,00</div>
+                        <span class="fase-badge">FASE 1 (1-50)</span>
+                        <div id="grid-fase1" class="grid-numeros"></div>
+                    </div>
 
-function atualizarCheckout() {
-    const area = document.getElementById('payment-area');
-    if (numerosSelecionados.length > 0) {
-        area.classList.remove('hidden');
-        document.getElementById('num-selecionados').innerText = numerosSelecionados.join(', ');
-        document.getElementById('total-pagar').innerText = (numerosSelecionados.length * 7).toFixed(2);
-    } else {
-        area.classList.add('hidden');
-    }
-}
-/* === FIM GRIDS E SELEÇÃO === */
+                    <div class="fase-slide locked" id="fase2-ui">
+                        <div class="lock-overlay">🔒 META: 50 VENDAS PARA LIBERAR</div>
+                        <div class="valor-premio">PRÊMIO: R$ 220,00</div>
+                        <span class="fase-badge">FASE 2 (51-100)</span>
+                        <div id="grid-fase2" class="grid-numeros"></div>
+                    </div>
 
-/* === INÍCIO LÓGICA DE PAGAMENTO PIX === */
-window.gerarPix = async () => {
-    // Espaço para integração de API de pagamento futuramente
-    alert("Função de gerar PIX para os números: " + numerosSelecionados.join(', '));
-};
-/* === FIM LÓGICA DE PAGAMENTO PIX === */
+                    <div class="fase-slide locked" id="fase3-ui">
+                        <div class="lock-overlay">🔒 META: 100 VENDAS PARA LIBERAR</div>
+                        <div class="valor-premio">PRÊMIO: R$ 330,00</div>
+                        <span class="fase-badge">FASE 3 (101-150)</span>
+                        <div id="grid-fase3" class="grid-numeros"></div>
+                    </div>
 
-/* === INÍCIO LÓGICA DE RANKING PREMIADO === */
-function carregarRanking() {
-    const q = query(collection(db, "usuarios"), orderBy("indicacoesSemana", "desc"), limit(3));
-    onSnapshot(q, (snap) => {
-        const premios = ["R$ 15,00", "R$ 10,00", "R$ 5,00"];
-        const icones = ["🥇", "🥈", "🥉"];
-        let html = "";
-        let i = 0;
-        snap.forEach(docSnap => {
-            html += `<p><span>${icones[i]} ${docSnap.data().nome} (${premios[i]})</span> <b>${docSnap.data().indicacoesSemana || 0} pts</b></p>`;
-            i++;
-        });
-        const lista = document.getElementById('ranking-lista');
-        if (lista) lista.innerHTML = html;
-    });
-}
-/* === FIM LÓGICA DE RANKING PREMIADO === */
+                </div>
+            </div>
 
-/* === FIM DO APP.JS COMPLETO === */
+            <div id="payment-area" class="hidden">
+                <div class="pay-card">
+                    <p>Números Selecionados: <span id="num-selecionados" style="color: var(--neon-blue);">...</span></p>
+                    <p style="font-size: 1.2rem; margin: 10px 0;">Total: <b style="color: var(--neon-green);">R$ <span id="total-pagar">0,00</span></b></p>
+                    <button onclick="gerarPix()" class="btn-pix">GERAR PAGAMENTO PIX</button>
+                </div>
+            </div>
+
+            <div id="area-resultado" class="quadro-data">AGUARDANDO SORTEIO...</div>
+
+            /* === INÍCIO DO RANKING PREMIADO === */
+            <div class="ranking-container">
+                <h3>🏆 TOP INDICADORES</h3>
+                <div id="ranking-lista">
+                    </div>
+            </div>
+            /* === FIM DO RANKING PREMIADO === */
+
+            /* === INÍCIO DO CARROSSEL DE PROPAGANDA BAIXO === */
+            <div class="ads-slider-container">
+                <div class="ads-track">
+                    <div class="ad-slide">💸 GANHE DINHEIRO INDICANDO AMIGOS</div>
+                    <div class="ad-slide">📺 ASSISTA E GANHE SALDO</div>
+                    <div class="ad-slide">🍀 SORTEIOS VIA LOTERIA FEDERAL</div>
+                    <div class="ad-slide">🚀 ROBOSORTEIO: A MELHOR PLATAFORMA</div>
+                </div>
+            </div>
+            /* === FIM DO CARROSSEL DE PROPAGANDA BAIXO === */
+
+            /* === INÍCIO DAS REGRAS E LEIS === */
+            <div class="regras-container">
+                <h4>⚖️ REGRAS E FUNCIONAMENTO</h4>
+                <p>• <b>Dinâmica:</b> O usuário escolhe cotas de R$ 7,00. Os sorteios ocorrem mensalmente.</p>
+                <p>• <b>Indicações:</b> Ganhe <b>R$ 1,00</b> de saldo real sempre que um indicado fizer a 1ª compra.</p>
+                <p>• <b>Saques:</b> O valor mínimo para retirada via PIX é de R$ 50,00.</p>
+                <p>• <b>Propagandas:</b> Limite de 1 vídeo por dia para bonificação de saldo acumulado.</p>
+                <p>• <b>Termos:</b> Em conformidade com a Lei nº 13.019/14 para fins de entretenimento.</p>
+            </div>
+            /* === FIM DAS REGRAS E LEIS === */
+
+        </div>
+    </div>
+
+    <script src="app.js" type="module"></script>
+</body>
+</html>
+/* === FIM DO INDEX.HTML COMPLETO === */
