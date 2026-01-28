@@ -23,6 +23,7 @@ window.cadastrar = async () => {
     const email = document.getElementById('email').value;
     const senha = document.getElementById('senha').value;
     const refCode = document.getElementById('ref-code').value;
+
     if (!nome || !email || !senha) return alert("Preencha os campos!");
     try {
         const res = await createUserWithEmailAndPassword(auth, email, senha);
@@ -31,13 +32,13 @@ window.cadastrar = async () => {
             nome, email, saldo: 0, meuCodigo, indicadoPor: refCode || null, indicacoesSemana: 0, vendasTotais: 0
         });
         location.reload();
-    } catch (e) { alert(e.message); }
+    } catch (e) { alert("Erro ao cadastrar: " + e.message); }
 };
 
 window.login = async () => {
     const email = document.getElementById('email').value;
     const senha = document.getElementById('senha').value;
-    try { await signInWithEmailAndPassword(auth, email, senha); } catch (e) { alert("Erro no login"); }
+    try { await signInWithEmailAndPassword(auth, email, senha); } catch (e) { alert("Dados incorretos."); }
 };
 
 window.sair = () => signOut(auth).then(() => location.reload());
@@ -49,73 +50,105 @@ onAuthStateChanged(auth, (user) => {
         document.getElementById('tela-rifa').classList.remove('hidden');
         onSnapshot(doc(db, "usuarios", user.uid), (d) => {
             const data = d.data();
-            document.getElementById('user-display').innerText = data.nome;
-            document.getElementById('saldo-pontos').innerText = data.saldo.toFixed(2);
-            document.getElementById('meu-codigo-txt').innerText = data.meuCodigo;
-            document.getElementById('ponto-semana').innerText = data.vendasTotais;
-            gerarGrids(data.vendasTotais);
+            if(data) {
+                document.getElementById('user-display').innerText = data.nome;
+                document.getElementById('saldo-pontos').innerText = data.saldo.toFixed(2);
+                document.getElementById('meu-codigo-txt').innerText = data.meuCodigo;
+                document.getElementById('ponto-semana').innerText = data.vendasTotais;
+                gerarGrids(data.vendasTotais);
+            }
         });
         carregarRanking();
     }
 });
 
 window.fazerCheckin = async () => {
-    await updateDoc(doc(db, "usuarios", usuarioAtual.uid), { saldo: increment(0.05) });
-    alert("Saldo atualizado!");
+    try {
+        await updateDoc(doc(db, "usuarios", usuarioAtual.uid), { saldo: increment(0.05) });
+        alert("Check-in: +R$ 0,05");
+    } catch (e) { console.error(e); }
 };
 
 window.assistirPropaganda = () => {
     let tempo = 30;
-    document.getElementById('btn-video').disabled = true;
-    document.getElementById('timer-video').classList.remove('hidden');
+    const btn = document.getElementById('btn-video');
+    const timerArea = document.getElementById('timer-video');
+    btn.disabled = true;
+    timerArea.classList.remove('hidden');
+    
     const inter = setInterval(async () => {
         tempo--;
         document.getElementById('segundos').innerText = tempo;
         if (tempo <= 0) {
             clearInterval(inter);
             await updateDoc(doc(db, "usuarios", usuarioAtual.uid), { saldo: increment(0.10) });
-            document.getElementById('timer-video').classList.add('hidden');
-            document.getElementById('btn-video').disabled = false;
+            timerArea.classList.add('hidden');
+            btn.disabled = false;
+            alert("Vídeo: +R$ 0,10");
         }
     }, 1000);
 };
 
 function gerarGrids(vendas) {
-    const configs = [{id:'grid-fase1',m:1,x:50},{id:'grid-fase2',m:51,x:100},{id:'grid-fase3',m:101,x:150}];
-    configs.forEach(c => {
-        const el = document.getElementById(c.id);
-        if(!el) return;
-        el.innerHTML = "";
-        for(let i=c.m; i<=c.x; i++) {
-            const b = document.createElement('button');
-            b.className = 'num';
-            b.innerText = i;
-            if(numerosSelecionados.includes(i)) b.classList.add('selecionado');
-            b.onclick = () => {
-                if(numerosSelecionados.includes(i)) numerosSelecionados = numerosSelecionados.filter(n=>n!==i);
-                else numerosSelecionados.push(i);
+    const configs = [
+        {id:'grid-fase1', min:1, max:50},
+        {id:'grid-fase2', min:51, max:100},
+        {id:'grid-fase3', min:101, max:150}
+    ];
+
+    configs.forEach(conf => {
+        const container = document.getElementById(conf.id);
+        if(!container) return;
+        container.innerHTML = "";
+        for(let i = conf.min; i <= conf.max; i++) {
+            const btn = document.createElement('button');
+            btn.className = 'num';
+            btn.innerText = i;
+            if(numerosSelecionados.includes(i)) btn.classList.add('selecionado');
+            btn.onclick = () => {
+                if(numerosSelecionados.includes(i)) {
+                    numerosSelecionados = numerosSelecionados.filter(n => n !== i);
+                } else {
+                    numerosSelecionados.push(i);
+                }
+                atualizarCheckout();
                 gerarGrids(vendas);
-                document.getElementById('payment-area').classList.toggle('hidden', numerosSelecionados.length === 0);
-                document.getElementById('num-selecionados').innerText = numerosSelecionados.join(', ');
-                document.getElementById('total-pagar').innerText = (numerosSelecionados.length * 7).toFixed(2);
             };
-            el.appendChild(b);
+            container.appendChild(btn);
         }
     });
+
     document.getElementById('fase2-ui').classList.toggle('locked', vendas < 50);
     document.getElementById('fase3-ui').classList.toggle('locked', vendas < 100);
 }
 
+function atualizarCheckout() {
+    const area = document.getElementById('payment-area');
+    if (numerosSelecionados.length > 0) {
+        area.classList.remove('hidden');
+        document.getElementById('num-selecionados').innerText = numerosSelecionados.join(', ');
+        document.getElementById('total-pagar').innerText = (numerosSelecionados.length * 7).toFixed(2);
+    } else {
+        area.classList.add('hidden');
+    }
+}
+
 function carregarRanking() {
     const q = query(collection(db, "usuarios"), orderBy("indicacoesSemana", "desc"), limit(3));
-    onSnapshot(q, (s) => {
+    onSnapshot(q, (snap) => {
         let h = "";
         const icons = ["🥇","🥈","🥉"];
-        s.forEach((d, i) => {
-            h += `<p>${icons[i]} ${d.data().nome} <b>${d.data().indicacoesSemana} pts</b></p>`;
+        let i = 0;
+        snap.forEach(d => {
+            const u = d.data();
+            // Correção do undefined: usa fallback caso o nome não exista
+            const nomeExibicao = u.nome || "Usuário";
+            h += `<p><span>${icons[i] || ""} ${nomeExibicao}</span> <b>${u.indicacoesSemana || 0} pts</b></p>`;
+            i++;
         });
-        document.getElementById('ranking-lista').innerHTML = h;
+        const listEl = document.getElementById('ranking-lista');
+        if(listEl) listEl.innerHTML = h;
     });
 }
 
-window.gerarPix = () => alert("Redirecionando para PIX...");
+window.gerarPix = () => alert("Redirecionando para o pagamento...");
