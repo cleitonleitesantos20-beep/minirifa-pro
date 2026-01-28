@@ -1,164 +1,99 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getFirestore, doc, onSnapshot, updateDoc, increment } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RoboSorteio IA - Painel</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body>
 
-// Configuração Firebase (v5.1)
-const firebaseConfig = {
-    apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8",
-    authDomain: "minharifadigital.firebaseapp.com",
-    projectId: "minharifadigital",
-    storageBucket: "minharifadigital.firebasestorage.app",
-    messagingSenderId: "59630725905",
-    appId: "1:59630725905:web:396c8cfca385dc3d957ab0"
-};
+    <div class="header">🤖 ROBOSORTEIO IA</div>
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-
-let user, userData, selecionados = [];
-
-// --- CONFIGURAÇÃO DAS FASES SEQUENCIAIS ---
-const configFases = [
-    { id: 1, inicio: 1, fim: 50, preco: 110, metaIndica: 0 },
-    { id: 2, inicio: 51, fim: 100, preco: 220, metaIndica: 50 },
-    { id: 3, inicio: 101, fim: 150, preco: 350, metaIndica: 100 }
-];
-
-// --- PROTEÇÃO DE ROTA E DADOS EM TEMPO REAL ---
-onAuthStateChanged(auth, (u) => {
-    if (u) {
-        user = u;
-        onSnapshot(doc(db, "usuarios", u.uid), (snap) => {
-            userData = snap.data();
-            if (userData) {
-                renderDashboard();
-                atualizarTravaFases();
-            }
-        });
-    } else {
-        // Se não estiver logado, expulsa para a página de login
-        window.location.href = 'login.html';
-    }
-});
-
-// --- ATUALIZAÇÃO DA INTERFACE ---
-function renderDashboard() {
-    const elNome = document.getElementById('u-nome');
-    const elSaldo = document.getElementById('u-saldo');
-    const elCode = document.getElementById('u-code');
-    const elVendas = document.getElementById('u-vendas');
-
-    if (elNome) elNome.innerText = userData.nome || "Usuário";
-    if (elSaldo) elSaldo.innerText = (userData.saldo || 0).toFixed(2);
-    if (elCode) elCode.innerText = userData.meuCodigo || "---";
-    if (elVendas) elVendas.innerText = userData.vendas || 0;
-}
-
-// --- LÓGICA DE SELEÇÃO E VALORES (BUG 1, 3 e 4) ---
-window.selectNum = (faseId, n, el) => {
-    const faseInfo = configFases.find(f => f.id === faseId);
-    
-    // Bloqueio de segurança por indicações
-    if (faseId > 1 && (userData.vendas || 0) < faseInfo.metaIndica) {
-        return alert(`🔒 Bloqueado! Esta fase requer ${faseInfo.metaIndica} indicações.`);
-    }
-
-    const idNum = `N${n}`;
-    if (selecionados.includes(idNum)) {
-        selecionados = selecionados.filter(x => x !== idNum);
-        el.classList.remove('selected');
-    } else {
-        selecionados.push(idNum);
-        el.classList.add('selected');
-    }
-    
-    const checkout = document.getElementById('checkout');
-    if (selecionados.length > 0) {
-        checkout.classList.remove('hidden');
-        document.getElementById('sel-nums').innerText = selecionados.length;
+    <div class="container">
         
-        // Cálculo proporcional ao valor da fase
-        const valorTotal = selecionados.length * (faseInfo.preco / 50);
-        document.getElementById('total-val').innerText = valorTotal.toFixed(2);
-    } else {
-        if (checkout) checkout.classList.add('hidden');
-    }
-};
+        <div class="slider">
+            <div class="track">
+                <div>🚀 IA v5.1 MONITORANDO SORTEIOS</div>
+                <div>💎 SALDO ATUALIZADO EM TEMPO REAL</div>
+                <div>🍀 INDIQUE AMIGOS E LIBERE FASES</div>
+                <div>📊 SISTEMA DE RIFAS SEQUENCIAIS</div>
+            </div>
+        </div>
 
-// --- GERAÇÃO DOS GRIDS SEQUENCIAIS (Bug 4) ---
-function inicializarGrids() {
-    configFases.forEach(fase => {
-        const grid = document.getElementById(`grid-${fase.id}`);
-        if (grid) {
-            grid.innerHTML = "";
-            for (let i = fase.inicio; i <= fase.fim; i++) {
-                const b = document.createElement('div');
-                b.className = 'num-btn';
-                b.innerText = i;
-                b.onclick = () => window.selectNum(fase.id, i, b);
-                grid.appendChild(b);
-            }
-        }
-    });
-}
+        <div class="card dashboard">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.9rem;">Bem-vindo, <b id="u-nome">...</b></span>
+                <button onclick="window.location.href='config.html'" class="btn-settings">⚙️</button>
+            </div>
+            
+            <div class="saldo">
+                <small style="display:block; font-size: 0.6rem; color: var(--neon); letter-spacing: 2px;">SALDO DISPONÍVEL</small>
+                R$ <span id="u-saldo">0.00</span>
+            </div>
 
-// --- CONTROLE DE TRAVAS VISUAIS ---
-function atualizarTravaFases() {
-    configFases.forEach(fase => {
-        const card = document.getElementById(`fase-card-${fase.id}`);
-        if (fase.id > 1 && card) {
-            const bloqueado = (userData.vendas || 0) < fase.metaIndica;
-            card.classList.toggle('locked', bloqueado);
-            card.style.opacity = bloqueado ? "0.4" : "1";
-        }
-    });
-}
+            <button onclick="window.location.href='central.html'" class="btn-outline" style="margin-bottom: 15px; border-color: #ffd700; color: #ffd700;">🎮 CENTRAL DE MINIGAMES</button>
 
-// --- TAREFAS DIÁRIAS ---
-window.checkin = async () => {
-    const hoje = new Date().toISOString().split('T')[0];
-    if (userData.lastCheckin === hoje) return alert("IA: Limite de 1 check-in por dia.");
-    await updateDoc(doc(db, "usuarios", user.uid), { 
-        saldo: increment(0.01), 
-        lastCheckin: hoje 
-    });
-    alert("Check-in: +R$ 0,01");
-};
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button onclick="checkin()" class="btn-primary" style="font-size: 0.7rem; background: #1a1a1a; color: #fff; border: 1px solid #333;">📍 CHECK-IN (+0.01)</button>
+                <button onclick="video()" id="btn-video" class="btn-primary" style="font-size: 0.7rem; background: #1a1a1a; color: #fff; border: 1px solid #333;">📺 VÍDEO (+0.02)</button>
+            </div>
+            
+            <div id="video-timer" class="hidden" style="text-align:center; margin-top:10px; font-size: 0.7rem; color: var(--neon);">
+                Sincronizando dados: <span id="timer">30</span>s...
+            </div>
+            
+            <div class="stats" style="margin-top: 15px; border-top: 1px solid #222; padding-top: 10px;">
+                <p>CÓDIGO: <span id="u-code" style="color: var(--neon);">...</span></p>
+                <p>INDICAÇÕES: <span id="u-vendas" style="color: var(--neon);">0</span></p>
+            </div>
+        </div>
 
-window.video = () => {
-    const hoje = new Date().toISOString().split('T')[0];
-    if (userData.lastVideo === hoje) return alert("IA: Limite de vídeos diários atingido.");
-    
-    const btn = document.getElementById('btn-video');
-    const timerArea = document.getElementById('video-timer');
-    
-    if(btn) btn.disabled = true;
-    if(timerArea) timerArea.classList.remove('hidden');
-
-    let tempo = 30;
-    const interval = setInterval(async () => {
-        tempo--;
-        const tDisplay = document.getElementById('timer');
-        if(tDisplay) tDisplay.innerText = tempo;
+        <h4 style="font-family: 'Orbitron'; margin: 20px 0 10px 5px; font-size: 0.8rem; color: var(--neon); text-transform: uppercase;">🍀 Escolha seus Números</h4>
         
-        if (tempo <= 0) {
-            clearInterval(interval);
-            await updateDoc(doc(db, "usuarios", user.uid), { 
-                saldo: increment(0.02), 
-                lastVideo: hoje 
-            });
-            if(timerArea) timerArea.classList.add('hidden');
-            if(btn) btn.disabled = false;
-            alert("Anúncio recompensado: +R$ 0,02");
-        }
-    }, 1000);
-};
+        <div class="fases-scroll">
+            <div class="fase-card" id="fase-card-1">
+                <div class="banner-lucro" style="background: var(--neon); position: relative; margin: -12px -12px 10px -12px; border-radius: 10px 10px 0 0;">FASE 1 - R$ 110,00</div>
+                <div id="grid-1" class="grid"></div>
+            </div>
 
-window.pix = () => {
-    const total = document.getElementById('total-val').innerText;
-    alert(`IA: Gerando QR Code PIX no valor de R$ ${total}...`);
-};
+            <div class="fase-card" id="fase-card-2">
+                <div id="lock-2" class="lock-msg">
+                    <span>🔒 FASE BLOQUEADA</span>
+                    <small>REQUER 50 INDICAÇÕES</small>
+                </div>
+                <div class="banner-lucro" style="background: #333; position: relative; margin: -12px -12px 10px -12px; border-radius: 10px 10px 0 0;">FASE 2 - R$ 220,00</div>
+                <div id="grid-2" class="grid"></div>
+            </div>
 
-// Dispara a criação dos grids ao carregar a página
-document.addEventListener('DOMContentLoaded', inicializarGrids);
+            <div class="fase-card" id="fase-card-3">
+                <div id="lock-3" class="lock-msg">
+                    <span>🔒 FASE BLOQUEADA</span>
+                    <small>REQUER 100 INDICAÇÕES</small>
+                </div>
+                <div class="banner-lucro" style="background: #333; position: relative; margin: -12px -12px 10px -12px; border-radius: 10px 10px 0 0;">FASE 3 - R$ 350,00</div>
+                <div id="grid-3" class="grid"></div>
+            </div>
+        </div>
+
+        <div class="regras">
+            <h4 style="color: #888;">INSTRUÇÕES IA v5.1</h4>
+            <p>• Selecione os números desejados em qualquer fase liberada.</p>
+            <p>• O valor total é calculado automaticamente no checkout.</p>
+            <p>• Pagamentos via PIX são processados instantaneamente.</p>
+        </div>
+
+        <div id="checkout" class="hidden">
+            <div style="flex-grow: 1;">
+                <p style="font-size: 0.6rem; color: #888; margin-bottom: 2px;">SELECIONADOS: <b id="sel-nums" style="color: var(--neon);">0</b></p>
+                <p style="font-size: 1.1rem; font-weight: bold; color: var(--green);">R$ <span id="total-val">0.00</span></p>
+            </div>
+            <button onclick="pix()" class="btn-primary" style="width: auto; padding: 10px 25px; background: var(--green);">PAGAR PIX</button>
+        </div>
+
+    </div>
+
+    <script src="app.js" type="module"></script>
+</body>
+</html>
