@@ -1,5 +1,5 @@
 /* =========================================
-   1. CONFIGURAÇÕES GERAIS E FONTES
+   1. CONFIGURAÇÕES GERAIS E RESET
    ========================================= */
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap');
 
@@ -10,7 +10,6 @@
     --neon-yellow: #ffcc00;
     --neon-purple: #bc13fe;
     --dark-bg: #0a0b10;
-    --card-bg: rgba(20, 22, 30, 0.95);
 }
 
 * { 
@@ -23,7 +22,7 @@
 html, body {
     width: 100%;
     min-height: 100vh;
-    overflow-x: hidden; /* IMPORTANTE: Resolve o erro de puxar para o lado */
+    overflow-x: hidden;
     background-color: var(--dark-bg);
     color: #ffffff;
     font-family: 'Rajdhani', sans-serif;
@@ -32,88 +31,97 @@ html, body {
     align-items: center;
 }
 
-/* =========================================
-   2. HEADER E PROPAGANDAS
-   ========================================= */
-.header-info {
-    width: 100%;
-    background: rgba(0, 0, 0, 0.9);
-    border-bottom: 2px solid var(--neon-blue);
-    padding: 20px 0;
-    text-align: center;
-    box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
-}
-
-#meta-banner {
-    font-family: 'Orbitron', sans-serif;
-    color: var(--neon-blue);
-    font-size: 1.4rem;
-    text-shadow: 0 0 10px var(--neon-blue);
-    letter-spacing: 2px;
-}
-
-.ads-block {
-    background: #16171d;
-    color: #555;
-    width: 90%;
-    max-width: 470px;
-    height: 80px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 15px auto;
-    border: 1px dashed #444;
-    border-radius: 8px;
-    font-size: 0.7rem;
-    text-transform: uppercase;
-}
-
-/* =========================================
-   3. ÁREA DE ACESSO (LOGIN / CADASTRO)
-   ========================================= */
 .container {
     width: 100%;
     max-width: 500px;
     padding: 0 15px;
 }
 
-.auth-card {
-    background: #16171d;
-    padding: 25px;
-    border-radius: 15px;
-    border: 1px solid var(--neon-blue);
-    margin-top: 30px;
-    box-shadow: 0 0 20px rgba(0, 242, 255, 0.1);
-}
-
-.auth-card input {
+/* =========================================
+   2. HEADER E BANNER CHAMATIVO (R$ 345)
+   ========================================= */
+.header-info {
     width: 100%;
-    padding: 12px;
-    margin-bottom: 12px;
     background: #000;
-    border: 1px solid #333;
-    color: #fff;
-    border-radius: 5px;
-    font-family: 'Rajdhani';
+    border-bottom: 2px solid var(--neon-blue);
+    padding: 20px 0;
+    text-align: center;
 }
 
-.divider {
-    text-align: center;
-    margin: 15px 0;
-    color: #555;
-    font-size: 0.8rem;
+#meta-banner {
     font-family: 'Orbitron';
+    color: var(--neon-blue);
+    font-size: 1.4rem;
+    text-shadow: 0 0 10px var(--neon-blue);
+}
+
+.chamada-lucro {
+    background: linear-gradient(90deg, var(--neon-red), #660018);
+    color: white;
+    text-align: center;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    margin: 15px 0;
+    font-size: 0.9rem;
+    font-family: 'Orbitron';
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 0, 60, 0.7); }
+    70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(255, 0, 60, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 0, 60, 0); }
 }
 
 /* =========================================
-   4. DASHBOARD DO USUÁRIO
+   3. SLIDER DE PROPAGANDAS (MOVIMENTO)
+   ========================================= */
+.ads-slider-container {
+    width: 100%;
+    max-width: 470px;
+    overflow: hidden;
+    background: #111;
+    border: 1px solid #222;
+    margin: 15px 0;
+    border-radius: 8px;
+}
+
+.ads-track {
+    display: flex;
+    width: 400%; /* Para 4 slides */
+    animation: slideAds 12s infinite linear;
+}
+
+.ad-slide {
+    width: 100%;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    font-family: 'Orbitron';
+    font-size: 0.75rem;
+    text-transform: uppercase;
+}
+
+@keyframes slideAds {
+    0%, 20% { transform: translateX(0); }
+    25%, 45% { transform: translateX(-25%); }
+    50%, 70% { transform: translateX(-50%); }
+    75%, 95% { transform: translateX(-75%); }
+    100% { transform: translateX(0); }
+}
+
+/* =========================================
+   4. DASHBOARD E BOTÕES DE GANHO
    ========================================= */
 .user-dashboard {
-    background: #111;
+    background: #16171d;
     padding: 20px;
     border-radius: 15px;
-    margin-top: 15px;
     border: 1px solid #222;
+    width: 100%;
 }
 
 .user-header {
@@ -127,12 +135,11 @@ html, body {
     background: var(--neon-red);
     color: #fff;
     border: none;
-    padding: 6px 15px;
-    border-radius: 4px;
+    padding: 6px 12px;
+    border-radius: 5px;
     font-family: 'Orbitron';
     cursor: pointer;
-    font-size: 0.65rem;
-    font-weight: bold;
+    font-size: 0.6rem;
 }
 
 .pontos-wallet {
@@ -141,14 +148,12 @@ html, body {
     color: var(--neon-green);
     font-family: 'Orbitron';
     margin: 10px 0;
-    text-shadow: 0 0 15px rgba(77, 242, 0, 0.4);
 }
 
 .ganhos-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
-    margin-top: 15px;
 }
 
 #btn-checkin, #btn-video {
@@ -158,7 +163,6 @@ html, body {
     background: transparent;
     cursor: pointer;
     border-radius: 6px;
-    transition: 0.3s;
 }
 
 #btn-checkin { border: 1px solid var(--neon-blue); color: var(--neon-blue); }
@@ -167,25 +171,26 @@ html, body {
 #timer-video {
     width: 100%;
     text-align: center;
-    padding: 12px;
+    padding: 10px;
     color: var(--neon-yellow);
     border: 1px dashed var(--neon-yellow);
     margin-top: 10px;
-    font-family: 'Orbitron';
     font-size: 0.8rem;
-}
-
-.user-info-footer {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 15px;
-    font-size: 0.8rem;
-    color: #888;
 }
 
 /* =========================================
-   5. CARROSSEL E FASES
+   5. CARROSSEL DE FASES E GRIDS
    ========================================= */
+.fase-slide {
+    min-width: 100%;
+    scroll-snap-align: center;
+    background: #16171d;
+    padding: 15px;
+    border-radius: 15px;
+    border: 1px solid #222;
+    position: relative;
+}
+
 .valor-premio {
     background: linear-gradient(90deg, transparent, var(--neon-green), transparent);
     color: #000;
@@ -194,8 +199,6 @@ html, body {
     font-weight: bold;
     padding: 8px;
     margin-bottom: 12px;
-    border-radius: 4px;
-    font-size: 1rem;
 }
 
 .fases-wrapper {
@@ -203,39 +206,12 @@ html, body {
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     gap: 15px;
-    padding: 20px 0;
+    padding: 15px 0;
     cursor: grab;
-    scrollbar-width: none;
 }
 
 .fases-wrapper::-webkit-scrollbar { display: none; }
 
-.fase-slide {
-    min-width: 100%;
-    scroll-snap-align: center;
-    background: #16171d;
-    padding: 15px;
-    border-radius: 15px;
-    position: relative;
-    border: 1px solid #222;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
-
-.fase-badge {
-    display: block;
-    background: var(--neon-blue);
-    color: #000;
-    font-size: 0.7rem;
-    font-weight: bold;
-    text-align: center;
-    padding: 5px;
-    border-radius: 4px;
-    margin-bottom: 15px;
-}
-
-/* =========================================
-   6. GRID DE NÚMEROS E ESTADOS
-   ========================================= */
 .grid-numeros {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -248,130 +224,56 @@ html, body {
     color: var(--neon-blue);
     padding: 12px 0;
     font-family: 'Orbitron';
-    font-size: 0.9rem;
-    cursor: pointer;
     border-radius: 5px;
-    transition: 0.2s;
+    cursor: pointer;
 }
 
-.num.selecionado {
-    background: var(--neon-green) !important;
-    color: #000 !important;
-    border-color: var(--neon-green);
-    box-shadow: 0 0 10px var(--neon-green);
-}
+.num.selecionado { background: var(--neon-green) !important; color: #000 !important; border-color: var(--neon-green); }
+.num.comprado { background: var(--neon-red) !important; color: #fff !important; opacity: 0.3; pointer-events: none; }
 
-.num.comprado {
-    background: var(--neon-red) !important;
-    color: #fff !important;
-    opacity: 0.3;
-    cursor: not-allowed;
-    border-color: var(--neon-red);
-}
-
-/* BLOQUEIO DE FASE */
 .locked { filter: grayscale(1) blur(2px); pointer-events: none; }
 .lock-overlay {
     position: absolute;
     top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.85);
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--neon-red);
-    font-family: 'Orbitron';
-    font-size: 0.8rem;
-    border-radius: 15px;
-    text-align: center;
+    background: rgba(0,0,0,0.8);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--neon-red); font-family: 'Orbitron'; z-index: 10; border-radius: 15px;
+}
+
+/* =========================================
+   6. REGRAS E LEIS (RODAPÉ)
+   ========================================= */
+.regras-container {
     padding: 20px;
-}
-
-/* =========================================
-   7. CHECKOUT E BOTÕES DE AÇÃO
-   ========================================= */
-.pay-card {
-    background: #1a1c26;
-    border: 1px solid var(--neon-green);
-    padding: 15px;
+    background: rgba(255, 255, 255, 0.03);
+    margin: 20px 0 50px 0;
     border-radius: 10px;
-    text-align: center;
-    margin: 20px 0;
-}
-
-.btn-pix {
-    background: var(--neon-green);
-    color: #000;
-    border: none;
-    padding: 15px;
-    width: 100%;
-    font-family: 'Orbitron';
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 6px;
-    margin-top: 10px;
-}
-
-.btn-main {
-    background: var(--neon-blue);
-    color: #000;
-    border: none;
-    padding: 15px;
-    width: 100%;
-    font-family: 'Orbitron';
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 6px;
-}
-
-.btn-sec {
-    background: transparent;
+    font-size: 0.75rem;
     color: #888;
-    border: 1px solid #333;
-    width: 100%;
-    padding: 12px;
-    font-family: 'Orbitron';
-    cursor: pointer;
-    border-radius: 6px;
-    margin-top: 10px;
+    border-top: 1px solid #333;
 }
+
+.regras-container h4 {
+    color: #fff;
+    margin-bottom: 12px;
+    text-align: center;
+    font-family: 'Orbitron';
+    font-size: 0.8rem;
+}
+
+.regras-container p { margin-bottom: 8px; line-height: 1.4; }
+.regras-container b { color: var(--neon-blue); }
 
 /* =========================================
-   8. RANKING E EXTRAS
+   7. AUXILIARES E LOGIN
    ========================================= */
-.ranking-container {
-    border: 1px solid var(--neon-purple);
-    padding: 15px;
-    border-radius: 10px;
-    margin: 25px 0;
-    background: rgba(188, 19, 254, 0.05);
-}
-
-.ranking-container h3 {
-    color: var(--neon-purple);
-    font-family: 'Orbitron';
-    font-size: 0.9rem;
-    margin-bottom: 10px;
-    text-align: center;
-}
-
-.ranking-list p {
-    display: flex;
-    justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px solid #1a1a1a;
-    font-size: 0.9rem;
-}
-
-.quadro-data {
-    text-align: center;
-    padding: 15px;
-    border: 1px solid #222;
-    margin: 20px 0;
-    font-family: 'Orbitron';
-    color: var(--neon-blue);
-    font-size: 0.8rem;
-    border-radius: 8px;
-}
+.auth-card { background: #16171d; padding: 25px; border-radius: 15px; border: 1px solid var(--neon-blue); }
+.auth-card input { width: 100%; padding: 12px; margin-bottom: 10px; background: #000; border: 1px solid #333; color: #fff; border-radius: 5px; }
+.btn-main { background: var(--neon-blue); color: #000; width: 100%; padding: 15px; font-family: 'Orbitron'; font-weight: bold; border: none; cursor: pointer; border-radius: 5px; }
+.btn-sec { background: transparent; color: #777; width: 100%; padding: 10px; font-family: 'Orbitron'; border: 1px solid #333; cursor: pointer; border-radius: 5px; margin-top: 10px; }
 
 .hidden { display: none !important; }
+
+#payment-area { margin: 20px 0; }
+.pay-card { background: #1a1c26; border: 1px solid var(--neon-green); padding: 15px; border-radius: 10px; text-align: center; }
+.btn-pix { background: var(--neon-green); color: #000; border: none; width: 100%; padding: 15px; font-family: 'Orbitron'; font-weight: bold; cursor: pointer; border-radius: 5px; }
