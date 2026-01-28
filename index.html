@@ -3,9 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RoboSorteio IA - v5.0</title>
+    <title>RoboSorteio IA - v5.1</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Ajuste do Slider Centralizado */
+        .track div { display: flex; align-items: center; justify-content: center; width: 100vw; text-align: center; }
+        /* Engrenagem Clicável */
+        .btn-settings { background:none; border:none; color:var(--neon); font-size:1.6rem; cursor:pointer; transition: 0.3s; padding: 5px; }
+        .btn-settings:active { transform: scale(0.8); opacity: 0.6; }
+        /* Layout Rifas */
+        .lock-msg { background: rgba(0,0,0,0.8); color: #fff; padding: 10px; border-radius: 5px; font-size: 0.7rem; }
+    </style>
 </head>
 <body>
     <div class="header">🤖 ROBOSORTEIO IA</div>
@@ -27,7 +36,7 @@
         <div id="app-screen" class="hidden">
             <div class="slider">
                 <div class="track">
-                    <div>🚀 IA AUTÔNOMA v5.0 ATIVA</div>
+                    <div>🚀 IA AUTÔNOMA v5.1 ATIVA</div>
                     <div>💎 ACUMULE SALDO DIÁRIO</div>
                     <div>🍀 INDIQUE E GANHE R$ 0,10</div>
                 </div>
@@ -36,22 +45,18 @@
             <div class="card dashboard">
                 <div class="top-row" style="display: flex; justify-content: space-between; align-items: center;">
                     <span>Olá, <b id="u-nome">...</b></span>
-                    <button onclick="window.location.href='config.html'" style="background:none; border:none; color:var(--neon); font-size:1.4rem; cursor:pointer;">⚙️</button>
+                    <button onclick="window.location.href='config.html'" class="btn-settings">⚙️</button>
                 </div>
-                
                 <div class="saldo" style="margin: 20px 0 10px 0;">
                     <small style="display:block; font-size: 0.7rem; color: var(--neon); font-family: 'Orbitron';">SALDO TOTAL</small>
                     R$ <span id="u-saldo">0.00</span>
                 </div>
-
-                <button onclick="window.location.href='central.html'" class="btn-outline" style="margin-bottom: 20px; border-color: #ffd700; color: #ffd700; border-width: 2px; width: 100%; font-family: 'Orbitron';">🎮 MINIGAMES $$$</button>
-
+                <button onclick="window.location.href='central.html'" class="btn-outline" style="margin-bottom: 20px; border-color: #ffd700; color: #ffd700; border-width: 2px; width: 100%;">🎮 MINIGAMES $$$</button>
                 <div class="actions">
                     <button onclick="checkin()" id="btn-checkin">📍 CHECK-IN (+0.01)</button>
                     <button onclick="video()" id="btn-video">📺 VÍDEO (+0.02)</button>
                 </div>
-                <div id="video-timer" class="hidden" style="color:var(--neon); font-size:0.7rem; text-align:center; margin-top:5px;">Processando dados: <span id="timer">30</span>s...</div>
-                
+                <div id="video-timer" class="hidden">Processando: <span id="timer">30</span>s...</div>
                 <div class="stats">
                     <p>CÓDIGO: <span id="u-code">...</span></p>
                     <p>INDICAÇÕES: <span id="u-vendas">0</span></p>
@@ -59,15 +64,25 @@
             </div>
 
             <div class="fases-scroll">
-                <div class="fase-card" id="card-fase1"><div class="badge">FASE 1 (R$ 100)</div><div id="grid-1" class="grid"></div></div>
-                <div class="fase-card" id="card-fase2" style="opacity:0.5;"><div class="lock-msg">🔒 50 INDICAÇÕES</div><div id="grid-2" class="grid"></div></div>
+                <div class="fase-card"><div class="badge">FASE 1 (R$ 100)</div><div id="grid-1" class="grid"></div></div>
+                <div class="fase-card" style="opacity:0.5;"><div class="lock-msg">🔒 FASE 2 (R$ 220)<br>50 INDICAÇÕES</div><div id="grid-2" class="grid"></div></div>
+                <div class="fase-card" style="opacity:0.5;"><div class="lock-msg">🔒 FASE 3 (R$ 350)<br>100 INDICAÇÕES</div><div id="grid-3" class="grid"></div></div>
+                <div class="fase-card" style="opacity:0.5;"><div class="lock-msg">🔒 FASE 4 (R$ 500)<br>250 INDICAÇÕES</div><div id="grid-4" class="grid"></div></div>
+            </div>
+
+            <div id="checkout" class="hidden card">
+                <p>Selecionados: <span id="sel-nums" style="color:#00f2ff"></span></p>
+                <h3>Total: R$ <span id="total-val">0.00</span></h3>
+                <button onclick="pix()" class="btn-pix">PAGAR COM PIX</button>
             </div>
 
             <div class="regras">
-                <h4>⚖️ REGRAS v5.0</h4>
-                <p>• Check-in: R$ 0,01 | Vídeo: R$ 0,02</p>
-                <p>• Indicação: R$ 0,10 | Bônus Nível: R$ 0,10</p>
-                <p>• Saque mínimo: R$ 20,00</p>
+                <h4>⚖️ REGRAS DETALHADAS v5.1</h4>
+                <p>• <b>Check-in:</b> Recompensa de R$ 0,01 a cada 24 horas.</p>
+                <p>• <b>Vídeos:</b> Ganhe R$ 0,02 após assistir 30s de anúncio.</p>
+                <p>• <b>Indicação:</b> R$ 0,10 adicionado ao saldo por cada novo usuário real.</p>
+                <p>• <b>Minigames:</b> Acumule XP para subir de nível. Cada Nível = R$ 0,10.</p>
+                <p>• <b>Saque:</b> Permitido apenas após atingir o mínimo de R$ 20,00.</p>
             </div>
         </div>
     </div>
