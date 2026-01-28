@@ -2,35 +2,35 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 
-// Configurações iniciais do servidor
+// Configurações essenciais de segurança e leitura de dados
 app.use(cors());
 app.use(express.json());
 
-// Rota principal de processamento do Robô
+// Rota para o Robô Processar o PIX
 app.post('/gerar-pix', (req, res) => {
     try {
         const { nome, telefone, numeros, total } = req.body;
 
-        // Limpeza do valor para evitar erro de cálculo matemático
+        // Limpeza do valor para cálculo (Remove "R$ " e troca vírgula por ponto)
         const totalLimpo = typeof total === 'string' 
-            ? parseFloat(total.replace('R$ ', '').replace(',', '.')) 
+            ? parseFloat(total.replace('R$ ', '').replace('.', '').replace(',', '.')) 
             : parseFloat(total);
 
-        // LOG DE ANÁLISE DO ROBÔ (Aparece no seu terminal)
+        // LOG DE ANÁLISE DO ROBÔ (Aparece no painel do Render)
         console.log("\n==========================================");
         console.log("🤖 ROBÔ ANALISTA ATIVO");
         console.log(`Cliente: ${nome || 'Não Identificado'}`);
         console.log(`Telefone: ${telefone || 'N/A'}`);
-        console.log(`Números: ${numeros ? numeros.join(', ') : 'Nenhum'}`);
+        console.log(`Números Escolhidos: ${numeros ? numeros.join(', ') : 'Nenhum'}`);
         console.log(`Valor Processado: R$ ${totalLimpo.toFixed(2)}`);
-        console.log("STATUS: Transação autorizada com sucesso.");
+        console.log("STATUS: Transação autorizada.");
         console.log("==========================================\n");
 
-        // Resposta para o site (Aqui você pode colocar sua chave PIX real)
+        // Resposta enviada de volta para o seu site
         res.json({
             status: "sucesso",
-            copy_paste: "00020101021226850014BR.GOV.BCB.PIX0114SUACHAVEPIX25260530BR.com.mercadopago",
-            msg: "Robô: Pagamento gerado!"
+            copy_paste: "00020101021226850014BR.GOV.BCB.PIX0114SUACHAVEPIX25260530BR.com.mercadopago", // Substitua pela sua chave real
+            msg: "Robô: Pagamento gerado com sucesso!"
         });
 
     } catch (error) {
@@ -39,8 +39,8 @@ app.post('/gerar-pix', (req, res) => {
     }
 });
 
-// Inicialização do sistema
-const PORT = process.env.PORT || 3000; 
+// Porta dinâmica para o Render (Ele usa a 10000 por padrão)
+const PORT = process.env.PORT || 10000; 
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`🤖 MiniRifaProRobo Ativo na porta ${PORT}`);
 });
