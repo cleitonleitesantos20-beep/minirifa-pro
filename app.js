@@ -8,23 +8,21 @@ const firebaseConfig = {
   projectId: "minharifadigital",
   storageBucket: "minharifadigital.firebasestorage.app",
   messagingSenderId: "59630725905",
-  appId: "1:59630725905:web:396c8cfca385dc3d957ab0",
-  measurementId: "G-195QMHMXML"
+  appId: "1:59630725905:web:396c8cfca385dc3d957ab0"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-
 let selecionados = [];
 
-// Gerenciamento de Telas
-window.mostrarTela = function(tela) {
+// --- GERENCIAMENTO DE TELAS ---
+window.mostrarTela = (tela) => {
     document.getElementById('tela-cadastro').style.display = tela === 'cadastro' ? 'block' : 'none';
     document.getElementById('tela-login').style.display = tela === 'login' ? 'block' : 'none';
 };
 
-// Cadastro de Perfil Permanente
+// --- CADASTRO DE USUÁRIO ---
 window.registrarUsuario = async function() {
     const email = document.getElementById('reg-email').value;
     const senha = document.getElementById('reg-senha').value;
@@ -36,24 +34,28 @@ window.registrarUsuario = async function() {
     try {
         const res = await createUserWithEmailAndPassword(auth, email, senha);
         await setDoc(doc(db, "usuarios", res.user.uid), { nome, email, telefone: tel });
-        alert("Perfil Pro Salvo com Sucesso!");
+        alert("Perfil Salvo com Sucesso!");
     } catch (e) { alert("Erro ao criar conta: " + e.message); }
 };
 
-// Sistema de Login
+// --- SISTEMA DE LOGIN ---
 window.fazerLogin = async function() {
     const email = document.getElementById('log-email').value;
     const senha = document.getElementById('log-senha').value;
-    try { await signInWithEmailAndPassword(auth, email, senha); } 
-    catch (e) { alert("Login Inválido!"); }
+    try { 
+        await signInWithEmailAndPassword(auth, email, senha); 
+    } catch (e) { 
+        alert("Login Inválido!"); 
+    }
 };
 
-// Monitor de Sessão (Mantém logado)
+// --- MONITOR DE SESSÃO ---
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         const snap = await getDoc(doc(db, "usuarios", user.uid));
         if (snap.exists()) {
             document.getElementById('user-display').innerText = snap.data().nome;
+            // Esconde telas de login/cadastro e mostra a rifa
             document.getElementById('tela-cadastro').style.display = 'none';
             document.getElementById('tela-login').style.display = 'none';
             document.getElementById('tela-rifa').style.display = 'block';
@@ -65,6 +67,7 @@ onAuthStateChanged(auth, async (user) => {
 
 document.getElementById('btnSair').onclick = () => signOut(auth).then(() => location.reload());
 
+// --- LÓGICA DA RIFA ---
 function iniciarRifa() {
     const grid = document.getElementById('gridRifa');
     grid.innerHTML = ''; 
@@ -76,7 +79,8 @@ function iniciarRifa() {
         div.onclick = () => clicarNumero(i, div);
         grid.appendChild(div);
     }
-    // Monitoramento 24h de vendas
+
+    // Monitoramento em tempo real de números vendidos no Firebase
     onSnapshot(doc(db, "rifas", "sorteio1"), (s) => {
         const d = s.data();
         if (d) Object.keys(d).forEach(k => {
@@ -98,50 +102,39 @@ function clicarNumero(n, el) {
         selecionados.push(n);
         el.classList.add('selected');
     }
-    let total = selecionados.length * 5;
-    if (selecionados.length > 5) total *= 0.9; // Desconto estratégico
+    const total = selecionados.length * 5; // Valor unitário R$ 5,00
     document.getElementById('qtd').innerText = selecionados.length;
     document.getElementById('total').innerText = "R$ " + total.toFixed(2);
 }
 
+// --- BOTÃO GERAR PIX (CONEXÃO COM RENDER) ---
 document.getElementById('btnPagar').onclick = async () => {
     const user = auth.currentUser;
-    if (!user) return alert("Faça login para comprar!");
+    if (!user) return alert("Faça login para continuar!");
     if (selecionados.length === 0) return alert("Selecione ao menos um número!");
 
     const snap = await getDoc(doc(db, "usuarios", user.uid));
     const dadosUsuario = snap.data();
-    
-    // Pegamos o valor direto do elemento da tela
-    const valorTexto = document.getElementById('total').innerText;
 
     try {
-        const res = await fetch('https://minirifa-pro.onrender.com/gerar-pix', { 
+        const resposta = await fetch('https://minirifa-pro.onrender.com/gerar-pix', { 
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                nome: dadosUsuario.nome, // Corrigido: usando o nome do Firebase
+                nome: dadosUsuario.nome,
                 telefone: dadosUsuario.telefone,
-                total: valorTexto,       // Corrigido: pegando o R$ do HTML
-                numeros: selecionados    // Corrigido: usando sua lista de números
+                numeros: selecionados,
+                total: document.getElementById('total').innerText
             })
         });
 
-        const d = await res.json();
-        
+        const d = await resposta.json();
         if (d.copy_paste) {
-            prompt("🤖 ROBÔ: PIX Gerado com Sucesso!\n\nCopia e cola:", d.copy_paste);
+            prompt("🤖 PIX GERADO!\nCopie o código abaixo:", d.copy_paste);
         } else {
-            alert("Erro ao gerar PIX. Tente novamente.");
+            alert("Erro ao processar pagamento.");
         }
     } catch (e) { 
-        alert("Servidor Offline ou ainda acordando. Tente novamente em 30 segundos!"); 
+        alert("O servidor está acordando... Tente novamente em 30 segundos!"); 
     }
 };
-        const d = await res.json();
-        prompt("PIX COPIA E COLA:", d.copy_paste);
-    } catch (e) { alert("Servidor Offline!"); }
-
-};
-
-
