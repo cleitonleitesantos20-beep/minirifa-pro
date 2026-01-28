@@ -183,3 +183,32 @@ slider.addEventListener('mousemove', (e) => {
     const walk = (x - startX) * 2;
     slider.scrollLeft = scrollLeft - walk;
 });
+// 7. FUNÇÃO DE PAGAMENTO (GERAR PIX)
+window.gerarPix = async () => {
+    if (selecionados.length === 0) return alert("Selecione ao menos um número!");
+
+    const valorTotal = (selecionados.length * PRECO_UNITARIO).toFixed(2);
+    const user = auth.currentUser;
+
+    // Aqui simulamos a criação do pedido no banco de dados
+    const pedidoId = "PX" + Math.floor(1000 + Math.random() * 9000);
+    
+    // Alerta estilizado simulando o sistema de pagamento
+    const confirmacao = confirm(`🚀 ROBOSORTEIO - PEDIDO ${pedidoId}\n\nVocê selecionou os números: ${selecionados.join(', ')}\nValor Total: R$ ${valorTotal}\n\nDeseja gerar o código PIX Copia e Cola?`);
+
+    if (confirmacao) {
+        // No futuro, aqui você conectará com a API do Mercado Pago ou Efí
+        const pixFake = "00020126580014BR.GOV.BCB.PIX0136suachavepixaqui12345678905204000053039865404" + valorTotal + "5802BR5913ROBOSORTEIO6008BRASILIA62070503***6304E2B1";
+        
+        // Copia automaticamente para a área de transferência
+        navigator.clipboard.writeText(pixFake).then(() => {
+            alert("✅ CÓDIGO PIX COPIADO!\n\nCole no seu banco para pagar R$ " + valorTotal + ".\n\nApós o pagamento, seus números ficarão vermelhos em instantes.");
+            
+            // Limpa a seleção após "gerar" o pix
+            selecionados = [];
+            document.getElementById('payment-area').classList.add('hidden');
+            // Aqui você chamaria a renderização para atualizar o visual
+            // renderizarTodasFases([]); 
+        });
+    }
+};
