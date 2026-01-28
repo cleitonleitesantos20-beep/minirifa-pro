@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Acesso - RoboSorteio IA</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        body { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #000; }
+        .login-box { width: 100%; max-width: 350px; padding: 20px; }
+        .tab-container { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab-btn { flex: 1; padding: 10px; background: #111; border: 1px solid #333; color: #555; font-size: 0.7rem; }
+        .tab-btn.active { border-color: var(--neon); color: var(--neon); background: rgba(0,242,255,0.05); }
+    </style>
+</head>
+<body>
+
+    <div class="login-box">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="font-family: 'Orbitron'; color: var(--neon); font-size: 1.4rem;">ROBOSORTEIO IA</h1>
+            <p style="font-size: 0.8rem; color: #666;">AUTENTICAÇÃO NECESSÁRIA</p>
+        </div>
+
+        <div class="tab-container">
+            <button onclick="toggleTab('login')" id="tab-l" class="tab-btn active">ENTRAR</button>
+            <button onclick="toggleTab('cad')" id="tab-c" class="tab-btn">CADASTRAR</button>
+        </div>
+
+        <div id="form-login" class="card">
+            <input type="email" id="l-email" placeholder="E-mail">
+            <input type="password" id="l-senha" placeholder="Senha">
+            <button onclick="login()" class="btn-primary">ACESSAR PAINEL</button>
+        </div>
+
+        <div id="form-cad" class="card hidden">
+            <input type="text" id="c-nome" placeholder="Seu Nome">
+            <input type="email" id="c-email" placeholder="E-mail">
+            <input type="password" id="c-senha" placeholder="Senha">
+            <input type="text" id="c-ref" placeholder="Código de Indicação">
+            <button onclick="cadastrar()" class="btn-outline">CRIAR CONTA AGORA</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, updateDoc, increment, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8",
+            authDomain: "minharifadigital.firebaseapp.com",
+            projectId: "minharifadigital",
+            storageBucket: "minharifadigital.firebasestorage.app",
+            messagingSenderId: "59630725905",
+            appId: "1:59630725905:web:396c8cfca385dc3d957ab0"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // Se já estiver logado, vai direto pro index
+        onAuthStateChanged(auth, (u) => { if(u) window.location.href = 'index.html'; });
+
+        window.toggleTab = (type) => {
+            document.getElementById('form-login').classList.toggle('hidden', type === 'cad');
+            document.getElementById('form-cad').classList.toggle('hidden', type === 'login');
+            document.getElementById('tab-l').classList.toggle('active', type === 'login');
+            document.getElementById('tab-c').classList.toggle('active', type === 'cad');
+        };
+
+        window.login = async () => {
+            const e = document.getElementById('l-email').value;
+            const s = document.getElementById('l-senha').value;
+            try { await signInWithEmailAndPassword(auth, e, s); } 
+            catch (err) { alert("Erro: " + err.message); }
+        };
+
+        window.cadastrar = async () => {
+            const n = document.getElementById('c-nome').value;
+            const e = document.getElementById('c-email').value;
+            const s = document.getElementById('c-senha').value;
+            const r = document.getElementById('c-ref').value;
+            if(!n || !e || !s) return alert("Preencha tudo!");
+
+            try {
+                const res = await createUserWithEmailAndPassword(auth, e, s);
+                const code = Math.random().toString(36).substring(2, 7).toUpperCase();
+                await setDoc(doc(db, "usuarios", res.user.uid), { nome: n, email: e, meuCodigo: code, saldo: 0, vendas: 0, xp: 0 });
+                
+                if (r) {
+                    const q = query(collection(db, "usuarios"), where("meuCodigo", "==", r));
+                    const snap = await getDocs(q);
+                    if (!snap.empty) { await updateDoc(doc(db, "usuarios", snap.docs[0].id), { saldo: increment(0.10), vendas: increment(1) }); }
+                }
+            } catch (err) { alert(err.message); }
+        };
+    </script>
+</body>
+</html>
