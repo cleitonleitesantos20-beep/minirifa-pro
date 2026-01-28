@@ -1,5 +1,5 @@
 /* =========================================
-   1. RESET E CONFIGURAÇÃO DE TELA (BUG FIX)
+   1. CONFIGURAÇÕES GERAIS E FONTES
    ========================================= */
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap');
 
@@ -7,6 +7,7 @@
     --neon-blue: #00f2ff;
     --neon-green: #4df200;
     --neon-red: #ff003c;
+    --neon-yellow: #ffcc00;
     --neon-purple: #bc13fe;
     --dark-bg: #0a0b10;
     --card-bg: rgba(20, 22, 30, 0.95);
@@ -15,13 +16,14 @@
 * { 
     box-sizing: border-box; 
     -webkit-tap-highlight-color: transparent; 
+    margin: 0; 
+    padding: 0;
 }
 
 html, body {
     width: 100%;
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden; /* Resolve o erro de puxar para a esquerda */
+    min-height: 100vh;
+    overflow-x: hidden; /* IMPORTANTE: Resolve o erro de puxar para o lado */
     background-color: var(--dark-bg);
     color: #ffffff;
     font-family: 'Rajdhani', sans-serif;
@@ -55,7 +57,7 @@ html, body {
     color: #555;
     width: 90%;
     max-width: 470px;
-    height: 85px;
+    height: 80px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -67,7 +69,7 @@ html, body {
 }
 
 /* =========================================
-   3. DASHBOARD E BOTÕES DE GANHO
+   3. ÁREA DE ACESSO (LOGIN / CADASTRO)
    ========================================= */
 .container {
     width: 100%;
@@ -75,25 +77,71 @@ html, body {
     padding: 0 15px;
 }
 
+.auth-card {
+    background: #16171d;
+    padding: 25px;
+    border-radius: 15px;
+    border: 1px solid var(--neon-blue);
+    margin-top: 30px;
+    box-shadow: 0 0 20px rgba(0, 242, 255, 0.1);
+}
+
+.auth-card input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 12px;
+    background: #000;
+    border: 1px solid #333;
+    color: #fff;
+    border-radius: 5px;
+    font-family: 'Rajdhani';
+}
+
+.divider {
+    text-align: center;
+    margin: 15px 0;
+    color: #555;
+    font-size: 0.8rem;
+    font-family: 'Orbitron';
+}
+
+/* =========================================
+   4. DASHBOARD DO USUÁRIO
+   ========================================= */
 .user-dashboard {
-    background: var(--card-bg);
-    border: 1px solid rgba(255,255,255,0.1);
+    background: #111;
     padding: 20px;
     border-radius: 15px;
-    margin-top: 10px;
+    margin-top: 15px;
+    border: 1px solid #222;
+}
+
+.user-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.btn-logout {
+    background: var(--neon-red);
+    color: #fff;
+    border: none;
+    padding: 6px 15px;
+    border-radius: 4px;
+    font-family: 'Orbitron';
+    cursor: pointer;
+    font-size: 0.65rem;
+    font-weight: bold;
 }
 
 .pontos-wallet {
-    background: rgba(77, 242, 0, 0.05);
-    border: 1px solid var(--neon-green);
-    padding: 15px;
-    margin: 10px 0;
-    border-radius: 8px;
-    color: var(--neon-green);
     text-align: center;
+    font-size: 2.2rem;
+    color: var(--neon-green);
     font-family: 'Orbitron';
-    font-size: 1.4rem;
-    box-shadow: inset 0 0 15px rgba(77, 242, 0, 0.1);
+    margin: 10px 0;
+    text-shadow: 0 0 15px rgba(77, 242, 0, 0.4);
 }
 
 .ganhos-grid {
@@ -107,7 +155,6 @@ html, body {
     padding: 12px 5px;
     font-size: 0.7rem;
     font-family: 'Orbitron';
-    font-weight: bold;
     background: transparent;
     cursor: pointer;
     border-radius: 6px;
@@ -115,47 +162,62 @@ html, body {
 }
 
 #btn-checkin { border: 1px solid var(--neon-blue); color: var(--neon-blue); }
-#btn-video { border: 1px solid #ffcc00; color: #ffcc00; }
-
-#btn-checkin:hover { background: var(--neon-blue); color: #000; }
-#btn-video:hover { background: #ffcc00; color: #000; }
+#btn-video { border: 1px solid var(--neon-yellow); color: var(--neon-yellow); }
 
 #timer-video {
     width: 100%;
     text-align: center;
     padding: 12px;
-    color: #ffcc00;
-    border: 1px dashed #ffcc00;
+    color: var(--neon-yellow);
+    border: 1px dashed var(--neon-yellow);
     margin-top: 10px;
     font-family: 'Orbitron';
     font-size: 0.8rem;
-    background: rgba(255, 204, 0, 0.05);
+}
+
+.user-info-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+    font-size: 0.8rem;
+    color: #888;
 }
 
 /* =========================================
-   4. CARROSSEL DE FASES (A MÁGICA)
+   5. CARROSSEL E FASES
    ========================================= */
+.valor-premio {
+    background: linear-gradient(90deg, transparent, var(--neon-green), transparent);
+    color: #000;
+    text-align: center;
+    font-family: 'Orbitron';
+    font-weight: bold;
+    padding: 8px;
+    margin-bottom: 12px;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
 .fases-wrapper {
     display: flex;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     gap: 15px;
-    padding: 20px 5px;
-    width: 100%;
+    padding: 20px 0;
     cursor: grab;
-    scrollbar-width: none; /* Firefox */
+    scrollbar-width: none;
 }
 
-.fases-wrapper::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+.fases-wrapper::-webkit-scrollbar { display: none; }
 
 .fase-slide {
-    min-width: 95%;
+    min-width: 100%;
     scroll-snap-align: center;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid #222;
-    border-radius: 15px;
+    background: #16171d;
     padding: 15px;
+    border-radius: 15px;
     position: relative;
+    border: 1px solid #222;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
@@ -169,31 +231,10 @@ html, body {
     padding: 5px;
     border-radius: 4px;
     margin-bottom: 15px;
-    text-transform: uppercase;
 }
 
 /* =========================================
-   5. CADEADO E BLOQUEIO
-   ========================================= */
-.locked { filter: grayscale(1) blur(2px); pointer-events: none; }
-.lock-overlay {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.85);
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--neon-red);
-    font-family: 'Orbitron';
-    font-size: 0.8rem;
-    border-radius: 15px;
-    border: 1px solid var(--neon-red);
-    text-shadow: 0 0 10px var(--neon-red);
-}
-
-/* =========================================
-   6. GRID DE NÚMEROS E CORES
+   6. GRID DE NÚMEROS E ESTADOS
    ========================================= */
 .grid-numeros {
     display: grid;
@@ -202,7 +243,7 @@ html, body {
 }
 
 .num {
-    background: #111;
+    background: #000;
     border: 1px solid var(--neon-blue);
     color: var(--neon-blue);
     padding: 12px 0;
@@ -217,19 +258,37 @@ html, body {
     background: var(--neon-green) !important;
     color: #000 !important;
     border-color: var(--neon-green);
-    box-shadow: 0 0 15px var(--neon-green);
+    box-shadow: 0 0 10px var(--neon-green);
 }
 
 .num.comprado {
     background: var(--neon-red) !important;
     color: #fff !important;
-    border-color: var(--neon-red);
     opacity: 0.3;
     cursor: not-allowed;
+    border-color: var(--neon-red);
+}
+
+/* BLOQUEIO DE FASE */
+.locked { filter: grayscale(1) blur(2px); pointer-events: none; }
+.lock-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--neon-red);
+    font-family: 'Orbitron';
+    font-size: 0.8rem;
+    border-radius: 15px;
+    text-align: center;
+    padding: 20px;
 }
 
 /* =========================================
-   7. CHECKOUT E RANKING
+   7. CHECKOUT E BOTÕES DE AÇÃO
    ========================================= */
 .pay-card {
     background: #1a1c26;
@@ -249,48 +308,70 @@ html, body {
     font-family: 'Orbitron';
     font-weight: bold;
     cursor: pointer;
+    border-radius: 6px;
+    margin-top: 10px;
 }
 
+.btn-main {
+    background: var(--neon-blue);
+    color: #000;
+    border: none;
+    padding: 15px;
+    width: 100%;
+    font-family: 'Orbitron';
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 6px;
+}
+
+.btn-sec {
+    background: transparent;
+    color: #888;
+    border: 1px solid #333;
+    width: 100%;
+    padding: 12px;
+    font-family: 'Orbitron';
+    cursor: pointer;
+    border-radius: 6px;
+    margin-top: 10px;
+}
+
+/* =========================================
+   8. RANKING E EXTRAS
+   ========================================= */
 .ranking-container {
     border: 1px solid var(--neon-purple);
     padding: 15px;
     border-radius: 10px;
-    margin-top: 25px;
-    background: rgba(188, 19, 254, 0.02);
+    margin: 25px 0;
+    background: rgba(188, 19, 254, 0.05);
+}
+
+.ranking-container h3 {
+    color: var(--neon-purple);
+    font-family: 'Orbitron';
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    text-align: center;
 }
 
 .ranking-list p {
     display: flex;
     justify-content: space-between;
-    padding: 10px 0;
+    padding: 8px 0;
     border-bottom: 1px solid #1a1a1a;
     font-size: 0.9rem;
 }
 
-.ranking-list b { color: var(--neon-purple); }
-
-/* =========================================
-   8. AUTH E AUXILIARES
-   ========================================= */
-#auth-section input {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 10px;
-    background: #111;
-    border: 1px solid #333;
-    color: white;
-    border-radius: 5px;
-}
-
-.btn-main {
-    width: 100%;
+.quadro-data {
+    text-align: center;
     padding: 15px;
-    background: var(--neon-blue);
-    border: none;
+    border: 1px solid #222;
+    margin: 20px 0;
     font-family: 'Orbitron';
-    font-weight: bold;
-    cursor: pointer;
-    color: #000;
+    color: var(--neon-blue);
+    font-size: 0.8rem;
+    border-radius: 8px;
 }
 
 .hidden { display: none !important; }
