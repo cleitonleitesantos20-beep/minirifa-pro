@@ -5,38 +5,42 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// 1. ROTA DE PIX (Compra Avulsa)
 app.post('/gerar-pix', (req, res) => {
     try {
-        const { nome, numeros, total, planoMensal, indicação } = req.body;
+        const { nome, numeros, total } = req.body;
+        console.log(`\n💰 PIX SOLICITADO: ${nome} | Qtd: ${numeros.length}`);
         
-        // Limpeza de valores para cálculo matemático
-        let valorBase = typeof total === 'string' 
-            ? parseFloat(total.replace('R$ ', '').replace('.', '').replace(',', '.')) 
-            : parseFloat(total);
-
-        // Lógica de Desconto do Plano Mensal (20% OFF)
-        let valorFinal = planoMensal ? valorBase * 0.8 : valorBase;
-
-        console.log("\n==========================================");
-        console.log("🤖 ROBÔ ANALISTA ATIVO");
-        console.log(`Cliente: ${nome}`);
-        console.log(`Números: ${numeros.join(', ')}`);
-        console.log(`Plano Mensal: ${planoMensal ? 'SIM (Desconto Aplicado)' : 'NÃO'}`);
-        console.log(`Indicado por: ${indicação || 'Ninguém'}`);
-        console.log(`VALOR FINAL COBRADO: R$ ${valorFinal.toFixed(2)}`);
-        console.log("==========================================\n");
-
         res.json({
             status: "sucesso",
-            copy_paste: "00020101021226850014BR.GOV.BCB.PIX...", // Sua chave PIX aqui
-            valorAtualizado: valorFinal.toFixed(2)
+            copy_paste: "00020101021226850014BR.GOV.BCB.PIX0114SUACHAVEPIX25260530BR.com.mercadopago", // Coloque sua chave PIX aqui
+            msg: "Robô: PIX Gerado!"
         });
-    } catch (error) {
-        res.status(500).json({ error: "Erro no motor do robô." });
+    } catch (e) {
+        res.status(500).json({ error: "Erro no processamento do PIX." });
     }
 });
 
-const PORT = process.env.PORT || 10000; // Porta padrão do Render
+// 2. ROTA DE CARTÃO (Plano Mensal Recurrente)
+app.post('/assinar-plano', (req, res) => {
+    try {
+        const { nome, email, cartao, valorPlano } = req.body;
+        
+        // Simulação de Integração com Gateway (Stripe/MercadoPago)
+        console.log(`\n💎 NOVA ASSINATURA MENSAL: ${nome}`);
+        console.log(`Cartão: **** **** **** ${cartao.numero.slice(-4)}`);
+        console.log(`Recorrência Ativa: R$ ${valorPlano}/mês com 20% OFF`);
+
+        res.json({
+            status: "sucesso",
+            msg: "Assinatura confirmada! Seus números mensais foram liberados."
+        });
+    } catch (e) {
+        res.status(500).json({ error: "Erro ao processar cartão de crédito." });
+    }
+});
+
+const PORT = process.env.PORT || 10000;
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🤖 Robô Pro Ativo na porta ${PORT}`);
+    console.log(`🤖 Robô Pro Ativo na Porta ${PORT}`);
 });
