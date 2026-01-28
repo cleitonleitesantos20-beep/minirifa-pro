@@ -110,12 +110,13 @@ document.getElementById('btnPagar').onclick = async () => {
     const dados = { ...snap.data(), numeros: selecionados, total: document.getElementById('total').innerText };
     
     try {
-        const res = await fetch('http://192.168.1.134:3000/gerar-pix', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(dados)
+        const resposta = await fetch('https://minirifa-pro.onrender.com/gerar-pix', { 
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dadosDoUsuario)
         });
         const d = await res.json();
         prompt("PIX COPIA E COLA:", d.copy_paste);
     } catch (e) { alert("Servidor Offline!"); }
+
 };
