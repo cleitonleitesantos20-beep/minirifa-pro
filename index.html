@@ -3,84 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sua Rifa Milionária</title>
+    <title>RoboSorteio - Oficial</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://sdk.mercadopago.com/js/v2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <div class="header-info">
-        <div id="meta-banner">🚀 META ATUAL: <span id="vendas-contagem">0</span> / <span id="meta-max">50</span></div>
-        <div id="data-sorteio">📅 SORTEIO: <span id="data-txt">Carregando...</span></div>
+        <div id="meta-banner">🤖 ROBOSORTEIO</div>
     </div>
 
-    <div class="patrocinador-topo">
-        <span>Parceiro Oficial:</span>
-        <img src="https://via.placeholder.com/100x30?text=Sua+Logo" alt="Logo Patrocinador">
-    </div>
+    <div class="ads-block">SUA PROPAGANDA AQUI (500x90)</div>
 
     <div class="container">
         
         <div id="auth-section">
-            <h2 id="auth-title">Entrar na Rifa</h2>
+            <h2 class="neon-text">Acessar Sistema</h2>
             <input type="text" id="reg-nome" placeholder="Nome Completo">
-            <input type="email" id="email" placeholder="Seu melhor e-mail">
-            <input type="password" id="senha" placeholder="Sua senha (min. 6 dígitos)">
+            <input type="email" id="email" placeholder="Seu e-mail">
+            <input type="password" id="senha" placeholder="Sua senha">
             <input type="text" id="ref-code" placeholder="Código de Indicação (Opcional)">
             <div class="auth-buttons">
-                <button onclick="login()">Entrar</button>
-                <button onclick="cadastrar()">Criar Conta</button>
+                <button onclick="login()" class="btn-main">ENTRAR</button>
+                <button onclick="cadastrar()" class="btn-sec">CRIAR CONTA</button>
             </div>
         </div>
 
         <div id="tela-rifa" class="hidden">
             <div class="user-dashboard">
                 <p>Olá, <b id="user-display">...</b>! 👋</p>
-                <div class="referral-box">
-                    <p>Seu Código: <b id="meu-codigo-txt" class="highlight">...</b></p>
-                    <p>Indicações: <span id="ponto-indicacao">0/3</span> 🔥</p>
+                <p>Seu Código: <b id="meu-codigo-txt" class="highlight">...</b></p>
+                <p>Indicações na Semana: <span id="ponto-semana" class="highlight">0</span> 🔥</p>
+                
+                <div class="pontos-wallet">
+                    💰 SALDO ACUMULADO: <br>
+                    <span class="currency">R$</span> <span id="saldo-pontos">0.00</span>
                 </div>
-                <button onclick="fazerCheckin()" id="btn-checkin">📍 Check-in Diário</button>
+                
+                <button onclick="fazerCheckin()" id="btn-checkin">📍 EFETUAR CHECK-IN DIÁRIO</button>
             </div>
 
-            <div id="ranking-box" class="ranking-container">
-                <h3>🏆 Ranking de Indicadores</h3>
-                <div id="ranking-lista">Buscando líderes...</div>
-            </div>
-
-            <div class="rules-box">
-                <h3>📢 Regras da Rifa</h3>
-                <ul>
-                    <li><b>Fase 1:</b> 50 Números - Prêmio R$ 100,00</li>
-                    <li><b>Fase 2:</b> 100 Números - Prêmio R$ 200,00 (Bloqueada)</li>
-                    <li><b>Fase 3:</b> 150 Números - Prêmio R$ 400,00 (Bloqueada)</li>
-                </ul>
-            </div>
-
-            <div class="fases-wrapper">
-                <div class="fase-section" id="fase1-ui">
-                    <h4>🔢 Escolha seus números (Fase 1)</h4>
-                    <div id="grid-fase1" class="grid-numeros"></div>
-                </div>
-
-                <div class="fase-section locked" id="fase2-ui">
-                    <div class="lock-overlay">🔒 Alcance 50 vendas para liberar esta fase!</div>
-                    <h4>🔢 Fase 2 (Prêmio Maior)</h4>
-                    <div id="grid-fase2" class="grid-numeros"></div>
-                </div>
+            <div class="fase-section">
+                <h3 class="section-title">🔢 Escolha seus Números</h3>
+                <div id="grid-principal" class="grid-numeros"></div>
             </div>
 
             <div id="payment-area" class="hidden">
-                <h3>Finalizar Compra</h3>
-                <p>Números selecionados: <span id="num-selecionados">-</span></p>
-                <p>Total: <b>R$ <span id="total-pagar">0,00</span></b></p>
-                
-                <div class="pay-methods">
-                    <button onclick="gerarPix()" class="btn-pix">Pagar com PIX</button>
-                    <div id="cardPaymentBrick_container"></div> </div>
+                <div class="pay-card">
+                    <p>Números: <span id="num-selecionados">...</span></p>
+                    <p>Total: <b id="total-pagar">0,00</b></p>
+                    <button onclick="gerarPix()" class="btn-pix">PAGAR VIA PIX</button>
+                </div>
+            </div>
+
+            <div class="sorteio-container">
+                <h3 class="section-title">📅 RESULTADO DO SORTEIO</h3>
+                <div id="area-resultado" class="quadro-vazio">
+                    AGUARDANDO SORTEIO...
+                </div>
+            </div>
+
+            <div class="ranking-container">
+                <h3 class="neon-purple">🏆 TOP INDICADORES DA SEMANA</h3>
+                <div id="ranking-lista" class="ranking-list">
+                    </div>
+                <div class="premios-info">
+                    🥇 R$ 15,00 | 🥈 R$ 10,00 | 🥉 R$ 5,00
+                </div>
+            </div>
+
+            <div class="rules-box">
+                <h3>📢 REGRAS E TERMOS LEGAIS</h3>
+                <p>• <b>Transparência:</b> Sistema baseado nos resultados da Loteria Federal.</p>
+                <p>• <b>Consumidor:</b> Conforme Lei 8.078/90, garantimos o acesso à informação.</p>
+                <p>• <b>Pontos:</b> Cada check-in diário acumula R$ 0,10 de bônus real.</p>
             </div>
         </div>
     </div>
+
+    <div class="ads-block">SUA PROPAGANDA AQUI (500x90)</div>
 
     <script src="app.js" type="module"></script>
 </body>
