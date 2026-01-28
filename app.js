@@ -1,99 +1,180 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RoboSorteio IA - Painel</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-</head>
-<body>
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { getFirestore, doc, onSnapshot, updateDoc, increment, setDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-    <div class="header">🤖 ROBOSORTEIO IA</div>
+const firebaseConfig = {
+    apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8",
+    authDomain: "minharifadigital.firebaseapp.com",
+    projectId: "minharifadigital",
+    storageBucket: "minharifadigital.firebasestorage.app",
+    messagingSenderId: "59630725905",
+    appId: "1:59630725905:web:396c8cfca385dc3d957ab0"
+};
 
-    <div class="container">
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+let user, userData, selecionados = [];
+
+// --- CONFIGURAÇÃO DAS FASES (1-150) ---
+const configFases = [
+    { id: 1, inicio: 1, fim: 50, preco: 110, metaIndica: 0 },
+    { id: 2, inicio: 51, fim: 100, preco: 220, metaIndica: 50 },
+    { id: 3, inicio: 101, fim: 150, preco: 350, metaIndica: 100 }
+];
+
+// --- SISTEMA DE LOGIN E CADASTRO (CORRIGIDO) ---
+window.handleLogin = async () => {
+    const e = document.getElementById('l-email').value;
+    const s = document.getElementById('l-senha').value;
+    if(!e || !s) return alert("Preencha e-mail e senha!");
+    try {
+        await signInWithEmailAndPassword(auth, e, s);
+    } catch (err) { alert("Erro ao entrar: Verifique seus dados."); }
+};
+
+window.handleCadastrar = async () => {
+    const n = document.getElementById('c-nome').value;
+    const e = document.getElementById('c-email').value;
+    const s = document.getElementById('c-senha').value;
+    const r = document.getElementById('c-ref').value;
+
+    if(!n || !e || !s) return alert("Preencha nome, e-mail e senha!");
+
+    try {
+        const res = await createUserWithEmailAndPassword(auth, e, s);
+        const code = Math.random().toString(36).substring(2, 7).toUpperCase();
         
-        <div class="slider">
-            <div class="track">
-                <div>🚀 IA v5.1 MONITORANDO SORTEIOS</div>
-                <div>💎 SALDO ATUALIZADO EM TEMPO REAL</div>
-                <div>🍀 INDIQUE AMIGOS E LIBERE FASES</div>
-                <div>📊 SISTEMA DE RIFAS SEQUENCIAIS</div>
-            </div>
-        </div>
-
-        <div class="card dashboard">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 0.9rem;">Bem-vindo, <b id="u-nome">...</b></span>
-                <button onclick="window.location.href='config.html'" class="btn-settings">⚙️</button>
-            </div>
-            
-            <div class="saldo">
-                <small style="display:block; font-size: 0.6rem; color: var(--neon); letter-spacing: 2px;">SALDO DISPONÍVEL</small>
-                R$ <span id="u-saldo">0.00</span>
-            </div>
-
-            <button onclick="window.location.href='central.html'" class="btn-outline" style="margin-bottom: 15px; border-color: #ffd700; color: #ffd700;">🎮 CENTRAL DE MINIGAMES</button>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <button onclick="checkin()" class="btn-primary" style="font-size: 0.7rem; background: #1a1a1a; color: #fff; border: 1px solid #333;">📍 CHECK-IN (+0.01)</button>
-                <button onclick="video()" id="btn-video" class="btn-primary" style="font-size: 0.7rem; background: #1a1a1a; color: #fff; border: 1px solid #333;">📺 VÍDEO (+0.02)</button>
-            </div>
-            
-            <div id="video-timer" class="hidden" style="text-align:center; margin-top:10px; font-size: 0.7rem; color: var(--neon);">
-                Sincronizando dados: <span id="timer">30</span>s...
-            </div>
-            
-            <div class="stats" style="margin-top: 15px; border-top: 1px solid #222; padding-top: 10px;">
-                <p>CÓDIGO: <span id="u-code" style="color: var(--neon);">...</span></p>
-                <p>INDICAÇÕES: <span id="u-vendas" style="color: var(--neon);">0</span></p>
-            </div>
-        </div>
-
-        <h4 style="font-family: 'Orbitron'; margin: 20px 0 10px 5px; font-size: 0.8rem; color: var(--neon); text-transform: uppercase;">🍀 Escolha seus Números</h4>
+        await setDoc(doc(db, "usuarios", res.user.uid), {
+            nome: n, email: e, meuCodigo: code, saldo: 0, vendas: 0, xp: 0, data: new Date().toISOString()
+        });
         
-        <div class="fases-scroll">
-            <div class="fase-card" id="fase-card-1">
-                <div class="banner-lucro" style="background: var(--neon); position: relative; margin: -12px -12px 10px -12px; border-radius: 10px 10px 0 0;">FASE 1 - R$ 110,00</div>
-                <div id="grid-1" class="grid"></div>
-            </div>
+        if (r) {
+            const q = query(collection(db, "usuarios"), where("meuCodigo", "==", r));
+            const snap = await getDocs(q);
+            if (!snap.empty) {
+                await updateDoc(doc(db, "usuarios", snap.docs[0].id), { saldo: increment(0.10), vendas: increment(1) });
+            }
+        }
+    } catch (err) { alert("Erro no cadastro: " + err.message); }
+};
 
-            <div class="fase-card" id="fase-card-2">
-                <div id="lock-2" class="lock-msg">
-                    <span>🔒 FASE BLOQUEADA</span>
-                    <small>REQUER 50 INDICAÇÕES</small>
-                </div>
-                <div class="banner-lucro" style="background: #333; position: relative; margin: -12px -12px 10px -12px; border-radius: 10px 10px 0 0;">FASE 2 - R$ 220,00</div>
-                <div id="grid-2" class="grid"></div>
-            </div>
+// --- MONITORAMENTO DE USUÁRIO ---
+onAuthStateChanged(auth, (u) => {
+    if (u) {
+        user = u;
+        // Se estiver na login.html e logar, vai para o index
+        if (window.location.pathname.includes('login.html')) {
+            window.location.href = 'index.html';
+        }
+        
+        onSnapshot(doc(db, "usuarios", u.uid), (snap) => {
+            userData = snap.data();
+            if (userData) {
+                renderDashboard();
+                atualizarTravaFases();
+            }
+        });
+    } else {
+        // Se não estiver logado e não estiver na login.html, expulsa
+        if (!window.location.pathname.includes('login.html')) {
+            window.location.href = 'login.html';
+        }
+    }
+});
 
-            <div class="fase-card" id="fase-card-3">
-                <div id="lock-3" class="lock-msg">
-                    <span>🔒 FASE BLOQUEADA</span>
-                    <small>REQUER 100 INDICAÇÕES</small>
-                </div>
-                <div class="banner-lucro" style="background: #333; position: relative; margin: -12px -12px 10px -12px; border-radius: 10px 10px 0 0;">FASE 3 - R$ 350,00</div>
-                <div id="grid-3" class="grid"></div>
-            </div>
-        </div>
+function renderDashboard() {
+    const comps = { 'u-nome': userData.nome, 'u-saldo': (userData.saldo || 0).toFixed(2), 'u-code': userData.meuCodigo, 'u-vendas': userData.vendas || 0 };
+    for (let id in comps) {
+        let el = document.getElementById(id);
+        if (el) el.innerText = comps[id];
+    }
+}
 
-        <div class="regras">
-            <h4 style="color: #888;">INSTRUÇÕES IA v5.1</h4>
-            <p>• Selecione os números desejados em qualquer fase liberada.</p>
-            <p>• O valor total é calculado automaticamente no checkout.</p>
-            <p>• Pagamentos via PIX são processados instantaneamente.</p>
-        </div>
+// --- LÓGICA DE SELEÇÃO E RIFAS ---
+window.selectNum = (faseId, n, el) => {
+    const fase = configFases.find(f => f.id === faseId);
+    if (faseId > 1 && (userData.vendas || 0) < fase.metaIndica) return;
 
-        <div id="checkout" class="hidden">
-            <div style="flex-grow: 1;">
-                <p style="font-size: 0.6rem; color: #888; margin-bottom: 2px;">SELECIONADOS: <b id="sel-nums" style="color: var(--neon);">0</b></p>
-                <p style="font-size: 1.1rem; font-weight: bold; color: var(--green);">R$ <span id="total-val">0.00</span></p>
-            </div>
-            <button onclick="pix()" class="btn-primary" style="width: auto; padding: 10px 25px; background: var(--green);">PAGAR PIX</button>
-        </div>
+    const idNum = `N${n}`;
+    if (selecionados.includes(idNum)) {
+        selecionados = selecionados.filter(x => x !== idNum);
+        el.classList.remove('selected');
+    } else {
+        selecionados.push(idNum);
+        el.classList.add('selected');
+    }
+    
+    const checkout = document.getElementById('checkout');
+    if (selecionados.length > 0) {
+        if(checkout) checkout.classList.remove('hidden');
+        document.getElementById('sel-nums').innerText = selecionados.length;
+        document.getElementById('total-val').innerText = (selecionados.length * (fase.preco / 50)).toFixed(2);
+    } else {
+        if(checkout) checkout.classList.add('hidden');
+    }
+};
 
-    </div>
+function inicializarGrids() {
+    configFases.forEach(fase => {
+        const grid = document.getElementById(`grid-${fase.id}`);
+        if (grid) {
+            grid.innerHTML = "";
+            for (let i = fase.inicio; i <= fase.fim; i++) {
+                const b = document.createElement('div');
+                b.className = 'num-btn';
+                b.innerText = i;
+                b.onclick = () => window.selectNum(fase.id, i, b);
+                grid.appendChild(b);
+            }
+        }
+    });
+}
 
-    <script src="app.js" type="module"></script>
-</body>
-</html>
+function atualizarTravaFases() {
+    configFases.forEach(fase => {
+        const card = document.getElementById(`fase-card-${fase.id}`);
+        if (fase.id > 1 && card) {
+            const bloqueado = (userData.vendas || 0) < fase.metaIndica;
+            card.classList.toggle('locked', bloqueado);
+            card.style.opacity = bloqueado ? "0.4" : "1";
+            // Mostra ou esconde a mensagem de lock
+            const msg = card.querySelector('.lock-msg');
+            if(msg) msg.style.display = bloqueado ? 'flex' : 'none';
+        }
+    });
+}
+
+// --- TAREFAS ---
+window.checkin = async () => {
+    const hoje = new Date().toISOString().split('T')[0];
+    if (userData.lastCheckin === hoje) return alert("Check-in já realizado!");
+    await updateDoc(doc(db, "usuarios", user.uid), { saldo: increment(0.01), lastCheckin: hoje });
+    alert("Check-in: +R$ 0,01");
+};
+
+window.video = () => {
+    const hoje = new Date().toISOString().split('T')[0];
+    if (userData.lastVideo === hoje) return alert("Limite de vídeos atingido!");
+    
+    document.getElementById('btn-video').disabled = true;
+    document.getElementById('video-timer').classList.remove('hidden');
+
+    let tempo = 30;
+    const interval = setInterval(async () => {
+        tempo--;
+        document.getElementById('timer').innerText = tempo;
+        if (tempo <= 0) {
+            clearInterval(interval);
+            await updateDoc(doc(db, "usuarios", user.uid), { saldo: increment(0.02), lastVideo: hoje });
+            document.getElementById('video-timer').classList.add('hidden');
+            document.getElementById('btn-video').disabled = false;
+            alert("Vídeo recompensado!");
+        }
+    }, 1000);
+};
+
+window.pix = () => alert("IA: Gerando PIX de R$ " + document.getElementById('total-val').innerText);
+
+document.addEventListener('DOMContentLoaded', inicializarGrids);
