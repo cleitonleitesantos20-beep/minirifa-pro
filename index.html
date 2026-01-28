@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RoboSorteio - Oficial</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -13,75 +13,79 @@
         <div id="meta-banner">🤖 ROBOSORTEIO</div>
     </div>
 
-    <div class="ads-block">SUA PROPAGANDA AQUI (500x90)</div>
+    <div class="ads-block">SUA PROPAGANDA AQUI</div>
 
     <div class="container">
-        
         <div id="auth-section">
             <h2 class="neon-text">Acessar Sistema</h2>
             <input type="text" id="reg-nome" placeholder="Nome Completo">
             <input type="email" id="email" placeholder="Seu e-mail">
             <input type="password" id="senha" placeholder="Sua senha">
-            <input type="text" id="ref-code" placeholder="Código de Indicação (Opcional)">
-            <div class="auth-buttons">
-                <button onclick="login()" class="btn-main">ENTRAR</button>
-                <button onclick="cadastrar()" class="btn-sec">CRIAR CONTA</button>
-            </div>
+            <input type="text" id="ref-code" placeholder="Código de Indicação">
+            <button onclick="login()" class="btn-main">ENTRAR</button>
+            <button onclick="cadastrar()" class="btn-sec">CRIAR CONTA</button>
         </div>
 
         <div id="tela-rifa" class="hidden">
             <div class="user-dashboard">
-                <p>Olá, <b id="user-display">...</b>! 👋</p>
-                <p>Seu Código: <b id="meu-codigo-txt" class="highlight">...</b></p>
-                <p>Indicações na Semana: <span id="ponto-semana" class="highlight">0</span> 🔥</p>
-                
+                <p>Olá, <b id="user-display">...</b>!</p>
+                <p>Código: <b id="meu-codigo-txt" class="highlight">...</b></p>
+                <p>Indicações na Semana: <span id="ponto-semana">0</span> 🔥</p>
                 <div class="pontos-wallet">
-                    💰 SALDO ACUMULADO: <br>
-                    <span class="currency">R$</span> <span id="saldo-pontos">0.00</span>
+                    💰 SALDO ACUMULADO: R$ <span id="saldo-pontos">0.00</span>
                 </div>
-                
                 <button onclick="fazerCheckin()" id="btn-checkin">📍 EFETUAR CHECK-IN DIÁRIO</button>
             </div>
 
-            <div class="fase-section">
-                <h3 class="section-title">🔢 Escolha seus Números</h3>
-                <div id="grid-principal" class="grid-numeros"></div>
+            <div class="fase-container">
+                <h3 class="section-title">🔢 Arraste para o lado</h3>
+                <div class="fases-wrapper">
+                    <div class="fase-slide" id="fase1-section">
+                        <span class="fase-badge">FASE 1 (1-50)</span>
+                        <div id="grid-fase1" class="grid-numeros"></div>
+                    </div>
+                    <div class="fase-slide locked" id="fase2-ui">
+                        <div class="lock-overlay">🔒 META: 50 VENDAS</div>
+                        <span class="fase-badge">FASE 2 (51-100)</span>
+                        <div id="grid-fase2" class="grid-numeros"></div>
+                    </div>
+                    <div class="fase-slide locked" id="fase3-ui">
+                        <div class="lock-overlay">🔒 META: 100 VENDAS</div>
+                        <span class="fase-badge">FASE 3 (101-150)</span>
+                        <div id="grid-fase3" class="grid-numeros"></div>
+                    </div>
+                </div>
             </div>
 
             <div id="payment-area" class="hidden">
                 <div class="pay-card">
                     <p>Números: <span id="num-selecionados">...</span></p>
-                    <p>Total: <b id="total-pagar">0,00</b></p>
-                    <button onclick="gerarPix()" class="btn-pix">PAGAR VIA PIX</button>
+                    <p>Total: <b>R$ <span id="total-pagar">0,00</span></b></p>
+                    <button onclick="gerarPix()" class="btn-pix">PAGAR VIA PIX (R$ 7,00 cada)</button>
                 </div>
             </div>
 
             <div class="sorteio-container">
                 <h3 class="section-title">📅 RESULTADO DO SORTEIO</h3>
-                <div id="area-resultado" class="quadro-vazio">
-                    AGUARDANDO SORTEIO...
-                </div>
+                <div id="area-resultado" class="quadro-vazio">CARREGANDO DATA...</div>
             </div>
 
             <div class="ranking-container">
                 <h3 class="neon-purple">🏆 TOP INDICADORES DA SEMANA</h3>
-                <div id="ranking-lista" class="ranking-list">
-                    </div>
-                <div class="premios-info">
-                    🥇 R$ 15,00 | 🥈 R$ 10,00 | 🥉 R$ 5,00
-                </div>
+                <div id="ranking-lista" class="ranking-list"></div>
+                <div class="premios-info">🥇 R$ 15 | 🥈 R$ 10 | 🥉 R$ 5</div>
             </div>
 
             <div class="rules-box">
-                <h3>📢 REGRAS E TERMOS LEGAIS</h3>
-                <p>• <b>Transparência:</b> Sistema baseado nos resultados da Loteria Federal.</p>
-                <p>• <b>Consumidor:</b> Conforme Lei 8.078/90, garantimos o acesso à informação.</p>
-                <p>• <b>Pontos:</b> Cada check-in diário acumula R$ 0,10 de bônus real.</p>
+                <h3>📢 REGRAS E LEIS</h3>
+                <p>• Sorteio baseado na Loteria Federal.</p>
+                <p>• Transparência total conforme Lei 8.078/90 (CDC).</p>
+                <p>• Check-in diário acumula R$ 0,10 de bônus real.</p>
             </div>
         </div>
     </div>
 
-    <div class="ads-block">SUA PROPAGANDA AQUI (500x90)</div>
+    <div class="ads-block">SUA PROPAGANDA AQUI</div>
 
     <script src="app.js" type="module"></script>
 </body>
