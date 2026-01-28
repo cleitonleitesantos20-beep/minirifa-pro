@@ -1,7 +1,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, onSnapshot, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+// --- CONFIGURAÇÃO FIREBASE (Mantenha a sua aqui) ---
 const firebaseConfig = {
   apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8",
   authDomain: "minharifadigital.firebaseapp.com",
@@ -14,127 +15,143 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
 let selecionados = [];
+const PRECO_UNITARIO = 5.00;
 
-// --- GERENCIAMENTO DE TELAS ---
-window.mostrarTela = (tela) => {
-    document.getElementById('tela-cadastro').style.display = tela === 'cadastro' ? 'block' : 'none';
-    document.getElementById('tela-login').style.display = tela === 'login' ? 'block' : 'none';
-};
-
-// --- CADASTRO DE USUÁRIO ---
-window.registrarUsuario = async function() {
+// --- 1. CADASTRO COM SISTEMA DE INDICAÇÃO ---
+window.registrarUsuario = async () => {
+    const nome = document.getElementById('reg-nome').value;
     const email = document.getElementById('reg-email').value;
     const senha = document.getElementById('reg-senha').value;
-    const nome = document.getElementById('reg-nome').value;
     const tel = document.getElementById('reg-tel').value;
+    const quemIndicou = document.getElementById('reg-indicacao').value;
 
-    if (!email || !senha || !nome) return alert("Preencha os campos obrigatórios!");
+    if(!nome || !email || !senha) return alert("Preencha os campos obrigatórios!");
 
     try {
         const res = await createUserWithEmailAndPassword(auth, email, senha);
-        await setDoc(doc(db, "usuarios", res.user.uid), { nome, email, telefone: tel });
-        alert("Perfil Salvo com Sucesso!");
-    } catch (e) { alert("Erro ao criar conta: " + e.message); }
+        const meuCod = res.user.uid.substring(0, 5).toUpperCase();
+        
+        await setDoc(doc(db, "usuarios", res.user.uid), {
+            nome, email, telefone: tel,
+            meuCodigo: meuCod,
+            indicadoPor: quemIndicou || null,
+            indicacoesVendas: 0,
+            planoAtivo: false
+        });
+        alert("Conta VIP Criada! Seu código: " + meuCod);
+        location.reload();
+    } catch (e) { alert("Erro ao cadastrar: " + e.message); }
 };
 
-// --- SISTEMA DE LOGIN ---
-window.fazerLogin = async function() {
+// --- 2. LOGIN E LOGOUT ---
+window.fazerLogin = async () => {
     const email = document.getElementById('log-email').value;
     const senha = document.getElementById('log-senha').value;
-    try { 
-        await signInWithEmailAndPassword(auth, email, senha); 
-    } catch (e) { 
-        alert("Login Inválido!"); 
-    }
+    try { await signInWithEmailAndPassword(auth, email, senha); } 
+    catch (e) { alert("Dados inválidos!"); }
 };
 
-// --- MONITOR DE SESSÃO ---
+window.logout = () => signOut(auth).then(() => location.reload());
+
+// --- 3. MONITOR DE SESSÃO E EVOLUÇÃO DA RIFA ---
 onAuthStateChanged(auth, async (user) => {
     if (user) {
-        const snap = await getDoc(doc(db, "usuarios", user.uid));
-        if (snap.exists()) {
-            document.getElementById('user-display').innerText = snap.data().nome;
-            // Esconde telas de login/cadastro e mostra a rifa
-            document.getElementById('tela-cadastro').style.display = 'none';
-            document.getElementById('tela-login').style.display = 'none';
-            document.getElementById('tela-rifa').style.display = 'block';
-            document.getElementById('btnSair').style.display = 'block';
-            iniciarRifa();
-        }
+        const uSnap = await getDoc(doc(db, "usuarios", user.uid));
+        const uDados = uSnap.data();
+        
+        document.getElementById('user-display').innerText = uDados.nome;
+        document.getElementById('meu-codigo-txt').innerText = uDados.meuCodigo;
+        document.getElementById('ponto-indicacao').innerText = `${uDados.indicacoesVendas}/3`;
+        document.getElementById('auth-section').classList.add('hidden');
+        document.getElementById('tela-rifa').classList.remove('hidden');
+
+        // Escuta em tempo real a Meta Evolutiva [cite: 2026-01-28]
+        onSnapshot(doc(db, "config", "sorteio"), (doc) => {
+            const totalNumeros = doc.data()?.total || 50;
+            const vendidos = doc.data()?.vendidos || 0;
+            
+            document.getElementById('vendas-contagem').innerText = vendidos;
+            document.getElementById('meta-max').innerText = totalNumeros;
+            desenharRifa(totalNumeros);
+        });
     }
 });
 
-document.getElementById('btnSair').onclick = () => signOut(auth).then(() => location.reload());
-
-// --- LÓGICA DA RIFA ---
-function iniciarRifa() {
+// --- 4. LÓGICA DO GRID DA RIFA ---
+function desenharRifa(qtd) {
     const grid = document.getElementById('gridRifa');
-    grid.innerHTML = ''; 
-    for (let i = 1; i <= 100; i++) {
+    grid.innerHTML = '';
+    for (let i = 1; i <= qtd; i++) {
         const div = document.createElement('div');
         div.className = 'num';
-        div.id = `n-${i}`;
         div.innerText = i;
-        div.onclick = () => clicarNumero(i, div);
+        if(selecionados.includes(i)) div.classList.add('selected');
+
+        div.onclick = () => {
+            if (selecionados.includes(i)) {
+                selecionados = selecionados.filter(x => x !== i);
+                div.classList.remove('selected');
+            } else {
+                selecionados.push(i);
+                div.classList.add('selected');
+            }
+            atualizarValores();
+        };
         grid.appendChild(div);
     }
-
-    // Monitoramento em tempo real de números vendidos no Firebase
-    onSnapshot(doc(db, "rifas", "sorteio1"), (s) => {
-        const d = s.data();
-        if (d) Object.keys(d).forEach(k => {
-            const el = document.getElementById(`n-${k.replace('num','')}`);
-            if (d[k] === "vendido" && el) { 
-                el.className = 'num sold'; 
-                el.onclick = null; 
-            }
-        });
-    });
 }
 
-function clicarNumero(n, el) {
-    if (el.classList.contains('sold')) return;
-    if (selecionados.includes(n)) {
-        selecionados = selecionados.filter(i => i !== n);
-        el.classList.remove('selected');
-    } else {
-        selecionados.push(n);
-        el.classList.add('selected');
-    }
-    const total = selecionados.length * 5; // Valor unitário R$ 5,00
+function atualizarValores() {
+    const total = selecionados.length * PRECO_UNITARIO;
     document.getElementById('qtd').innerText = selecionados.length;
     document.getElementById('total').innerText = "R$ " + total.toFixed(2);
 }
 
-// --- BOTÃO GERAR PIX (CONEXÃO COM RENDER) ---
-document.getElementById('btnPagar').onclick = async () => {
-    const user = auth.currentUser;
-    if (!user) return alert("Faça login para continuar!");
-    if (selecionados.length === 0) return alert("Selecione ao menos um número!");
+// --- 5. PAGAMENTO HÍBRIDO (PIX E CARTÃO) ---
 
-    const snap = await getDoc(doc(db, "usuarios", user.uid));
-    const dadosUsuario = snap.data();
-
+// PAGAR AVULSO (PIX)
+window.pagarPix = async () => {
+    if (selecionados.length === 0) return alert("Selecione números primeiro!");
+    
     try {
-        const resposta = await fetch('https://minirifa-pro.onrender.com/gerar-pix', { 
+        const res = await fetch('https://minirifa-pro.onrender.com/gerar-pix', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
-                nome: dadosUsuario.nome,
-                telefone: dadosUsuario.telefone,
+                nome: document.getElementById('user-display').innerText,
                 numeros: selecionados,
                 total: document.getElementById('total').innerText
             })
         });
+        const d = await res.json();
+        prompt("PIX GERADO! Copie o código abaixo:", d.copy_paste);
+    } catch (e) { alert("Servidor offline. Tente em instantes."); }
+};
 
-        const d = await resposta.json();
-        if (d.copy_paste) {
-            prompt("🤖 PIX GERADO!\nCopie o código abaixo:", d.copy_paste);
-        } else {
-            alert("Erro ao processar pagamento.");
-        }
-    } catch (e) { 
-        alert("O servidor está acordando... Tente novamente em 30 segundos!"); 
-    }
+// ASSINAR PLANO (CARTÃO)
+window.assinarPlano = async () => {
+    const cardData = {
+        numero: document.getElementById('card-num').value,
+        vencimento: document.getElementById('card-date').value,
+        cvv: document.getElementById('card-cvv').value
+    };
+
+    if(!cardData.numero || !cardData.cvv) return alert("Preencha os dados do cartão!");
+
+    try {
+        const res = await fetch('https://minirifa-pro.onrender.com/assinar-plano', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                nome: document.getElementById('user-display').innerText,
+                email: auth.currentUser.email,
+                cartao: cardData,
+                valorPlano: 30.00 // Exemplo de valor fixo mensal
+            })
+        });
+        const d = await res.json();
+        alert(d.msg);
+    } catch (e) { alert("Erro ao processar assinatura."); }
 };
