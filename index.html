@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RoboSorteio</title>
+    <title>RoboSorteio - IA Autônoma</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <div class="header">🤖 ROBOSORTEIO</div>
+    <div class="header">🤖 ROBOSORTEIO IA</div>
 
     <div class="container">
         <div id="auth-screen">
@@ -30,10 +30,10 @@
             
             <div class="slider">
                 <div class="track">
-                    <div>🚀 GANHE DINHEIRO AGORA</div>
-                    <div>💎 PRÊMIOS INCRÍVEIS</div>
-                    <div>⚡ SORTEIOS MENSAIS</div>
-                    <div>🍀 SUA SORTE ESTÁ AQUI</div>
+                    <div>🚀 IA AUTÔNOMA ATIVA</div>
+                    <div>💎 ACUMULE SALDO DIÁRIO</div>
+                    <div>⚡ SORTEIOS EM BREVE</div>
+                    <div>🍀 INDIQUE E GANHE</div>
                 </div>
             </div>
 
@@ -44,30 +44,30 @@
                 </div>
                 <div class="saldo">R$ <span id="u-saldo">0.00</span></div>
                 <div class="actions">
-                    <button onclick="checkin()">📍 CHECK-IN (+0.05)</button>
+                    <button onclick="checkin()" id="btn-checkin">📍 CHECK-IN (+0.05)</button>
                     <button onclick="video()" id="btn-video">📺 VÍDEO (+0.10)</button>
                 </div>
                 <div id="video-timer" class="hidden">Aguarde <span id="timer">30</span>s...</div>
                 <div class="stats">
                     <p>CÓDIGO: <span id="u-code">...</span></p>
-                    <p>VENDAS: <span id="u-vendas">0</span></p>
+                    <p>INDICAÇÕES: <span id="u-vendas">0</span></p>
                 </div>
             </div>
 
             <div class="fases-scroll">
                 <div class="fase-card" id="card-fase1">
-                    <div class="badge">FASE 1 (R$ 100,00)</div>
+                    <div class="badge">FASE 1 (R$ 110,00)</div>
                     <div id="grid-1" class="grid"></div>
                 </div>
                 
                 <div class="fase-card" id="card-fase2">
-                    <div class="lock-msg">🔒 50 VENDAS NECESSÁRIAS</div>
+                    <div class="lock-msg">🔒 50 INDICAÇÕES NECESSÁRIAS</div>
                     <div class="badge">FASE 2 (R$ 220,00)</div>
                     <div id="grid-2" class="grid"></div>
                 </div>
                 
                 <div class="fase-card" id="card-fase3">
-                    <div class="lock-msg">🔒 100 VENDAS NECESSÁRIAS</div>
+                    <div class="lock-msg">🔒 100 INDICAÇÕES NECESSÁRIAS</div>
                     <div class="badge">FASE 3 (R$ 330,00)</div>
                     <div id="grid-3" class="grid"></div>
                 </div>
@@ -85,7 +85,12 @@
             </div>
             
             <div class="regras">
-                <p>⚖️ <b>Regras:</b> Cotas R$ 7,00. Indicação R$ 1,00. Saque min R$ 50.</p>
+                <h4>⚖️ REGRAS E FUNCIONAMENTO</h4>
+                <p>• <b>Sistema:</b> Criado por um Robô com IA Autônoma.</p>
+                <p>• <b>Ganhos:</b> Faça check-in e veja vídeos (1x ao dia cada) para acumular saldo.</p>
+                <p>• <b>Valores:</b> Números da sorte custam R$ 7,00 cada.</p>
+                <p>• <b>Saques:</b> No momento não há opção de saque, apenas acúmulo de saldo para uso interno.</p>
+                <p>• <b>Indicação:</b> Ganhe pontos no ranking e bônus ao indicar novos usuários.</p>
             </div>
         </div>
     </div>
