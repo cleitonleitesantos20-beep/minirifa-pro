@@ -59,27 +59,27 @@
     <div class="container">
         
         <div class="monthly-timer">
-            <span class="timer-label">PREMIAÇÃO MENSAL EM:</span>
+            <span class="timer-label">ENQUERRAMENTO E PAGAMENTO EM:</span>
             <div class="timer-clock" id="countdown">00d 00h 00m 00s</div>
         </div>
 
         <div class="lucky-section">
-            <div class="lucky-label">SORTEIO ATUAL</div>
+            <div class="lucky-label">SORTEIO ATIVO</div>
             <div class="lucky-number" id="rifa-draw">----</div>
         </div>
 
         <div class="rank-section">
-            <div class="section-header">📢 Top Afiliados</div>
+            <div class="section-header">📢 Top Afiliados (Ao Vivo)</div>
             <div id="list-indicacao" class="rank-list"></div>
         </div>
 
         <div class="rank-section">
-            <div class="section-header">🎮 Elite Gamers</div>
+            <div class="section-header">🎮 Recordes Games (Ao Vivo)</div>
             <div id="list-jogos" class="rank-list"></div>
         </div>
 
         <div class="rank-section">
-            <div class="section-header">💎 Investidores</div>
+            <div class="section-header">💎 Maiores Compradores (Ao Vivo)</div>
             <div id="list-mercado" class="rank-list"></div>
         </div>
 
@@ -99,17 +99,14 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // TIMER DINÂMICO PARA O ÚLTIMO DIA DO MÊS
         function updateTimer() {
             const now = new Date();
             const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
             const diff = endOfMonth - now;
-
             const d = Math.floor(diff / (1000 * 60 * 60 * 24));
             const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const s = Math.floor((diff % (1000 * 60)) / 1000);
-
             document.getElementById('countdown').innerText = `${d}d ${h}h ${m}m ${s}s`;
         }
         setInterval(updateTimer, 1000);
@@ -120,15 +117,22 @@
 
             data.forEach((user, index) => {
                 const pos = index + 1;
-                let prize = "PREVISTO";
                 let value = "R$ 0,00";
+                let unit = "PTS";
                 
+                // Define valores de prêmio para os recordistas atuais
                 if(type === 'indica') {
+                    unit = "INDICADOS";
                     if(pos === 1) value = "R$ 15,00";
                     else if(pos === 2) value = "R$ 10,00";
                     else if(pos === 3) value = "R$ 5,00";
-                } else if(type === 'jogos' && pos === 1) value = "R$ 5,00";
-                else if(type === 'mercado' && pos === 1) value = "R$ 10,00";
+                } else if(type === 'jogos') {
+                    unit = "SCORE";
+                    if(pos === 1) value = "R$ 5,00";
+                } else if(type === 'mercado') {
+                    unit = "GASTO";
+                    if(pos === 1) value = "R$ 10,00";
+                }
 
                 const item = document.createElement('div');
                 item.className = 'rank-item';
@@ -137,27 +141,27 @@
                     <div class="user-img">${user.avatarEmoji || '👤'}</div>
                     <div class="info-box">
                         <span class="user-name">${user.nome || 'Usuário'}</span>
-                        <span class="user-meta">${user.count || 0} PTS</span>
+                        <span class="user-meta">${user.count || 0} ${unit}</span>
                     </div>
                     <div class="prize-badge">
                         ${value}
-                        <small>NO FINAL DO MÊS</small>
+                        <small>FINAL DO MÊS</small>
                     </div>
                 `;
                 container.appendChild(item);
             });
         }
 
-        // Listeners Tempo Real
-        onSnapshot(query(collection(db, "usuarios"), orderBy("indicacoesCount", "desc"), limit(5)), snap => {
+        // Listeners Tempo Real puxando dados reais do Banco
+        onSnapshot(query(collection(db, "usuarios"), orderBy("indicacoesCount", "desc"), limit(3)), snap => {
             renderRank('list-indicacao', snap.docs.map(d => ({...d.data(), count: d.data().indicacoesCount})), 'indica');
         });
 
-        onSnapshot(query(collection(db, "usuarios"), orderBy("highScore", "desc"), limit(5)), snap => {
+        onSnapshot(query(collection(db, "usuarios"), orderBy("highScore", "desc"), limit(3)), snap => {
             renderRank('list-jogos', snap.docs.map(d => ({...d.data(), count: d.data().highScore})), 'jogos');
         });
 
-        onSnapshot(query(collection(db, "usuarios"), orderBy("totalGasto", "desc"), limit(5)), snap => {
+        onSnapshot(query(collection(db, "usuarios"), orderBy("totalGasto", "desc"), limit(3)), snap => {
             renderRank('list-mercado', snap.docs.map(d => ({...d.data(), count: d.data().totalGasto})), 'mercado');
         });
 
