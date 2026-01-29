@@ -11,81 +11,78 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden; }
 
-        /* HEADER */
         .header { padding: 20px; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100; }
         .btn-back { background: none; border: 1px solid var(--neon); color: var(--neon); padding: 8px 15px; border-radius: 8px; font-family: 'Orbitron'; font-size: 0.6rem; cursor: pointer; text-transform: uppercase; }
         .page-title { font-family: 'Orbitron'; font-size: 0.9rem; letter-spacing: 2px; color: #fff; margin: 0; }
 
-        .container { padding: 15px; max-width: 450px; margin: 0 auto; padding-bottom: 100px; }
+        .container { padding: 15px; max-width: 450px; margin: 0 auto; padding-bottom: 50px; }
 
-        /* NAVEGAÇÃO POR ABAS */
-        .rank-tabs { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
-        .rank-tabs::-webkit-scrollbar { display: none; }
-        .tab-btn { background: #0a0a0a; border: 1px solid #1a1a1a; color: #555; padding: 12px 18px; border-radius: 12px; font-family: 'Orbitron'; font-size: 0.55rem; cursor: pointer; white-space: nowrap; flex-grow: 1; transition: 0.3s; }
-        .tab-btn.active { color: var(--neon); border-color: var(--neon); background: rgba(0,242,255,0.05); box-shadow: 0 0 10px rgba(0,242,255,0.1); }
+        /* SEÇÕES DE RANKING REESTRUTURADAS PARA ROLAGEM */
+        .rank-section { margin-bottom: 40px; }
+        .section-header { font-family: 'Orbitron'; font-size: 0.7rem; color: var(--neon); margin-bottom: 15px; display: flex; align-items: center; gap: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .section-header::after { content: ''; flex-grow: 1; height: 1px; background: linear-gradient(90deg, var(--neon), transparent); }
 
-        /* LISTA DE RANKING */
-        .rank-container { background: var(--bg-card); border: 1px solid #1a1a1a; border-radius: 20px; padding: 5px; display: none; min-height: 200px; }
-        .rank-container.active { display: block; animation: fadeIn 0.4s ease; }
+        .rank-list { background: var(--bg-card); border: 1px solid #1a1a1a; border-radius: 20px; overflow: hidden; }
 
-        .rank-item { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #111; gap: 12px; }
+        .rank-item { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #111; gap: 12px; transition: 0.3s; }
         .rank-item:last-child { border: none; }
         
-        .pos { font-family: 'Orbitron'; font-size: 1rem; width: 35px; font-weight: bold; text-align: center; }
+        .pos { font-family: 'Orbitron'; font-size: 0.9rem; width: 30px; font-weight: bold; text-align: center; }
         .pos-1 { color: var(--gold); text-shadow: 0 0 10px rgba(255,204,0,0.3); }
         .pos-2 { color: #c0c0c0; }
         .pos-3 { color: #cd7f32; }
 
-        .user-img { width: 42px; height: 42px; background: #000; border: 1px solid #222; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; }
+        .user-img { width: 38px; height: 38px; background: #111; border: 1px solid #222; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
         
         .info-box { flex-grow: 1; min-width: 0; }
-        .user-name { font-family: 'Orbitron'; font-size: 0.75rem; color: #eee; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .user-meta { font-size: 0.6rem; color: #555; text-transform: uppercase; }
+        .user-name { font-family: 'Orbitron'; font-size: 0.7rem; color: #eee; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-meta { font-size: 0.6rem; color: #555; text-transform: uppercase; font-family: 'Orbitron'; }
 
-        .prize-badge { background: rgba(0,255,136,0.1); color: var(--green); font-family: 'Orbitron'; font-size: 0.6rem; padding: 5px 10px; border-radius: 8px; border: 1px solid rgba(0,255,136,0.2); white-space: nowrap; }
+        .prize-badge { background: rgba(0,255,136,0.05); color: var(--green); font-family: 'Orbitron'; font-size: 0.55rem; padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(0,255,136,0.1); white-space: nowrap; }
 
-        /* PAINEL RIFA RESULTADO */
-        .lucky-section { margin-top: 30px; background: linear-gradient(135deg, #080808 0%, #111 100%); border: 1px solid var(--pink); border-radius: 20px; padding: 20px; text-align: center; position: relative; overflow: hidden; }
-        .lucky-section::before { content: 'RIFA FINALIZADA'; position: absolute; top: 10px; left: -30px; background: var(--pink); color: #fff; font-size: 0.5rem; font-family: 'Orbitron'; padding: 2px 30px; transform: rotate(-45deg); }
+        /* PAINEL SORTEIO - DESTAQUE NO TOPO */
+        .lucky-section { margin-bottom: 30px; background: linear-gradient(135deg, #080808 0%, #111 100%); border: 1px solid var(--pink); border-radius: 20px; padding: 20px; text-align: center; position: relative; overflow: hidden; }
         .lucky-label { font-family: 'Orbitron'; font-size: 0.65rem; color: var(--pink); letter-spacing: 3px; margin-bottom: 10px; }
-        .lucky-number { font-family: 'Orbitron'; font-size: 3rem; color: #fff; letter-spacing: 8px; text-shadow: 0 0 20px var(--pink); margin: 15px 0; }
-        .lucky-footer { font-size: 0.6rem; color: #444; font-family: 'Orbitron'; }
+        .lucky-number { font-family: 'Orbitron'; font-size: 2.5rem; color: #fff; letter-spacing: 6px; text-shadow: 0 0 20px var(--pink); margin: 10px 0; }
+        .lucky-footer { font-size: 0.55rem; color: #555; font-family: 'Orbitron'; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
     <div class="header">
         <button class="btn-back" onclick="window.location.href='index.html'">VOLTAR</button>
-        <h1 class="page-title">RANKING NEXUS</h1>
+        <h1 class="page-title">CENTRAL NEXUS</h1>
         <div style="width: 40px;"></div>
     </div>
 
     <div class="container">
         
-        <div class="rank-tabs">
-            <button class="tab-btn active" onclick="switchTab(event, 'tab-indicacao')">📢 INDICAÇÃO</button>
-            <button class="tab-btn" onclick="switchTab(event, 'tab-jogos')">🎮 GAMES</button>
-            <button class="tab-btn" onclick="switchTab(event, 'tab-mercado')">💎 MERCADO</button>
-        </div>
-
-        <div id="tab-indicacao" class="rank-container active">
-            <div style="padding: 20px; text-align: center; color: #333; font-size: 0.7rem;">SINCRONIZANDO DADOS...</div>
-        </div>
-
-        <div id="tab-jogos" class="rank-container">
-            <div style="padding: 20px; text-align: center; color: #333; font-size: 0.7rem;">CARREGANDO SCORES...</div>
-        </div>
-
-        <div id="tab-mercado" class="rank-container">
-            <div style="padding: 20px; text-align: center; color: #333; font-size: 0.7rem;">ANALISANDO TRANSAÇÕES...</div>
-        </div>
-
         <div class="lucky-section">
-            <div class="lucky-label">NÚMERO DA SORTE</div>
+            <div class="lucky-label">SORTEIO ATIVO</div>
             <div class="lucky-number" id="rifa-draw">0000</div>
-            <div class="lucky-footer">ÚLTIMO SORTEIO REALIZADO</div>
+            <div class="lucky-footer">NÚMERO DA SORTE ATUAL</div>
+        </div>
+
+        <div class="rank-section">
+            <div class="section-header">📢 Top Afiliados</div>
+            <div id="list-indicacao" class="rank-list">
+                <div style="padding: 20px; text-align: center; color: #333; font-size: 0.6rem;">SINCRONIZANDO REDE...</div>
+            </div>
+        </div>
+
+        <div class="rank-section">
+            <div class="section-header">🎮 Elite Gamers</div>
+            <div id="list-jogos" class="rank-list">
+                <div style="padding: 20px; text-align: center; color: #333; font-size: 0.6rem;">PROCESSANDO SCORES...</div>
+            </div>
+        </div>
+
+        <div class="rank-section">
+            <div class="section-header">💎 Investidores</div>
+            <div id="list-mercado" class="rank-list">
+                <div style="padding: 20px; text-align: center; color: #333; font-size: 0.6rem;">ESTATÍSTICAS DE MERCADO...</div>
+            </div>
         </div>
 
     </div>
@@ -104,19 +101,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Função para alternar abas
-        window.switchTab = (event, tabId) => {
-            const containers = document.querySelectorAll('.rank-container');
-            const buttons = document.querySelectorAll('.tab-btn');
-            
-            containers.forEach(c => c.classList.remove('active'));
-            buttons.forEach(b => b.classList.remove('active'));
-            
-            document.getElementById(tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
-        };
-
-        // Renderizar Itens do Ranking
         function renderRank(containerId, data, type) {
             const container = document.getElementById(containerId);
             container.innerHTML = "";
@@ -125,7 +109,7 @@
                 const pos = index + 1;
                 let prize = "--";
                 
-                // Lógica de prêmios definida por você
+                // Recompensas Nexus Points (NP) ou R$ conforme seu modelo
                 if(type === 'indica') {
                     if(pos === 1) prize = "R$ 15,00";
                     else if(pos === 2) prize = "R$ 10,00";
@@ -142,8 +126,8 @@
                     <span class="pos pos-${pos}">${pos}º</span>
                     <div class="user-img">${user.avatarEmoji || '👤'}</div>
                     <div class="info-box">
-                        <span class="user-name">${user.nome || 'Operador'}</span>
-                        <span class="user-meta">${user.count || 0} ${type === 'mercado' ? 'Gasto' : 'Pontos'}</span>
+                        <span class="user-name">${user.nome || 'Usuário Nexus'}</span>
+                        <span class="user-meta">${user.count || 0} ${type === 'mercado' ? 'NP Alocados' : 'Pontos'}</span>
                     </div>
                     <div class="prize-badge">${prize}</div>
                 `;
@@ -151,34 +135,28 @@
             });
         }
 
-        // Listeners do Firebase
-        // 1. Ranking Indicação (Baseado no campo 'indicacoesCount')
-        const qIndica = query(collection(db, "usuarios"), orderBy("indicacoesCount", "desc"), limit(10));
+        // Listeners em Tempo Real
+        const qIndica = query(collection(db, "usuarios"), orderBy("indicacoesCount", "desc"), limit(5));
         onSnapshot(qIndica, snap => {
             const users = snap.docs.map(d => ({ ...d.data(), count: d.data().indicacoesCount }));
-            renderRank('tab-indicacao', users, 'indica');
+            renderRank('list-indicacao', users, 'indica');
         });
 
-        // 2. Ranking Games (Baseado no campo 'highScore')
-        const qGames = query(collection(db, "usuarios"), orderBy("highScore", "desc"), limit(10));
+        const qGames = query(collection(db, "usuarios"), orderBy("highScore", "desc"), limit(5));
         onSnapshot(qGames, snap => {
             const users = snap.docs.map(d => ({ ...d.data(), count: d.data().highScore }));
-            renderRank('tab-jogos', users, 'jogos');
+            renderRank('list-jogos', users, 'jogos');
         });
 
-        // 3. Ranking Mercado (Baseado no campo 'totalGasto')
-        const qMercado = query(collection(db, "usuarios"), orderBy("totalGasto", "desc"), limit(10));
+        const qMercado = query(collection(db, "usuarios"), orderBy("totalGasto", "desc"), limit(5));
         onSnapshot(qMercado, snap => {
-            const users = snap.docs.map(d => ({ ...d.data(), count: 'R$ ' + (d.data().totalGasto || 0) }));
-            renderRank('tab-mercado', users, 'mercado');
+            const users = snap.docs.map(d => ({ ...d.data(), count: (d.data().totalGasto || 0) }));
+            renderRank('list-mercado', users, 'mercado');
         });
 
-        // 4. Resultado da Rifa (Puxa da coleção 'sistema' ou similar)
         onSnapshot(doc(db, "configuracoes", "rifa_atual"), snap => {
             if(snap.exists()) {
                 document.getElementById('rifa-draw').innerText = snap.data().numeroSorteado || "----";
-            } else {
-                document.getElementById('rifa-draw').innerText = "8742"; // Valor exemplo
             }
         });
 
