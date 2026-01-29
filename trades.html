@@ -3,29 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IA Trades v5.5.5</title>
+    <title>Nexus Alocação IA v5.5.5</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --dark: #0a0a0a; --card: #111; }
         body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; padding: 0; min-height: 100vh; overflow-y: auto; }
         
         .header { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #222; position: sticky; top: 0; background: rgba(0,0,0,0.95); z-index: 100; }
-        .btn-nav { background: none; border: 1px solid var(--neon); color: var(--neon); padding: 6px 15px; border-radius: 5px; font-family: 'Orbitron'; cursor: pointer; font-size: 0.6rem; }
+        .btn-back { background: none; border: 1px solid #333; color: #fff; padding: 6px 15px; border-radius: 5px; font-family: 'Orbitron'; cursor: pointer; font-size: 0.6rem; }
 
         .container { padding: 20px; max-width: 500px; margin: 0 auto; }
 
-        /* TEXTO TÉCNICO EXPLICATIVO */
+        /* TEXTO TÉCNICO EXPLICATIVO - Ajustado para Alocação de Ecossistema */
         .whitepaper-box { background: var(--card); border: 1px solid #222; padding: 20px; border-radius: 15px; margin-bottom: 25px; line-height: 1.6; }
         .whitepaper-box h2 { font-family: 'Orbitron'; font-size: 0.9rem; color: var(--neon); margin-top: 0; }
         .whitepaper-box p { font-size: 0.85rem; color: #aaa; text-align: justify; }
         .risk-alert { color: var(--pink); font-family: 'Orbitron'; font-size: 0.6rem; border: 1px solid var(--pink); padding: 10px; border-radius: 8px; margin-top: 15px; text-align: center; }
 
-        /* SELETOR DE PERÍODO */
         .time-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
         .time-btn { background: #111; border: 1px solid #333; color: #666; padding: 12px; border-radius: 10px; font-family: 'Orbitron'; font-size: 0.6rem; cursor: pointer; transition: 0.3s; }
         .time-btn.active { border-color: var(--neon); color: var(--neon); background: rgba(0,242,255,0.05); }
 
-        /* CARDS DE INVESTIMENTO */
         .invest-grid { display: grid; gap: 15px; margin-bottom: 30px; }
         .invest-card { background: #080808; border: 1px solid #1a1a1a; padding: 18px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
         .invest-card:active { transform: scale(0.98); border-color: var(--green); }
@@ -40,43 +38,49 @@
 
     <div class="header">
         <button class="btn-back" onclick="window.location.href='index.html'">VOLTAR</button>
-        <span style="font-family:'Orbitron'; font-size:0.55rem; color:var(--neon);">TRADES IA v5.5.5</span>
+        <span style="font-family:'Orbitron'; font-size:0.55rem; color:var(--neon);">NEXUS AI v5.5.5</span>
     </div>
 
     <div class="container">
         
         <div class="whitepaper-box">
-            <h2>PROJETO DE ALOCAÇÃO DINÂMICA (IA)</h2>
+            <h2>ALOCAÇÃO DE LIQUIDEZ ESTRATÉGICA (IA)</h2>
             <p>
-                O sistema de <b>Trades em IA</b> é um algoritmo de alta frequência projetado para maximizar a liquidez do ecossistema e gerar rentabilidade acelerada. A inteligência opera de forma híbrida: realizando <b>arbitragem automatizada</b> em Criptoativos, operações de <i>scalping</i> na Bolsa de Valores, além de alocações estratégicas em CDB e Tesouro para proteção de lastro.
+                O sistema <b>Nexus IA</b> utiliza processamento de dados para otimizar o fluxo de liquidez do ecossistema. Ao alocar pontos (NP), você participa da sustentabilidade da plataforma. A IA realiza operações de <b>arbitragem tecnológica</b> e reequilíbrio de ativos digitais para sustentar as recompensas do projeto.
             </p>
             <p>
-                Simultaneamente, o lucro é potencializado pelo fluxo interno do site (rifas, lances e Ads), criando uma sintonia direta entre o crescimento da plataforma e o investidor.
+                Os resultados são baseados na performance global do site (Ads, Lances e Operações), garantindo um ciclo de recompensas dinâmico para os participantes ativos.
             </p>
             <div class="risk-alert">
-                AVISO: OPERAÇÕES DE ALTO RISCO. A VOLATILIDADE DO MERCADO FINANCEIRO PODE RESULTAR EM PERDA PARCIAL OU TOTAL DO CAPITAL ALOCADO CASO O FECHAMENTO OCORRA EM BAIXA.
+                IMPORTANTE: ESTA É UMA ATIVIDADE DE ALOCAÇÃO DIGITAL. OS RESULTADOS SÃO ESTIMATIVAS E DEPENDEM DA PERFORMANCE DO ALGORITMO E DO ECOSSISTEMA.
             </div>
         </div>
 
-        <span style="font-family:'Orbitron'; font-size:0.6rem; color:#555; margin-bottom:10px; display:block;">SELECIONE O PERÍODO DE MATURAÇÃO:</span>
+        <span style="font-family:'Orbitron'; font-size:0.6rem; color:#555; margin-bottom:10px; display:block;">PERÍODO DE MATURAÇÃO:</span>
         <div class="time-selector">
-            <button class="time-btn active" onclick="selectTime(1, this)">1 MÊS</button>
-            <button class="time-btn" onclick="selectTime(2, this)">2 MESES</button>
-            <button class="time-btn" onclick="selectTime(3, this)">3 MESES</button>
+            <button class="time-btn active" onclick="selectTime(1, this)">30 DIAS</button>
+            <button class="time-btn" onclick="selectTime(2, this)">60 DIAS</button>
+            <button class="time-btn" onclick="selectTime(3, this)">90 DIAS</button>
         </div>
 
-        <div class="invest-grid" id="cards-container">
-            </div>
+        <div class="invest-grid" id="cards-container"></div>
 
-        <div class="footer-note">TRANSAÇÕES PROTEGIDAS POR PROTOCOLO DE CRIPTOGRAFIA QUÂNTICA</div>
+        <div class="footer-note">SISTEMA MONITORADO E PROTEGIDO POR SSL END-TO-END</div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, updateDoc, increment, setDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", authDomain: "minharifadigital.firebaseapp.com", projectId: "minharifadigital", appId: "1:59630725905:web:396c8cfca385dc3d957ab0" };
+        // CONFIGURAÇÃO SEGURA: Use variáveis ou garanta que as regras do Firebase (Rules) protejam os dados
+        const firebaseConfig = { 
+            apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", 
+            authDomain: "minharifadigital.firebaseapp.com", 
+            projectId: "minharifadigital", 
+            appId: "1:59630725905:web:396c8cfca385dc3d957ab0" 
+        };
+
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
@@ -84,6 +88,7 @@
         let userSaldo = 0;
         let selectedMonth = 1;
 
+        // Tabela interna de alocação
         const table = {
             1: [ {c: 50, r: 70}, {c: 100, r: 130}, {c: 200, r: 250} ],
             2: [ {c: 50, r: 100}, {c: 100, r: 200}, {c: 200, r: 300} ],
@@ -92,10 +97,13 @@
 
         onAuthStateChanged(auth, async user => {
             if (user) {
-                const snap = await getDoc(doc(db, "usuarios", user.uid));
-                userSaldo = snap.data().saldo || 0;
-                renderCards();
-            } else { window.location.href = "index.html"; }
+                const userRef = doc(db, "usuarios", user.uid);
+                const snap = await getDoc(userRef);
+                if (snap.exists()) {
+                    userSaldo = snap.data().saldo || 0;
+                    renderCards();
+                }
+            } else { window.location.href = "login.html"; }
         });
 
         window.selectTime = (m, btn) => {
@@ -109,29 +117,52 @@
             const container = document.getElementById('cards-container');
             container.innerHTML = '';
             table[selectedMonth].forEach(opt => {
-                container.innerHTML += `
-                    <div class="invest-card">
-                        <div class="invest-info">
-                            <b>R$ ${opt.c},00</b>
-                            <span>RETORNO ESTIMADO: R$ ${opt.r},00</span>
-                        </div>
-                        <button class="btn-buy" onclick="processInvest(${opt.c})">ALOCAR</button>
+                const card = document.createElement('div');
+                card.className = 'invest-card';
+                card.innerHTML = `
+                    <div class="invest-info">
+                        <b>${opt.c} NP</b>
+                        <span>RETORNO ESTIMADO: ${opt.r} NP</span>
                     </div>
+                    <button class="btn-buy" onclick="processInvest(${opt.c}, ${opt.r})">ALOCAR</button>
                 `;
+                container.appendChild(card);
             });
         }
 
-        window.processInvest = async (valor) => {
+        window.processInvest = async (valor, retorno) => {
+            if (!auth.currentUser) return;
+            
             if (userSaldo >= valor) {
-                if(confirm(`Confirmar alocação de R$ ${valor},00 no plano de ${selectedMonth} mês(es)?`)) {
-                    await updateDoc(doc(db, "usuarios", auth.currentUser.uid), {
-                        saldo: increment(-valor)
-                    });
-                    alert("Investimento processado com sucesso! Acompanhe no seu perfil.");
-                    window.location.href = "config.html";
+                if(confirm(`Confirmar alocação de ${valor} NP por ${selectedMonth * 30} dias?`)) {
+                    try {
+                        const userRef = doc(db, "usuarios", auth.currentUser.uid);
+                        
+                        // Atualiza saldo e registra a alocação em uma subcoleção para segurança
+                        await updateDoc(userRef, {
+                            saldo: increment(-valor)
+                        });
+
+                        // É fundamental registrar a operação para o admin validar depois
+                        const investID = "inv_" + Date.now();
+                        await setDoc(doc(db, "alocacoes", investID), {
+                            uid: auth.currentUser.uid,
+                            valor: valor,
+                            estimativa: retorno,
+                            prazo: selectedMonth,
+                            data: new Date().toISOString(),
+                            status: "ativo"
+                        });
+
+                        alert("Alocação iniciada! Verifique seu painel.");
+                        window.location.href = "perfil.html";
+                    } catch (e) {
+                        alert("Erro ao processar. Tente novamente.");
+                        console.error(e);
+                    }
                 }
             } else {
-                alert("Saldo insuficiente. Redirecionando para depósito...");
+                alert("Saldo insuficiente.");
                 window.location.href = "deposito.html"; 
             }
         };
