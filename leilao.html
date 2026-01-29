@@ -3,69 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mundo dos Lances v5.3.4</title>
+    <title>Leilões IA v5.8.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --orange: #ff7b00; --neon: #00f2ff; --green: #00ff88; }
-        body { background: #000; color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; overflow-x: hidden; }
+        :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --dark: #0a0a0a; --gold: #ffcc00; }
+        body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; padding: 0; min-height: 100vh; overflow-y: auto; }
         
-        .header { height: 60px; display: flex; align-items: center; justify-content: center; background: #000; border-bottom: 1px solid #111; font-family: 'Orbitron'; font-size: 0.8rem; letter-spacing: 2px; position: relative; }
-        .btn-back { background:none; border:none; color:var(--orange); font-size:1.2rem; position:absolute; left:15px; cursor: pointer; }
+        /* BARRA DE STATUS FIXA */
+        .status-bar { position: sticky; top: 0; z-index: 100; background: rgba(0,0,0,0.9); padding: 10px 20px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; backdrop-filter: blur(10px); }
+        .stat-item { font-family: 'Orbitron'; font-size: 0.65rem; display: flex; flex-direction: column; }
+        .stat-val { font-size: 0.9rem; font-weight: bold; }
+        .val-cash { color: var(--green); }
+        .val-bids { color: var(--neon); }
 
         .container { padding: 20px; max-width: 500px; margin: 0 auto; }
+        .header-title { font-family: 'Orbitron'; font-size: 0.8rem; color: #555; text-align: center; margin-bottom: 25px; letter-spacing: 2px; }
+
+        /* CARDS DE LEILÃO */
+        .auction-card { background: #080808; border: 1px solid #1a1a1a; border-radius: 20px; padding: 20px; margin-bottom: 30px; position: relative; overflow: hidden; }
+        .auction-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; }
         
-        .bids-status { background: #050505; border: 1px solid #111; padding: 15px; border-radius: 15px; display: flex; justify-content: space-around; margin-bottom: 20px; }
-        .status-item span { display: block; font-family: 'Orbitron'; font-size: 0.5rem; color: #444; margin-bottom: 5px; }
-        .status-item b { color: #fff; font-size: 1rem; font-family: 'Orbitron'; }
+        /* CORES POR TIPO */
+        .type-classic::before { background: var(--neon); }
+        .type-reverse::before { background: var(--pink); }
+        .type-blind::before { background: var(--gold); }
 
-        .auction-card { background: linear-gradient(180deg, #0a0a0a 0%, #000 100%); border: 1px solid #1a1a1a; border-radius: 20px; padding: 30px 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .timer-display { font-family: 'Orbitron'; font-size: 2.8rem; color: #fff; text-shadow: 0 0 15px var(--orange); margin: 20px 0; }
-        .current-bidder { background: rgba(255, 123, 0, 0.1); color: var(--orange); padding: 8px 15px; border-radius: 20px; font-size: 0.7rem; font-family: 'Orbitron'; display: inline-block; margin-bottom: 20px; border: 1px solid rgba(255,123,0,0.2); }
-        .bid-price { font-size: 2rem; color: var(--green); font-family: 'Orbitron'; font-weight: bold; margin: 10px 0; }
+        .badge-type { font-family: 'Orbitron'; font-size: 0.5rem; padding: 3px 8px; border-radius: 4px; position: absolute; top: 15px; right: 15px; }
+        .badge-classic { background: rgba(0, 242, 255, 0.1); color: var(--neon); border: 1px solid var(--neon); }
+        .badge-reverse { background: rgba(255, 0, 85, 0.1); color: var(--pink); border: 1px solid var(--pink); }
+        .badge-blind { background: rgba(255, 204, 0, 0.1); color: var(--gold); border: 1px solid var(--gold); }
 
-        .btn-bid { background: var(--orange); color: #000; border: none; width: 100%; padding: 20px; border-radius: 15px; font-family: 'Orbitron'; font-weight: bold; font-size: 1.1rem; cursor: pointer; margin-top: 20px; box-shadow: 0 5px 15px rgba(255, 123, 0, 0.3); transition: 0.2s; }
-        .btn-bid:active { transform: scale(0.95); background: #fff; }
+        .item-img { width: 100%; height: 120px; background: #111; border-radius: 12px; margin: 15px 0; display: flex; align-items: center; justify-content: center; font-size: 3rem; }
+        .item-name { font-family: 'Orbitron'; font-size: 1.1rem; display: block; }
+        .item-timer { font-family: 'Orbitron'; font-size: 0.7rem; color: #ff0055; margin-bottom: 10px; display: block; }
+        
+        .bid-info { display: flex; justify-content: space-between; align-items: flex-end; margin: 15px 0; border-top: 1px solid #1a1a1a; padding-top: 15px; }
+        .current-price { font-family: 'Orbitron'; font-size: 1.3rem; }
+        .last-bidder { font-size: 0.6rem; color: #555; text-transform: uppercase; }
+
+        .btn-bid { width: 100%; background: var(--neon); color: #000; border: none; padding: 15px; border-radius: 10px; font-family: 'Orbitron'; font-weight: bold; cursor: pointer; font-size: 0.8rem; transition: 0.3s; }
+        .btn-bid:disabled { background: #222; color: #444; }
+        
+        .auction-desc { font-size: 0.7rem; color: #666; margin-bottom: 15px; line-height: 1.4; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <button class="btn-back" onclick="window.location.href='index.html'">⬅</button>
-        ARENA DE LANCES
+    <div class="status-bar">
+        <div class="stat-item">
+            <span>CARTEIRA (BRL)</span>
+            <span class="stat-val val-cash">R$ <span id="u-saldo">0,00</span></span>
+        </div>
+        <div class="stat-item" style="align-items: flex-end;">
+            <span>MEUS BIDS</span>
+            <span class="stat-val val-bids"><span id="u-bids">0</span> BIDS</span>
+        </div>
     </div>
 
     <div class="container">
-        <div class="bids-status">
-            <div class="status-item">
-                <span>SEUS BIDS</span>
-                <b id="u-bids">0</b>
-            </div>
-            <div class="status-item">
-                <span>SALDO CARTEIRA</span>
-                <b id="u-saldo">R$ 0.00</b>
+        <div class="header-title">SISTEMA DE LEILÕES IA</div>
+
+        <div class="auction-card type-classic">
+            <span class="badge-type badge-classic">CENTAVOS CLÁSSICO</span>
+            <span class="item-name">IPHONE 15 PRO MAX</span>
+            <div class="item-img">📱</div>
+            <span class="item-timer">⏱ 00:00:15</span>
+            <p class="auction-desc">Cada lance aumenta o valor em R$ 0,01 e reinicia o cronômetro. O último a dar o lance vence.</p>
+            <div class="bid-info">
+                <div>
+                    <span class="last-bidder">ÚLTIMO: @CyberPlayer</span>
+                    <div class="current-price">R$ 1,42</div>
+                </div>
+                <button class="btn-bid" onclick="darLance(1)">DAR LANCE (1 BID)</button>
             </div>
         </div>
 
-        <div class="auction-card">
-            <div style="font-family:'Orbitron'; color:#444; font-size:0.6rem; letter-spacing:2px;">PRÊMIO EM DISPUTA</div>
-            <div style="font-size: 1.5rem; color:#fff; font-weight:bold; margin: 10px 0; font-family: 'Rajdhani';">PIX DE R$ 200,00</div>
-            
-            <div class="timer-display" id="timer">00:15</div>
-            
-            <div class="current-bidder" id="bidder">AGUARDANDO LANCE...</div>
-            
-            <div style="font-family:'Orbitron'; font-size:0.55rem; color:#444;">VALOR ATUAL</div>
-            <div class="bid-price">R$ <span id="current-price">0.00</span></div>
-
-            <button class="btn-bid" id="btn-main" onclick="darLance()">
-                DAR LANCE
-            </button>
-            
-            <p style="font-size:0.55rem; color:#333; margin-top:15px; font-family:'Orbitron'; line-height: 1.4;">
-                Custo: 1 Bid ou R$ 0,10 (se não houver bids).<br>
-                Cada lance adiciona +10s ao cronômetro.
-            </p>
+        <div class="auction-card type-reverse">
+            <span class="badge-type badge-reverse">REVERSO</span>
+            <span class="item-name">PLAYSTATION 5</span>
+            <div class="item-img">🎮</div>
+            <span class="item-timer">⏱ 02:45:12</span>
+            <p class="auction-desc">O vencedor é aquele que der o **MENOR LANCE ÚNICO**. Se duas pessoas derem o mesmo valor, ele deixa de ser único.</p>
+            <div class="bid-info">
+                <input type="number" step="0.01" placeholder="0,00" style="width: 40%; background: #000; border: 1px solid var(--pink); color: #fff; padding: 10px; border-radius: 8px; font-family: 'Orbitron';">
+                <button class="btn-bid" style="width: 55%; background: var(--pink);" onclick="darLance(2)">DAR LANCE (5 BIDS)</button>
+            </div>
         </div>
+
+        <div class="auction-card type-blind">
+            <span class="badge-type badge-blind">CEGO (BLIND)</span>
+            <span class="item-name">BITCOIN (0.1 BTC)</span>
+            <div class="item-img">₿</div>
+            <span class="item-timer">FECHAMENTO: 20:00</span>
+            <p class="auction-desc">Ninguém vê os lances dos outros. Ao final do tempo, o maior lance secreto leva o prêmio.</p>
+            <div class="bid-info">
+                <input type="number" placeholder="Quantos Bids?" style="width: 40%; background: #000; border: 1px solid var(--gold); color: #fff; padding: 10px; border-radius: 8px; font-family: 'Orbitron';">
+                <button class="btn-bid" style="width: 55%; background: var(--gold);" onclick="darLance(10)">DAR LANCE (10 BIDS)</button>
+            </div>
+        </div>
+
+        <button class="btn-bid" style="background:none; border: 1px solid #333; color:#555;" onclick="window.location.href='central.html'">VOLTAR À CENTRAL</button>
     </div>
 
     <script type="module">
@@ -73,96 +110,34 @@
         import { getFirestore, doc, onSnapshot, updateDoc, increment } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8",
-            authDomain: "minharifadigital.firebaseapp.com",
-            projectId: "minharifadigital",
-            appId: "1:59630725905:web:396c8cfca385dc3d957ab0"
-        };
-
+        const firebaseConfig = { apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", authDomain: "minharifadigital.firebaseapp.com", projectId: "minharifadigital", appId: "1:59630725905:web:396c8cfca385dc3d957ab0" };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        let user;
         let userBids = 0;
-        let saldoReal = 0;
-        let nomeUsuario = "";
-        let leilaoEncerrado = false;
 
-        // Monitorar Usuário
-        onAuthStateChanged(auth, (u) => {
-            if (u) {
-                user = u;
-                onSnapshot(doc(db, "usuarios", u.uid), (snap) => {
-                    const data = snap.data();
-                    if (data) {
-                        nomeUsuario = data.nome;
-                        userBids = data.bids || 0;
-                        saldoReal = data.saldo || 0;
-                        document.getElementById('u-bids').innerText = userBids;
-                        document.getElementById('u-saldo').innerText = `R$ ${saldoReal.toFixed(2)}`;
-                    }
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                onSnapshot(doc(db, "usuarios", user.uid), snap => {
+                    const d = snap.data();
+                    if(!d) return;
+                    userBids = d.bids || 0;
+                    document.getElementById('u-saldo').innerText = (d.saldo || 0).toLocaleString('pt-br', {minimumFractionDigits: 2});
+                    document.getElementById('u-bids').innerText = userBids;
                 });
-            } else { window.location.href = 'login.html'; }
+            } else { window.location.href = "index.html"; }
         });
 
-        // Sincronização do Leilão
-        const leilaoRef = doc(db, "leiloes", "ativo");
-        onSnapshot(leilaoRef, (snap) => {
-            const data = snap.data();
-            if (data) {
-                document.getElementById('current-price').innerText = data.preco.toFixed(2);
-                document.getElementById('bidder').innerText = `ÚLTIMO LANCE: ${data.ultimo_licitante.toUpperCase()}`;
-                
-                // Lógica simples de tempo para teste (Ideal ser via Timestamp como antes)
-                iniciarTimer(15);
-            }
-        });
-
-        let countdown;
-        function iniciarTimer(seg) {
-            clearInterval(countdown);
-            let tempo = seg;
-            countdown = setInterval(() => {
-                tempo--;
-                document.getElementById('timer').innerText = `00:${tempo.toString().padStart(2,'0')}`;
-                if(tempo <= 0) {
-                    clearInterval(countdown);
-                    document.getElementById('timer').innerText = "ENCERRADO";
-                    leilaoEncerrado = true;
-                }
-            }, 1000);
-        }
-
-        window.darLance = async () => {
-            if (leilaoEncerrado) return;
-
-            let metodo = "";
-            if (userBids >= 1) {
-                metodo = "bids";
-            } else if (saldoReal >= 0.10) {
-                metodo = "saldo";
+        window.darLance = async (custo) => {
+            if (userBids >= custo) {
+                await updateDoc(doc(db, "usuarios", auth.currentUser.uid), {
+                    bids: increment(-custo)
+                });
+                alert("LANCE REGISTRADO NO SISTEMA!");
             } else {
-                alert("Sem Bids ou Saldo!");
-                return;
+                alert("BIDS INSUFICIENTES! Adquira mais no Market.");
             }
-
-            try {
-                // Atualiza Leilão
-                await updateDoc(leilaoRef, {
-                    preco: increment(0.01),
-                    ultimo_licitante: nomeUsuario
-                });
-
-                // Desconto Conectado
-                const userRef = doc(db, "usuarios", user.uid);
-                if (metodo === "bids") {
-                    await updateDoc(userRef, { bids: increment(-1) });
-                } else {
-                    await updateDoc(userRef, { saldo: increment(-0.10) });
-                }
-            } catch (e) { console.error(e); }
         };
     </script>
 </body>
