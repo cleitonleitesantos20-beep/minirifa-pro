@@ -3,55 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Trades da IA - RoboSorteio</title>
+    <title>Trades da IA - RoboSorteio v5.2.3</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        .trade-header { background: #050505; padding: 30px 20px; text-align: center; border-bottom: 2px solid #00f2ff; }
-        .risk-warning { background: rgba(255, 0, 0, 0.1); border: 1px solid #ff0000; padding: 15px; border-radius: 8px; color: #ff4444; font-size: 0.7rem; margin: 20px 0; line-height: 1.4; text-align: justify; }
-        .trade-option { background: #111; border: 1px solid #222; padding: 20px; border-radius: 15px; margin-bottom: 15px; transition: 0.3s; cursor: pointer; position: relative; overflow: hidden; }
+        :root { --neon: #00f2ff; --green: #00ff88; --dark: #050505; }
+        body { background-color: #000; color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; }
+        
+        .trade-header { background: var(--dark); padding: 30px 20px; text-align: center; border-bottom: 2px solid var(--neon); }
+        
+        .risk-warning { 
+            background: rgba(0, 242, 255, 0.02); 
+            border: 1px solid #111; 
+            padding: 20px; 
+            border-radius: 12px; 
+            margin: 20px; 
+        }
+
+        .trade-option { 
+            background: #0a0a0a; 
+            border: 1px solid #1a1a1a; 
+            padding: 20px; 
+            border-radius: 15px; 
+            margin: 0 20px 15px 20px; 
+            transition: 0.3s; 
+            cursor: pointer; 
+            position: relative; 
+            overflow: hidden; 
+        }
+        
         .trade-option:active { transform: scale(0.98); border-color: var(--neon); }
-        .profit-badge { position: absolute; top: 10px; right: 10px; background: var(--green); color: #000; font-size: 0.6rem; padding: 2px 8px; border-radius: 4px; font-family: 'Orbitron'; }
+        
+        .profit-badge { 
+            position: absolute; 
+            top: 12px; 
+            right: 12px; 
+            background: #111; 
+            color: var(--green); 
+            border: 1px solid var(--green); 
+            font-size: 0.55rem; 
+            padding: 3px 8px; 
+            border-radius: 4px; 
+            font-family: 'Orbitron'; 
+            font-weight: bold; 
+        }
+
+        .container { padding-bottom: 40px; }
+        
+        .btn-back {
+            background: none; border: none; color: var(--neon); 
+            font-size: 1.4rem; position: absolute; left: 20px; top: 18px; cursor: pointer;
+        }
+
+        .header {
+            height: 60px; display: flex; align-items: center; justify-content: center;
+            background: #000; border-bottom: 1px solid #111; font-family: 'Orbitron';
+            font-size: 0.8rem; letter-spacing: 2px;
+        }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <button onclick="window.location.href='config.html'" style="background:none; border:none; color:var(--neon); font-size:1.2rem; position:absolute; left:15px;">⬅</button>
-        <span>TRADES DA IA</span>
+        <button class="btn-back" onclick="window.location.href='config.html'">⬅</button>
+        OPERADOR DE TRADES IA
     </div>
 
     <div class="trade-header">
-        <h1 style="font-family:'Orbitron'; color:#00f2ff; font-size:1.3rem;">ALGORITMO DE ALTA FREQUÊNCIA</h1>
-        <p style="font-size:0.8rem; color:#666; margin-top:10px;">Deixe nosso Robô operar seu capital em mercados voláteis.</p>
+        <h1 style="font-family:'Orbitron'; color:var(--neon); font-size:1.1rem; margin:0;">ALGORITMO DE ALTA PERFORMANCE</h1>
+        <p style="font-size:0.7rem; color:#444; margin-top:10px; font-family: 'Orbitron';">MULTI-ESTRATÉGIA ATIVA v5.2.3</p>
     </div>
 
     <div class="container">
         <div class="risk-warning">
-            <b>⚠️ AVISO DE ALTO RISCO:</b> As operações de trade são executadas por inteligência artificial em mercados de cripto-ativos. 
-            Existe a possibilidade real de perda de capital. Em caso de sucesso, o lucro é de <b>+10%</b>. Em caso de falha, a redução é de <b>-10%</b>. 
-            Não invista valores destinados a necessidades básicas.
+            <h3 style="color: var(--neon); font-family: 'Orbitron'; font-size: 0.7rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                <span>📡</span> MEMORANDO DE OPERAÇÕES IA
+            </h3>
+            
+            <div style="font-size: 0.75rem; color: #888; line-height: 1.6;">
+                <p>O algoritmo <b>RoboSorteio IA</b> utiliza alavancagem em mercados de derivativos. Ao confirmar o aporte, o usuário compreende que:</p>
+                
+                <ul style="list-style: none; padding: 0; margin: 12px 0; display: flex; flex-direction: column; gap: 8px;">
+                    <li style="display: flex; gap: 8px;">
+                        <span style="color: var(--neon);">[!]</span> 
+                        <span><b>GESTÃO DE RISCO:</b> A volatilidade do mercado pode impactar o rendimento final. A IA trabalha para preservação de capital.</span>
+                    </li>
+                    <li style="display: flex; gap: 8px;">
+                        <span style="color: var(--green);">[✓]</span> 
+                        <span><b>LIQUIDEZ MENSAL:</b> Os lucros e o capital aportado são processados e liberados para saque <u>exclusivamente no último dia útil de cada mês</u>.</span>
+                    </li>
+                </ul>
+                
+                <p style="font-size: 0.65rem; border-top: 1px solid #111; padding-top: 10px; margin-top: 10px; color: #444;">
+                    * Operação limitada a 01 aporte ativo por ciclo mensal.
+                </p>
+            </div>
         </div>
 
-        <div class="trade-option" onclick="processarTrade(100)">
-            <span class="profit-badge">RETORNO: R$ 110,00</span>
-            <div style="font-family:'Orbitron'; color:#fff;">APORTE INICIAL</div>
-            <div style="font-size: 1.5rem; color:var(--neon); font-weight:bold;">R$ 100,00</div>
-            <p style="font-size:0.6rem; color:#555; margin-top:5px;">Ciclo de operação: 24 horas</p>
+        <div class="trade-option" onclick="processarTrade(100, 200)">
+            <span class="profit-badge">LIQUIDEZ MENSAL</span>
+            <div style="font-family:'Orbitron'; color:#444; font-size: 0.55rem; letter-spacing: 1px;">MODALIDADE: STARTER</div>
+            <div style="font-size: 1.8rem; color:#fff; font-weight:bold; font-family: 'Orbitron'; margin: 5px 0;">R$ 100</div>
+            <div style="font-size:0.6rem; color:var(--green); font-family: 'Orbitron';">PROJEÇÃO: R$ 200,00</div>
         </div>
 
-        <div class="trade-option" onclick="processarTrade(200)">
-            <span class="profit-badge">RETORNO: R$ 220,00</span>
-            <div style="font-family:'Orbitron'; color:#fff;">APORTE INTERMEDIÁRIO</div>
-            <div style="font-size: 1.5rem; color:var(--neon); font-weight:bold;">R$ 200,00</div>
-            <p style="font-size:0.6rem; color:#555; margin-top:5px;">Ciclo de operação: 24 horas</p>
+        <div class="trade-option" onclick="processarTrade(200, 300)">
+            <span class="profit-badge">LIQUIDEZ MENSAL</span>
+            <div style="font-family:'Orbitron'; color:#444; font-size: 0.55rem; letter-spacing: 1px;">MODALIDADE: ADVANCED</div>
+            <div style="font-size: 1.8rem; color:#fff; font-weight:bold; font-family: 'Orbitron'; margin: 5px 0;">R$ 200</div>
+            <div style="font-size:0.6rem; color:var(--green); font-family: 'Orbitron';">PROJEÇÃO: R$ 300,00</div>
         </div>
 
-        <div class="trade-option" onclick="processarTrade(300)">
-            <span class="profit-badge">RETORNO: R$ 330,00</span>
-            <div style="font-family:'Orbitron'; color:#fff;">APORTE AVANÇADO</div>
-            <div style="font-size: 1.5rem; color:var(--neon); font-weight:bold;">R$ 300,00</div>
-            <p style="font-size:0.6rem; color:#555; margin-top:5px;">Ciclo de operação: 24 horas</p>
+        <div class="trade-option" onclick="processarTrade(300, 400)">
+            <span class="profit-badge">LIQUIDEZ MENSAL</span>
+            <div style="font-family:'Orbitron'; color:#444; font-size: 0.55rem; letter-spacing: 1px;">MODALIDADE: INSTITUCIONAL</div>
+            <div style="font-size: 1.8rem; color:#fff; font-weight:bold; font-family: 'Orbitron'; margin: 5px 0;">R$ 300</div>
+            <div style="font-size:0.6rem; color:var(--green); font-family: 'Orbitron';">PROJEÇÃO: R$ 400,00</div>
         </div>
 
     </div>
@@ -60,24 +127,28 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
         import { getAuth } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
+        // Configuração mantida da v5.2
         const firebaseConfig = {
             apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8",
             authDomain: "minharifadigital.firebaseapp.com",
             projectId: "minharifadigital",
-            storageBucket: "minharifadigital.firebasestorage.app",
-            messagingSenderId: "59630725905",
             appId: "1:59630725905:web:396c8cfca385dc3d957ab0"
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        window.processarTrade = (valor) => {
-            const confirmar = confirm(`Deseja iniciar a operação de R$ ${valor},00?\n\nVocê será redirecionado para o pagamento PIX.`);
-            if(confirmar) {
-                // Simulação de redirecionamento para pagamento (mesma lógica da rifa)
-                alert("Gerando chave PIX para aporte de R$ " + valor.toFixed(2));
-                // window.location.href = 'link-do-seu-pix-ou-checkout';
+        window.processarTrade = (valor, retorno) => {
+            const msg = `SOLICITAÇÃO DE APORTE:\n\n` +
+                        `Valor: R$ ${valor},00\n` +
+                        `Retorno Estimado: R$ ${retorno},00\n` +
+                        `Data de Liquidez: Último dia útil do mês\n\n` +
+                        `Deseja prosseguir para o pagamento?`;
+            
+            if(confirm(msg)) {
+                alert("Terminal de Pagamento iniciado. Gere o PIX para validar o aporte.");
+                // Redirecionamento para o seu gateway de pagamento
+                // window.location.href = 'SUA_URL_DE_PAGAMENTO';
             }
         };
     </script>
