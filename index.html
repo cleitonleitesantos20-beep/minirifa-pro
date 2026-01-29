@@ -3,105 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RoboSorteio IA - Painel v5.2.2</title>
+    <title>RoboSorteio IA - Terminal v5.3.0</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        /* Estilos de Estrutura v5.2.2 */
-        .wallet-card { background: linear-gradient(135deg, #0f0f0f 0%, #050505 100%); border: 1px solid #222; border-radius: 18px; padding: 20px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .user-row { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 20px; }
-        .profile-info { display: flex; align-items: center; gap: 12px; }
-        .lvl-tag { background: var(--neon); color: #000; padding: 2px 8px; border-radius: 4px; font-family: 'Orbitron'; font-weight: bold; font-size: 0.6rem; }
-        
-        /* Botão Engrenagem Integrado */
-        .btn-config { background: #111; border: 1px solid #333; color: var(--neon); width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; transition: 0.3s; }
-        .btn-config:active { transform: scale(0.9); border-color: var(--neon); }
+        /* Layout Principal */
+        .main-menu-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 15px; 
+            margin-top: 20px; 
+        }
 
-        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .btn-action { background: #0a0a0a; border: 1px solid #222; color: #fff; padding: 14px; border-radius: 12px; font-size: 0.65rem; font-family: 'Orbitron'; display: flex; align-items: center; justify-content: center; gap: 8px; text-transform: uppercase; }
+        /* Botões Grandes Estilizados */
+        .menu-card {
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
+            border-radius: 20px;
+            padding: 25px 15px;
+            text-align: center;
+            transition: 0.3s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+        }
 
-        /* Lógica Visual de Fases */
-        .fase-card.locked { border-color: #ff0055 !important; background: rgba(255, 0, 85, 0.03) !important; position: relative; }
-        .fase-card.locked .banner-lucro { background: #ff0055 !important; color: #fff !important; }
-        .fase-card.locked .grid { filter: grayscale(1) blur(1px); opacity: 0.2; pointer-events: none; }
-        .lock-msg { color: #ff0055; font-size: 0.55rem; font-family: 'Orbitron'; text-align: center; display: block; margin-top: 8px; font-weight: bold; }
+        .menu-card:active { transform: scale(0.95); }
+        .menu-card i { font-size: 2.5rem; display: block; }
+        .menu-card span { 
+            font-family: 'Orbitron'; 
+            font-size: 0.65rem; 
+            letter-spacing: 1px; 
+            font-weight: bold;
+        }
 
-        #checkout { position: fixed; bottom: 0; left: 0; width: 100%; background: #000; border-top: 2px solid var(--green); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; box-shadow: 0 -10px 20px rgba(0,0,0,0.8); }
-        .hidden { display: none !important; }
+        /* Cores Específicas para Identificação Rápida */
+        .card-rifa { border-bottom: 4px solid var(--neon); }
+        .card-games { border-bottom: 4px solid var(--pink); }
+        .card-trade { border-bottom: 4px solid #0055ff; }
+        .card-leilao { border-bottom: 4px solid #ff7b00; }
+
+        .wallet-mini {
+            background: #050505;
+            border: 1px solid #111;
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
 
-    <div class="header" style="justify-content: center; letter-spacing: 2px;">
-        <span>🤖 ROBOSORTEIO IA v5.2.2</span>
+    <div class="header" style="justify-content: center;">
+        <span>🤖 ROBOSORTEIO IA v5.3.0</span>
     </div>
 
     <div class="container">
         
-        <div class="wallet-card">
-            <div class="user-row">
-                <div class="profile-info">
-                    <div style="width:45px; height:45px; background:#111; border:1px solid #333; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">👤</div>
+        <div class="wallet-card" style="padding: 15px; margin-bottom: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width:45px; height:45px; background:#111; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.5rem; border:1px solid #222;">👤</div>
                     <div>
-                        <div style="color:#fff; font-weight:bold; font-size:0.9rem; display: flex; align-items: center; gap: 6px;">
-                            <span id="u-nome">...</span> 
-                            <span class="lvl-tag">LVL <span id="u-lvl">1</span></span>
-                        </div>
-                        <div style="font-size:0.6rem; color:#444; font-family: 'Orbitron';">ID: <span id="u-code">---</span></div>
+                        <div style="color:#fff; font-weight:bold; font-size:0.9rem;" id="u-nome">Carregando...</div>
+                        <div style="font-size:0.55rem; color:#444; font-family:'Orbitron';">LVL <span id="u-lvl">1</span> | ID: <span id="u-code">---</span></div>
                     </div>
                 </div>
-                
-                <button class="btn-config" onclick="window.location.href='config.html'">⚙️</button>
+                <button class="btn-config" onclick="window.location.href='config.html'" style="background:#111; border:1px solid #333; color:var(--neon); width:38px; height:38px; border-radius:10px; cursor:pointer;">⚙️</button>
             </div>
-
-            <div style="text-align: center; padding-top: 15px; border-top: 1px solid #1a1a1a;">
-                <small style="color:#444; letter-spacing:3px; font-size:0.5rem; display:block; margin-bottom:5px;">DISPONÍVEL NO TERMINAL</small>
-                <div style="font-size: 2.4rem; font-family: 'Orbitron'; color: var(--green); text-shadow: 0 0 20px rgba(0, 255, 136, 0.2);">
-                    R$ <span id="u-saldo">0.00</span>
-                </div>
+            
+            <div class="wallet-mini">
+                <span style="font-family:'Orbitron'; font-size:0.55rem; color:#444;">SALDO DISPONÍVEL</span>
+                <span style="font-family:'Orbitron'; font-size:1.1rem; color:var(--green);">R$ <span id="u-saldo">0.00</span></span>
             </div>
         </div>
 
-        <div class="action-grid">
-            <button onclick="window.location.href='central.html'" class="btn-action" style="border-color: #ffd700; color: #ffd700;">🎮 MINIGAMES</button>
-            <button onclick="checkin()" class="btn-action" style="border-color: var(--neon); color: var(--neon);">📍 CHECK-IN</button>
-            <button onclick="video()" id="btn-video" class="btn-action" style="grid-column: span 2; border-color: #fff;">📺 ASSISTIR PROPAGANDA (DIÁRIO)</button>
+        <div class="main-menu-grid">
+            
+            <div class="menu-card card-rifa" onclick="window.location.href='rifas.html'">
+                <i>🎟️</i>
+                <span style="color:var(--neon);">RIFAS DA SORTE</span>
+            </div>
+
+            <div class="menu-card card-games" onclick="window.location.href='central.html'">
+                <i>🎮</i>
+                <span style="color:var(--pink);">CENTRAL GAMES</span>
+            </div>
+
+            <div class="menu-card card-trade" onclick="window.location.href='trades.html'">
+                <i>📈</i>
+                <span style="color:#00a2ff;">TRADES DA IA</span>
+            </div>
+
+            <div class="menu-card card-leilao" onclick="window.location.href='leilao.html'">
+                <i>🏆</i>
+                <span style="color:#ff7b00;">MUNDO LANCES</span>
+            </div>
+
         </div>
 
-        <div id="video-timer" class="hidden" style="text-align:center; margin-bottom:15px; font-size: 0.7rem; color: var(--pink); font-family: 'Orbitron';">
-            SINCRONIZANDO DADOS: <span id="timer">30</span>s...
-        </div>
-
-        <div class="fases-scroll">
-            <div class="fase-card" id="fase-card-1">
-                <div class="banner-lucro" style="background:var(--neon); color:#000; padding:10px; text-align:center; font-family:'Orbitron'; font-size:0.75rem; font-weight:bold;">FASE 01 - R$ 110,00</div>
-                <div id="grid-1" class="grid" style="padding:15px;"></div>
-            </div>
-
-            <div class="fase-card locked" id="fase-card-2">
-                <div class="banner-lucro">FASE 02 - R$ 220,00</div>
-                <span class="lock-msg">🔒 ALCANÇAR 50 INDICAÇÕES</span>
-                <div id="grid-2" class="grid" style="padding:15px;"></div>
-            </div>
-
-            <div class="fase-card locked" id="fase-card-3">
-                <div class="banner-lucro">FASE 03 - R$ 330,00</div>
-                <span class="lock-msg">🔒 ALCANÇAR 100 INDICAÇÕES</span>
-                <div id="grid-3" class="grid" style="padding:15px;"></div>
-            </div>
-        </div>
-
-        <div id="checkout" class="hidden">
-            <div>
-                <p style="font-size:0.6rem; color:#555; font-family:'Orbitron';">COTAS: <span id="sel-nums" style="color:#fff;">0</span></p>
-                <p style="font-size:1.4rem; font-weight:bold; color:var(--green); font-family:'Orbitron';">R$ <span id="total-val">0.00</span></p>
-            </div>
-            <button onclick="pix()" class="btn-primary" style="width:auto; padding:12px 35px; background:var(--green); color:#000; border:none; box-shadow: 0 0 15px var(--green);">PAGAR AGORA</button>
+        <div style="text-align:center; margin-top:30px; opacity:0.3; font-family:'Orbitron'; font-size:0.45rem;">
+            SISTEMA OPERACIONAL ATIVO | CONEXÃO ENCRIPTADA
         </div>
 
     </div>
 
-    <script src="app.js" type="module"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8",
+            authDomain: "minharifadigital.firebaseapp.com",
+            projectId: "minharifadigital",
+            appId: "1:59630725905:web:396c8cfca385dc3d957ab0"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        onAuthStateChanged(auth, (u) => {
+            if (u) {
+                onSnapshot(doc(db, "usuarios", u.uid), (snap) => {
+                    const data = snap.data();
+                    if (data) {
+                        document.getElementById('u-nome').innerText = data.nome;
+                        document.getElementById('u-saldo').innerText = (data.saldo || 0).toFixed(2);
+                        document.getElementById('u-code').innerText = data.meuCodigo;
+                        document.getElementById('u-lvl').innerText = Math.floor((data.xp || 0) / 100) + 1;
+                    }
+                });
+            } else { window.location.href = 'login.html'; }
+        });
+    </script>
 </body>
 </html>
