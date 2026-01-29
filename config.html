@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Configurações IA</title>
+    <title>Nexus S - Configurações</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --dark: #0a0a0a; --card: #111; }
@@ -14,7 +14,6 @@
 
         .container { padding: 20px; padding-bottom: 60px; max-width: 500px; margin: 0 auto; }
 
-        /* PERFIL COM SELETOR DE EMOJI */
         .profile-hero { text-align: center; padding: 25px; background: var(--card); border-radius: 25px; border: 1px solid #1a1a1a; margin-bottom: 25px; }
         .avatar-main { width: 90px; height: 90px; background: #000; border: 2px solid var(--neon); border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; cursor: pointer; position: relative; }
         .avatar-edit-badge { position: absolute; bottom: 0; right: 0; background: var(--neon); color: #000; font-size: 0.5rem; padding: 3px 6px; border-radius: 10px; font-family: 'Orbitron'; }
@@ -24,9 +23,9 @@
         .emoji-option:hover { background: #1a1a1a; transform: scale(1.2); }
 
         .balance-main { font-size: 2.2rem; font-weight: 700; color: var(--green); margin: 5px 0; }
+        .balance-label { font-family: 'Orbitron'; font-size: 0.6rem; color: #555; }
         .section-title { font-family: 'Orbitron'; font-size: 0.7rem; color: var(--neon); margin: 25px 0 15px; display: block; letter-spacing: 2px; text-transform: uppercase; }
 
-        /* BOXES */
         .box-dark { background: #080808; border: 1px solid #1a1a1a; padding: 20px; border-radius: 18px; margin-bottom: 20px; }
         .input-dark { width: 100%; background: #000; border: 1px solid #222; color: #fff; padding: 14px; border-radius: 10px; margin-bottom: 15px; font-family: 'Rajdhani'; font-size: 1rem; box-sizing: border-box; }
         
@@ -43,7 +42,7 @@
 
     <div class="header">
         <button class="btn-nav" onclick="window.location.href='index.html'">⬅ VOLTAR</button>
-        <span style="font-family:'Orbitron'; font-size:0.55rem; color:#555;">SYSTEM CONFIG v5.1.2</span>
+        <span style="font-family:'Orbitron'; font-size:0.55rem; color:#555;">NEXUS SYSTEM ID: 091-S</span>
     </div>
 
     <div class="container">
@@ -51,7 +50,7 @@
         <div class="profile-hero">
             <div class="avatar-main" onclick="toggleEmojiPicker()" id="current-emoji">
                 👤
-                <div class="avatar-edit-badge">EDIT</div>
+                <div class="avatar-edit-badge">MOD</div>
             </div>
             <div class="emoji-picker" id="emoji-list">
                 <span class="emoji-option" onclick="updateEmoji('👤')">👤</span>
@@ -66,37 +65,37 @@
                 <span class="emoji-option" onclick="updateEmoji('👑')">👑</span>
             </div>
             <h2 id="u-nome" style="font-family:'Orbitron'; margin: 10px 0;">...</h2>
-            <div class="balance-main">R$ <span id="u-saldo">0,00</span></div>
+            <div class="balance-main"><span id="u-saldo">0</span> <span class="balance-label">NP</span></div>
         </div>
 
-        <span class="section-title">Financeiro</span>
+        <span class="section-title">Cashback & Recompensas</span>
         <div class="box-dark">
-            <input type="text" id="pix-key" class="input-dark" placeholder="Chave PIX para Recebimento">
-            <button class="btn-action" onclick="solicitarSaque()">SOLICITAR RESGATE (PIX)</button>
-            <div style="font-size: 0.6rem; color: #444; text-align: center; margin-top: 10px;">Mínimo R$ 50,00 | Apenas último dia do mês</div>
+            <input type="text" id="pix-key" class="input-dark" placeholder="ID de Resgate (Chave)">
+            <button class="btn-action" onclick="solicitarSaque()">SOLICITAR RESGATE DE TOKENS</button>
+            <div style="font-size: 0.6rem; color: #444; text-align: center; margin-top: 10px;">Conversão mínima: 5.000 NP | Processamento em 48h</div>
         </div>
 
-        <span class="section-title">Indicações</span>
+        <span class="section-title">Afiliados</span>
         <div class="box-dark" style="text-align: center;">
-            <div style="font-size: 0.9rem; margin-bottom: 12px; font-family:'Orbitron'">Total Indicados: <span id="u-indicados" style="color:var(--neon)">0</span></div>
-            <button class="btn-nav" style="width:100%; padding:12px;" onclick="copyLink()">COPIAR MEU LINK</button>
+            <div style="font-size: 0.9rem; margin-bottom: 12px; font-family:'Orbitron'">Tokens Gerados: <span id="u-indicados" style="color:var(--neon)">0</span></div>
+            <button class="btn-nav" style="width:100%; padding:12px;" onclick="copyLink()">COPIAR LINK DE CONVITE</button>
         </div>
 
-        <span class="section-title">Comunidade</span>
+        <span class="section-title">Comunidade Global</span>
         <div class="social-grid">
             <a href="#" class="social-btn">INSTAGRAM</a>
             <a href="#" class="social-btn">TELEGRAM</a>
-            <a href="#" class="social-btn">FACEBOOK</a>
+            <a href="#" class="social-btn">DISCORD</a>
             <a href="#" class="social-btn">TIKTOK</a>
         </div>
 
-        <span class="section-title">Suporte & Feedback</span>
+        <span class="section-title">Suporte ao Operador</span>
         <div class="box-dark">
-            <textarea class="feedback-area" id="user-feedback" placeholder="Mensagem para a equipe..."></textarea>
-            <button class="btn-nav" style="width:100%; border-color:var(--green); color:var(--green)" onclick="enviarFeedback()">ENVIAR FEEDBACK</button>
+            <textarea class="feedback-area" id="user-feedback" placeholder="Descreva sua solicitação técnica..."></textarea>
+            <button class="btn-nav" style="width:100%; border-color:var(--green); color:var(--green)" onclick="enviarFeedback()">ENVIAR CHAMADO</button>
         </div>
 
-        <button class="btn-logout" id="btn-sair">SAIR DA CONTA</button>
+        <button class="btn-logout" id="btn-sair">DESCONECTAR TERMINAL</button>
 
     </div>
 
@@ -105,7 +104,12 @@
         import { getFirestore, doc, onSnapshot, updateDoc, setDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", authDomain: "minharifadigital.firebaseapp.com", projectId: "minharifadigital", appId: "1:59630725905:web:396c8cfca385dc3d957ab0" };
+        const firebaseConfig = { 
+            apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", 
+            authDomain: "minharifadigital.firebaseapp.com", 
+            projectId: "minharifadigital", 
+            appId: "1:59630725905:web:396c8cfca385dc3d957ab0" 
+        };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
@@ -121,53 +125,49 @@
                     if(!d) return;
                     userSaldo = d.saldo || 0;
                     document.getElementById('u-nome').innerText = (d.nome || "OPERADOR").toUpperCase();
-                    document.getElementById('u-saldo').innerText = userSaldo.toLocaleString('pt-br', {minimumFractionDigits: 2});
-                    document.getElementById('u-indicados').innerText = d.indicadosCount || 0;
+                    document.getElementById('u-saldo').innerText = Math.floor(userSaldo).toLocaleString('pt-br');
+                    document.getElementById('u-indicados').innerText = (d.indicadosCount || 0) * 100; // Simulação de tokens por indicação
                     if(d.pixPadrao) document.getElementById('pix-key').value = d.pixPadrao;
                     if(d.avatarEmoji) document.getElementById('current-emoji').childNodes[0].textContent = d.avatarEmoji;
                 });
             } else { window.location.href = "index.html"; }
         });
 
-        // Alternar visualização do seletor de emoji
         window.toggleEmojiPicker = () => {
             const picker = document.getElementById('emoji-list');
             picker.style.display = picker.style.display === 'grid' ? 'none' : 'grid';
         };
 
-        // Salvar emoji escolhido no Firebase
         window.updateEmoji = async (emoji) => {
             await updateDoc(doc(db, "usuarios", currentUser.uid), { avatarEmoji: emoji });
             toggleEmojiPicker();
         };
 
         window.solicitarSaque = async () => {
-            const pix = document.getElementById('pix-key').value;
-            const now = new Date();
-            const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-            if (userSaldo < 50 || now.getDate() !== lastDay) {
-                alert("Condições não atendidas (Saldo ou Data).");
+            const chave = document.getElementById('pix-key').value;
+            if (userSaldo < 50) {
+                alert("Margem insuficiente para resgate de tokens (Mínimo 5.000 NP).");
                 return;
             }
-            await updateDoc(doc(db, "usuarios", currentUser.uid), { pixPadrao: pix });
-            alert("Solicitação registrada.");
+            await updateDoc(doc(db, "usuarios", currentUser.uid), { pixPadrao: chave, saqueSolicitado: true });
+            alert("Solicitação de resgate enviada para análise técnica.");
         };
 
         window.enviarFeedback = async () => {
             const texto = document.getElementById('user-feedback').value;
-            if (texto.length < 10) return;
+            if (texto.length < 5) return;
             await setDoc(doc(collection(db, "feedbacks")), {
                 uid: currentUser.uid,
                 mensagem: texto,
                 data: serverTimestamp()
             });
-            alert("Feedback enviado!");
+            alert("Chamado aberto com sucesso!");
             document.getElementById('user-feedback').value = "";
         };
 
         window.copyLink = () => {
-            navigator.clipboard.writeText(`https://seusite.com/register?ref=${currentUser.uid}`);
-            alert("Link copiado!");
+            navigator.clipboard.writeText(`https://nexus-s.net/join?ref=${currentUser.uid}`);
+            alert("Link de convite copiado!");
         };
 
         document.getElementById('btn-sair').addEventListener('click', () => {
