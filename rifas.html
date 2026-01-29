@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Rifas da Sorte - RoboSorteio</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --neon: #00f2ff; --green: #00ff88; }
+        
+        /* Grid de Números */
+        .rifa-container { padding: 20px; padding-bottom: 100px; }
+        .rifa-grid { 
+            display: grid; 
+            grid-template-columns: repeat(5, 1fr); 
+            gap: 8px; 
+            margin-top: 15px; 
+        }
+        
+        .num-cota {
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
+            color: #444;
+            aspect-ratio: 1/1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron';
+            font-size: 0.7rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .num-cota.selected {
+            background: var(--neon);
+            color: #000;
+            border-color: #fff;
+            box-shadow: 0 0 15px var(--neon);
+        }
+
+        /* Checkout Flutuante */
+        #checkout-bar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 400px;
+            background: #000;
+            border: 1px solid var(--green);
+            border-radius: 15px;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            display: none; /* Escondido por padrão */
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <button onclick="window.location.href='index.html'" style="background:none; border:none; color:var(--neon); font-size:1.2rem; position:absolute; left:15px;">⬅</button>
+        <span>RIFAS DA SORTE</span>
+    </div>
+
+    <div class="rifa-container">
+        
+        <div style="background: linear-gradient(90deg, #0015ff, #00f2ff); padding: 20px; border-radius: 15px; text-align: center; margin-bottom: 20px;">
+            <h2 style="font-family:'Orbitron'; color:#fff; font-size:0.9rem; margin:0;">PRÊMIO ATUAL: R$ 110,00</h2>
+            <p style="font-size:0.6rem; color:#000; font-weight:bold; margin-top:5px;">VALOR POR COTA: R$ 8,00</p>
+        </div>
+
+        <div style="font-family:'Orbitron'; font-size:0.55rem; color:#444; letter-spacing:1px;">SELECIONE SEUS NÚMEROS:</div>
+        
+        <div id="grid-rifa" class="rifa-grid"></div>
+
+    </div>
+
+    <div id="checkout-bar">
+        <div>
+            <div style="font-size:0.5rem; color:var(--green); font-family:'Orbitron';">TOTAL A PAGAR</div>
+            <div style="font-size:1.4rem; color:#fff; font-family:'Orbitron';">R$ <span id="total-price">0.00</span></div>
+        </div>
+        <button onclick="irParaPagamento()" style="background:var(--green); color:#000; border:none; padding:12px 20px; border-radius:10px; font-family:'Orbitron'; font-weight:bold; font-size:0.7rem; cursor:pointer;">
+            PAGAR AGORA
+        </button>
+    </div>
+
+    <script>
+        const grid = document.getElementById('grid-rifa');
+        const checkoutBar = document.getElementById('checkout-bar');
+        const totalPriceEl = document.getElementById('total-price');
+        let selecionados = [];
+        const precoCota = 8.00;
+
+        // Gerar 50 números para a rifa
+        for (let i = 1; i <= 50; i++) {
+            const div = document.createElement('div');
+            div.className = 'num-cota';
+            div.innerText = i.toString().padStart(2, '0');
+            div.onclick = () => toggleNumero(i, div);
+            grid.appendChild(div);
+        }
+
+        function toggleNumero(num, el) {
+            if (selecionados.includes(num)) {
+                selecionados = selecionados.filter(n => n !== num);
+                el.classList.remove('selected');
+            } else {
+                selecionados.push(num);
+                el.classList.add('selected');
+            }
+
+            // Atualizar Checkout
+            const total = selecionados.length * precoCota;
+            totalPriceEl.innerText = total.toFixed(2);
+
+            if (selecionados.length > 0) {
+                checkoutBar.style.display = 'flex';
+            } else {
+                checkoutBar.style.display = 'none';
+            }
+        }
+
+        function irParaPagamento() {
+            alert(`Iniciando pagamento para ${selecionados.length} cotas.\nTotal: R$ ${ (selecionados.length * precoCota).toFixed(2) }`);
+            // Aqui você redireciona para o seu link de pagamento
+            // window.location.href = 'SEU_LINK_AQUI';
+        }
+    </script>
+</body>
+</html>
