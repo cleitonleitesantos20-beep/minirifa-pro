@@ -1,57 +1,68 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Central IA v5.6.4 - Estável</title>
+    <title>Central IA v5.7.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --dark: #0a0a0a; }
-        body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; overflow: hidden; touch-action: manipulation; }
+        body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; padding: 0; min-height: 100vh; overflow-y: auto; -webkit-tap-highlight-color: transparent; }
         
-        .header { height: 60px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #111; font-family: 'Orbitron'; font-size: 0.7rem; position: relative; }
-        .btn-back { position: absolute; left: 15px; background: none; border: none; color: var(--neon); font-size: 1.2rem; cursor: pointer; }
+        /* BARRA DE PROGRESSO NO TOPO */
+        .top-progress-bar { position: sticky; top: 0; z-index: 100; background: #000; padding: 10px 15px; border-bottom: 1px solid #1a1a1a; box-shadow: 0 4px 10px rgba(0,0,0,0.8); }
+        .lvl-section { background: var(--dark); padding: 10px; border-radius: 10px; border: 1px solid #222; }
+        .progress-container { background: #111; height: 8px; border-radius: 4px; margin-top: 5px; overflow: hidden; border: 1px solid #222; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--neon), var(--green)); width: 0%; transition: 0.5s ease; }
 
-        .container { padding: 15px; height: calc(100vh - 60px); overflow-y: auto; }
-        .ads-space { background: rgba(255,255,255,0.02); border: 1px dashed #222; color: #333; text-align: center; padding: 10px; font-family: 'Orbitron'; font-size: 0.45rem; margin: 10px 0; border-radius: 8px; }
+        .header { height: 50px; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 0.7rem; color: #444; }
+        .container { padding: 15px; padding-bottom: 50px; }
 
-        .daily-section { background: var(--dark); padding: 15px; border-radius: 15px; border: 1px solid #1a1a1a; margin-bottom: 15px; }
+        /* CHECK-IN */
+        .daily-section { background: var(--dark); padding: 15px; border-radius: 15px; border: 1px solid #1a1a1a; margin-bottom: 20px; }
         .daily-grid { display: flex; justify-content: space-between; margin-top: 10px; }
-        .day-dot { width: 30px; height: 30px; border-radius: 50%; border: 1px solid #222; display: flex; align-items: center; justify-content: center; font-size: 0.5rem; font-family: 'Orbitron'; }
+        .day-dot { width: 28px; height: 28px; border-radius: 50%; border: 1px solid #222; display: flex; align-items: center; justify-content: center; font-size: 0.5rem; font-family: 'Orbitron'; }
         .day-dot.active { border-color: var(--green); color: var(--green); }
         .day-dot.done { background: var(--green); color: #000; border: none; }
         .btn-checkin { width: 100%; margin-top: 12px; background: #111; border: 1px solid var(--green); color: var(--green); padding: 10px; border-radius: 8px; font-family: 'Orbitron'; font-size: 0.6rem; cursor: pointer; }
 
-        .lvl-section { background: var(--dark); padding: 15px; border-radius: 15px; border: 1px solid #1a1a1a; margin-bottom: 15px; }
-        .progress-container { background: #111; height: 10px; border-radius: 5px; margin-top: 10px; overflow: hidden; }
-        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--neon), var(--green)); width: 0%; transition: 0.4s; }
-
-        .game-card { background: var(--dark); border: 1px solid #1a1a1a; border-radius: 20px; padding: 15px; margin-bottom: 15px; position: relative; }
+        /* CARDS DE JOGO */
+        .game-card { background: var(--dark); border: 1px solid #1a1a1a; border-radius: 20px; padding: 15px; margin-bottom: 20px; }
         .game-card h3 { font-family: 'Orbitron'; font-size: 0.65rem; margin: 0; color: var(--neon); }
         .game-stat { font-size: 0.5rem; color: #555; font-family: 'Orbitron'; margin-bottom: 5px; display: block; }
-        
-        .screen { background: #050505; border: 1px solid #111; border-radius: 10px; height: 130px; margin-top: 10px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+        .screen { background: #050505; border: 1px solid #111; border-radius: 12px; height: 140px; margin-top: 10px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
 
         #ad-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; }
         
-        #cube-hero { width: 22px; height: 22px; background: var(--neon); position: absolute; bottom: 20px; left: 40px; box-shadow: 0 0 10px var(--neon); z-index: 10; }
-        .obstacle { width: 18px; height: 35px; background: var(--pink); position: absolute; bottom: 20px; box-shadow: 0 0 10px var(--pink); border-radius: 2px; }
+        /* RUNNER AJUSTADO */
+        #cube-hero { width: 20px; height: 20px; background: var(--neon); position: absolute; bottom: 20px; left: 45px; box-shadow: 0 0 10px var(--neon); z-index: 10; }
+        .obstacle { width: 14px; height: 28px; background: var(--pink); position: absolute; bottom: 20px; box-shadow: 0 0 8px var(--pink); border-radius: 2px; }
 
-        .btn-game { background: var(--neon); color: #000; border: none; padding: 10px 20px; font-family: 'Orbitron'; font-weight: bold; border-radius: 5px; cursor: pointer; }
+        .btn-game { background: var(--neon); color: #000; border: none; padding: 12px 25px; font-family: 'Orbitron'; font-weight: bold; border-radius: 8px; cursor: pointer; }
     </style>
 </head>
 <body>
 
+    <div class="top-progress-bar">
+        <div class="lvl-section">
+            <div style="display: flex; justify-content: space-between; font-family: 'Orbitron'; font-size: 0.55rem;">
+                <span id="u-nome">CARREGANDO...</span>
+                <span style="color: var(--neon);">LVL <span id="u-lvl">1</span></span>
+            </div>
+            <div class="progress-container"><div class="progress-bar" id="xp-bar"></div></div>
+            <div style="display:flex; justify-content:space-between; margin-top:5px; font-family:'Orbitron'; font-size:0.45rem;">
+                <span>XP: <span id="xp-num">0</span> / <span id="xp-target">1000</span></span>
+                <span style="color:var(--green);">BÔNUS R$ 0,10 / LEVEL</span>
+            </div>
+        </div>
+    </div>
+
     <div id="ad-overlay">
-        <div style="font-family:'Orbitron'; color:var(--neon); margin-bottom:20px;">PROCESSANDO DADOS...</div>
+        <div style="font-family:'Orbitron'; color:var(--neon); margin-bottom:20px;">SINCRONIZANDO RECOMPENSA...</div>
         <div id="ad-timer" style="font-family:'Orbitron'; font-size:2.5rem; color:var(--pink);">30</div>
     </div>
 
-    <div class="header">
-        <button class="btn-back" onclick="window.location.href='index.html'">⬅</button>
-        CENTRAL IA v5.6.4
-    </div>
+    <div class="header">CENTRAL IA v5.7.0</div>
 
     <div class="container">
         
@@ -62,18 +73,6 @@
                 <div class="day-dot" data-day="0">D</div>
             </div>
             <button class="btn-checkin" id="btn-do-checkin" onclick="processCheckIn()">CHECK-IN DIÁRIO (+R$ 0,02)</button>
-        </div>
-
-        <div class="lvl-section">
-            <div style="display: flex; justify-content: space-between; font-family: 'Orbitron'; font-size: 0.55rem;">
-                <span id="u-nome">...</span>
-                <span style="color: var(--neon);">LVL <span id="u-lvl">1</span></span>
-            </div>
-            <div class="progress-container"><div class="progress-bar" id="xp-bar"></div></div>
-            <div style="display:flex; justify-content:space-between; margin-top:5px; font-family:'Orbitron'; font-size:0.45rem;">
-                <span>XP: <span id="xp-num">0</span> / <span id="xp-target">1000</span></span>
-                <span style="color:var(--green);">+R$ 0,10 / LEVEL</span>
-            </div>
         </div>
 
         <div class="game-grid">
@@ -87,11 +86,11 @@
             </div>
 
             <div class="game-card">
-                <span class="game-stat">MELHOR TEMPO: <span id="best-click" style="color:var(--green)">0</span>s</span>
-                <h3>DATA CLICKER (+1 XP)</h3>
+                <span class="game-stat">MELHOR VELOCIDADE: <span id="best-click" style="color:var(--green)">0</span> CPS</span>
+                <h3>HACK CLICKER (VELOCIDADE)</h3>
                 <div class="screen">
-                    <div id="click-fill" style="width:0%; height:100%; background:rgba(0,242,255,0.1); position:absolute; left:0;"></div>
-                    <button class="btn-game" onclick="doClickGame()">HACKEAR!</button>
+                    <div id="click-display" style="font-family:'Orbitron'; font-size:1.5rem; color:var(--neon); margin-bottom:10px;">0.0 CPS</div>
+                    <button class="btn-game" onclick="doCpsClick()">CLICK!</button>
                 </div>
             </div>
 
@@ -100,7 +99,7 @@
                 <h3>MATH IA (+1 XP)</h3>
                 <div class="screen">
                     <div id="math-quest" style="font-family:'Orbitron'; font-size:1.5rem; margin-bottom:10px;">0 + 0</div>
-                    <input type="number" id="math-ans" placeholder="?" style="background:#111; border:1px solid var(--neon); color:#fff; width:80px; text-align:center; padding:5px; font-family:'Orbitron';" oninput="checkMath(this)">
+                    <input type="number" id="math-ans" placeholder="?" style="background:#111; border:1px solid var(--neon); color:#fff; width:80px; text-align:center; padding:8px; font-family:'Orbitron';" oninput="checkMath(this)">
                 </div>
             </div>
         </div>
@@ -154,23 +153,20 @@
             }
         }
 
-        // --- RUNNER ENGINE V2.1 ---
-        let rActive = false, rStart = 0, isJumping = false, blockCounter = 0;
+        // --- RUNNER ---
+        let rActive = false, rStart = 0, isJumping = false, blockCount = 0;
         window.jumpCube = () => {
             const h = document.getElementById('cube-hero');
             if(isJumping) return;
             isJumping = true;
             h.style.transition = "bottom 0.35s cubic-bezier(0.4, 0, 0.2, 1)";
-            h.style.bottom = "90px";
-            setTimeout(() => {
-                h.style.bottom = "20px";
-                setTimeout(() => { isJumping = false; }, 350);
-            }, 350);
+            h.style.bottom = "95px";
+            setTimeout(() => { h.style.bottom = "20px"; setTimeout(() => isJumping = false, 350); }, 350);
             if(!rActive) startRunner();
         };
 
         function startRunner() {
-            rActive = true; rStart = Date.now(); blockCounter = 0;
+            rActive = true; rStart = Date.now(); blockCount = 0;
             const screen = document.getElementById('runner-screen');
             const obs = document.createElement('div');
             obs.className = 'obstacle';
@@ -178,52 +174,47 @@
             screen.appendChild(obs);
 
             let loop = setInterval(() => {
-                let x = parseInt(obs.style.right) + 7;
+                let x = parseInt(obs.style.right) + 8;
                 obs.style.right = x + "px";
-
-                let h = document.getElementById('cube-hero');
-                let hBot = parseInt(h.style.bottom);
+                let hBot = parseInt(document.getElementById('cube-hero').style.bottom);
                 
-                if(x > 260 && x < 295 && hBot < 55) {
+                // Colisão com Hitbox reduzida para maior precisão
+                if(x > 265 && x < 290 && hBot < 48) {
                     clearInterval(loop); obs.remove(); rActive = false;
                     saveBest('runner', Math.floor((Date.now() - rStart)/1000));
-                    alert("FALHA NA REDE! Recorde: " + Math.floor((Date.now() - rStart)/1000) + "s");
                 }
-                
                 if(x > 380) {
-                    blockCounter++;
-                    if(blockCounter % 2 === 0) {
-                        addXP(1); // GANHA 1 XP A CADA 2 BLOCOS
-                    }
-                    x = -30;
-                    obs.style.right = "-30px";
+                    blockCount++;
+                    if(blockCount % 2 === 0) addXP(1);
+                    obs.style.right = "-20px";
                 }
             }, 20);
         }
 
-        // --- CLICKER ---
-        let cVal = 0, cStart = null;
-        window.doClickGame = () => {
-            if(!cStart) cStart = Date.now();
-            cVal += 5;
-            document.getElementById('click-fill').style.width = cVal + "%";
-            if(cVal >= 100) {
-                addXP(1);
-                saveBest('click', Math.floor((Date.now() - cStart)/1000));
-                cVal = 0; cStart = null;
-                document.getElementById('click-fill').style.width = "0%";
+        // --- CLICKER CPS (NEW) ---
+        let clicks = 0, clickStart = null;
+        window.doCpsClick = () => {
+            if(!clickStart) {
+                clickStart = Date.now();
+                setTimeout(() => {
+                    let duration = (Date.now() - clickStart) / 1000;
+                    let cps = (clicks / duration).toFixed(1);
+                    document.getElementById('click-display').innerText = cps + " CPS";
+                    if(clicks >= 10) addXP(1);
+                    saveBest('click', parseFloat(cps));
+                    clicks = 0; clickStart = null;
+                }, 2000);
             }
+            clicks++;
+            document.getElementById('click-display').innerText = clicks + " CLICKS";
         };
 
         // --- MATH ---
         let n1, n2, res, mCount = 0;
-        function nextM() { n1=Math.floor(Math.random()*15); n2=Math.floor(Math.random()*15); res=n1+n2; document.getElementById('math-quest').innerText = n1+"+"+n2; }
+        function nextM() { n1=Math.floor(Math.random()*20); n2=Math.floor(Math.random()*20); res=n1+n2; document.getElementById('math-quest').innerText = n1+"+"+n2; }
         nextM();
         window.checkMath = el => {
-            if(parseInt(el.value) === res) {
-                mCount++; addXP(1); saveBest('math', mCount);
-                el.value = ""; nextM();
-            }
+            if(parseInt(el.value) === res) { mCount++; addXP(1); saveBest('math', mCount); el.value = ""; nextM(); }
         };
 
         // --- CHECKIN ---
