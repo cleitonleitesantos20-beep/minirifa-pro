@@ -3,91 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Configurações v5.2.2 - RoboSorteio IA</title>
+    <title>Configurações v5.2.4 - RoboSorteio IA</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        .config-container { padding: 15px; padding-bottom: 40px; }
-        .section-title { font-family: 'Orbitron'; font-size: 0.6rem; color: #444; margin: 25px 0 10px 5px; letter-spacing: 2px; font-weight: bold; }
+        .config-container { padding: 15px; padding-bottom: 50px; }
+        .section-title { font-family: 'Orbitron'; font-size: 0.55rem; color: #333; margin: 25px 0 10px 5px; letter-spacing: 2px; }
         
-        /* Card de Perfil Superior */
-        .profile-card { background: linear-gradient(180deg, #0a0a0a 0%, #000 100%); border: 1px solid #1a1a1a; border-radius: 20px; padding: 25px; text-align: center; margin-bottom: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
-        .lvl-badge { background: var(--neon); color: #000; padding: 3px 12px; border-radius: 5px; font-family: 'Orbitron'; font-size: 0.65rem; font-weight: bold; box-shadow: 0 0 10px var(--neon); }
-        
-        /* Menu de Itens */
-        .menu-list { display: flex; flex-direction: column; gap: 10px; }
-        .menu-item { background: #0d0d0d; border: 1px solid #1a1a1a; padding: 16px; border-radius: 14px; display: flex; justify-content: space-between; align-items: center; }
-        .menu-label { font-size: 0.7rem; color: #666; font-family: 'Rajdhani'; font-weight: 700; text-transform: uppercase; }
-        .menu-value { font-size: 0.9rem; color: #fff; font-weight: bold; font-family: 'Orbitron'; }
+        /* Cabeçalho de Perfil */
+        .profile-header { background: linear-gradient(180deg, #0a0a0a 0%, #000 100%); border: 1px solid #111; border-radius: 20px; padding: 30px 20px; text-align: center; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .avatar-frame { width: 70px; height: 70px; background: #050505; border: 2px solid var(--neon); border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 2rem; box-shadow: 0 0 15px rgba(0, 242, 255, 0.2); }
+        .lvl-badge { background: var(--neon); color: #000; padding: 2px 10px; border-radius: 4px; font-family: 'Orbitron'; font-size: 0.6rem; font-weight: bold; }
 
-        /* Estilo para Trades e Links */
-        .btn-trade { background: linear-gradient(90deg, #0015ff, #00f2ff); color: #fff; border: none; width: 100%; padding: 16px; border-radius: 14px; font-family: 'Orbitron'; font-weight: bold; cursor: pointer; margin-bottom: 10px; font-size: 0.75rem; box-shadow: 0 5px 15px rgba(0, 242, 255, 0.2); }
-        .copy-box { background: #050505; border: 1px dashed #333; padding: 14px; border-radius: 10px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .copy-link { font-size: 0.6rem; color: #444; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 85%; font-family: 'Rajdhani'; }
+        /* Lista de Opções Estilizada */
+        .menu-list { display: flex; flex-direction: column; gap: 8px; }
+        .menu-item { background: #080808; border: 1px solid #111; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .menu-label { font-size: 0.65rem; color: #555; font-family: 'Orbitron'; text-transform: uppercase; }
+        .menu-value { font-size: 0.85rem; color: #fff; font-weight: bold; font-family: 'Rajdhani'; }
+
+        /* Botões Especiais */
+        .btn-trade-ia { background: linear-gradient(90deg, #0015ff, #00f2ff); color: #fff; border: none; width: 100%; padding: 16px; border-radius: 12px; font-family: 'Orbitron'; font-weight: bold; cursor: pointer; margin-bottom: 10px; font-size: 0.7rem; box-shadow: 0 0 15px rgba(0, 242, 255, 0.2); }
+        .btn-withdraw-action { background: var(--green); color: #000; border: none; width: 100%; padding: 16px; border-radius: 12px; font-family: 'Orbitron'; font-weight: bold; cursor: pointer; font-size: 0.7rem; }
         
-        .btn-withdraw { background: var(--green); color: #000; border: none; width: 100%; padding: 16px; border-radius: 14px; font-family: 'Orbitron'; font-weight: bold; cursor: pointer; font-size: 0.75rem; box-shadow: 0 5px 15px rgba(0, 255, 136, 0.2); }
-        .btn-exit { background: transparent; border: 1px solid #200; color: #ff4444; width: 100%; padding: 14px; border-radius: 14px; margin-top: 30px; font-size: 0.65rem; font-family: 'Orbitron'; font-weight: bold; text-transform: uppercase; }
+        /* Compartilhamento */
+        .share-box { background: #050505; border: 1px dashed #222; padding: 12px; border-radius: 10px; margin-top: 5px; display: flex; justify-content: space-between; align-items: center; }
+        .share-link { font-size: 0.6rem; color: #444; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 80%; }
+        
+        .btn-logout { background: transparent; border: 1px solid #200; color: #ff4444; width: 100%; padding: 12px; border-radius: 12px; margin-top: 30px; font-family: 'Orbitron'; font-size: 0.6rem; letter-spacing: 1px; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <button onclick="window.location.href='index.html'" style="background:none; border:none; color:var(--neon); font-size:1.4rem; position:absolute; left:20px;">⬅</button>
-        <span style="letter-spacing: 3px;">TERMINAL DE AJUSTES</span>
+        <button onclick="window.location.href='index.html'" style="background:none; border:none; color:var(--neon); font-size:1.2rem; position:absolute; left:15px;">⬅</button>
+        <span>CONFIGURAÇÕES DE TERMINAL</span>
     </div>
 
     <div class="config-container">
-        <div class="profile-card">
-            <div style="font-size: 3rem; margin-bottom: 15px; filter: drop-shadow(0 0 10px var(--neon));">👤</div>
-            <h2 id="u-nome" style="color:#fff; font-family:'Orbitron'; font-size: 1.2rem; margin-bottom: 10px;">...</h2>
-            <span class="lvl-badge">LEVEL <span id="u-lvl">1</span></span>
+        
+        <div class="profile-header">
+            <div class="avatar-frame">👤</div>
+            <h2 id="u-nome" style="font-family:'Orbitron'; color:#fff; font-size:1rem; margin-bottom:8px;">...</h2>
+            <span class="lvl-badge">NÍVEL <span id="u-lvl">1</span></span>
         </div>
 
-        <div class="section-title">OPERAÇÕES FINANCEIRAS</div>
+        <div class="section-title">GESTÃO DE ATIVOS</div>
         <div class="menu-list">
-            <button class="btn-trade" onclick="window.location.href='trades.html'">
+            <button class="btn-trade-ia" onclick="window.location.href='trades.html'">
                 🤖 TRADES DA IA (ALTO RISCO)
             </button>
-
+            
             <div class="menu-item">
-                <span class="menu-label">Saldo em Carteira</span>
+                <span class="menu-label">Saldo em Conta</span>
                 <span class="menu-value" style="color:var(--green)">R$ <span id="u-saldo">0.00</span></span>
             </div>
-            
-            <button class="btn-withdraw" onclick="solicitarSaque()">SOLICITAR SAQUE PIX</button>
+
+            <button class="btn-withdraw-action" onclick="solicitarSaque()">
+                SOLICITAR SAQUE PIX
+            </button>
         </div>
 
-        <div class="section-title">SISTEMA DE AFILIADOS</div>
+        <div class="section-title">PROGRAMA DE EXPANSÃO</div>
         <div class="menu-list">
             <div class="menu-item">
-                <span class="menu-label">Vendas/Indicações</span>
+                <span class="menu-label">Indicações Reais</span>
                 <span class="menu-value" id="u-vendas">0</span>
             </div>
-            <div>
-                <span style="font-size: 0.55rem; color:#333; margin-left: 5px; font-family: 'Orbitron';">LINK DE CONVITE ÚNICO:</span>
-                <div class="copy-box">
-                    <span class="copy-link" id="referral-link">https://minharifa.web.app/login.html?ref=...</span>
-                    <button onclick="copyLink()" style="background:none; border:none; color:var(--neon); font-size: 1.1rem; cursor: pointer;">📋</button>
+            <div style="margin-top:5px;">
+                <span style="font-size:0.55rem; color:#333; margin-left:5px; font-family:'Orbitron';">LINK DE CONVITE:</span>
+                <div class="share-box">
+                    <span class="share-link" id="referral-link">---</span>
+                    <button onclick="copyLink()" style="background:none; border:none; color:var(--neon); font-size:1rem;">📋</button>
                 </div>
             </div>
         </div>
 
-        <div class="section-title">LOGS DO SISTEMA</div>
+        <div class="section-title">INFORMAÇÕES DE SISTEMA</div>
         <div class="menu-list">
             <div class="menu-item">
-                <span class="menu-label">Experiência Total</span>
+                <span class="menu-label">XP Acumulado</span>
                 <span class="menu-value" id="u-xp">0.00</span>
             </div>
             <div class="menu-item">
-                <span class="menu-label">ID do Terminal</span>
+                <span class="menu-label">Código ID</span>
                 <span class="menu-value" id="u-code" style="color:var(--neon)">---</span>
             </div>
         </div>
 
-        <button onclick="handleLogout()" class="btn-exit">ENCERRAR SESSÃO</button>
+        <button onclick="handleLogout()" class="btn-logout">DESCONECTAR TERMINAL</button>
         
-        <p style="text-align:center; color:#1a1a1a; font-size:0.5rem; margin-top:25px; font-family: 'Orbitron';">
-            SECURITY KEY: <span id="u-uid">...</span>
+        <p style="text-align:center; color:#111; font-size:0.45rem; margin-top:20px; font-family:'Orbitron';">
+            UID: <span id="u-uid">...</span>
         </p>
     </div>
 
@@ -100,8 +106,6 @@
             apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8",
             authDomain: "minharifadigital.firebaseapp.com",
             projectId: "minharifadigital",
-            storageBucket: "minharifadigital.firebasestorage.app",
-            messagingSenderId: "59630725905",
             appId: "1:59630725905:web:396c8cfca385dc3d957ab0"
         };
 
@@ -132,21 +136,20 @@
         window.copyLink = () => {
             const link = document.getElementById('referral-link').innerText;
             navigator.clipboard.writeText(link);
-            alert("Link copiado para a área de transferência!");
+            alert("Link de indicação copiado com sucesso!");
         };
 
         window.solicitarSaque = () => {
             const saldo = parseFloat(document.getElementById('u-saldo').innerText);
             if(saldo < 25) {
-                alert("Erro: Saldo insuficiente. Mínimo para saque: R$ 25,00");
+                alert("O valor mínimo para saque é R$ 25,00.");
             } else {
-                alert("Acesso autorizado. Redirecionando para Terminal de Saque...");
-                // window.location.href = 'saque.html';
+                window.location.href = 'saque.html';
             }
         };
 
         window.handleLogout = async () => {
-            if(confirm("Confirmar encerramento de sessão?")) {
+            if(confirm("Deseja realmente encerrar a sessão?")) {
                 await signOut(auth);
                 window.location.href = 'login.html';
             }
