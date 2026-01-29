@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Rifas Progressivas IA v5.5.2</title>
+    <title>Nexus S - Campanhas Ativas</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --neon: #00f2ff; --green: #00ff88; --pink: #ff0055; --bg: #000; }
+        :root { --neon: #00f2ff; --green: #00ff88; --pink: #ff0055; --bg: #000; --red-sold: #ff0000; }
         body { background: var(--bg); color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; overflow-x: hidden; }
         
         .header { height: 60px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #111; font-family: 'Orbitron'; font-size: 0.7rem; position: relative; }
@@ -23,11 +23,21 @@
         .level-prize { font-family: 'Orbitron'; font-size: 1rem; color: var(--green); margin-top: 4px; }
 
         .rifa-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; }
-        .num { background: #111; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; font-size: 0.55rem; font-family: 'Orbitron'; border-radius: 3px; color: #333; border: 1px solid #1a1a1a; cursor: pointer; }
+        .num { background: #111; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; font-size: 0.55rem; font-family: 'Orbitron'; border-radius: 3px; color: #333; border: 1px solid #1a1a1a; cursor: pointer; transition: 0.2s; }
         
         .num.selected { background: var(--neon); color: #000; border-color: #fff; box-shadow: 0 0 8px var(--neon); }
-        .num.sold { background: #300 !important; color: #ff0000 !important; border: 1px solid #500 !important; pointer-events: none; opacity: 0.8; position: relative; }
-        .num.sold::after { content: 'X'; position: absolute; font-size: 0.4rem; top: 1px; right: 2px; }
+        
+        /* ESTILO DOS NÚMEROS VENDIDOS (VERMELHO) */
+        .num.sold { 
+            background: #300 !important; 
+            color: var(--red-sold) !important; 
+            border: 1px solid #600 !important; 
+            pointer-events: none; 
+            opacity: 1; 
+            position: relative;
+            box-shadow: inset 0 0 5px #f00;
+        }
+        .num.sold::after { content: 'X'; position: absolute; font-size: 0.4rem; top: 1px; right: 2px; color: #f00; }
 
         .lock-msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: 'Orbitron'; font-size: 0.6rem; background: #000; padding: 5px 10px; border: 1px solid var(--pink); color: var(--pink); z-index: 5; display: none; }
         .level-card.locked .lock-msg { display: block; }
@@ -42,28 +52,28 @@
 
     <div class="header">
         <button onclick="window.location.href='index.html'" style="background:none; border:none; color:var(--neon); font-size:1.2rem; position:absolute; left:15px;">⬅</button>
-        RIFAS DA SORTE v5.5.2
+        NEXUS CAMPANHAS v5.5.2
     </div>
 
-    <div class="ads-space">SUA PROPAGANDA AQUI</div>
+    <div class="ads-space">ACESSANDO SERVIDOR DE TOKENS...</div>
 
     <div class="level-slider" id="main-slider"></div>
 
-    <div class="ads-space">SUA PROPAGANDA AQUI</div>
+    <div class="ads-space">ESPAÇO PARA ADS PARCEIROS</div>
 
     <div id="checkout">
         <div class="checkout-row">
             <div>
-                <div style="font-size:0.5rem; color:#444; font-family:'Orbitron';">NÚMEROS: <span id="num-list" style="color:var(--neon);">-</span></div>
-                <div style="font-size:1.2rem; color:#fff; font-family:'Orbitron';">R$ <span id="total-price">0.00</span></div>
+                <div style="font-size:0.5rem; color:#444; font-family:'Orbitron';">TOKENS ALOCADOS: <span id="num-list" style="color:var(--neon);">-</span></div>
+                <div style="font-size:1.2rem; color:#fff; font-family:'Orbitron';"><span id="total-price">0</span> <span style="font-size: 0.6rem; color: #555;">NP</span></div>
             </div>
             <div style="text-align:right">
-                <div style="font-size:0.5rem; color:#444; font-family:'Orbitron';">SALDO</div>
-                <div id="u-balance" style="font-size:0.8rem; color:var(--green); font-family:'Orbitron';">R$ 0.00</div>
+                <div style="font-size:0.5rem; color:#444; font-family:'Orbitron';">DISPONÍVEL</div>
+                <div id="u-balance" style="font-size:0.8rem; color:var(--green); font-family:'Orbitron';">0 NP</div>
             </div>
         </div>
-        <button id="btn-pay" class="btn-action" style="background:var(--green); color:#000;" onclick="confirmarCompra()">FINALIZAR COMPRA</button>
-        <button id="btn-deposit" class="btn-action" style="background:var(--pink); color:#fff; display:none;" onclick="window.location.href='depositar.html'">DEPOSITAR AGORA</button>
+        <button id="btn-pay" class="btn-action" style="background:var(--green); color:#000;" onclick="confirmarCompra()">CONFIRMAR ALOCAÇÃO</button>
+        <button id="btn-deposit" class="btn-action" style="background:var(--pink); color:#fff; display:none;" onclick="window.location.href='deposito.html'">OBTER MAIS NP</button>
     </div>
 
     <script type="module">
@@ -82,27 +92,27 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        const precoCota = 8.0;
+        const custoPorToken = 8; // Equivalente aos 8.00 anteriores mas tratado como NP
         let user, saldoAtual = 0, selecionados = [], vendidosGlobal = [];
 
         const niveis = [
-            { id: 1, start: 1, end: 50, prize: 110 },
-            { id: 2, start: 51, end: 100, prize: 220 },
-            { id: 3, start: 101, end: 150, prize: 330 },
-            { id: 4, start: 151, end: 200, prize: 440 }
+            { id: 1, start: 1, end: 50, prize: 1100 },
+            { id: 2, start: 51, end: 100, prize: 2200 },
+            { id: 3, start: 101, end: 150, prize: 3300 },
+            { id: 4, start: 151, end: 200, prize: 4400 }
         ];
 
+        // Montagem do Slider
         const slider = document.getElementById('main-slider');
         niveis.forEach(lvl => {
             const card = document.createElement('div');
-            // Inicializa apenas o lvl 1 sem a classe locked
             card.className = `level-card ${lvl.id === 1 ? '' : 'locked'}`;
             card.id = `lvl-${lvl.id}`;
             card.innerHTML = `
                 <div class="lock-msg">ESGOTAR NÍVEL ANTERIOR 🔒</div>
                 <div class="level-header">
-                    <div class="level-title">NÍVEL 0${lvl.id} (NUMS ${lvl.start}-${lvl.end})</div>
-                    <div class="level-prize">PRÊMIO R$ ${lvl.prize},00</div>
+                    <div class="level-title">CAMPANHA 0${lvl.id} (${lvl.start}-${lvl.end})</div>
+                    <div class="level-prize">RECOMPENSA ${lvl.prize} NP</div>
                 </div>
                 <div class="rifa-grid" id="grid-${lvl.id}"></div>
             `;
@@ -118,6 +128,7 @@
             }
         });
 
+        // Escuta Números Vendidos no Firebase
         onSnapshot(doc(db, "rifas_vendas", "global"), (snap) => {
             const data = snap.data();
             vendidosGlobal = data ? (data.vendidos || []) : [];
@@ -128,16 +139,17 @@
                 if (el) el.classList.add('sold');
             });
 
-            // Lógica de Desbloqueio Dinâmico
-            const vendidosLvl1 = vendidosGlobal.filter(n => n <= 50).length;
-            const vendidosLvl2 = vendidosGlobal.filter(n => n > 50 && n <= 100).length;
-            const vendidosLvl3 = vendidosGlobal.filter(n => n > 100 && n <= 150).length;
+            // Lógica de Desbloqueio
+            const v1 = vendidosGlobal.filter(n => n <= 50).length;
+            const v2 = vendidosGlobal.filter(n => n > 50 && n <= 100).length;
+            const v3 = vendidosGlobal.filter(n => n > 100 && n <= 150).length;
 
-            if (vendidosLvl1 >= 50) document.getElementById('lvl-2')?.classList.remove('locked');
-            if (vendidosLvl2 >= 50) document.getElementById('lvl-3')?.classList.remove('locked');
-            if (vendidosLvl3 >= 50) document.getElementById('lvl-4')?.classList.remove('locked');
+            if (v1 >= 50) document.getElementById('lvl-2')?.classList.remove('locked');
+            if (v2 >= 50) document.getElementById('lvl-3')?.classList.remove('locked');
+            if (v3 >= 50) document.getElementById('lvl-4')?.classList.remove('locked');
         });
 
+        // Autenticação e Saldo
         onAuthStateChanged(auth, (u) => {
             if (u) {
                 user = u;
@@ -145,11 +157,11 @@
                     const data = snap.data();
                     if(data) {
                         saldoAtual = data.saldo || 0;
-                        document.getElementById('u-balance').innerText = `R$ ${saldoAtual.toFixed(2)}`;
+                        document.getElementById('u-balance').innerText = `${Math.floor(saldoAtual)} NP`;
                         atualizarPainel();
                     }
                 });
-            }
+            } else { window.location.href = "login.html"; }
         });
 
         window.toggleNum = (n, el) => {
@@ -165,8 +177,8 @@
         };
 
         function atualizarPainel() {
-            const total = selecionados.length * precoCota;
-            document.getElementById('total-price').innerText = total.toFixed(2);
+            const total = selecionados.length * custoPorToken;
+            document.getElementById('total-price').innerText = total;
             document.getElementById('num-list').innerText = selecionados.sort((a,b)=>a-b).join(', ') || '-';
             document.getElementById('checkout').classList.toggle('active', selecionados.length > 0);
             
@@ -176,20 +188,36 @@
         }
 
         window.confirmarCompra = async () => {
-            const total = selecionados.length * precoCota;
-            if(!confirm(`Confirmar R$ ${total.toFixed(2)}?`)) return;
+            const total = selecionados.length * custoPorToken;
+            
+            if (saldoAtual < total) {
+                alert("Nexus Points insuficientes.");
+                return;
+            }
+
+            if(!confirm(`Confirmar alocação de ${total} NP?`)) return;
 
             try {
                 const userRef = doc(db, "usuarios", user.uid);
                 const globalRef = doc(db, "rifas_vendas", "global");
 
-                await updateDoc(userRef, { saldo: increment(-total), xp: increment(selecionados.length * 10) });
-                await updateDoc(globalRef, { vendidos: arrayUnion(...selecionados) });
+                // Atualização atômica no Firebase
+                await updateDoc(userRef, { 
+                    saldo: increment(-total), 
+                    xp: increment(selecionados.length * 10) 
+                });
+                
+                await updateDoc(globalRef, { 
+                    vendidos: arrayUnion(...selecionados) 
+                });
 
-                alert("Sucesso! Números reservados.");
+                alert("Alocação concluída com sucesso!");
                 selecionados = [];
                 atualizarPainel();
-            } catch(e) { alert("Erro na reserva."); }
+            } catch(e) { 
+                alert("Erro ao processar tokens. Tente novamente."); 
+                console.error(e);
+            }
         };
     </script>
 </body>
