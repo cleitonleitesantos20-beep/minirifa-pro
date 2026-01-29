@@ -3,137 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Rifas da Sorte - RoboSorteio</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Rifas Progressivas IA</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --neon: #00f2ff; --green: #00ff88; }
+        :root { --neon: #00f2ff; --green: #00ff88; --pink: #ff0055; --bg: #000; }
+        body { background: var(--bg); color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; overflow-x: hidden; }
         
-        /* Grid de Números */
-        .rifa-container { padding: 20px; padding-bottom: 100px; }
-        .rifa-grid { 
-            display: grid; 
-            grid-template-columns: repeat(5, 1fr); 
-            gap: 8px; 
-            margin-top: 15px; 
-        }
-        
-        .num-cota {
-            background: #0a0a0a;
-            border: 1px solid #1a1a1a;
-            color: #444;
-            aspect-ratio: 1/1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Orbitron';
-            font-size: 0.7rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
+        .header { height: 60px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #111; font-family: 'Orbitron'; font-size: 0.7rem; position: relative; }
+        .ads-space { background: rgba(255,255,255,0.02); border: 1px dashed #222; color: #333; text-align: center; padding: 10px; font-family: 'Orbitron'; font-size: 0.45rem; margin: 10px 15px; border-radius: 8px; }
 
-        .num-cota.selected {
-            background: var(--neon);
-            color: #000;
-            border-color: #fff;
-            box-shadow: 0 0 15px var(--neon);
-        }
+        /* Slider de Níveis */
+        .level-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 15px; padding: 10px 15px; scrollbar-width: none; }
+        .level-slider::-webkit-scrollbar { display: none; }
+
+        .level-card { min-width: 88vw; scroll-snap-align: center; background: #080808; border: 1px solid #151515; border-radius: 15px; padding: 12px; position: relative; box-sizing: border-box; transition: 0.3s; }
+        .level-card.locked { filter: grayscale(1) blur(1px); opacity: 0.4; pointer-events: none; }
+        
+        .level-header { text-align: center; margin-bottom: 10px; border-bottom: 1px solid #111; padding-bottom: 8px; }
+        .level-title { font-family: 'Orbitron'; font-size: 0.55rem; color: var(--neon); letter-spacing: 1px; }
+        .level-prize { font-family: 'Orbitron'; font-size: 1rem; color: var(--green); margin-top: 4px; }
+
+        /* Grid Ultra Compacto (10 colunas) */
+        .rifa-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; }
+        .num { background: #111; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; font-size: 0.55rem; font-family: 'Orbitron'; border-radius: 3px; color: #333; border: 1px solid #1a1a1a; cursor: pointer; }
+        .num.selected { background: var(--neon); color: #000; border-color: #fff; box-shadow: 0 0 8px var(--neon); }
+        .num.sold { background: #1a0000; color: #400; border: none; pointer-events: none; }
+
+        .lock-msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: 'Orbitron'; font-size: 0.6rem; background: #000; padding: 5px 10px; border: 1px solid var(--pink); color: var(--pink); z-index: 5; display: none; }
+        .level-card.locked .lock-msg { display: block; }
 
         /* Checkout Flutuante */
-        #checkout-bar {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 400px;
-            background: #000;
-            border: 1px solid var(--green);
-            border-radius: 15px;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 1000;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            display: none; /* Escondido por padrão */
-        }
-
-        .hidden { display: none !important; }
+        #checkout { position: fixed; bottom: 0; width: 100%; background: #050505; border-top: 2px solid var(--neon); padding: 15px; box-sizing: border-box; transform: translateY(100%); transition: 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28); z-index: 100; box-shadow: 0 -10px 30px rgba(0,0,0,0.8); }
+        #checkout.active { transform: translateY(0); }
+        .checkout-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .btn-action { font-family: 'Orbitron'; font-weight: bold; font-size: 0.75rem; width: 100%; padding: 15px; border-radius: 10px; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <button onclick="window.location.href='index.html'" style="background:none; border:none; color:var(--neon); font-size:1.2rem; position:absolute; left:15px;">⬅</button>
-        <span>RIFAS DA SORTE</span>
+        RIFAS DA SORTE v5.5.0
     </div>
 
-    <div class="rifa-container">
-        
-        <div style="background: linear-gradient(90deg, #0015ff, #00f2ff); padding: 20px; border-radius: 15px; text-align: center; margin-bottom: 20px;">
-            <h2 style="font-family:'Orbitron'; color:#fff; font-size:0.9rem; margin:0;">PRÊMIO ATUAL: R$ 110,00</h2>
-            <p style="font-size:0.6rem; color:#000; font-weight:bold; margin-top:5px;">VALOR POR COTA: R$ 8,00</p>
+    <div class="ads-space">SUA PROPAGANDA AQUI</div>
+
+    <div class="level-slider" id="main-slider">
+        <script>
+            const niveis = [
+                { id: 1, start: 1, end: 50, prize: 110 },
+                { id: 2, start: 51, end: 100, prize: 220 },
+                { id: 3, start: 101, end: 150, prize: 330 },
+                { id: 4, start: 151, end: 200, prize: 440 }
+            ];
+
+            const slider = document.getElementById('main-slider');
+            niveis.forEach(lvl => {
+                const card = document.createElement('div');
+                card.className = `level-card ${lvl.id > 1 ? 'locked' : ''}`;
+                card.id = `lvl-${lvl.id}`;
+                card.innerHTML = `
+                    <div class="lock-msg">ESGOTAR NÍVEL ANTERIOR 🔒</div>
+                    <div class="level-header">
+                        <div class="level-title">NÍVEL 0${lvl.id} (NUMS ${lvl.start}-${lvl.end})</div>
+                        <div class="level-prize">PRÊMIO R$ ${lvl.prize},00</div>
+                    </div>
+                    <div class="rifa-grid" id="grid-${lvl.id}"></div>
+                `;
+                slider.appendChild(card);
+                
+                const grid = document.getElementById(`grid-${lvl.id}`);
+                for(let i=lvl.start; i<=lvl.end; i++) {
+                    const n = document.createElement('div');
+                    n.className = 'num';
+                    n.innerText = String(i).padStart(2,'0');
+                    n.onclick = () => window.toggleNum(i, n);
+                    grid.appendChild(n);
+                }
+            });
+        </script>
+    </div>
+
+    <div class="ads-space">SUA PROPAGANDA AQUI</div>
+
+    <div id="checkout">
+        <div class="checkout-row">
+            <div>
+                <div style="font-size:0.5rem; color:#444; font-family:'Orbitron';">SELECIONADOS: <span id="num-list" style="color:var(--neon);">-</span></div>
+                <div style="font-size:1.2rem; color:#fff; font-family:'Orbitron'; font-weight:bold;">R$ <span id="total-price">0.00</span></div>
+            </div>
+            <div style="text-align:right">
+                <div style="font-size:0.5rem; color:#444; font-family:'Orbitron';">MEU SALDO</div>
+                <div id="u-balance" style="font-size:0.8rem; color:var(--green); font-family:'Orbitron';">R$ 0.00</div>
+            </div>
         </div>
-
-        <div style="font-family:'Orbitron'; font-size:0.55rem; color:#444; letter-spacing:1px;">SELECIONE SEUS NÚMEROS:</div>
-        
-        <div id="grid-rifa" class="rifa-grid"></div>
-
+        <button id="btn-pay" class="btn-action" style="background:var(--green); color:#000;" onclick="confirmarCompra()">FINALIZAR COMPRA</button>
+        <button id="btn-deposit" class="btn-action" style="background:var(--pink); color:#fff; display:none;" onclick="window.location.href='depositar.html'">SALDO INSUFICIENTE: DEPOSITAR</button>
     </div>
 
-    <div id="checkout-bar">
-        <div>
-            <div style="font-size:0.5rem; color:var(--green); font-family:'Orbitron';">TOTAL A PAGAR</div>
-            <div style="font-size:1.4rem; color:#fff; font-family:'Orbitron';">R$ <span id="total-price">0.00</span></div>
-        </div>
-        <button onclick="irParaPagamento()" style="background:var(--green); color:#000; border:none; padding:12px 20px; border-radius:10px; font-family:'Orbitron'; font-weight:bold; font-size:0.7rem; cursor:pointer;">
-            PAGAR AGORA
-        </button>
-    </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, increment } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-    <script>
-        const grid = document.getElementById('grid-rifa');
-        const checkoutBar = document.getElementById('checkout-bar');
-        const totalPriceEl = document.getElementById('total-price');
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8",
+            authDomain: "minharifadigital.firebaseapp.com",
+            projectId: "minharifadigital",
+            appId: "1:59630725905:web:396c8cfca385dc3d957ab0"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        let user;
+        let saldoAtual = 0;
         let selecionados = [];
-        const precoCota = 8.00;
+        const precoCota = 8.0;
 
-        // Gerar 50 números para a rifa
-        for (let i = 1; i <= 50; i++) {
-            const div = document.createElement('div');
-            div.className = 'num-cota';
-            div.innerText = i.toString().padStart(2, '0');
-            div.onclick = () => toggleNumero(i, div);
-            grid.appendChild(div);
-        }
+        onAuthStateChanged(auth, (u) => {
+            if (u) {
+                user = u;
+                onSnapshot(doc(db, "usuarios", u.uid), (snap) => {
+                    saldoAtual = snap.data().saldo || 0;
+                    document.getElementById('u-balance').innerText = `R$ ${saldoAtual.toFixed(2)}`;
+                    atualizarPainel();
+                });
+            }
+        });
 
-        function toggleNumero(num, el) {
-            if (selecionados.includes(num)) {
-                selecionados = selecionados.filter(n => n !== num);
+        window.toggleNum = (n, el) => {
+            if(selecionados.includes(n)) {
+                selecionados = selecionados.filter(i => i !== n);
                 el.classList.remove('selected');
             } else {
-                selecionados.push(num);
+                selecionados.push(n);
                 el.classList.add('selected');
             }
+            atualizarPainel();
+        };
 
-            // Atualizar Checkout
+        function atualizarPainel() {
             const total = selecionados.length * precoCota;
-            totalPriceEl.innerText = total.toFixed(2);
+            document.getElementById('total-price').innerText = total.toFixed(2);
+            document.getElementById('num-list').innerText = selecionados.sort((a,b)=>a-b).join(', ') || '-';
+            
+            const check = document.getElementById('checkout');
+            if(selecionados.length > 0) check.classList.add('active');
+            else check.classList.remove('active');
 
-            if (selecionados.length > 0) {
-                checkoutBar.style.display = 'flex';
+            if(total > saldoAtual) {
+                document.getElementById('btn-pay').style.display = 'none';
+                document.getElementById('btn-deposit').style.display = 'block';
             } else {
-                checkoutBar.style.display = 'none';
+                document.getElementById('btn-pay').style.display = 'block';
+                document.getElementById('btn-deposit').style.display = 'none';
             }
         }
 
-        function irParaPagamento() {
-            alert(`Iniciando pagamento para ${selecionados.length} cotas.\nTotal: R$ ${ (selecionados.length * precoCota).toFixed(2) }`);
-            // Aqui você redireciona para o seu link de pagamento
-            // window.location.href = 'SEU_LINK_AQUI';
-        }
+        window.confirmarCompra = async () => {
+            const total = selecionados.length * precoCota;
+            if(confirm(`Confirmar reserva de ${selecionados.length} números por R$ ${total.toFixed(2)}?`)) {
+                try {
+                    await updateDoc(doc(db, "usuarios", user.uid), {
+                        saldo: increment(-total),
+                        xp: increment(selecionados.length * 5)
+                    });
+                    alert("Sorteio Reservado! Boa sorte!");
+                    location.reload();
+                } catch(e) { alert("Erro ao processar. Tente novamente."); }
+            }
+        };
     </script>
 </body>
 </html>
