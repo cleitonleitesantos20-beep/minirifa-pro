@@ -33,7 +33,7 @@
         .pos-2 { color: #c0c0c0; }
         .pos-3 { color: #cd7f32; }
 
-        .user-img { width: 42px; height: 42px; background: #111; border: 2px solid #222; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
+        .user-img { width: 42px; height: 42px; background: #111; border: 2px solid #222; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; }
         
         .info-box { flex-grow: 1; min-width: 0; }
         .user-name { font-family: 'Orbitron'; font-size: 0.75rem; color: #fff; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
@@ -75,7 +75,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getFirestore, collection, query, orderBy, onSnapshot, where, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
         const firebaseConfig = { 
             apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", 
@@ -87,7 +87,22 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Timer de encerramento do mês
+        // --- FUNÇÕES DE SALVAMENTO (Para uso no Mercado e Jogos) ---
+        
+        // Use esta função quando o usuário terminar um jogo
+        async function salvarScore(userId, novoScore) {
+            const userRef = doc(db, "usuarios", userId);
+            await updateDoc(userRef, { highScore: novoScore });
+        }
+
+        // Use esta função quando o usuário comprar no mercado
+        async function salvarCompra(userId, valorGasto) {
+            const userRef = doc(db, "usuarios", userId);
+            await updateDoc(userRef, { totalGasto: increment(valorGasto) });
+        }
+
+        // --- LÓGICA DO RANKING ---
+
         function updateTimer() {
             const now = new Date();
             const end = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
@@ -102,8 +117,8 @@
 
         function renderRank(containerId, data, type) {
             const container = document.getElementById(containerId);
-            if (!data.length) {
-                container.innerHTML = '<div style="padding:20px; color:#333; font-size:0.6rem; text-align:center;">AGUARDANDO ATIVIDADE...</div>';
+            if (!data || data.length === 0) {
+                container.innerHTML = '<div style="padding:20px; color:#444; font-size:0.6rem; text-align:center; font-family:Orbitron;">SEM REGISTROS AO VIVO</div>';
                 return;
             }
             container.innerHTML = "";
@@ -115,15 +130,15 @@
 
                 if(type === 'indica') {
                     label = "REDE";
-                    if(pos === 1) prizeVal = "R$ 15,00";
-                    else if(pos === 2) prizeVal = "R$ 10,00";
-                    else if(pos === 3) prizeVal = "R$ 5,00";
+                    if(pos === 1) prizeVal = "15 NP";
+                    else if(pos === 2) prizeVal = "10 NP";
+                    else if(pos === 3) prizeVal = "5 NP";
                 } else if(type === 'jogos') {
                     label = "SCORE";
-                    if(pos === 1) prizeVal = "R$ 5,00";
+                    if(pos === 1) prizeVal = "5 NP";
                 } else if(type === 'mercado') {
                     label = "GASTO";
-                    if(pos === 1) prizeVal = "R$ 10,00";
+                    if(pos === 1) prizeVal = "10 NP";
                 }
 
                 const item = document.createElement('div');
@@ -132,33 +147,34 @@
                     <span class="pos pos-${pos}">${pos}º</span>
                     <div class="user-img">${user.avatarEmoji || '👤'}</div>
                     <div class="info-box">
-                        <span class="user-name">${user.nome || 'Usuário Nexus'}</span>
+                        <span class="user-name">${user.nome || 'Anônimo'}</span>
                         <span class="user-meta">${user.count || 0} ${label}</span>
                     </div>
                     <div class="prize-badge">
                         ${prizeVal}
-                        <small>PRÊMIO MENSAL</small>
+                        <small>PRÊMIO FINAL</small>
                     </div>
                 `;
                 container.appendChild(item);
             });
         }
 
-        // Listeners em Tempo Real (Atualiza na hora que o banco mudar)
-        onSnapshot(query(collection(db, "usuarios"), orderBy("indicacoesCount", "desc"), limit(3)), snap => {
-            const users = snap.docs.map(d => ({ ...d.data(), count: d.data().indicacoesCount || 0 }));
-            renderRank('list-indicacao', users, 'indica');
+        // Listeners Tempo Real - Mostra todos os usuários com pontos > 0
+        onSnapshot(query(collection(db, "usuarios"), where("indicacoesCount", ">", 0), orderBy("indicacoesCount", "desc")), snap => {
+            renderRank('list-indicacao', snap.docs.map(d => ({ ...d.data(), count: d.data().indicacoesCount })), 'indica');
         });
 
-        onSnapshot(query(collection(db, "usuarios"), orderBy("highScore", "desc"), limit(3)), snap => {
-            const users = snap.docs.map(d => ({ ...d.data(), count: d.data().highScore || 0 }));
-            renderRank('list-jogos', users, 'jogos');
+        onSnapshot(query(collection(db, "usuarios"), where("highScore", ">", 0), orderBy("highScore", "desc")), snap => {
+            renderRank('list-jogos', snap.docs.map(d => ({ ...d.data(), count: d.data().highScore })), 'jogos');
         });
 
-        onSnapshot(query(collection(db, "usuarios"), orderBy("totalGasto", "desc"), limit(3)), snap => {
-            const users = snap.docs.map(d => ({ ...d.data(), count: d.data().totalGasto || 0 }));
-            renderRank('list-mercado', users, 'mercado');
+        onSnapshot(query(collection(db, "usuarios"), where("totalGasto", ">", 0), orderBy("totalGasto", "desc")), snap => {
+            renderRank('list-mercado', snap.docs.map(d => ({ ...d.data(), count: d.data().totalGasto })), 'mercado');
         });
+
+        // Expor funções para o console ou outros scripts se necessário
+        window.salvarScore = salvarScore;
+        window.salvarCompra = salvarCompra;
     </script>
 </body>
 </html>
