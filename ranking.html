@@ -7,7 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --gold: #ffcc00; --dark: #0a0a0a; --bg-card: #080808; }
-        
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden; }
 
@@ -17,7 +16,6 @@
 
         .container { padding: 15px; max-width: 450px; margin: 0 auto; padding-bottom: 50px; }
 
-        /* TIMER MENSAL */
         .monthly-timer { background: rgba(255, 0, 85, 0.1); border: 1px solid var(--pink); border-radius: 12px; padding: 10px; text-align: center; margin-bottom: 20px; }
         .timer-label { font-family: 'Orbitron'; font-size: 0.5rem; color: var(--pink); display: block; margin-bottom: 5px; }
         .timer-clock { font-family: 'Orbitron'; font-size: 1rem; color: #fff; letter-spacing: 2px; }
@@ -25,27 +23,24 @@
         .section-header { font-family: 'Orbitron'; font-size: 0.7rem; color: var(--neon); margin: 25px 0 15px 0; display: flex; align-items: center; gap: 10px; text-transform: uppercase; }
         .section-header::after { content: ''; flex-grow: 1; height: 1px; background: linear-gradient(90deg, var(--neon), transparent); }
 
-        .rank-list { background: var(--bg-card); border: 1px solid #1a1a1a; border-radius: 20px; overflow: hidden; }
-
-        .rank-item { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #111; gap: 12px; }
+        .rank-list { background: var(--bg-card); border: 1px solid #1a1a1a; border-radius: 20px; overflow: hidden; min-height: 50px; }
+        .rank-item { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #111; gap: 12px; animation: fadeIn 0.5s ease; }
         
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
         .pos { font-family: 'Orbitron'; font-size: 0.9rem; width: 30px; font-weight: bold; text-align: center; }
         .pos-1 { color: var(--gold); text-shadow: 0 0 10px rgba(255,204,0,0.3); }
         .pos-2 { color: #c0c0c0; }
         .pos-3 { color: #cd7f32; }
 
-        .user-img { width: 38px; height: 38px; background: #111; border: 1px solid #222; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+        .user-img { width: 42px; height: 42px; background: #111; border: 2px solid #222; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
         
         .info-box { flex-grow: 1; min-width: 0; }
-        .user-name { font-family: 'Orbitron'; font-size: 0.7rem; color: #eee; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .user-meta { font-size: 0.55rem; color: #555; text-transform: uppercase; font-family: 'Orbitron'; }
+        .user-name { font-family: 'Orbitron'; font-size: 0.75rem; color: #fff; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+        .user-meta { font-size: 0.6rem; color: var(--neon); text-transform: uppercase; font-family: 'Orbitron'; font-weight: bold; }
 
-        .prize-badge { background: rgba(0,255,136,0.05); color: var(--green); font-family: 'Orbitron'; font-size: 0.5rem; padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(0,255,136,0.1); text-align: center; line-height: 1.2; }
-        .prize-badge small { display: block; font-size: 0.35rem; color: #444; }
-
-        .lucky-section { margin-bottom: 30px; background: #080808; border: 1px solid #222; border-radius: 20px; padding: 20px; text-align: center; }
-        .lucky-label { font-family: 'Orbitron'; font-size: 0.6rem; color: #555; letter-spacing: 2px; }
-        .lucky-number { font-family: 'Orbitron'; font-size: 2.2rem; color: #fff; letter-spacing: 6px; margin: 10px 0; }
+        .prize-badge { background: rgba(0,255,136,0.1); color: var(--green); font-family: 'Orbitron'; font-size: 0.55rem; padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(0,255,136,0.2); text-align: center; min-width: 80px; }
+        .prize-badge small { display: block; font-size: 0.35rem; color: #aaa; margin-top: 2px; }
     </style>
 </head>
 <body>
@@ -57,37 +52,30 @@
     </div>
 
     <div class="container">
-        
         <div class="monthly-timer">
-            <span class="timer-label">ENQUERRAMENTO E PAGAMENTO EM:</span>
+            <span class="timer-label">PRÓXIMO PAGAMENTO EM:</span>
             <div class="timer-clock" id="countdown">00d 00h 00m 00s</div>
         </div>
 
-        <div class="lucky-section">
-            <div class="lucky-label">SORTEIO ATIVO</div>
-            <div class="lucky-number" id="rifa-draw">----</div>
-        </div>
-
         <div class="rank-section">
-            <div class="section-header">📢 Top Afiliados (Ao Vivo)</div>
+            <div class="section-header">📢 Top Afiliados</div>
             <div id="list-indicacao" class="rank-list"></div>
         </div>
 
         <div class="rank-section">
-            <div class="section-header">🎮 Recordes Games (Ao Vivo)</div>
+            <div class="section-header">🎮 Elite Gamers</div>
             <div id="list-jogos" class="rank-list"></div>
         </div>
 
         <div class="rank-section">
-            <div class="section-header">💎 Maiores Compradores (Ao Vivo)</div>
+            <div class="section-header">💎 Top Investidores</div>
             <div id="list-mercado" class="rank-list"></div>
         </div>
-
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, collection, query, orderBy, limit, onSnapshot, doc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getFirestore, collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
         const firebaseConfig = { 
             apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", 
@@ -99,10 +87,11 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // Timer de encerramento do mês
         function updateTimer() {
             const now = new Date();
-            const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
-            const diff = endOfMonth - now;
+            const end = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+            const diff = end - now;
             const d = Math.floor(diff / (1000 * 60 * 60 * 24));
             const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
@@ -113,25 +102,28 @@
 
         function renderRank(containerId, data, type) {
             const container = document.getElementById(containerId);
+            if (!data.length) {
+                container.innerHTML = '<div style="padding:20px; color:#333; font-size:0.6rem; text-align:center;">AGUARDANDO ATIVIDADE...</div>';
+                return;
+            }
             container.innerHTML = "";
 
             data.forEach((user, index) => {
                 const pos = index + 1;
-                let value = "R$ 0,00";
-                let unit = "PTS";
-                
-                // Define valores de prêmio para os recordistas atuais
+                let prizeVal = "---";
+                let label = "PTS";
+
                 if(type === 'indica') {
-                    unit = "INDICADOS";
-                    if(pos === 1) value = "R$ 15,00";
-                    else if(pos === 2) value = "R$ 10,00";
-                    else if(pos === 3) value = "R$ 5,00";
+                    label = "REDE";
+                    if(pos === 1) prizeVal = "R$ 15,00";
+                    else if(pos === 2) prizeVal = "R$ 10,00";
+                    else if(pos === 3) prizeVal = "R$ 5,00";
                 } else if(type === 'jogos') {
-                    unit = "SCORE";
-                    if(pos === 1) value = "R$ 5,00";
+                    label = "SCORE";
+                    if(pos === 1) prizeVal = "R$ 5,00";
                 } else if(type === 'mercado') {
-                    unit = "GASTO";
-                    if(pos === 1) value = "R$ 10,00";
+                    label = "GASTO";
+                    if(pos === 1) prizeVal = "R$ 10,00";
                 }
 
                 const item = document.createElement('div');
@@ -140,33 +132,32 @@
                     <span class="pos pos-${pos}">${pos}º</span>
                     <div class="user-img">${user.avatarEmoji || '👤'}</div>
                     <div class="info-box">
-                        <span class="user-name">${user.nome || 'Usuário'}</span>
-                        <span class="user-meta">${user.count || 0} ${unit}</span>
+                        <span class="user-name">${user.nome || 'Usuário Nexus'}</span>
+                        <span class="user-meta">${user.count || 0} ${label}</span>
                     </div>
                     <div class="prize-badge">
-                        ${value}
-                        <small>FINAL DO MÊS</small>
+                        ${prizeVal}
+                        <small>PRÊMIO MENSAL</small>
                     </div>
                 `;
                 container.appendChild(item);
             });
         }
 
-        // Listeners Tempo Real puxando dados reais do Banco
+        // Listeners em Tempo Real (Atualiza na hora que o banco mudar)
         onSnapshot(query(collection(db, "usuarios"), orderBy("indicacoesCount", "desc"), limit(3)), snap => {
-            renderRank('list-indicacao', snap.docs.map(d => ({...d.data(), count: d.data().indicacoesCount})), 'indica');
+            const users = snap.docs.map(d => ({ ...d.data(), count: d.data().indicacoesCount || 0 }));
+            renderRank('list-indicacao', users, 'indica');
         });
 
         onSnapshot(query(collection(db, "usuarios"), orderBy("highScore", "desc"), limit(3)), snap => {
-            renderRank('list-jogos', snap.docs.map(d => ({...d.data(), count: d.data().highScore})), 'jogos');
+            const users = snap.docs.map(d => ({ ...d.data(), count: d.data().highScore || 0 }));
+            renderRank('list-jogos', users, 'jogos');
         });
 
         onSnapshot(query(collection(db, "usuarios"), orderBy("totalGasto", "desc"), limit(3)), snap => {
-            renderRank('list-mercado', snap.docs.map(d => ({...d.data(), count: d.data().totalGasto})), 'mercado');
-        });
-
-        onSnapshot(doc(db, "configuracoes", "rifa_atual"), snap => {
-            if(snap.exists()) document.getElementById('rifa-draw').innerText = snap.data().numeroSorteado || "----";
+            const users = snap.docs.map(d => ({ ...d.data(), count: d.data().totalGasto || 0 }));
+            renderRank('list-mercado', users, 'mercado');
         });
     </script>
 </body>
