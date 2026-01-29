@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nexus S - Master Dashboard</title>
+    <title>Nexus S - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --gold: #ffcc00; --dark: #0a0a0a; --bg-card: #080808; }
@@ -11,10 +11,8 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden; display: flex; flex-direction: column; }
 
-        /* ANÚNCIO DE CIMA (FIXADO) */
         .ad-banner-top { width: 100%; height: 60px; background: #050505; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 0.55rem; color: #333; letter-spacing: 2px; flex-shrink: 0; text-align: center; }
 
-        /* HEADER & PERFIL */
         .profile-section { padding: 20px; background: linear-gradient(to bottom, #111, #000); border-bottom: 1px solid #1a1a1a; display: flex; align-items: center; gap: 15px; position: relative; flex-shrink: 0; }
         
         .avatar-container { position: relative; width: 65px; height: 65px; flex-shrink: 0; }
@@ -23,45 +21,37 @@
         .user-data { flex-grow: 1; min-width: 0; }
         .user-data h2 { font-family: 'Orbitron'; font-size: 0.85rem; margin: 0; color: #eee; text-transform: uppercase; }
         .user-balance { color: var(--green); font-weight: bold; font-size: 1.1rem; display: block; margin: 2px 0; }
+        .balance-label { font-size: 0.5rem; color: #555; font-family: 'Orbitron'; letter-spacing: 1px; }
         .lvl-tag { font-family: 'Orbitron'; font-size: 0.55rem; color: var(--neon); background: rgba(0,242,255,0.05); padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(0,242,255,0.2); }
 
         .btn-config-side { background: #0a0a0a; border: 1px solid #222; color: #666; width: 42px; height: 42px; border-radius: 10px; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
-        .btn-config-side:active { border-color: var(--neon); color: var(--neon); transform: rotate(90deg); }
 
         .container { padding: 15px; max-width: 450px; margin: 0 auto; width: 100%; flex-grow: 1; }
 
-        /* STATUS BOX */
         .sys-info { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #050505; border-radius: 12px; border: 1px solid #111; margin-bottom: 15px; }
         .sys-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; display: inline-block; margin-right: 5px; box-shadow: 0 0 8px var(--green); animation: pulse 2s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
         .sys-text { font-family: 'Orbitron'; font-size: 0.5rem; color: #444; }
 
-        /* GRID UNIFORME DE 6 BOTÕES */
         .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
         .btn-card { background: var(--bg-card); border: 1px solid #1a1a1a; padding: 20px 10px; border-radius: 20px; color: #fff; font-family: 'Orbitron'; font-size: 0.65rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 10px; transition: 0.2s; text-decoration: none; }
         .btn-card span { font-size: 1.5rem; }
         .btn-card:active { transform: translateY(2px); border-color: var(--neon); background: #111; }
 
-        /* BOTÃO NEXUS S */
         .btn-nexus { width: 100%; background: linear-gradient(90deg, #000, #151515, #000); border: 1px solid var(--gold); padding: 20px; border-radius: 20px; color: var(--gold); font-family: 'Orbitron'; font-size: 0.95rem; font-weight: bold; cursor: pointer; letter-spacing: 4px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
 
-        /* ANÚNCIO DE BAIXO */
         .ad-banner-bottom { width: 100%; min-height: 80px; background: #050505; border: 1px solid #111; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 0.55rem; color: #222; text-align: center; padding: 10px; margin-bottom: 20px; }
 
-        /* TEXTO TREM */
         .news-ticker { position: fixed; bottom: 0; left: 0; width: 100%; background: #000; border-top: 1px solid #1a1a1a; padding: 12px 0; overflow: hidden; z-index: 1000; }
         .ticker-content { display: inline-block; white-space: nowrap; animation: ticker 25s linear infinite; font-family: 'Orbitron'; font-size: 0.6rem; color: var(--neon); letter-spacing: 2px; }
 
-        @keyframes ticker {
-            0% { transform: translateX(100vw); }
-            100% { transform: translateX(-100%); }
-        }
+        @keyframes ticker { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
     </style>
 </head>
 <body>
 
     <div class="ad-banner-top">
-        ESPAÇO PUBLICITÁRIO DISPONÍVEL<br>ANUNCIE SUA MARCA NO NEXUS S
+        CONTEÚDO DIGITAL EXCLUSIVO<br>PLATAFORMA DE CRÉDITOS NEXUS
     </div>
 
     <div class="profile-section">
@@ -70,7 +60,7 @@
         </div>
         <div class="user-data">
             <h2 id="u-nome">CARREGANDO...</h2>
-            <div class="user-balance">R$ <span id="u-saldo">0,00</span></div>
+            <div class="user-balance"><span id="u-saldo">0</span> <span class="balance-label">NP</span></div>
             <span class="lvl-tag">NÍVEL <span id="u-level">1</span></span>
         </div>
         <button class="btn-config-side" onclick="window.location.href='config.html'">⚙️</button>
@@ -79,28 +69,28 @@
     <div class="container">
         
         <div class="sys-info">
-            <div><span class="sys-dot"></span><span class="sys-text">ESTADO: OPERACIONAL</span></div>
+            <div><span class="sys-dot"></span><span class="sys-text">NEXUS CORE: ATIVO</span></div>
             <span class="sys-text" id="sys-clock">00:00:00</span>
         </div>
 
         <div class="main-grid">
-            <button class="btn-card" onclick="window.location.href='rifas.html'"><span>🎟️</span>RIFAS</button>
-            <button class="btn-card" onclick="window.location.href='leilao.html'"><span>🔨</span>LEILÕES</button>
-            <button class="btn-card" onclick="window.location.href='trades.html'"><span>📈</span>TRADES IA</button>
-            <button class="btn-card" onclick="window.location.href='minigames.html'"><span>🎮</span>MINIGAMES</button>
-            <button class="btn-card" onclick="window.location.href='deposito.html'"><span>💰</span>DEPÓSITO</button>
-            <button class="btn-card" onclick="window.location.href='ranking.html'"><span>🏆</span>RANKING</button>
+            <button class="btn-card" onclick="window.location.href='rifas.html'"><span>🎟️</span>CAMPANHAS</button>
+            <button class="btn-card" onclick="window.location.href='leilao.html'"><span>🔨</span>DROPS</button>
+            <button class="btn-card" onclick="window.location.href='trades.html'"><span>📈</span>ALGORITMOS</button>
+            <button class="btn-card" onclick="window.location.href='minigames.html'"><span>🎮</span>NEXUS GAMES</button>
+            <button class="btn-card" onclick="window.location.href='deposito.html'"><span>💎</span>CRÉDITOS</button>
+            <button class="btn-card" onclick="window.location.href='ranking.html'"><span>🏆</span>MESTRES</button>
         </div>
 
-        <button class="btn-nexus" onclick="window.location.href='market.html'">🛒 NEXUS S</button>
+        <button class="btn-nexus" onclick="window.location.href='market.html'">🛒 MARKETPLACE</button>
 
-        <div class="ad-banner-bottom">ADS - PARCEIRO PREMIUM<br>FAÇA SEU UPGRADE PARA REMOVER ANÚNCIOS</div>
+        <div class="ad-banner-bottom">MEMBROS PREMIUM<br>ACESSO AO GUIA DE ESTRATÉGIAS DIGITAIS</div>
 
     </div>
 
     <div class="news-ticker">
         <div class="ticker-content">
-            ••• VEM JOGAR COM A NOSSA IA ••• COMPRE SUA RIFA AGORA E CONCORRA A PRÊMIOS ••• NOVO RANKING DISPONÍVEL ••• NEXUS S: O FUTURO DOS INVESTIMENTOS DIGITAIS •••
+            ••• ADQUIRA CRÉDITOS E RECEBA CONTEÚDO EXCLUSIVO ••• PARTICIPE DAS CAMPANHAS DE FIDELIDADE ••• NOVA TEMPORADA NEXUS S DISPONÍVEL ••• O FUTURO DA ECONOMIA TOKENIZADA •••
         </div>
     </div>
 
@@ -126,14 +116,17 @@
                     const d = snap.data();
                     if(!d) return;
                     document.getElementById('u-nome').innerText = (d.nome || "OPERADOR").toUpperCase();
-                    document.getElementById('u-saldo').innerText = (d.saldo || 0).toLocaleString('pt-br', {minimumFractionDigits: 2});
+                    
+                    // Mostra saldo em pontos inteiros (NP)
+                    const saldoPontos = Math.floor(d.saldo || 0);
+                    document.getElementById('u-saldo').innerText = saldoPontos.toLocaleString('pt-br');
+                    
                     if(d.avatarEmoji) document.getElementById('u-avatar').innerText = d.avatarEmoji;
                     document.getElementById('u-level').innerText = d.level || 1;
                 });
             } else { window.location.href = "login.html"; }
         });
 
-        // Relógio do Sistema
         setInterval(() => {
             document.getElementById('sys-clock').innerText = new Date().toLocaleTimeString('pt-br');
         }, 1000);
