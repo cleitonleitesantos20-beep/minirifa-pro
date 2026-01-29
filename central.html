@@ -3,82 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IA - Central de Operações v5.2</title>
+    <title>IA - Central de Operações v5.2.1</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        .level-bar { width: 100%; height: 8px; background: #222; border-radius: 4px; margin-top: 10px; overflow: hidden; }
+        :root { --neon: #00f2ff; --green: #00ff88; --pink: #ff0055; }
+        .level-bar { width: 100%; height: 6px; background: #111; border-radius: 3px; margin-top: 10px; border: 1px solid #222; }
         .level-progress { height: 100%; background: var(--neon); width: 0%; transition: 0.5s; box-shadow: 0 0 10px var(--neon); }
         
+        /* Modal de Jogo Neon */
         .game-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-        .wire-board { width: 280px; height: 250px; background: #0a0a0a; border: 2px solid #333; border-radius: 10px; position: relative; }
-        .wire-node { width: 45px; height: 15px; border-radius: 4px; position: absolute; cursor: pointer; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .wire-node.connected { transform: translateX(200px); box-shadow: 0 0 15px currentColor; }
+        .wire-board { width: 280px; height: 250px; background: #050505; border: 2px solid #111; border-radius: 15px; position: relative; box-shadow: inset 0 0 20px rgba(0,242,255,0.1); }
+        .wire-node { width: 50px; height: 20px; border-radius: 4px; position: absolute; cursor: pointer; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid rgba(255,255,255,0.1); }
+        .wire-node.connected { transform: translateX(200px); box-shadow: 0 0 20px currentColor; border: 1px solid #fff; }
         
-        .social-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
-        .social-btn { padding: 12px; border-radius: 8px; text-align: center; font-size: 1.2rem; background: #111; border: 1px solid #333; color: #fff; text-decoration: none; }
+        /* Botões de Redes Sociais */
+        .social-grid { display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 20px; width: 100%; }
+        .social-btn { padding: 12px; border-radius: 8px; text-align: center; font-size: 0.65rem; font-family: 'Orbitron'; background: #080808; border: 1px solid #222; color: #fff; text-decoration: none; transition: 0.3s; }
+        .social-btn:hover { border-color: var(--neon); background: rgba(0,242,255,0.05); }
         
-        .ads-box { width: 100%; background: #080808; border: 1px dashed #333; padding: 15px; text-align: center; border-radius: 8px; margin: 15px 0; }
+        .ads-box { width: 100%; background: #050505; border: 1px dashed #222; padding: 12px; text-align: center; border-radius: 8px; margin: 15px 0; color: #333; font-family: 'Orbitron'; font-size: 0.6rem; }
         .hidden { display: none !important; }
+
+        /* Obstáculo Neon */
+        .obstacle { position: absolute; bottom: 10px; right: -50px; width: 20px; height: 30px; background: var(--pink); box-shadow: 0 0 15px var(--pink); animation: slide 2s infinite linear; }
+        @keyframes slide { from { right: -50px; } to { right: 300px; } }
     </style>
 </head>
 <body>
 
-    <div class="header">🎮 CENTRAL IA v5.2</div>
+    <div class="header">🎮 CENTRAL IA v5.2.1</div>
 
     <div class="container">
-        <div class="ads-box">
-            <small style="color:#444; display:block; margin-bottom:5px;">PATROCINADO</small>
-            <div style="color:#222; font-family:'Orbitron'; font-size:0.8rem;">ESPAÇO PUBLICITÁRIO 01</div>
-        </div>
+        <div class="ads-box">PUBLICIDADE_TOP_01</div>
 
         <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-family:'Orbitron'; font-size:0.7rem; color:var(--neon);">NÍVEL <span id="u-lvl">1</span></span>
-                <span style="font-size:0.7rem; color:#777;"><span id="u-xp">0</span> / 100 XP</span>
+                <span style="font-family:'Orbitron'; font-size:0.6rem; color:var(--neon);">DATA_SYNC: LVL <span id="u-lvl">1</span></span>
+                <span style="font-size:0.6rem; color:#444;"><span id="u-xp">0.00</span> XP</span>
             </div>
             <div class="level-bar"><div id="lvl-fill" class="level-progress"></div></div>
         </div>
 
-        <div class="card" onclick="openGame('fio')">
+        <div class="card" onclick="openGame('fio')" style="border-left: 4px solid var(--neon);">
             <div style="display: flex; align-items: center; gap: 15px;">
-                <div style="font-size: 1.8rem;">⚡</div>
+                <div style="color:var(--neon); font-size:1.5rem;">⚡</div>
                 <div style="flex-grow: 1;">
-                    <h3 style="font-family: 'Orbitron'; color: var(--neon); font-size: 0.8rem;">DESCRIPTOGRAFAR</h3>
-                    <p style="font-size: 0.65rem; color: #666;">Conecte os fios para ganhar XP.</p>
+                    <h3 style="font-family: 'Orbitron'; color: #fff; font-size: 0.75rem;">DESCRIPTOGRAFAR</h3>
+                    <p style="font-size: 0.6rem; color: #444;">Estabilize a fiação de dados.</p>
                 </div>
-                <div style="color:var(--green); font-size:0.7rem;">+10 XP</div>
+                <div style="color:var(--neon); font-size:0.6rem;">+0.05 XP</div>
             </div>
         </div>
 
-        <div class="card" onclick="openGame('hack')">
+        <div class="card" onclick="openGame('hack')" style="border-left: 4px solid var(--pink);">
             <div style="display: flex; align-items: center; gap: 15px;">
-                <div style="font-size: 1.8rem;">💻</div>
+                <div style="color:var(--pink); font-size:1.5rem;">💻</div>
                 <div style="flex-grow: 1;">
-                    <h3 style="font-family: 'Orbitron'; color: var(--green); font-size: 0.8rem;">HACKEANDO</h3>
-                    <p style="font-size: 0.65rem; color: #666;">Infiltre-se no sistema (Tron Runner).</p>
+                    <h3 style="font-family: 'Orbitron'; color: #fff; font-size: 0.75rem;">HACKEANDO</h3>
+                    <p style="font-size: 0.6rem; color: #444;">Bypass de firewall (Tron).</p>
                 </div>
-                <div style="color:var(--green); font-size:0.7rem;">+R$ 0,05</div>
+                <div style="color:var(--pink); font-size:0.6rem;">+0.01 XP</div>
             </div>
         </div>
 
+        <div class="section-title" style="color:#333; font-size:0.5rem; margin-top:20px;">CONEXÕES EXTERNAS</div>
         <div class="social-grid">
-            <a href="https://facebook.com" target="_blank" class="social-btn">📘</a>
-            <a href="https://instagram.com" target="_blank" class="social-btn">📸</a>
-            <a href="https://tiktok.com" target="_blank" class="social-btn">🎵</a>
+            <a href="https://facebook.com/SEU_USER" target="_blank" class="social-btn">FACEBOOK OFFICIAL</a>
+            <a href="https://instagram.com/SEU_USER" target="_blank" class="social-btn">INSTAGRAM FEED</a>
+            <a href="https://tiktok.com/@SEU_USER" target="_blank" class="social-btn">TIKTOK CHANNEL</a>
         </div>
 
-        <div class="ads-box">
-            <div style="color:#222; font-family:'Orbitron'; font-size:0.8rem;">ESPAÇO PUBLICITÁRIO 02</div>
-            <small style="color:#444; display:block; margin-top:5px;">ADS v5.2</small>
-        </div>
-
-        <button onclick="window.location.href='index.html'" class="btn-outline" style="margin-top: 10px;">SAIR DA CENTRAL</button>
+        <div class="ads-box">PUBLICIDADE_BOT_02</div>
+        <button onclick="window.location.href='index.html'" class="btn-outline" style="margin-top: 10px; font-size: 0.6rem;">RETORNAR AO TERMINAL</button>
     </div>
 
     <div id="game-overlay" class="game-modal hidden">
         <div id="game-content" style="width:100%; display:flex; flex-direction:column; align-items:center;"></div>
-        <button onclick="closeGame()" class="btn-outline" style="width:150px; margin-top:30px;">FECHAR JOGO</button>
+        <button onclick="closeGame()" class="btn-outline" style="width:180px; margin-top:30px; border-color:#444; color:#444;">CANCELAR</button>
     </div>
 
     <script type="module">
@@ -90,28 +92,23 @@
             apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8",
             authDomain: "minharifadigital.firebaseapp.com",
             projectId: "minharifadigital",
-            storageBucket: "minharifadigital.firebasestorage.app",
-            messagingSenderId: "59630725905",
             appId: "1:59630725905:web:396c8cfca385dc3d957ab0"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
-        let user, currentXP = 0;
+        let user;
 
         onAuthStateChanged(auth, (u) => {
             if(u) {
                 user = u;
                 onSnapshot(doc(db, "usuarios", u.uid), (snap) => {
                     const data = snap.data();
-                    currentXP = data.xp || 0;
-                    const level = Math.floor(currentXP / 100) + 1;
-                    const progress = currentXP % 100;
-                    
-                    document.getElementById('u-xp').innerText = currentXP;
-                    document.getElementById('u-lvl').innerText = level;
-                    document.getElementById('lvl-fill').style.width = progress + "%";
+                    const xp = data.xp || 0;
+                    document.getElementById('u-xp').innerText = xp.toFixed(2);
+                    document.getElementById('u-lvl').innerText = Math.floor(xp / 100) + 1;
+                    document.getElementById('lvl-fill').style.width = (xp % 100) + "%";
                 });
             } else { window.location.href = 'login.html'; }
         });
@@ -119,55 +116,49 @@
         window.openGame = (tipo) => {
             const content = document.getElementById('game-content');
             document.getElementById('game-overlay').classList.remove('hidden');
-
             if(tipo === 'fio') {
                 content.innerHTML = `
-                    <h2 style="color:var(--neon); font-family:'Orbitron'; margin-bottom:20px;">FIAÇÃO IA</h2>
+                    <h2 style="color:var(--neon); font-family:'Orbitron'; font-size:0.9rem; margin-bottom:20px;">SYNC_WIRE_NODES</h2>
                     <div class="wire-board">
-                        <div class="wire-node" style="background:#ff0055; top:40px; left:15px;" onclick="connectWire(this)"></div>
-                        <div class="wire-node" style="background:#00f2ff; top:115px; left:15px;" onclick="connectWire(this)"></div>
-                        <div class="wire-node" style="background:#00ff88; top:190px; left:15px;" onclick="connectWire(this)"></div>
-                    </div>
-                    <p id="game-status" style="margin-top:20px; font-size:0.8rem; color:#555;">Conecte todos os terminais</p>
-                `;
+                        <div class="wire-node" style="background:var(--pink); top:40px; left:15px;" onclick="connectWire(this)"></div>
+                        <div class="wire-node" style="background:var(--neon); top:115px; left:15px;" onclick="connectWire(this)"></div>
+                        <div class="wire-node" style="background:var(--green); top:190px; left:15px;" onclick="connectWire(this)"></div>
+                    </div>`;
             } else {
                 content.innerHTML = `
-                    <h2 style="color:var(--green); font-family:'Orbitron';">HACKEANDO...</h2>
-                    <div style="width:200px; height:100px; border:1px solid #222; margin:20px; overflow:hidden; position:relative;">
-                        <div id="runner" style="position:absolute; bottom:10px; left:10px; font-size:1.5rem;">🏃</div>
-                        <div style="position:absolute; bottom:10px; right:-50px; font-size:1.2rem; animation: slide 2s infinite linear;">🚧</div>
+                    <h2 style="color:var(--pink); font-family:'Orbitron'; font-size:0.9rem;">TRON_RUNNER</h2>
+                    <div style="width:260px; height:120px; border:1px solid #111; margin:20px; overflow:hidden; position:relative; background:#020202;">
+                        <div id="runner" style="position:absolute; bottom:10px; left:20px; font-size:1.5rem; transition:0.2s;">🏃</div>
+                        <div class="obstacle"></div>
                     </div>
-                    <button class="btn-primary" onclick="jump()">PULAR OBSTÁCULO</button>
-                    <style> @keyframes slide { from { right: -50px; } to { right: 250px; } } </style>
+                    <button class="btn-primary" onclick="jump()" style="background:var(--pink); border:none; box-shadow:0 0 10px var(--pink);">JUMP_DATA</button>
                 `;
             }
         };
 
-        let wiresConnected = 0;
+        let wires = 0;
         window.connectWire = async (el) => {
             if(el.classList.contains('connected')) return;
             el.classList.add('connected');
-            wiresConnected++;
-            if(wiresConnected === 3) {
-                document.getElementById('game-status').innerText = "CONEXÃO ESTABELECIDA! +10 XP";
-                document.getElementById('game-status').style.color = "var(--green)";
-                await updateDoc(doc(db, "usuarios", user.uid), { xp: increment(10) });
-                setTimeout(closeGame, 1500);
+            wires++;
+            if(wires === 3) {
+                await updateDoc(doc(db, "usuarios", user.uid), { xp: increment(0.05) });
+                closeGame();
             }
         };
 
         window.jump = async () => {
             const runner = document.getElementById('runner');
-            runner.style.bottom = "50px";
+            runner.style.bottom = "60px";
             setTimeout(() => { 
                 runner.style.bottom = "10px";
-                updateDoc(doc(db, "usuarios", user.uid), { saldo: increment(0.01) });
-            }, 300);
+                updateDoc(doc(db, "usuarios", user.uid), { xp: increment(0.01) });
+            }, 350);
         };
 
         window.closeGame = () => {
             document.getElementById('game-overlay').classList.add('hidden');
-            wiresConnected = 0;
+            wires = 0;
         };
     </script>
 </body>
