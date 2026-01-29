@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Trades da IA - RoboSorteio</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        .trade-header { background: #050505; padding: 30px 20px; text-align: center; border-bottom: 2px solid #00f2ff; }
+        .risk-warning { background: rgba(255, 0, 0, 0.1); border: 1px solid #ff0000; padding: 15px; border-radius: 8px; color: #ff4444; font-size: 0.7rem; margin: 20px 0; line-height: 1.4; text-align: justify; }
+        .trade-option { background: #111; border: 1px solid #222; padding: 20px; border-radius: 15px; margin-bottom: 15px; transition: 0.3s; cursor: pointer; position: relative; overflow: hidden; }
+        .trade-option:active { transform: scale(0.98); border-color: var(--neon); }
+        .profit-badge { position: absolute; top: 10px; right: 10px; background: var(--green); color: #000; font-size: 0.6rem; padding: 2px 8px; border-radius: 4px; font-family: 'Orbitron'; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <button onclick="window.location.href='config.html'" style="background:none; border:none; color:var(--neon); font-size:1.2rem; position:absolute; left:15px;">⬅</button>
+        <span>TRADES DA IA</span>
+    </div>
+
+    <div class="trade-header">
+        <h1 style="font-family:'Orbitron'; color:#00f2ff; font-size:1.3rem;">ALGORITMO DE ALTA FREQUÊNCIA</h1>
+        <p style="font-size:0.8rem; color:#666; margin-top:10px;">Deixe nosso Robô operar seu capital em mercados voláteis.</p>
+    </div>
+
+    <div class="container">
+        <div class="risk-warning">
+            <b>⚠️ AVISO DE ALTO RISCO:</b> As operações de trade são executadas por inteligência artificial em mercados de cripto-ativos. 
+            Existe a possibilidade real de perda de capital. Em caso de sucesso, o lucro é de <b>+10%</b>. Em caso de falha, a redução é de <b>-10%</b>. 
+            Não invista valores destinados a necessidades básicas.
+        </div>
+
+        <div class="trade-option" onclick="processarTrade(100)">
+            <span class="profit-badge">RETORNO: R$ 110,00</span>
+            <div style="font-family:'Orbitron'; color:#fff;">APORTE INICIAL</div>
+            <div style="font-size: 1.5rem; color:var(--neon); font-weight:bold;">R$ 100,00</div>
+            <p style="font-size:0.6rem; color:#555; margin-top:5px;">Ciclo de operação: 24 horas</p>
+        </div>
+
+        <div class="trade-option" onclick="processarTrade(200)">
+            <span class="profit-badge">RETORNO: R$ 220,00</span>
+            <div style="font-family:'Orbitron'; color:#fff;">APORTE INTERMEDIÁRIO</div>
+            <div style="font-size: 1.5rem; color:var(--neon); font-weight:bold;">R$ 200,00</div>
+            <p style="font-size:0.6rem; color:#555; margin-top:5px;">Ciclo de operação: 24 horas</p>
+        </div>
+
+        <div class="trade-option" onclick="processarTrade(300)">
+            <span class="profit-badge">RETORNO: R$ 330,00</span>
+            <div style="font-family:'Orbitron'; color:#fff;">APORTE AVANÇADO</div>
+            <div style="font-size: 1.5rem; color:var(--neon); font-weight:bold;">R$ 300,00</div>
+            <p style="font-size:0.6rem; color:#555; margin-top:5px;">Ciclo de operação: 24 horas</p>
+        </div>
+
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8",
+            authDomain: "minharifadigital.firebaseapp.com",
+            projectId: "minharifadigital",
+            storageBucket: "minharifadigital.firebasestorage.app",
+            messagingSenderId: "59630725905",
+            appId: "1:59630725905:web:396c8cfca385dc3d957ab0"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        window.processarTrade = (valor) => {
+            const confirmar = confirm(`Deseja iniciar a operação de R$ ${valor},00?\n\nVocê será redirecionado para o pagamento PIX.`);
+            if(confirmar) {
+                // Simulação de redirecionamento para pagamento (mesma lógica da rifa)
+                alert("Gerando chave PIX para aporte de R$ " + valor.toFixed(2));
+                // window.location.href = 'link-do-seu-pix-ou-checkout';
+            }
+        };
+    </script>
+</body>
+</html>
