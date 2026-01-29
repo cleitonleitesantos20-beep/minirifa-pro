@@ -3,119 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Configurações IA - Master</title>
+    <title>Configurações IA</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --dark: #0a0a0a; --card: #111; }
         body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; padding: 0; min-height: 100vh; overflow-y: auto; }
         
-        /* HEADER */
-        .header { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #222; position: sticky; top: 0; background: rgba(0,0,0,0.9); z-index: 100; backdrop-filter: blur(10px); }
-        .btn-nav { background: none; border: 1px solid var(--neon); color: var(--neon); padding: 6px 15px; border-radius: 5px; font-family: 'Orbitron'; cursor: pointer; font-size: 0.6rem; transition: 0.3s; }
-        .btn-nav:hover { background: var(--neon); color: #000; }
+        .header { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #222; position: sticky; top: 0; background: #000; z-index: 100; }
+        .btn-nav { background: none; border: 1px solid var(--neon); color: var(--neon); padding: 6px 15px; border-radius: 5px; font-family: 'Orbitron'; cursor: pointer; font-size: 0.6rem; }
 
         .container { padding: 20px; padding-bottom: 60px; max-width: 500px; margin: 0 auto; }
 
-        /* PERFIL DASHBOARD */
-        .profile-hero { text-align: center; padding: 30px 20px; background: radial-gradient(circle at top, #111 0%, #000 100%); border-radius: 25px; border: 1px solid #1a1a1a; margin-bottom: 25px; position: relative; overflow: hidden; }
-        .profile-hero::after { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(var(--neon), transparent 70%); opacity: 0.05; pointer-events: none; }
+        /* PERFIL COM SELETOR DE EMOJI */
+        .profile-hero { text-align: center; padding: 25px; background: var(--card); border-radius: 25px; border: 1px solid #1a1a1a; margin-bottom: 25px; }
+        .avatar-main { width: 90px; height: 90px; background: #000; border: 2px solid var(--neon); border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; cursor: pointer; position: relative; }
+        .avatar-edit-badge { position: absolute; bottom: 0; right: 0; background: var(--neon); color: #000; font-size: 0.5rem; padding: 3px 6px; border-radius: 10px; font-family: 'Orbitron'; }
         
-        .avatar-circle { width: 90px; height: 90px; background: #000; border: 2px solid var(--neon); border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: var(--neon); box-shadow: 0 0 20px rgba(0,242,255,0.15); }
-        .profile-hero h2 { margin: 5px 0; font-family: 'Orbitron'; font-size: 1.3rem; letter-spacing: 1px; }
-        .balance-main { font-size: 2.2rem; font-weight: 700; color: var(--green); margin: 10px 0; text-shadow: 0 0 10px rgba(0,255,136,0.2); }
+        .emoji-picker { display: none; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 15px; background: #080808; padding: 10px; border-radius: 15px; border: 1px solid #222; }
+        .emoji-option { font-size: 1.5rem; cursor: pointer; padding: 5px; border-radius: 8px; transition: 0.2s; }
+        .emoji-option:hover { background: #1a1a1a; transform: scale(1.2); }
 
-        /* SEÇÕES */
+        .balance-main { font-size: 2.2rem; font-weight: 700; color: var(--green); margin: 5px 0; }
         .section-title { font-family: 'Orbitron'; font-size: 0.7rem; color: var(--neon); margin: 25px 0 15px; display: block; letter-spacing: 2px; text-transform: uppercase; }
-        
-        /* GESTÃO DE TRADES IA */
-        .asset-card { background: var(--card); border-radius: 15px; padding: 15px; border-left: 4px solid var(--pink); box-shadow: 10px 0 20px rgba(0,0,0,0.5); }
-        .trade-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #1a1a1a; }
-        .trade-row:last-child { border: none; }
-        .trade-info b { font-family: 'Orbitron'; font-size: 0.75rem; color: #eee; }
-        .trade-info small { color: #666; display: block; margin-top: 2px; }
-        .trade-status { font-family: 'Orbitron'; font-size: 0.55rem; padding: 4px 8px; border-radius: 4px; background: rgba(255,0,85,0.1); color: var(--pink); }
 
-        /* FORMULÁRIOS */
-        .box-dark { background: #080808; border: 1px solid #1a1a1a; padding: 20px; border-radius: 18px; }
-        .input-dark { width: 100%; background: #000; border: 1px solid #222; color: #fff; padding: 14px; border-radius: 10px; margin-bottom: 15px; font-family: 'Rajdhani'; font-size: 1rem; box-sizing: border-box; transition: 0.3s; }
-        .input-dark:focus { border-color: var(--neon); outline: none; }
+        /* BOXES */
+        .box-dark { background: #080808; border: 1px solid #1a1a1a; padding: 20px; border-radius: 18px; margin-bottom: 20px; }
+        .input-dark { width: 100%; background: #000; border: 1px solid #222; color: #fff; padding: 14px; border-radius: 10px; margin-bottom: 15px; font-family: 'Rajdhani'; font-size: 1rem; box-sizing: border-box; }
         
-        .btn-action { width: 100%; border: none; padding: 16px; border-radius: 10px; font-family: 'Orbitron'; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 0.8rem; }
-        .btn-withdraw { background: var(--green); color: #000; }
-        .btn-withdraw:disabled { background: #222; color: #444; cursor: not-allowed; }
+        .btn-action { width: 100%; border: none; padding: 16px; border-radius: 10px; font-family: 'Orbitron'; font-weight: bold; cursor: pointer; font-size: 0.8rem; background: var(--green); color: #000; }
 
-        /* SOCIAL E FEEDBACK */
         .social-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .social-btn { background: #0a0a0a; border: 1px solid #222; padding: 12px; border-radius: 10px; text-align: center; color: #fff; text-decoration: none; font-size: 0.75rem; font-family: 'Orbitron'; transition: 0.3s; }
-        .social-btn:hover { border-color: var(--neon); background: rgba(0,242,255,0.05); }
+        .social-btn { background: #0a0a0a; border: 1px solid #222; padding: 12px; border-radius: 10px; text-align: center; color: #fff; text-decoration: none; font-size: 0.75rem; font-family: 'Orbitron'; }
         
         .feedback-area { width: 100%; background: #000; border: 1px solid #222; color: #fff; padding: 15px; border-radius: 10px; min-height: 100px; font-family: 'Rajdhani'; margin-bottom: 12px; box-sizing: border-box; resize: none; }
-
-        .btn-logout { width: 100%; background: none; border: 1px solid #333; color: #666; padding: 14px; border-radius: 10px; font-family: 'Orbitron'; font-size: 0.7rem; cursor: pointer; margin-top: 30px; transition: 0.3s; }
-        .btn-logout:hover { border-color: var(--pink); color: var(--pink); }
-
-        .invite-box { background: rgba(0,242,255,0.03); border: 1px dashed #222; padding: 20px; border-radius: 18px; text-align: center; }
+        .btn-logout { width: 100%; background: none; border: 1px solid #333; color: #666; padding: 14px; border-radius: 10px; font-family: 'Orbitron'; font-size: 0.7rem; cursor: pointer; margin-top: 30px; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <button class="btn-nav" onclick="window.location.href='central.html'">⬅ VOLTAR</button>
-        <span style="font-family:'Orbitron'; font-size:0.55rem; color:#555; letter-spacing:1px;">SYSTEM CONFIG v5.1.1</span>
+        <span style="font-family:'Orbitron'; font-size:0.55rem; color:#555;">SYSTEM CONFIG v5.1.2</span>
     </div>
 
     <div class="container">
         
         <div class="profile-hero">
-            <div class="avatar-circle">👤</div>
-            <h2 id="u-nome">CARREGANDO...</h2>
+            <div class="avatar-main" onclick="toggleEmojiPicker()" id="current-emoji">
+                👤
+                <div class="avatar-edit-badge">EDIT</div>
+            </div>
+            <div class="emoji-picker" id="emoji-list">
+                <span class="emoji-option" onclick="updateEmoji('👤')">👤</span>
+                <span class="emoji-option" onclick="updateEmoji('🤖')">🤖</span>
+                <span class="emoji-option" onclick="updateEmoji('⚡')">⚡</span>
+                <span class="emoji-option" onclick="updateEmoji('🐱‍💻')">🐱‍💻</span>
+                <span class="emoji-option" onclick="updateEmoji('💎')">💎</span>
+                <span class="emoji-option" onclick="updateEmoji('🔥')">🔥</span>
+                <span class="emoji-option" onclick="updateEmoji('🚀')">🚀</span>
+                <span class="emoji-option" onclick="updateEmoji('🧬')">🧬</span>
+                <span class="emoji-option" onclick="updateEmoji('🕶️')">🕶️</span>
+                <span class="emoji-option" onclick="updateEmoji('👑')">👑</span>
+            </div>
+            <h2 id="u-nome" style="font-family:'Orbitron'; margin: 10px 0;">...</h2>
             <div class="balance-main">R$ <span id="u-saldo">0,00</span></div>
-            <div style="font-size: 0.65rem; color: #444; font-family:'Orbitron';">DISPONÍVEL PARA RESGATE</div>
         </div>
 
-        <span class="section-title">IA Trading & Ativos</span>
-        <div class="asset-card">
-            <div class="trade-row">
-                <div class="trade-info"><b>BTC / USDT</b><small>Análise de Volatilidade</small></div>
-                <div class="trade-status">ATIVO</div>
-            </div>
-            <div class="trade-row">
-                <div class="trade-info"><b>MARKET SENTIMENT</b><small>Tendência de Alta</small></div>
-                <div class="trade-status" style="color:var(--green); background:rgba(0,255,136,0.1);">ESTÁVEL</div>
-            </div>
-        </div>
-
-        <span class="section-title">Solicitar Resgate</span>
+        <span class="section-title">Financeiro</span>
         <div class="box-dark">
-            <input type="text" id="pix-key" class="input-dark" placeholder="Sua Chave PIX (CPF, Celular...)">
-            <button class="btn-action btn-withdraw" id="btn-saque-exec" onclick="solicitarSaque()">SOLICITAR PIX (MÍN. R$ 50)</button>
-            <div style="font-size: 0.6rem; color: #444; text-align: center; margin-top: 15px; line-height: 1.5;">
-                Saques liberados apenas no <b>último dia do mês</b>.<br>
-                Taxa de processamento de rede: R$ 0,00.
-            </div>
+            <input type="text" id="pix-key" class="input-dark" placeholder="Chave PIX para Recebimento">
+            <button class="btn-action" onclick="solicitarSaque()">SOLICITAR RESGATE (PIX)</button>
+            <div style="font-size: 0.6rem; color: #444; text-align: center; margin-top: 10px;">Mínimo R$ 50,00 | Apenas último dia do mês</div>
         </div>
 
-        <span class="section-title">Rede de Afiliados</span>
-        <div class="invite-box">
-            <div style="font-size: 0.9rem; margin-bottom: 12px; font-family:'Orbitron'">Indicados: <span id="u-indicados" style="color:var(--neon)">0</span></div>
-            <button class="btn-nav" style="width:100%; padding:12px;" onclick="copyLink()">COPIAR LINK ÚNICO</button>
+        <span class="section-title">Indicações</span>
+        <div class="box-dark" style="text-align: center;">
+            <div style="font-size: 0.9rem; margin-bottom: 12px; font-family:'Orbitron'">Total Indicados: <span id="u-indicados" style="color:var(--neon)">0</span></div>
+            <button class="btn-nav" style="width:100%; padding:12px;" onclick="copyLink()">COPIAR MEU LINK</button>
         </div>
 
-        <span class="section-title">Canais Oficiais</span>
+        <span class="section-title">Comunidade</span>
         <div class="social-grid">
-            <a href="https://instagram.com" target="_blank" class="social-btn">INSTAGRAM</a>
-            <a href="https://t.me" target="_blank" class="social-btn">TELEGRAM</a>
-            <a href="https://facebook.com" target="_blank" class="social-btn">FACEBOOK</a>
-            <a href="https://tiktok.com" target="_blank" class="social-btn">TIKTOK</a>
+            <a href="#" class="social-btn">INSTAGRAM</a>
+            <a href="#" class="social-btn">TELEGRAM</a>
+            <a href="#" class="social-btn">FACEBOOK</a>
+            <a href="#" class="social-btn">TIKTOK</a>
         </div>
 
-        <span class="section-title">Feedback do Operador</span>
+        <span class="section-title">Suporte & Feedback</span>
         <div class="box-dark">
-            <textarea class="feedback-area" id="user-feedback" placeholder="Relate bugs ou sugira melhorias para a IA..."></textarea>
-            <button class="btn-nav" style="width:100%; border-color:var(--green); color:var(--green)" onclick="enviarFeedback()">ENVIAR RELATÓRIO TÉCNICO</button>
+            <textarea class="feedback-area" id="user-feedback" placeholder="Mensagem para a equipe..."></textarea>
+            <button class="btn-nav" style="width:100%; border-color:var(--green); color:var(--green)" onclick="enviarFeedback()">ENVIAR FEEDBACK</button>
         </div>
 
-        <button class="btn-logout" id="btn-sair">ENCERRAR SESSÃO</button>
+        <button class="btn-logout" id="btn-sair">SAIR DA CONTA</button>
 
     </div>
 
@@ -143,70 +124,54 @@
                     document.getElementById('u-saldo').innerText = userSaldo.toLocaleString('pt-br', {minimumFractionDigits: 2});
                     document.getElementById('u-indicados').innerText = d.indicadosCount || 0;
                     if(d.pixPadrao) document.getElementById('pix-key').value = d.pixPadrao;
+                    if(d.avatarEmoji) document.getElementById('current-emoji').childNodes[0].textContent = d.avatarEmoji;
                 });
-            } else {
-                window.location.href = "index.html";
-            }
+            } else { window.location.href = "index.html"; }
         });
 
-        // Lógica de Saque com bloqueio de data
+        // Alternar visualização do seletor de emoji
+        window.toggleEmojiPicker = () => {
+            const picker = document.getElementById('emoji-list');
+            picker.style.display = picker.style.display === 'grid' ? 'none' : 'grid';
+        };
+
+        // Salvar emoji escolhido no Firebase
+        window.updateEmoji = async (emoji) => {
+            await updateDoc(doc(db, "usuarios", currentUser.uid), { avatarEmoji: emoji });
+            toggleEmojiPicker();
+        };
+
         window.solicitarSaque = async () => {
             const pix = document.getElementById('pix-key').value;
             const now = new Date();
             const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-            const isLastDay = now.getDate() === lastDay;
-
-            if (userSaldo < 50) {
-                alert("ACESSO NEGADO: Saldo insuficiente (Mínimo R$ 50,00).");
+            if (userSaldo < 50 || now.getDate() !== lastDay) {
+                alert("Condições não atendidas (Saldo ou Data).");
                 return;
             }
-            if (!isLastDay) {
-                alert(`SISTEMA BLOQUEADO: Saques permitidos apenas no dia ${lastDay} deste mês.`);
-                return;
-            }
-            if (pix.length < 5) {
-                alert("ERRO: Chave PIX inválida.");
-                return;
-            }
-
-            // Salva a chave PIX no perfil para facilitar o próximo saque
             await updateDoc(doc(db, "usuarios", currentUser.uid), { pixPadrao: pix });
-            alert("SOLICITAÇÃO ENVIADA: O valor entrará em análise e será pago em até 24h.");
+            alert("Solicitação registrada.");
         };
 
-        // Lógica de Feedback (Grava no Firestore)
         window.enviarFeedback = async () => {
             const texto = document.getElementById('user-feedback').value;
-            if (texto.length < 10) {
-                alert("ERRO: O feedback deve ser mais detalhado.");
-                return;
-            }
-
-            try {
-                const feedbackRef = doc(collection(db, "feedbacks"));
-                await setDoc(feedbackRef, {
-                    uid: currentUser.uid,
-                    nome: document.getElementById('u-nome').innerText,
-                    mensagem: texto,
-                    data: serverTimestamp()
-                });
-                alert("RELATÓRIO ENVIADO: Agradecemos sua contribuição!");
-                document.getElementById('user-feedback').value = "";
-            } catch (e) {
-                alert("Erro ao enviar. Tente novamente.");
-            }
+            if (texto.length < 10) return;
+            await setDoc(doc(collection(db, "feedbacks")), {
+                uid: currentUser.uid,
+                mensagem: texto,
+                data: serverTimestamp()
+            });
+            alert("Feedback enviado!");
+            document.getElementById('user-feedback').value = "";
         };
 
         window.copyLink = () => {
-            const link = `https://seusite.com/register?ref=${currentUser.uid}`;
-            navigator.clipboard.writeText(link);
-            alert("LINK COPIADO: Comece a convidar para aumentar seus lucros.");
+            navigator.clipboard.writeText(`https://seusite.com/register?ref=${currentUser.uid}`);
+            alert("Link copiado!");
         };
 
         document.getElementById('btn-sair').addEventListener('click', () => {
-            if(confirm("Deseja realmente encerrar a sessão técnica?")) {
-                signOut(auth).then(() => window.location.href = "index.html");
-            }
+            signOut(auth).then(() => window.location.href = "index.html");
         });
     </script>
 </body>
