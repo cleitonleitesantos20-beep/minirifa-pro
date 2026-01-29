@@ -7,7 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --gold: #ffcc00; --dark: #0a0a0a; --bg-card: #080808; }
-        
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; padding: 0; min-height: 100vh; display: flex; flex-direction: column; }
 
@@ -18,36 +17,32 @@
 
         .container { padding: 20px; max-width: 450px; margin: 0 auto; width: 100%; flex-grow: 1; }
 
-        /* SELEÇÃO DE MÉTODO */
+        /* SALDO DISPLAY */
+        .balance-card { background: var(--bg-card); border: 1px solid #1a1a1a; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 20px; }
+        .balance-label { font-family: 'Orbitron'; font-size: 0.6rem; color: #444; letter-spacing: 2px; }
+        .balance-value { font-family: 'Orbitron'; font-size: 1.5rem; color: var(--green); margin-top: 5px; }
+
+        /* TABS */
         .method-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab { flex: 1; padding: 15px; border-radius: 12px; border: 1px solid #1a1a1a; background: #0a0a0a; text-align: center; font-family: 'Orbitron'; font-size: 0.6rem; cursor: pointer; position: relative; overflow: hidden; }
+        .tab { flex: 1; padding: 15px; border-radius: 12px; border: 1px solid #1a1a1a; background: #0a0a0a; text-align: center; font-family: 'Orbitron'; font-size: 0.55rem; cursor: pointer; position: relative; overflow: hidden; }
         .tab.active { border-color: var(--neon); color: var(--neon); background: rgba(0,242,255,0.05); }
-        .tab.locked { opacity: 0.5; cursor: not-allowed; border-color: #333; color: #555; }
-        .tab.locked::after { content: 'BLOQUEADO'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg); background: var(--pink); color: #fff; font-size: 0.4rem; padding: 2px 5px; border-radius: 3px; }
+        .tab.locked { opacity: 0.4; cursor: not-allowed; color: #555; }
+        .tab.locked::after { content: 'LOCK'; position: absolute; top: 5px; right: 5px; color: var(--pink); font-size: 0.4rem; }
 
-        /* INPUT DE VALOR */
+        /* INPUT AREA */
         .input-group { background: var(--bg-card); border: 1px solid #1a1a1a; padding: 20px; border-radius: 20px; margin-bottom: 20px; }
-        .input-label { font-family: 'Orbitron'; font-size: 0.6rem; color: #444; letter-spacing: 2px; margin-bottom: 15px; display: block; text-align: center; }
         .amount-input { width: 100%; background: #000; border: 1px solid #222; padding: 20px; border-radius: 15px; color: var(--green); font-family: 'Orbitron'; font-size: 1.5rem; text-align: center; }
-        .min-warning { color: var(--pink); font-size: 0.55rem; font-family: 'Orbitron'; display: block; margin-top: 10px; text-align: center; letter-spacing: 1px; }
+        .min-warning { color: var(--pink); font-size: 0.55rem; font-family: 'Orbitron'; display: block; margin-top: 10px; text-align: center; }
 
-        /* BOTÕES RÁPIDOS */
         .quick-amounts { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 25px; }
         .btn-quick { background: #080808; border: 1px solid #1a1a1a; padding: 12px; border-radius: 12px; color: #fff; font-family: 'Orbitron'; font-size: 0.65rem; cursor: pointer; }
-        .btn-quick:active { background: var(--neon); color: #000; }
 
-        /* BOTÃO AÇÃO */
-        .btn-generate { width: 100%; background: linear-gradient(90deg, #00f2ff, #00ff88); border: none; padding: 22px; border-radius: 20px; color: #000; font-family: 'Orbitron'; font-size: 0.85rem; font-weight: bold; cursor: pointer; letter-spacing: 2px; box-shadow: 0 0 20px rgba(0,255,136,0.1); }
-        .btn-generate:disabled { background: #111; color: #333; box-shadow: none; }
+        .btn-generate { width: 100%; background: linear-gradient(90deg, #00f2ff, #00ff88); border: none; padding: 22px; border-radius: 20px; color: #000; font-family: 'Orbitron'; font-size: 0.85rem; font-weight: bold; cursor: pointer; letter-spacing: 2px; }
 
-        /* PIX DISPLAY */
-        .pix-area { display: none; margin-top: 25px; background: #fff; padding: 25px; border-radius: 25px; text-align: center; animation: slideUp 0.4s ease; }
-        .pix-qr { width: 180px; height: 180px; margin: 0 auto 20px; }
-        .copy-box { background: #f5f5f5; border: 1px dashed #ddd; padding: 12px; border-radius: 10px; color: #666; font-family: monospace; font-size: 0.65rem; word-break: break-all; margin-bottom: 15px; }
-        .btn-copy { width: 100%; background: #000; color: #fff; border: none; padding: 15px; border-radius: 10px; font-family: 'Orbitron'; font-size: 0.7rem; cursor: pointer; }
-
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .footer-secure { text-align: center; padding: 20px; font-family: 'Orbitron'; font-size: 0.5rem; color: #222; letter-spacing: 2px; }
+        /* PIX AREA */
+        .pix-area { display: none; margin-top: 25px; background: #fff; padding: 25px; border-radius: 25px; text-align: center; color: #000; }
+        .copy-box { background: #f0f0f0; padding: 10px; border-radius: 10px; font-family: monospace; font-size: 0.6rem; word-break: break-all; margin: 15px 0; border: 1px dashed #ccc; }
+        .btn-copy { width: 100%; background: #000; color: #fff; border: none; padding: 15px; border-radius: 10px; font-family: 'Orbitron'; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -60,72 +55,94 @@
 
     <div class="container">
         
+        <div class="balance-card">
+            <div class="balance-label">SALDO ATUAL</div>
+            <div class="balance-value">R$ <span id="u-saldo">0,00</span></div>
+        </div>
+
         <div class="method-tabs">
-            <div class="tab active">PIX INSTANTÂNEO</div>
-            <div class="tab locked">CARTÃO CRÉDITO</div>
+            <div class="tab active">PIX (AUTO-TESTE)</div>
+            <div class="tab locked">CARTÃO</div>
         </div>
 
         <div class="input-group">
-            <label class="input-label">VALOR PARA RECARGA</label>
-            <input type="number" id="deposit-amount" class="amount-input" placeholder="0.00" min="5">
-            <span class="min-warning">DEPÓSITO MÍNIMO: R$ 5,00</span>
+            <input type="number" id="deposit-amount" class="amount-input" placeholder="0.00">
+            <span class="min-warning">MÍNIMO PARA TESTE: R$ 5,00</span>
         </div>
 
         <div class="quick-amounts">
             <button class="btn-quick" onclick="setAmount(10)">R$ 10</button>
-            <button class="btn-quick" onclick="setAmount(20)">R$ 20</button>
             <button class="btn-quick" onclick="setAmount(50)">R$ 50</button>
+            <button class="btn-quick" onclick="setAmount(100)">R$ 100</button>
         </div>
 
-        <button class="btn-generate" id="main-btn" onclick="generateDeposit()">GERAR PAGAMENTO</button>
+        <button class="btn-generate" id="main-btn" onclick="generateDeposit()">CONFIRMAR DEPÓSITO</button>
 
         <div id="pix-area" class="pix-area">
-            <div class="pix-qr">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=PAY-NEXUS-PIX-EXEMPLE" alt="QR Code" style="width:100%">
-            </div>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=NEXUS-S-TEST-PAY" alt="QR Code">
             <div class="copy-box" id="pix-string">00020126360014BR.GOV.BCB.PIX0114NEXUS624DEP5...</div>
-            <button class="btn-copy" onclick="copyPix()">COPIAR CHAVE PIX</button>
+            <button class="btn-copy" onclick="copyPix()">COPIAR E FINALIZAR</button>
         </div>
 
     </div>
 
-    <div class="footer-secure">
-        GATEWAY DE PAGAMENTO CRIPTOGRAFADO<br>SISTEMA NEXUS S - V8.1.0
-    </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, increment } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-    <script>
-        // Função para definir valores rápidos
-        function setAmount(val) {
-            document.getElementById('deposit-amount').value = val;
-        }
+        const firebaseConfig = { 
+            apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", 
+            authDomain: "minharifadigital.firebaseapp.com", 
+            projectId: "minharifadigital", 
+            appId: "1:59630725905:web:396c8cfca385dc3d957ab0" 
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
 
-        // Função para gerar o depósito com validação
-        function generateDeposit() {
+        let userUID = null;
+
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                userUID = user.uid;
+                onSnapshot(doc(db, "usuarios", user.uid), snap => {
+                    if(snap.exists()) {
+                        document.getElementById('u-saldo').innerText = (snap.data().saldo || 0).toLocaleString('pt-br', {minimumFractionDigits: 2});
+                    }
+                });
+            } else { window.location.href = "login.html"; }
+        });
+
+        window.setAmount = (val) => document.getElementById('deposit-amount').value = val;
+
+        window.generateDeposit = async () => {
             const amount = parseFloat(document.getElementById('deposit-amount').value);
-            
-            if (isNaN(amount) || amount < 5) {
-                alert("O valor mínimo para depósito é R$ 5,00");
-                return;
-            }
+            if (isNaN(amount) || amount < 5) return alert("Valor mínimo: R$ 5,00");
 
-            // Simulação de geração
             const btn = document.getElementById('main-btn');
-            btn.innerText = "PROCESSANDO...";
+            btn.innerText = "ATUALIZANDO SALDO...";
             btn.disabled = true;
 
-            setTimeout(() => {
-                document.getElementById('pix-area').style.display = 'block';
-                btn.innerText = "GERAR NOVO PAGAMENTO";
+            try {
+                if (userUID) {
+                    await updateDoc(doc(db, "usuarios", userUID), {
+                        saldo: increment(amount)
+                    });
+                    document.getElementById('pix-area').style.display = 'block';
+                    btn.innerText = "SALDO CREDITADO!";
+                }
+            } catch (e) {
+                alert("Erro ao processar.");
                 btn.disabled = false;
-                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-            }, 1000);
-        }
+            }
+        };
 
-        function copyPix() {
-            const code = document.getElementById('pix-string').innerText;
-            navigator.clipboard.writeText(code);
-            alert("Código PIX copiado com sucesso!");
-        }
+        window.copyPix = () => {
+            navigator.clipboard.writeText(document.getElementById('pix-string').innerText);
+            alert("Sucesso! Saldo adicionado para testes.");
+        };
     </script>
 </body>
 </html>
