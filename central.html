@@ -3,79 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Minigames $$$ - v5.1</title>
+    <title>IA - Central de Operações v5.2</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        .beta-header { background: #ffaa00; color: #000; font-size: 0.6rem; padding: 4px; font-weight: bold; text-align: center; width: 100%; border-radius: 4px; margin-bottom: 10px; }
+        .level-bar { width: 100%; height: 8px; background: #222; border-radius: 4px; margin-top: 10px; overflow: hidden; }
+        .level-progress { height: 100%; background: var(--neon); width: 0%; transition: 0.5s; box-shadow: 0 0 10px var(--neon); }
         
-        /* Patrocinadores */
-        .ads-frame { width: 100%; height: 60px; border: 1px dashed #333; display: flex; align-items: center; justify-content: center; color: #444; font-size: 0.7rem; font-family: 'Orbitron'; background: #0a0a0a; border-radius: 8px; margin: 10px 0; }
-
-        /* XP e Nível */
-        .xp-container { position: relative; margin-top: 15px; }
-        .xp-bar-bg { background: #000; height: 12px; border-radius: 10px; border: 1px solid var(--neon); overflow: hidden; }
-        .xp-bar-fill { background: linear-gradient(90deg, var(--neon), #00ff88); height: 100%; width: 0%; transition: 0.5s; box-shadow: 0 0 10px var(--neon); }
-        .bonus-tag { position: absolute; right: 0; top: -18px; color: var(--green); font-size: 0.7rem; font-weight: bold; }
-
-        /* Jogo TRON RUNNER */
-        #game-canvas { width: 100%; height: 140px; background: #000; border: 2px solid var(--neon); border-radius: 10px; position: relative; overflow: hidden; display: none; box-shadow: inset 0 0 20px rgba(0,242,255,0.2); }
-        .grid-bg { position: absolute; width: 100%; height: 100%; background-image: linear-gradient(rgba(0,242,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,242,255,0.1) 1px, transparent 1px); background-size: 20px 20px; }
-        #cube { position: absolute; bottom: 0; left: 40px; width: 20px; height: 20px; background: #00f2ff; box-shadow: 0 0 15px #00f2ff; border: 1px solid #fff; z-index: 2; transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .obstacle { position: absolute; bottom: 0; right: -25px; width: 15px; height: 35px; background: #ff0055; box-shadow: 0 0 10px #ff0055; z-index: 2; }
-
-        .scratch-area { width: 100%; height: 60px; background: #111; border: 1px solid #333; display: flex; align-items: center; justify-content: center; border-radius: 10px; cursor: pointer; color: #555; }
-        .scratch-active { animation: shake 0.3s infinite; background: var(--neon) !important; color: #000 !important; font-weight: bold; }
-        @keyframes shake { 0%{transform:translate(1px,1px)} 50%{transform:translate(-2px,-1px)} 100%{transform:translate(1px,1px)} }
-
-        button:disabled { opacity: 0.3; filter: grayscale(1); pointer-events: none; }
+        .game-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .wire-board { width: 280px; height: 250px; background: #0a0a0a; border: 2px solid #333; border-radius: 10px; position: relative; }
+        .wire-node { width: 45px; height: 15px; border-radius: 4px; position: absolute; cursor: pointer; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .wire-node.connected { transform: translateX(200px); box-shadow: 0 0 15px currentColor; }
+        
+        .social-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
+        .social-btn { padding: 12px; border-radius: 8px; text-align: center; font-size: 1.2rem; background: #111; border: 1px solid #333; color: #fff; text-decoration: none; }
+        
+        .ads-box { width: 100%; background: #080808; border: 1px dashed #333; padding: 15px; text-align: center; border-radius: 8px; margin: 15px 0; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div class="header">⚙️ MINIGAMES $$$</div>
+    <div class="header">🎮 CENTRAL IA v5.2</div>
 
     <div class="container">
-        <div class="beta-header">SISTEMA v5.1 ATIVO</div>
-        
-        <div class="ads-frame">ANUNCIE AQUI (TOPO)</div>
-
-        <button onclick="window.location.href='index.html'" class="btn-small" style="float:none; margin-bottom: 20px;">⬅ VOLTAR</button>
+        <div class="ads-box">
+            <small style="color:#444; display:block; margin-bottom:5px;">PATROCINADO</small>
+            <div style="color:#222; font-family:'Orbitron'; font-size:0.8rem;">ESPAÇO PUBLICITÁRIO 01</div>
+        </div>
 
         <div class="card">
-            <h2 style="font-family: 'Orbitron'; font-size: 1rem;">NÍVEL <span id="lvl-display">1</span></h2>
-            <div class="xp-container">
-                <span class="bonus-tag">+ R$ 0,10</span>
-                <div class="xp-bar-bg">
-                    <div id="xp-bar" class="xp-bar-fill"></div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-family:'Orbitron'; font-size:0.7rem; color:var(--neon);">NÍVEL <span id="u-lvl">1</span></span>
+                <span style="font-size:0.7rem; color:#777;"><span id="u-xp">0</span> / 100 XP</span>
+            </div>
+            <div class="level-bar"><div id="lvl-fill" class="level-progress"></div></div>
+        </div>
+
+        <div class="card" onclick="openGame('fio')">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div style="font-size: 1.8rem;">⚡</div>
+                <div style="flex-grow: 1;">
+                    <h3 style="font-family: 'Orbitron'; color: var(--neon); font-size: 0.8rem;">DESCRIPTOGRAFAR</h3>
+                    <p style="font-size: 0.65rem; color: #666;">Conecte os fios para ganhar XP.</p>
                 </div>
+                <div style="color:var(--green); font-size:0.7rem;">+10 XP</div>
             </div>
-            <p id="xp-status" style="font-size: 0.6rem; color: #666; margin-top: 5px; text-align: center;">0.0000/100 XP</p>
         </div>
 
-        <div class="card">
-            <h4>🏃 TRON RUNNER (+0.0001 XP/BLOCO)</h4>
-            <div id="game-canvas">
-                <div class="grid-bg"></div>
-                <div id="cube"></div>
+        <div class="card" onclick="openGame('hack')">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div style="font-size: 1.8rem;">💻</div>
+                <div style="flex-grow: 1;">
+                    <h3 style="font-family: 'Orbitron'; color: var(--green); font-size: 0.8rem;">HACKEANDO</h3>
+                    <p style="font-size: 0.65rem; color: #666;">Infiltre-se no sistema (Tron Runner).</p>
+                </div>
+                <div style="color:var(--green); font-size:0.7rem;">+R$ 0,05</div>
             </div>
-            <button id="btn-game" onclick="startGame()" class="btn-primary">INICIAR PARTIDA</button>
-            <p id="game-score" style="font-size: 0.6rem; color: var(--neon); margin-top: 5px; text-align: center;"></p>
         </div>
 
-        <div class="card">
-            <h4>🎰 RASPADINHA (+0.05 XP)</h4>
-            <div id="scratch-box" class="scratch-area" onclick="playScratch()">CLIQUE PARA RASPAR</div>
+        <div class="social-grid">
+            <a href="https://facebook.com" target="_blank" class="social-btn">📘</a>
+            <a href="https://instagram.com" target="_blank" class="social-btn">📸</a>
+            <a href="https://tiktok.com" target="_blank" class="social-btn">🎵</a>
         </div>
 
-        <div class="card">
-            <h4>📱 MISSÕES SOCIAIS (+0.25 XP)</h4>
-            <button id="ad-ins" onclick="visitAd('https://instagram.com/', 'lastIns')" class="btn-outline" style="width:100%; margin-bottom:8px; font-size: 0.7rem;">INSTAGRAM</button>
-            <button id="ad-tik" onclick="visitAd('https://tiktok.com/', 'lastTik')" class="btn-outline" style="width:100%; margin-bottom:8px; font-size: 0.7rem;">TIKTOK</button>
-            <button id="ad-fac" onclick="visitAd('https://facebook.com/', 'lastFac')" class="btn-outline" style="width:100%; font-size: 0.7rem;">FACEBOOK</button>
+        <div class="ads-box">
+            <div style="color:#222; font-family:'Orbitron'; font-size:0.8rem;">ESPAÇO PUBLICITÁRIO 02</div>
+            <small style="color:#444; display:block; margin-top:5px;">ADS v5.2</small>
         </div>
 
-        <div class="ads-frame">ANUNCIE AQUI (RODAPÉ)</div>
+        <button onclick="window.location.href='index.html'" class="btn-outline" style="margin-top: 10px;">SAIR DA CENTRAL</button>
+    </div>
+
+    <div id="game-overlay" class="game-modal hidden">
+        <div id="game-content" style="width:100%; display:flex; flex-direction:column; align-items:center;"></div>
+        <button onclick="closeGame()" class="btn-outline" style="width:150px; margin-top:30px;">FECHAR JOGO</button>
     </div>
 
     <script type="module">
@@ -95,108 +98,76 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
-        let user, userData, gameRunning = false;
+        let user, currentXP = 0;
 
         onAuthStateChanged(auth, (u) => {
-            if (u) {
+            if(u) {
                 user = u;
                 onSnapshot(doc(db, "usuarios", u.uid), (snap) => {
-                    userData = snap.data();
-                    if(userData) render();
+                    const data = snap.data();
+                    currentXP = data.xp || 0;
+                    const level = Math.floor(currentXP / 100) + 1;
+                    const progress = currentXP % 100;
+                    
+                    document.getElementById('u-xp').innerText = currentXP;
+                    document.getElementById('u-lvl').innerText = level;
+                    document.getElementById('lvl-fill').style.width = progress + "%";
                 });
-            } else { window.location.href = 'index.html'; }
+            } else { window.location.href = 'login.html'; }
         });
 
-        function render() {
-            const xp = userData.xp || 0;
-            const lvl = Math.floor(xp / 100) + 1;
-            document.getElementById('lvl-display').innerText = lvl;
-            document.getElementById('xp-bar').style.width = (xp % 100) + "%";
-            document.getElementById('xp-status').innerText = `${(xp % 100).toFixed(4)}/100 XP`;
+        window.openGame = (tipo) => {
+            const content = document.getElementById('game-content');
+            document.getElementById('game-overlay').classList.remove('hidden');
 
-            const hoje = new Date().toISOString().split('T')[0];
-            if(userData.lastScratch === hoje) {
-                document.getElementById('scratch-box').innerText = "✅ CONCLUÍDO HOJE";
-                document.getElementById('scratch-box').style.pointerEvents = "none";
-                document.getElementById('scratch-box').style.opacity = "0.5";
+            if(tipo === 'fio') {
+                content.innerHTML = `
+                    <h2 style="color:var(--neon); font-family:'Orbitron'; margin-bottom:20px;">FIAÇÃO IA</h2>
+                    <div class="wire-board">
+                        <div class="wire-node" style="background:#ff0055; top:40px; left:15px;" onclick="connectWire(this)"></div>
+                        <div class="wire-node" style="background:#00f2ff; top:115px; left:15px;" onclick="connectWire(this)"></div>
+                        <div class="wire-node" style="background:#00ff88; top:190px; left:15px;" onclick="connectWire(this)"></div>
+                    </div>
+                    <p id="game-status" style="margin-top:20px; font-size:0.8rem; color:#555;">Conecte todos os terminais</p>
+                `;
+            } else {
+                content.innerHTML = `
+                    <h2 style="color:var(--green); font-family:'Orbitron';">HACKEANDO...</h2>
+                    <div style="width:200px; height:100px; border:1px solid #222; margin:20px; overflow:hidden; position:relative;">
+                        <div id="runner" style="position:absolute; bottom:10px; left:10px; font-size:1.5rem;">🏃</div>
+                        <div style="position:absolute; bottom:10px; right:-50px; font-size:1.2rem; animation: slide 2s infinite linear;">🚧</div>
+                    </div>
+                    <button class="btn-primary" onclick="jump()">PULAR OBSTÁCULO</button>
+                    <style> @keyframes slide { from { right: -50px; } to { right: 250px; } } </style>
+                `;
             }
-            if(userData.lastIns === hoje) document.getElementById('ad-ins').disabled = true;
-            if(userData.lastTik === hoje) document.getElementById('ad-tik').disabled = true;
-            if(userData.lastFac === hoje) document.getElementById('ad-fac').disabled = true;
-        }
-
-        async function addXP(qtd) {
-            const xp = userData.xp || 0;
-            const up = Math.floor((xp + qtd) / 100) > Math.floor(xp / 100);
-            let d = { xp: increment(qtd) };
-            if(up) { 
-                d.saldo = increment(0.10); 
-                alert("NÍVEL UP! +R$ 0,10 BÔNUS IA"); 
-            }
-            await updateDoc(doc(db, "usuarios", user.uid), d);
-        }
-
-        window.startGame = () => {
-            const canvas = document.getElementById('game-canvas');
-            const cube = document.getElementById('cube');
-            const btn = document.getElementById('btn-game');
-            canvas.style.display = 'block'; btn.style.display = 'none';
-            gameRunning = true;
-            let score = 0;
-
-            canvas.onclick = () => {
-                if(cube.style.bottom === '0px' || !cube.style.bottom) {
-                    cube.style.bottom = '70px';
-                    setTimeout(() => cube.style.bottom = '0px', 350);
-                }
-            };
-
-            const spawn = setInterval(() => {
-                if(!gameRunning) { clearInterval(spawn); return; }
-                const obs = document.createElement('div');
-                obs.className = 'obstacle'; obs.style.right = '-25px';
-                canvas.appendChild(obs);
-
-                let pos = -25;
-                const move = setInterval(() => {
-                    if(!gameRunning) { clearInterval(move); obs.remove(); return; }
-                    pos += 5; obs.style.right = pos + 'px';
-
-                    if(pos > 280 && pos < 315 && (cube.style.bottom === '0px' || !cube.style.bottom)) {
-                        gameRunning = false;
-                        alert("CONEXÃO PERDIDA! XP ACUMULADO NESTA PARTIDA.");
-                        location.reload();
-                    }
-
-                    if(pos > 380) { 
-                        clearInterval(move); obs.remove(); 
-                        score++; 
-                        addXP(0.0001); 
-                        document.getElementById('game-score').innerText = "DATA XP: " + (score * 0.0001).toFixed(4);
-                    }
-                }, 20);
-            }, 1600);
         };
 
-        window.playScratch = async () => {
-            const hoje = new Date().toISOString().split('T')[0];
-            if(userData.lastScratch === hoje) return;
-            const box = document.getElementById('scratch-box');
-            box.classList.add('scratch-active');
-            box.innerText = "DESCRIPTOGRAFANDO...";
-            setTimeout(async () => {
-                await updateDoc(doc(db, "usuarios", user.uid), { lastScratch: hoje });
-                await addXP(0.05);
-                box.classList.remove('scratch-active');
-                box.innerText = "COMPLETO +0,05 XP";
-            }, 2000);
+        let wiresConnected = 0;
+        window.connectWire = async (el) => {
+            if(el.classList.contains('connected')) return;
+            el.classList.add('connected');
+            wiresConnected++;
+            if(wiresConnected === 3) {
+                document.getElementById('game-status').innerText = "CONEXÃO ESTABELECIDA! +10 XP";
+                document.getElementById('game-status').style.color = "var(--green)";
+                await updateDoc(doc(db, "usuarios", user.uid), { xp: increment(10) });
+                setTimeout(closeGame, 1500);
+            }
         };
 
-        window.visitAd = async (url, field) => {
-            const hoje = new Date().toISOString().split('T')[0];
-            window.open(url, '_blank');
-            let u = {}; u[field] = hoje; u.xp = increment(0.25);
-            await updateDoc(doc(db, "usuarios", user.uid), u);
+        window.jump = async () => {
+            const runner = document.getElementById('runner');
+            runner.style.bottom = "50px";
+            setTimeout(() => { 
+                runner.style.bottom = "10px";
+                updateDoc(doc(db, "usuarios", user.uid), { saldo: increment(0.01) });
+            }, 300);
+        };
+
+        window.closeGame = () => {
+            document.getElementById('game-overlay').classList.add('hidden');
+            wiresConnected = 0;
         };
     </script>
 </body>
