@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Saque PIX - RoboSorteio v5.2.4</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        .withdraw-container { padding: 20px; }
+        .status-card { background: #0a0a0a; border: 1px solid #111; border-radius: 15px; padding: 20px; text-align: center; margin-bottom: 25px; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; font-family: 'Orbitron'; font-size: 0.55rem; color: #444; margin-bottom: 8px; letter-spacing: 1px; }
+        .input-group input, .input-group select { width: 100%; background: #050505; border: 1px solid #1a1a1a; padding: 15px; border-radius: 10px; color: #fff; font-family: 'Rajdhani'; font-size: 1rem; box-sizing: border-box; }
+        .input-group input:focus { border-color: var(--neon); outline: none; }
+        .info-box { background: rgba(0, 255, 136, 0.02); border: 1px solid #00331a; padding: 15px; border-radius: 10px; margin-bottom: 25px; }
+        .info-box p { margin: 0; font-size: 0.7rem; color: #00ff88; font-family: 'Rajdhani'; line-height: 1.4; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <button onclick="window.location.href='config.html'" style="background:none; border:none; color:var(--neon); font-size:1.4rem; position:absolute; left:20px;">⬅</button>
+        <span>SOLICITAÇÃO DE SAQUE</span>
+    </div>
+
+    <div class="withdraw-container">
+        <div class="status-card">
+            <div style="font-family:'Orbitron'; font-size:0.6rem; color:#444; margin-bottom:5px;">DISPONÍVEL PARA LIQUIDAÇÃO</div>
+            <div style="font-size: 2.2rem; color:var(--green); font-family:'Orbitron';">R$ <span id="u-saldo">0.00</span></div>
+        </div>
+
+        <div class="info-box">
+            <p>✅ <b>SEGURANÇA ATIVA:</b> Certifique-se de que a chave PIX informada pertence ao CPF cadastrado no terminal para evitar estornos.</p>
+        </div>
+
+        <div class="input-group">
+            <label>TIPO DE CHAVE</label>
+            <select id="pix-type">
+                <option value="cpf">CPF</option>
+                <option value="email">E-mail</option>
+                <option value="tel">Telefone</option>
+                <option value="ale">Chave Aleatória</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>SUA CHAVE PIX</label>
+            <input type="text" id="pix-key" placeholder="Digite sua chave aqui...">
+        </div>
+
+        <div class="input-group">
+            <label>VALOR DO SAQUE (MÍN. R$ 25,00)</label>
+            <input type="number" id="withdraw-val" placeholder="0.00">
+        </div>
+
+        <button onclick="confirmarSaque()" class="btn-primary" style="background:var(--green); color:#000; border:none; font-family:'Orbitron'; font-weight:bold; width:100%; padding:18px; border-radius:12px; margin-top:10px; box-shadow: 0 0 20px rgba(0,255,136,0.2);">
+            EFETUAR SAQUE AGORA
+        </button>
+        
+        <p style="text-align:center; font-size:0.55rem; color:#222; margin-top:20px; font-family:'Orbitron';">PROCESSAMENTO VIA GATEWAY SEGURO</p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, increment } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8",
+            authDomain: "minharifadigital.firebaseapp.com",
+            projectId: "minharifadigital",
+            appId: "1:59630725905:web:396c8cfca385dc3d957ab0"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        let user;
+        let saldoAtual = 0;
+
+        onAuthStateChanged(auth, (u) => {
+            if(u) {
+                user = u;
+                onSnapshot(doc(db, "usuarios", u.uid), (snap) => {
+                    const data = snap.data();
+                    saldoAtual = data.saldo || 0;
+                    document.getElementById('u-saldo').innerText = saldoAtual.toFixed(2);
+                });
+            }
+        });
+
+        window.confirmarSaque = async () => {
+            const valor = parseFloat(document.getElementById('withdraw-val').value);
+            const chave = document.getElementById('pix-key').value;
+
+            if(valor < 25) return alert("O valor mínimo para saque é R$ 25,00");
+            if(valor > saldoAtual) return alert("Saldo insuficiente.");
+            if(chave.length < 5) return alert("Por favor, insira uma chave PIX válida.");
+
+            if(confirm(`Confirmar saque de R$ ${valor.toFixed(2)} para a chave: ${chave}?`)) {
+                await updateDoc(doc(db, "usuarios", user.uid), {
+                    saldo: increment(-valor)
+                });
+                alert("Solicitação enviada! O valor será creditado em sua conta em breve.");
+                window.location.href = 'config.html';
+            }
+        };
+    </script>
+</body>
+</html>
