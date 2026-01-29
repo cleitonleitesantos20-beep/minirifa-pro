@@ -78,26 +78,48 @@
     // 3. Função de Dar Lance
     window.darLance = async () => {
         if (leilaoEncerrado) return alert("Leilão já encerrado!");
-        if (userBids <= 0) return alert("Você precisa de Bids! Jogue para ganhar.");
+        
+        const custoLanceReal = 0.10; // Valor descontado do saldo caso o usuário esteja sem Bids
+        let metodoPagamento = "";
+
+        // LÓGICA DE CONEXÃO: Prioriza Bids, se não houver, usa Saldo
+        if (userBids >= 1) {
+            metodoPagamento = "bids";
+        } else {
+            // Pega o saldo atual do elemento da tela (convertendo string para número)
+            const saldoAtual = parseFloat(document.getElementById('u-saldo').innerText.replace('R$ ', ''));
+            
+            if (saldoAtual >= custoLanceReal) {
+                metodoPagamento = "saldo";
+            } else {
+                alert("⚠️ SALDO INSUFICIENTE!\n\nVocê não possui Bids nem saldo em dinheiro para continuar lançando.");
+                return;
+            }
+        }
 
         try {
-            // Define o novo tempo de expiração (15 segundos a partir de agora)
             const novaDataFinal = new Date(new Date().getTime() + 15000);
+            const userRef = doc(db, "usuarios", user.uid);
 
-            // Atualiza o Leilão para Todos
+            // 1. ATUALIZA A ARENA PARA TODOS
             await updateDoc(leilaoRef, {
                 preco: increment(0.01),
                 ultimo_licitante: nomeUsuario,
                 termina_em: novaDataFinal
             });
 
-            // Consome 1 Bid do Usuário
-            await updateDoc(doc(db, "usuarios", user.uid), {
-                bids: increment(-1)
-            });
+            // 2. PROCESSA O DESCONTO CONECTADO
+            if (metodoPagamento === "bids") {
+                await updateDoc(userRef, { bids: increment(-1) });
+                console.log("Lance pago com: 1 Bid");
+            } else {
+                await updateDoc(userRef, { saldo: increment(-custoLanceReal) });
+                console.log(`Lance pago com: R$ ${custoLanceReal}`);
+                alert(`Você usou R$ ${custoLanceReal} do seu saldo pois seus Bids acabaram!`);
+            }
 
         } catch (e) {
-            console.error("Erro ao dar lance:", e);
+            console.error("Erro na transação:", e);
         }
     };
 </script>
