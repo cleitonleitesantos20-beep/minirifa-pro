@@ -16,6 +16,20 @@
         
         /* Lista de Opções Estilizada */
         .menu-list { display: flex; flex-direction: column; gap: 8px; }
+        <div class="section-title">FINANCEIRO</div>
+<div class="menu-list">
+    
+    <button class="btn-primary" onclick="window.location.href='trades.html'" 
+        style="background: linear-gradient(90deg, #0015ff, #00f2ff); color: #fff; border: none; width: 100%; padding: 15px; border-radius: 12px; font-family: 'Orbitron'; font-weight: bold; cursor: pointer; margin-bottom: 10px; box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);">
+        🤖 TRADES DA IA (ALTO RISCO)
+    </button>
+    <div class="menu-item">
+        <span class="menu-label">Saldo Atual</span>
+        <span class="menu-value" style="color:var(--green)">R$ <span id="u-saldo">0.00</span></span>
+    </div>
+    
+    <button class="btn-withdraw" onclick="solicitarSaque()">SOLICITAR SAQUE (PIX)</button>
+</div>
         .menu-item { background: #111; border: 1px solid #222; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
         .menu-label { font-size: 0.7rem; color: #777; font-family: 'Orbitron'; }
         .menu-value { font-size: 0.85rem; color: #fff; font-weight: bold; }
