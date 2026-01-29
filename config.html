@@ -3,64 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Configurações - v5.1</title>
+    <title>Configurações v5.2 - RoboSorteio IA</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        .status-saque { font-size: 0.8rem; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center; font-weight: bold; }
-        .bloqueado { background: rgba(255, 68, 68, 0.1); color: #ff4444; border: 1px solid #ff4444; }
-        .liberado { background: rgba(0, 255, 136, 0.1); color: #00ff88; border: 1px solid #00ff88; }
-        .link-box { background: #111; border: 1px solid #333; padding: 10px; border-radius: 5px; color: var(--neon); font-size: 0.8rem; width: 100%; text-align: center; margin-top: 10px; font-family: 'Rajdhani'; }
-        .info-footer { font-size: 0.7rem; color: #444; text-align: center; margin-top: 30px; line-height: 1.4; }
+        .config-container { padding: 15px; }
+        .section-title { font-family: 'Orbitron'; font-size: 0.65rem; color: var(--neon); margin: 20px 0 10px 5px; letter-spacing: 1px; }
+        
+        /* Card de Perfil Atualizado */
+        .profile-card { background: #0a0a0a; border: 1px solid #222; border-radius: 15px; padding: 20px; text-align: center; margin-bottom: 10px; }
+        .lvl-badge { background: var(--neon); color: #000; padding: 2px 10px; border-radius: 4px; font-family: 'Orbitron'; font-size: 0.6rem; font-weight: bold; }
+        
+        /* Lista de Opções Estilizada */
+        .menu-list { display: flex; flex-direction: column; gap: 8px; }
+        .menu-item { background: #111; border: 1px solid #222; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .menu-label { font-size: 0.7rem; color: #777; font-family: 'Orbitron'; }
+        .menu-value { font-size: 0.85rem; color: #fff; font-weight: bold; }
+
+        /* Área de Indicação */
+        .copy-box { background: #000; border: 1px dashed var(--neon); padding: 12px; border-radius: 8px; margin-top: 5px; display: flex; justify-content: space-between; align-items: center; }
+        .copy-link { font-size: 0.65rem; color: #555; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 80%; }
+        
+        .btn-withdraw { background: var(--green); color: #000; border: none; width: 100%; padding: 15px; border-radius: 12px; font-family: 'Orbitron'; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-exit { background: transparent; border: 1px solid #300; color: #ff4444; width: 100%; padding: 12px; border-radius: 12px; margin-top: 20px; font-size: 0.7rem; font-family: 'Orbitron'; }
     </style>
 </head>
 <body>
 
-    <div class="header">⚙️ CONFIGURAÇÕES</div>
+    <div class="header">
+        <button onclick="window.location.href='index.html'" style="background:none; border:none; color:var(--neon); font-size:1.2rem; position:absolute; left:15px;">⬅</button>
+        <span>AJUSTES DE CONTA</span>
+    </div>
 
-    <div class="container">
-        <button onclick="window.location.href='index.html'" class="btn-small" style="margin-bottom: 20px;">⬅ VOLTAR</button>
-
-        <div class="card">
-            <h4>🔗 LINK DE FILIAL</h4>
-            <p style="font-size: 0.7rem; color: #888; margin-top: 5px;">Ganhe R$ 0,10 por cada amigo que se cadastrar pelo seu link:</p>
-            <input type="text" id="link-filial" class="link-box" readonly value="Gerando link...">
-            <button onclick="copiarLink()" class="btn-outline" style="width: 100%; margin-top: 10px;">COPIAR MEU LINK</button>
+    <div class="config-container">
+        <div class="profile-card">
+            <div style="font-size: 2.5rem; margin-bottom: 10px;">👤</div>
+            <h2 id="u-nome" style="color:#fff; font-family:'Orbitron'; font-size: 1rem;">...</h2>
+            <span class="lvl-badge">NÍVEL <span id="u-lvl">1</span></span>
         </div>
 
-        <div class="card">
-            <h4>💳 SOLICITAR SAQUE</h4>
-            <div id="saque-info">
-                <p style="font-size: 0.9rem;">Mínimo para saque: <b>R$ 20,00</b></p>
-                <div id="status-msg" class="status-saque bloqueado">
-                    CARREGANDO DADOS...
-                </div>
-                <div id="pix-area" class="hidden" style="margin-top: 15px;">
-                    <input type="text" id="chave-pix" placeholder="Sua Chave PIX (CPF, E-mail ou Celular)" style="margin-bottom: 10px;">
-                    <button onclick="solicitarSaque()" class="btn-primary" style="width: 100%;">ENVIAR SOLICITAÇÃO</button>
+        <div class="section-title">FINANCEIRO</div>
+        <div class="menu-list">
+            <div class="menu-item">
+                <span class="menu-label">Saldo Atual</span>
+                <span class="menu-value" style="color:var(--green)">R$ <span id="u-saldo">0.00</span></span>
+            </div>
+            <button class="btn-withdraw" onclick="solicitarSaque()">SOLICITAR SAQUE (PIX)</button>
+        </div>
+
+        <div class="section-title">PROGRAMA DE AFILIADOS</div>
+        <div class="menu-list">
+            <div class="menu-item">
+                <span class="menu-label">Indicações Totais</span>
+                <span class="menu-value" id="u-vendas">0</span>
+            </div>
+            <div style="margin-top: 5px;">
+                <span style="font-size: 0.6rem; color:#444; margin-left: 5px;">SEU LINK DE CONVITE:</span>
+                <div class="copy-box">
+                    <span class="copy-link" id="referral-link">https://minharifa.web.app/login.html?ref=...</span>
+                    <button onclick="copyLink()" style="background:none; border:none; color:var(--neon); font-size: 0.8rem;">📋</button>
                 </div>
             </div>
         </div>
 
-        <div class="card">
-            <h4>🐞 FEEDBACK / SUPORTE</h4>
-            <textarea id="feedback-text" placeholder="Sugestões, dúvidas ou relatar bugs..." style="width:100%; background:#000; color:#fff; border:1px solid #333; padding:10px; border-radius:5px; margin-top:10px; font-family:'Rajdhani'; height: 80px;"></textarea>
-            <button onclick="enviarFeedback()" class="btn-outline" style="width: 100%; margin-top: 10px;">ENVIAR FEEDBACK</button>
+        <div class="section-title">DADOS TÉCNICOS</div>
+        <div class="menu-list">
+            <div class="menu-item">
+                <span class="menu-label">XP Acumulado</span>
+                <span class="menu-value" id="u-xp">0</span>
+            </div>
+            <div class="menu-item">
+                <span class="menu-label">ID da Conta</span>
+                <span class="menu-value" id="u-code" style="color:var(--neon)">...</span>
+            </div>
         </div>
 
-        <div class="card" style="border-color: #ff4444;">
-            <button onclick="sairConta()" class="btn-primary" style="background: #ff4444; width: 100%;">SAIR DA CONTA</button>
-        </div>
-
-        <div class="info-footer">
-            Idealizado por [Seu Projeto]<br>
-            Desenvolvido e Codificado por uma Inteligência Artificial v5.1.
-        </div>
+        <button onclick="handleLogout()" class="btn-exit">SAIR DO SISTEMA</button>
+        <p style="text-align:center; color:#222; font-size:0.5rem; margin-top:15px;">Versão de Segurança 5.2.0-IA</p>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -80,67 +104,43 @@
             if (u) {
                 onSnapshot(doc(db, "usuarios", u.uid), (snap) => {
                     const data = snap.data();
-                    if (!data) return;
-
-                    // Gerar Link de Filial
-                    const link = window.location.origin + "/index.html?ref=" + data.meuCodigo;
-                    document.getElementById('link-filial').value = link;
-
-                    // Lógica de Saque
-                    const statusMsg = document.getElementById('status-msg');
-                    const pixArea = document.getElementById('pix-area');
-                    const saldo = data.saldo || 0;
-
-                    if (saldo >= 20) {
-                        statusMsg.innerText = "✅ SAQUE DISPONÍVEL!";
-                        statusMsg.className = "status-saque liberado";
-                        pixArea.classList.remove('hidden');
-                    } else {
-                        statusMsg.innerHTML = `🔒 BLOQUEADO<br><span style="font-size:0.7rem">FALTAM R$ ${(20 - saldo).toFixed(2)}</span>`;
-                        statusMsg.className = "status-saque bloqueado";
-                        pixArea.classList.add('hidden');
+                    if (data) {
+                        document.getElementById('u-nome').innerText = data.nome;
+                        document.getElementById('u-saldo').innerText = (data.saldo || 0).toFixed(2);
+                        document.getElementById('u-vendas').innerText = data.vendas || 0;
+                        document.getElementById('u-xp').innerText = data.xp || 0;
+                        document.getElementById('u-code').innerText = data.meuCodigo;
+                        document.getElementById('u-lvl').innerText = Math.floor((data.xp || 0) / 100) + 1;
+                        
+                        // Atualiza o Link de Indicação
+                        const link = `https://minharifadigital.web.app/login.html?ref=${data.meuCodigo}`;
+                        document.getElementById('referral-link').innerText = link;
                     }
                 });
-            } else {
-                window.location.href = 'index.html';
-            }
+            } else { window.location.href = 'login.html'; }
         });
 
-        window.copiarLink = () => {
-            const copyText = document.getElementById("link-filial");
-            copyText.select();
-            copyText.setSelectionRange(0, 99999);
-            document.execCommand("copy");
-            alert("Link de filial copiado!");
+        window.copyLink = () => {
+            const link = document.getElementById('referral-link').innerText;
+            navigator.clipboard.writeText(link);
+            alert("Link de indicação copiado!");
         };
 
         window.solicitarSaque = () => {
-            const chave = document.getElementById('chave-pix').value;
-            if(!chave) return alert("Insira sua chave PIX!");
-            alert("IA: Solicitação enviada! Nossa equipe processará o pagamento em até 48 horas.");
+            const saldo = parseFloat(document.getElementById('u-saldo').innerText);
+            if(saldo < 25) {
+                alert("O valor mínimo para saque é R$ 25,00.");
+            } else {
+                alert("Redirecionando para o formulário de pagamento PIX...");
+                // Aqui você pode colocar window.location.href = 'saque.html'
+            }
         };
 
-        window.enviarFeedback = async () => {
-            const texto = document.getElementById('feedback-text').value;
-            if(!texto) return alert("Escreva algo antes de enviar.");
-            
-            try {
-                await setDoc(doc(db, "feedbacks", Date.now().toString()), {
-                    uid: auth.currentUser.uid,
-                    mensagem: texto,
-                    data: new Date().toISOString()
-                });
-                alert("Feedback enviado com sucesso!");
-                document.getElementById('feedback-text').value = "";
-            } catch (e) { alert("Erro ao enviar: " + e.message); }
-        };
-
-        window.sairConta = () => {
-            signOut(auth).then(() => {
-                window.location.href = 'index.html';
-            }).catch((error) => {
-                alert("Erro ao sair: " + error.message);
-            });
+        window.handleLogout = async () => {
+            if(confirm("Deseja desconectar?")) {
+                await signOut(auth);
+                window.location.href = 'login.html';
+            }
         };
     </script>
 </body>
