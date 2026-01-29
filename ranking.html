@@ -17,15 +17,17 @@
 
         .container { padding: 15px; max-width: 450px; margin: 0 auto; padding-bottom: 50px; }
 
-        /* SEÇÕES DE RANKING REESTRUTURADAS PARA ROLAGEM */
-        .rank-section { margin-bottom: 40px; }
-        .section-header { font-family: 'Orbitron'; font-size: 0.7rem; color: var(--neon); margin-bottom: 15px; display: flex; align-items: center; gap: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        /* TIMER MENSAL */
+        .monthly-timer { background: rgba(255, 0, 85, 0.1); border: 1px solid var(--pink); border-radius: 12px; padding: 10px; text-align: center; margin-bottom: 20px; }
+        .timer-label { font-family: 'Orbitron'; font-size: 0.5rem; color: var(--pink); display: block; margin-bottom: 5px; }
+        .timer-clock { font-family: 'Orbitron'; font-size: 1rem; color: #fff; letter-spacing: 2px; }
+
+        .section-header { font-family: 'Orbitron'; font-size: 0.7rem; color: var(--neon); margin: 25px 0 15px 0; display: flex; align-items: center; gap: 10px; text-transform: uppercase; }
         .section-header::after { content: ''; flex-grow: 1; height: 1px; background: linear-gradient(90deg, var(--neon), transparent); }
 
         .rank-list { background: var(--bg-card); border: 1px solid #1a1a1a; border-radius: 20px; overflow: hidden; }
 
-        .rank-item { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #111; gap: 12px; transition: 0.3s; }
-        .rank-item:last-child { border: none; }
+        .rank-item { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #111; gap: 12px; }
         
         .pos { font-family: 'Orbitron'; font-size: 0.9rem; width: 30px; font-weight: bold; text-align: center; }
         .pos-1 { color: var(--gold); text-shadow: 0 0 10px rgba(255,204,0,0.3); }
@@ -36,16 +38,14 @@
         
         .info-box { flex-grow: 1; min-width: 0; }
         .user-name { font-family: 'Orbitron'; font-size: 0.7rem; color: #eee; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .user-meta { font-size: 0.6rem; color: #555; text-transform: uppercase; font-family: 'Orbitron'; }
+        .user-meta { font-size: 0.55rem; color: #555; text-transform: uppercase; font-family: 'Orbitron'; }
 
-        .prize-badge { background: rgba(0,255,136,0.05); color: var(--green); font-family: 'Orbitron'; font-size: 0.55rem; padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(0,255,136,0.1); white-space: nowrap; }
+        .prize-badge { background: rgba(0,255,136,0.05); color: var(--green); font-family: 'Orbitron'; font-size: 0.5rem; padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(0,255,136,0.1); text-align: center; line-height: 1.2; }
+        .prize-badge small { display: block; font-size: 0.35rem; color: #444; }
 
-        /* PAINEL SORTEIO - DESTAQUE NO TOPO */
-        .lucky-section { margin-bottom: 30px; background: linear-gradient(135deg, #080808 0%, #111 100%); border: 1px solid var(--pink); border-radius: 20px; padding: 20px; text-align: center; position: relative; overflow: hidden; }
-        .lucky-label { font-family: 'Orbitron'; font-size: 0.65rem; color: var(--pink); letter-spacing: 3px; margin-bottom: 10px; }
-        .lucky-number { font-family: 'Orbitron'; font-size: 2.5rem; color: #fff; letter-spacing: 6px; text-shadow: 0 0 20px var(--pink); margin: 10px 0; }
-        .lucky-footer { font-size: 0.55rem; color: #555; font-family: 'Orbitron'; }
-
+        .lucky-section { margin-bottom: 30px; background: #080808; border: 1px solid #222; border-radius: 20px; padding: 20px; text-align: center; }
+        .lucky-label { font-family: 'Orbitron'; font-size: 0.6rem; color: #555; letter-spacing: 2px; }
+        .lucky-number { font-family: 'Orbitron'; font-size: 2.2rem; color: #fff; letter-spacing: 6px; margin: 10px 0; }
     </style>
 </head>
 <body>
@@ -58,31 +58,29 @@
 
     <div class="container">
         
+        <div class="monthly-timer">
+            <span class="timer-label">PREMIAÇÃO MENSAL EM:</span>
+            <div class="timer-clock" id="countdown">00d 00h 00m 00s</div>
+        </div>
+
         <div class="lucky-section">
-            <div class="lucky-label">SORTEIO ATIVO</div>
-            <div class="lucky-number" id="rifa-draw">0000</div>
-            <div class="lucky-footer">NÚMERO DA SORTE ATUAL</div>
+            <div class="lucky-label">SORTEIO ATUAL</div>
+            <div class="lucky-number" id="rifa-draw">----</div>
         </div>
 
         <div class="rank-section">
             <div class="section-header">📢 Top Afiliados</div>
-            <div id="list-indicacao" class="rank-list">
-                <div style="padding: 20px; text-align: center; color: #333; font-size: 0.6rem;">SINCRONIZANDO REDE...</div>
-            </div>
+            <div id="list-indicacao" class="rank-list"></div>
         </div>
 
         <div class="rank-section">
             <div class="section-header">🎮 Elite Gamers</div>
-            <div id="list-jogos" class="rank-list">
-                <div style="padding: 20px; text-align: center; color: #333; font-size: 0.6rem;">PROCESSANDO SCORES...</div>
-            </div>
+            <div id="list-jogos" class="rank-list"></div>
         </div>
 
         <div class="rank-section">
             <div class="section-header">💎 Investidores</div>
-            <div id="list-mercado" class="rank-list">
-                <div style="padding: 20px; text-align: center; color: #333; font-size: 0.6rem;">ESTATÍSTICAS DE MERCADO...</div>
-            </div>
+            <div id="list-mercado" class="rank-list"></div>
         </div>
 
     </div>
@@ -101,24 +99,36 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // TIMER DINÂMICO PARA O ÚLTIMO DIA DO MÊS
+        function updateTimer() {
+            const now = new Date();
+            const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+            const diff = endOfMonth - now;
+
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById('countdown').innerText = `${d}d ${h}h ${m}m ${s}s`;
+        }
+        setInterval(updateTimer, 1000);
+
         function renderRank(containerId, data, type) {
             const container = document.getElementById(containerId);
             container.innerHTML = "";
 
             data.forEach((user, index) => {
                 const pos = index + 1;
-                let prize = "--";
+                let prize = "PREVISTO";
+                let value = "R$ 0,00";
                 
-                // Recompensas Nexus Points (NP) ou R$ conforme seu modelo
                 if(type === 'indica') {
-                    if(pos === 1) prize = "R$ 15,00";
-                    else if(pos === 2) prize = "R$ 10,00";
-                    else if(pos === 3) prize = "R$ 5,00";
-                } else if(type === 'jogos' && pos === 1) {
-                    prize = "R$ 5,00";
-                } else if(type === 'mercado' && pos === 1) {
-                    prize = "R$ 10,00";
-                }
+                    if(pos === 1) value = "R$ 15,00";
+                    else if(pos === 2) value = "R$ 10,00";
+                    else if(pos === 3) value = "R$ 5,00";
+                } else if(type === 'jogos' && pos === 1) value = "R$ 5,00";
+                else if(type === 'mercado' && pos === 1) value = "R$ 10,00";
 
                 const item = document.createElement('div');
                 item.className = 'rank-item';
@@ -126,40 +136,34 @@
                     <span class="pos pos-${pos}">${pos}º</span>
                     <div class="user-img">${user.avatarEmoji || '👤'}</div>
                     <div class="info-box">
-                        <span class="user-name">${user.nome || 'Usuário Nexus'}</span>
-                        <span class="user-meta">${user.count || 0} ${type === 'mercado' ? 'NP Alocados' : 'Pontos'}</span>
+                        <span class="user-name">${user.nome || 'Usuário'}</span>
+                        <span class="user-meta">${user.count || 0} PTS</span>
                     </div>
-                    <div class="prize-badge">${prize}</div>
+                    <div class="prize-badge">
+                        ${value}
+                        <small>NO FINAL DO MÊS</small>
+                    </div>
                 `;
                 container.appendChild(item);
             });
         }
 
-        // Listeners em Tempo Real
-        const qIndica = query(collection(db, "usuarios"), orderBy("indicacoesCount", "desc"), limit(5));
-        onSnapshot(qIndica, snap => {
-            const users = snap.docs.map(d => ({ ...d.data(), count: d.data().indicacoesCount }));
-            renderRank('list-indicacao', users, 'indica');
+        // Listeners Tempo Real
+        onSnapshot(query(collection(db, "usuarios"), orderBy("indicacoesCount", "desc"), limit(5)), snap => {
+            renderRank('list-indicacao', snap.docs.map(d => ({...d.data(), count: d.data().indicacoesCount})), 'indica');
         });
 
-        const qGames = query(collection(db, "usuarios"), orderBy("highScore", "desc"), limit(5));
-        onSnapshot(qGames, snap => {
-            const users = snap.docs.map(d => ({ ...d.data(), count: d.data().highScore }));
-            renderRank('list-jogos', users, 'jogos');
+        onSnapshot(query(collection(db, "usuarios"), orderBy("highScore", "desc"), limit(5)), snap => {
+            renderRank('list-jogos', snap.docs.map(d => ({...d.data(), count: d.data().highScore})), 'jogos');
         });
 
-        const qMercado = query(collection(db, "usuarios"), orderBy("totalGasto", "desc"), limit(5));
-        onSnapshot(qMercado, snap => {
-            const users = snap.docs.map(d => ({ ...d.data(), count: (d.data().totalGasto || 0) }));
-            renderRank('list-mercado', users, 'mercado');
+        onSnapshot(query(collection(db, "usuarios"), orderBy("totalGasto", "desc"), limit(5)), snap => {
+            renderRank('list-mercado', snap.docs.map(d => ({...d.data(), count: d.data().totalGasto})), 'mercado');
         });
 
         onSnapshot(doc(db, "configuracoes", "rifa_atual"), snap => {
-            if(snap.exists()) {
-                document.getElementById('rifa-draw').innerText = snap.data().numeroSorteado || "----";
-            }
+            if(snap.exists()) document.getElementById('rifa-draw').innerText = snap.data().numeroSorteado || "----";
         });
-
     </script>
 </body>
 </html>
