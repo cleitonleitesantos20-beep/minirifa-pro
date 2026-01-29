@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Central IA v5.6.0 - Recompensas</title>
+    <title>Central IA v5.6.2 - Definitiva</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --dark: #0a0a0a; }
@@ -19,75 +19,73 @@
         .daily-section { background: var(--dark); padding: 15px; border-radius: 15px; border: 1px solid #1a1a1a; margin-bottom: 15px; }
         .daily-grid { display: flex; justify-content: space-between; margin-top: 10px; }
         .day-dot { width: 30px; height: 30px; border-radius: 50%; border: 1px solid #222; display: flex; align-items: center; justify-content: center; font-size: 0.5rem; font-family: 'Orbitron'; color: #444; }
-        .day-dot.active { border-color: var(--green); color: var(--green); box-shadow: 0 0 10px rgba(0,255,136,0.2); }
+        .day-dot.active { border-color: var(--green); color: var(--green); }
         .day-dot.done { background: var(--green); color: #000; border: none; }
         .btn-checkin { width: 100%; margin-top: 12px; background: #111; border: 1px solid var(--green); color: var(--green); padding: 10px; border-radius: 8px; font-family: 'Orbitron'; font-size: 0.6rem; cursor: pointer; }
 
-        /* Barra de Progresso (1000 XP) */
+        /* Barra de Progresso Progressiva */
         .lvl-section { background: var(--dark); padding: 15px; border-radius: 15px; border: 1px solid #1a1a1a; margin-bottom: 15px; }
         .progress-container { background: #111; height: 10px; border-radius: 5px; margin-top: 10px; overflow: hidden; border: 1px solid #222; }
         .progress-bar { height: 100%; background: linear-gradient(90deg, var(--neon), var(--green)); width: 0%; transition: 0.4s; }
 
         /* Games */
         .game-card { background: var(--dark); border: 1px solid #1a1a1a; border-radius: 20px; padding: 20px; margin-bottom: 15px; position: relative; }
-        .game-card h3 { font-family: 'Orbitron'; font-size: 0.75rem; margin: 0 0 5px 0; color: var(--neon); }
-        .screen { background: #000; border: 1px solid #111; border-radius: 10px; height: 140px; margin-top: 10px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; cursor: pointer; }
+        .game-card h3 { font-family: 'Orbitron'; font-size: 0.7rem; margin: 0; color: var(--neon); }
+        .game-stat { font-size: 0.5rem; color: #444; font-family: 'Orbitron'; margin-top: 4px; display: block; }
+        .best-score { color: var(--green); }
+        
+        .screen { background: #000; border: 1px solid #111; border-radius: 10px; height: 130px; margin-top: 10px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
 
         /* Ad Overlay */
         #ad-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; }
         
         #cube-hero { width: 20px; height: 20px; background: var(--neon); position: absolute; bottom: 20px; left: 40px; transition: 0.3s; box-shadow: 0 0 10px var(--neon); }
         .obstacle { width: 20px; height: 35px; background: var(--pink); position: absolute; right: -30px; bottom: 20px; }
+
+        .btn-game { background: var(--neon); color: #000; border: none; padding: 10px 20px; font-family: 'Orbitron'; font-weight: bold; border-radius: 5px; cursor: pointer; z-index: 5; }
     </style>
 </head>
 <body>
 
     <div id="ad-overlay">
-        <div style="font-family:'Orbitron'; color:var(--neon); margin-bottom:20px;">CARREGANDO VÍDEO...</div>
-        <div style="width:250px; height:150px; border:1px dashed #333; display:flex; align-items:center; justify-content:center; text-align:center; padding:20px; font-size:0.8rem; color:#444;">
-            SUA PROPAGANDA AQUI<br>(Aguarde 30s)
-        </div>
-        <div id="ad-timer" style="font-family:'Orbitron'; font-size:2rem; margin-top:20px; color:var(--pink);">30</div>
+        <div style="font-family:'Orbitron'; color:var(--neon); margin-bottom:20px;">VÍDEO EM EXIBIÇÃO...</div>
+        <div style="font-size:0.8rem; color:#444; text-align:center;">SUA PROPAGANDA AQUI<br>Aguarde o bônus de R$ 0,02</div>
+        <div id="ad-timer" style="font-family:'Orbitron'; font-size:2.5rem; color:var(--pink); margin-top:20px;">30</div>
     </div>
 
     <div class="header">
         <button class="btn-back" onclick="window.location.href='index.html'">⬅</button>
-        CENTRAL IA v5.6.0
+        CENTRAL IA v5.6.2
     </div>
 
     <div class="container">
         
         <div class="daily-section">
-            <div style="font-family:'Orbitron'; font-size:0.55rem; color:#888;">CHECK-IN SEMANAL (+R$ 0,02)</div>
+            <div style="font-family:'Orbitron'; font-size:0.5rem; color:#888;">CHECK-IN SEMANAL</div>
             <div class="daily-grid" id="daily-dots">
-                <div class="day-dot" data-day="1">S</div>
-                <div class="day-dot" data-day="2">T</div>
-                <div class="day-dot" data-day="3">Q</div>
-                <div class="day-dot" data-day="4">Q</div>
-                <div class="day-dot" data-day="5">S</div>
-                <div class="day-dot" data-day="6">S</div>
+                <div class="day-dot" data-day="1">S</div><div class="day-dot" data-day="2">T</div><div class="day-dot" data-day="3">Q</div>
+                <div class="day-dot" data-day="4">Q</div><div class="day-dot" data-day="5">S</div><div class="day-dot" data-day="6">S</div>
                 <div class="day-dot" data-day="0">D</div>
             </div>
-            <button class="btn-checkin" id="btn-do-checkin" onclick="processCheckIn()">FAZER CHECK-IN DE HOJE</button>
+            <button class="btn-checkin" id="btn-do-checkin" onclick="processCheckIn()">RESGATAR DIÁRIO (+R$ 0,02)</button>
         </div>
-
-        <div class="ads-space">SUA PROPAGANDA AQUI</div>
 
         <div class="lvl-section">
             <div style="display: flex; justify-content: space-between; font-family: 'Orbitron'; font-size: 0.55rem;">
-                <span id="u-nome">OPERADOR...</span>
-                <span style="color: var(--neon);">LEVEL <span id="u-lvl">1</span></span>
+                <span id="u-nome">CARREGANDO...</span>
+                <span style="color: var(--neon);">LVL <span id="u-lvl">1</span></span>
             </div>
             <div class="progress-container"><div class="progress-bar" id="xp-bar"></div></div>
             <div style="display:flex; justify-content:space-between; margin-top:5px; font-family:'Orbitron'; font-size:0.45rem; color:#444;">
-                <span><span id="xp-num">0</span> / 1000 XP</span>
+                <span>XP: <span id="xp-num">0</span> / <span id="xp-target">1000</span></span>
                 <span style="color:var(--green);">BÔNUS: R$ 0,10 / LVL</span>
             </div>
         </div>
 
         <div class="game-grid">
             <div class="game-card">
-                <h3>RUNNER: TOQUE PARA SALTAR (+1 XP)</h3>
+                <span class="game-stat">MELHOR TEMPO: <span id="best-runner" class="best-score">0</span>s</span>
+                <h3>RUNNER CYBERPUNK (+1 XP)</h3>
                 <div class="screen" onclick="jumpCube()">
                     <div id="cube-hero"></div>
                     <div style="position:absolute; bottom:0; width:100%; height:20px; background:#111;"></div>
@@ -95,43 +93,37 @@
             </div>
 
             <div class="game-card">
-                <h3>EXTRAÇÃO: PRESSIONE (+1 XP)</h3>
-                <div class="screen" onmousedown="startHold()" onmouseup="stopHold()" ontouchstart="startHold()" ontouchend="stopHold()">
-                    <div id="hold-fill" style="width:0%; height:100%; background:rgba(0,242,255,0.1); position:absolute; left:0;"></div>
-                    <div style="font-family:'Orbitron'; font-size:0.6rem; z-index:2; color:var(--neon);">SEGURE PARA CARREGAR</div>
+                <span class="game-stat">MELHOR TEMPO: <span id="best-click" class="best-score">0</span>s</span>
+                <h3>DATA CLICKER (+1 XP)</h3>
+                <div class="screen">
+                    <div id="click-fill" style="width:0%; height:100%; background:rgba(0,242,255,0.1); position:absolute; left:0; transition: 0.1s;"></div>
+                    <button class="btn-game" onclick="doClickGame()">CLICK!</button>
                 </div>
             </div>
 
             <div class="game-card">
-                <h3>CÁLCULO RÁPIDO (+1 XP)</h3>
-                <div class="screen" style="cursor:default">
+                <span class="game-stat">MELHOR PONTUAÇÃO: <span id="best-math" class="best-score">0</span> acertos</span>
+                <h3>MATH IA (+1 XP)</h3>
+                <div class="screen">
                     <div id="math-quest" style="font-family:'Orbitron'; font-size:1.5rem; margin-bottom:10px;">0 + 0</div>
-                    <input type="number" id="math-ans" placeholder="?" style="background:#111; border:1px solid var(--neon); color:#fff; width:80px; text-align:center; padding:8px; font-family:'Orbitron';" oninput="checkMath(this)">
+                    <input type="number" id="math-ans" placeholder="?" style="background:#111; border:1px solid var(--neon); color:#fff; width:80px; text-align:center; padding:5px; font-family:'Orbitron';" oninput="checkMath(this)">
                 </div>
             </div>
         </div>
-
-        <div class="ads-space">SUA PROPAGANDA AQUI</div>
 
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, updateDoc, increment, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, increment } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8",
-            authDomain: "minharifadigital.firebaseapp.com",
-            projectId: "minharifadigital",
-            appId: "1:59630725905:web:396c8cfca385dc3d957ab0"
-        };
-
+        const firebaseConfig = { apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", authDomain: "minharifadigital.firebaseapp.com", projectId: "minharifadigital", appId: "1:59630725905:web:396c8cfca385dc3d957ab0" };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        let user, currentXP = 0, currentLevel = 1;
+        let user, currentXP = 0, currentLevel = 1, bests = { runner:0, click:0, math:0 };
 
         onAuthStateChanged(auth, async (u) => {
             if (u) {
@@ -139,17 +131,29 @@
                 onSnapshot(doc(db, "usuarios", u.uid), (snap) => {
                     const data = snap.data();
                     if(data) {
-                        const newXP = data.xp || 0;
-                        const newLevel = Math.floor(newXP / 1000) + 1;
-                        if(newLevel > currentLevel) payBonus(0.10, "LEVEL UP!");
-                        
-                        currentXP = newXP;
-                        currentLevel = newLevel;
-                        document.getElementById('u-nome').innerText = (data.nome || "User").toUpperCase();
+                        currentXP = data.xp || 0;
+                        // Cálculo Progressivo Dobrado
+                        currentLevel = Math.floor(Math.log2(currentXP/1000 + 1)) + 1;
+                        if (currentXP < 1000) currentLevel = 1;
+
+                        let targetXPForThisLevel = Math.pow(2, currentLevel - 1) * 1000;
+                        let prevLevelsTotalXP = currentLevel === 1 ? 0 : (Math.pow(2, currentLevel - 1) - 1) * 1000;
+                        let progressInLevel = currentXP - prevLevelsTotalXP;
+
+                        document.getElementById('u-nome').innerText = (data.nome || "OPERADOR").toUpperCase();
                         document.getElementById('u-lvl').innerText = currentLevel;
-                        document.getElementById('xp-bar').style.width = ((currentXP % 1000) / 10) + "%";
-                        document.getElementById('xp-num').innerText = Math.floor(currentXP % 1000);
+                        document.getElementById('xp-target').innerText = targetXPForThisLevel;
+                        document.getElementById('xp-num').innerText = Math.floor(progressInLevel);
+                        document.getElementById('xp-bar').style.width = (progressInLevel / targetXPForThisLevel * 100) + "%";
                         
+                        // Atualiza recordes
+                        bests.runner = data.bestRunner || 0;
+                        bests.click = data.bestClick || 0;
+                        bests.math = data.bestMath || 0;
+                        document.getElementById('best-runner').innerText = bests.runner;
+                        document.getElementById('best-click').innerText = bests.click;
+                        document.getElementById('best-math').innerText = bests.math;
+
                         updateCheckInUI(data.lastCheckIn);
                     }
                 });
@@ -157,103 +161,82 @@
         });
 
         async function addXP(v) { await updateDoc(doc(db, "usuarios", user.uid), { xp: increment(v) }); }
-        async function payBonus(v, msg) { 
-            await updateDoc(doc(db, "usuarios", user.uid), { saldo: increment(v) });
-            if(msg) alert(msg);
+        async function saveBest(field, value) {
+            if(value > bests[field]) {
+                const update = {}; update[`best${field.charAt(0).toUpperCase() + field.slice(1)}`] = value;
+                await updateDoc(doc(db, "usuarios", user.uid), update);
+            }
         }
 
-        // --- CHECK-IN LOGIC ---
-        function updateCheckInUI(lastDate) {
-            const today = new Date().toLocaleDateString();
-            const dayOfWeek = new Date().getDay();
-            const dots = document.querySelectorAll('.day-dot');
-            
-            dots.forEach(dot => {
-                if(parseInt(dot.dataset.day) === dayOfWeek) dot.classList.add('active');
-                if(lastDate === today && parseInt(dot.dataset.day) === dayOfWeek) {
-                    dot.classList.add('done');
-                    document.getElementById('btn-do-checkin').innerText = "CHECK-IN CONCLUÍDO";
-                    document.getElementById('btn-do-checkin').disabled = true;
-                    document.getElementById('btn-do-checkin').style.opacity = "0.5";
-                }
-            });
-        }
-
+        // --- CHECK-IN & ANÚNCIO ---
         window.processCheckIn = () => {
             document.getElementById('ad-overlay').style.display = 'flex';
-            let timeLeft = 30;
-            const timer = setInterval(() => {
-                timeLeft--;
-                document.getElementById('ad-timer').innerText = timeLeft;
-                if(timeLeft <= 0) {
-                    clearInterval(timer);
-                    finalizeCheckIn();
-                }
+            let tl = 30;
+            const t = setInterval(() => {
+                tl--; document.getElementById('ad-timer').innerText = tl;
+                if(tl <= 0) { clearInterval(t); finalizeCheckIn(); }
             }, 1000);
         };
 
         async function finalizeCheckIn() {
-            const today = new Date().toLocaleDateString();
-            await updateDoc(doc(db, "usuarios", user.uid), {
-                lastCheckIn: today,
-                saldo: increment(0.02)
-            });
+            await updateDoc(doc(db, "usuarios", user.uid), { lastCheckIn: new Date().toLocaleDateString(), saldo: increment(0.02) });
             document.getElementById('ad-overlay').style.display = 'none';
-            alert("Check-in realizado! +R$ 0,02");
+            alert("Check-in concluído! +R$ 0,02");
         }
 
-        // --- GAME: RUNNER ---
-        let runActive = false;
-        window.jumpCube = () => {
-            const hero = document.getElementById('cube-hero');
-            if(hero.style.bottom === "80px") return;
-            hero.style.bottom = "80px";
-            setTimeout(() => { hero.style.bottom = "20px"; }, 400);
-            if(!runActive) spawnObstacle();
+        function updateCheckInUI(ld) {
+            const today = new Date().toLocaleDateString();
+            const day = new Date().getDay();
+            document.querySelectorAll('.day-dot').forEach(d => {
+                if(parseInt(d.dataset.day) === day) d.classList.add('active');
+                if(ld === today && parseInt(d.dataset.day) === day) {
+                    d.classList.add('done');
+                    const btn = document.getElementById('btn-do-checkin');
+                    btn.innerText = "HOJE CONCLUÍDO"; btn.disabled = true; btn.style.opacity = "0.5";
+                }
+            });
+        }
+
+        // --- GAME CLICKER ---
+        let cVal = 0, cStart = null;
+        window.doClickGame = () => {
+            if(!cStart) cStart = Date.now();
+            cVal += 5; document.getElementById('click-fill').style.width = cVal + "%";
+            if(cVal >= 100) {
+                addXP(1);
+                saveBest('click', Math.floor((Date.now() - cStart) / 1000));
+                cVal = 0; cStart = null;
+                setTimeout(() => document.getElementById('click-fill').style.width = "0%", 100);
+            }
         };
 
-        function spawnObstacle() {
-            runActive = true;
-            const screen = document.querySelector('.screen');
+        // --- GAME RUNNER ---
+        let rActive = false, rStart = 0;
+        window.jumpCube = () => {
+            const h = document.getElementById('cube-hero');
+            if(h.style.bottom === "80px") return;
+            h.style.bottom = "80px"; setTimeout(() => h.style.bottom = "20px", 400);
+            if(!rActive) { rActive = true; rStart = Date.now(); spawnObs(); }
+        };
+        function spawnObs() {
             const obs = document.createElement('div');
-            obs.className = 'obstacle';
-            screen.appendChild(obs);
-            
-            let pos = -30;
-            let loop = setInterval(() => {
-                pos += 5;
-                obs.style.right = pos + 'px';
-                const hBot = parseInt(document.getElementById('cube-hero').style.bottom);
-                if(pos > 250 && pos < 280 && hBot < 50) {
-                    clearInterval(loop); obs.remove(); runActive = false;
+            obs.className = 'obstacle'; document.querySelector('.screen').appendChild(obs);
+            let p = -30;
+            let l = setInterval(() => {
+                p += 6; obs.style.right = p + 'px';
+                if(p > 250 && p < 280 && parseInt(document.getElementById('cube-hero').style.bottom) < 50) {
+                    clearInterval(l); obs.remove(); rActive = false;
+                    saveBest('runner', Math.floor((Date.now() - rStart) / 1000));
                 }
-                if(pos > 350) {
-                    clearInterval(loop); obs.remove(); runActive = false; addXP(1);
-                }
+                if(p > 350) { clearInterval(l); obs.remove(); rActive = false; addXP(1); spawnObs(); }
             }, 20);
         }
 
-        // --- GAME: HOLD ---
-        let holdInt, holdVal = 0;
-        window.startHold = () => {
-            holdInt = setInterval(() => {
-                holdVal += 2;
-                document.getElementById('hold-fill').style.width = holdVal + "%";
-                if(holdVal >= 100) { addXP(1); holdVal = 0; }
-            }, 50);
-        };
-        window.stopHold = () => { clearInterval(holdInt); holdVal = 0; document.getElementById('hold-fill').style.width = "0%"; };
-
-        // --- GAME: MATH ---
-        let n1, n2, res;
-        function newM() {
-            n1 = Math.floor(Math.random()*15); n2 = Math.floor(Math.random()*15);
-            res = n1 + n2; document.getElementById('math-quest').innerText = `${n1} + ${n2}`;
-        }
+        // --- MATH IA ---
+        let n1, n2, res, mScore = 0;
+        function newM() { n1 = Math.floor(Math.random()*15); n2 = Math.floor(Math.random()*15); res = n1+n2; document.getElementById('math-quest').innerText = n1+'+'+n2; }
         newM();
-        window.checkMath = (el) => {
-            if(parseInt(el.value) === res) { addXP(1); el.value = ""; newM(); }
-        };
+        window.checkMath = (el) => { if(parseInt(el.value) === res) { mScore++; addXP(1); saveBest('math', mScore); el.value=""; newM(); } };
     </script>
 </body>
 </html>
