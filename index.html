@@ -3,97 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nexus S - Dashboard</title>
+    <title>Nexus S - Master Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --gold: #ffcc00; --dark: #0a0a0a; }
+        :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --gold: #ffcc00; --dark: #0a0a0a; --bg-card: #080808; }
+        
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden; }
 
-        /* HEADER & PERFIL COMPLETO */
-        .profile-section { padding: 30px 20px; background: radial-gradient(circle at top, #111 0%, #000 100%); border-bottom: 1px solid #1a1a1a; text-align: center; position: relative; }
+        /* PROPAGANDA TOPO */
+        .ad-banner-top { width: 100%; height: 50px; background: #050505; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 0.55rem; color: #444; letter-spacing: 2px; }
+
+        /* HEADER & PERFIL */
+        .profile-section { padding: 20px; background: linear-gradient(to bottom, #111, #000); border-bottom: 1px solid #1a1a1a; display: flex; align-items: center; gap: 15px; position: relative; }
         
-        .avatar-container { position: relative; width: 90px; height: 90px; margin: 0 auto 15px; }
-        .avatar-main { width: 100%; height: 100%; background: #000; border: 2px solid var(--neon); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; box-shadow: 0 0 20px rgba(0,242,255,0.2); cursor: pointer; transition: 0.3s; }
-        .avatar-main:hover { transform: scale(1.05); border-color: #fff; }
+        .avatar-container { position: relative; width: 65px; height: 65px; flex-shrink: 0; }
+        .avatar-main { width: 100%; height: 100%; background: #000; border: 2px solid var(--neon); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; box-shadow: 0 0 15px rgba(0,242,255,0.1); }
+        .level-badge { position: absolute; bottom: -2px; right: -2px; background: var(--neon); color: #000; font-family: 'Orbitron'; font-size: 0.5rem; font-weight: bold; padding: 2px 5px; border-radius: 6px; }
+
+        .user-data { flex-grow: 1; min-width: 0; }
+        .user-data h2 { font-family: 'Orbitron'; font-size: 0.85rem; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #eee; }
+        .user-balance { color: var(--green); font-weight: bold; font-size: 1.1rem; display: block; margin: 2px 0; }
         
-        .level-badge { position: absolute; bottom: -5px; right: -5px; background: var(--neon); color: #000; font-family: 'Orbitron'; font-size: 0.6rem; font-weight: bold; padding: 4px 8px; border-radius: 10px; box-shadow: 0 0 10px var(--neon); }
+        .xp-mini-bar { width: 100%; background: #1a1a1a; height: 4px; border-radius: 2px; margin-top: 6px; overflow: hidden; }
+        .xp-fill { height: 100%; background: var(--neon); width: 0%; transition: width 1.5s cubic-bezier(0.1, 0, 0.3, 1); }
 
-        .user-info h2 { font-family: 'Orbitron'; font-size: 1.1rem; margin: 10px 0 5px; letter-spacing: 2px; }
-        .user-balance { color: var(--green); font-weight: bold; font-size: 1.3rem; margin-bottom: 15px; display: block; }
+        .btn-config-side { background: #0a0a0a; border: 1px solid #222; color: #666; width: 40px; height: 40px; border-radius: 10px; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .btn-config-side:active { border-color: var(--neon); color: var(--neon); transform: rotate(45deg); }
 
-        /* BARRA DE PROGRESSO XP */
-        .xp-container { width: 80%; max-width: 250px; margin: 0 auto; background: #111; height: 6px; border-radius: 10px; overflow: hidden; border: 1px solid #222; }
-        .xp-bar { height: 100%; background: linear-gradient(90deg, var(--neon), var(--pink)); width: 0%; transition: 1s ease-in-out; }
-        .xp-text { font-size: 0.55rem; font-family: 'Orbitron'; color: #444; margin-top: 5px; display: block; }
+        .container { padding: 15px; max-width: 450px; margin: 0 auto; padding-bottom: 80px; }
 
-        .container { padding: 25px; max-width: 450px; margin: 0 auto; }
-
-        /* GRID DE BOTÕES */
-        .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .btn-card { background: #080808; border: 1px solid #1a1a1a; padding: 25px 15px; border-radius: 20px; color: #fff; font-family: 'Orbitron'; font-size: 0.7rem; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden; }
-        .btn-card:active { transform: scale(0.95); border-color: var(--neon); }
-        .btn-card i { font-size: 1.8rem; }
+        /* GRID PRINCIPAL (4 BOTÕES) */
+        .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+        .btn-card { background: var(--bg-card); border: 1px solid #1a1a1a; padding: 22px 10px; border-radius: 20px; color: #fff; font-family: 'Orbitron'; font-size: 0.65rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 10px; transition: 0.2s; }
+        .btn-card span { font-size: 1.6rem; }
+        .btn-card:active { background: #111; transform: translateY(2px); border-color: var(--neon); }
         
+        /* GRID SECUNDÁRIO */
+        .secondary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+        .btn-sec { background: #050505; border: 1px solid #1a1a1a; padding: 14px; border-radius: 14px; color: #888; font-family: 'Orbitron'; font-size: 0.6rem; cursor: pointer; transition: 0.2s; letter-spacing: 1px; }
+        .btn-sec:active { color: #fff; border-color: #333; }
+
         /* BOTÃO NEXUS S */
-        .nexus-wrapper { width: 100%; display: flex; justify-content: center; margin-top: 5px; }
-        .btn-nexus { width: 100%; background: linear-gradient(135deg, #0a0a0a 0%, #151515 100%); border: 1px solid var(--gold); padding: 22px; border-radius: 20px; color: var(--gold); font-family: 'Orbitron'; font-size: 1rem; font-weight: bold; cursor: pointer; letter-spacing: 4px; box-shadow: 0 0 20px rgba(255, 204, 0, 0.05); transition: 0.3s; }
-        .btn-nexus:active { transform: scale(0.98); background: #1a1a1a; }
+        .btn-nexus { width: 100%; background: linear-gradient(90deg, #000, #151515, #000); border: 1px solid var(--gold); padding: 18px; border-radius: 18px; color: var(--gold); font-family: 'Orbitron'; font-size: 0.9rem; font-weight: bold; cursor: pointer; letter-spacing: 4px; margin-bottom: 15px; text-shadow: 0 0 10px rgba(255,204,0,0.2); }
+        .btn-nexus:active { transform: scale(0.98); background: #000; }
 
-        /* STATUS DO SISTEMA */
-        .system-status { margin-top: 30px; background: #050505; border: 1px solid #111; padding: 15px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .status-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; display: inline-block; margin-right: 5px; box-shadow: 0 0 10px var(--green); }
-        .status-text { font-family: 'Orbitron'; font-size: 0.55rem; color: #444; }
+        /* ANÚNCIO INFERIOR */
+        .ad-banner-bottom { width: 100%; min-height: 70px; background: #050505; border: 1px solid #111; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 0.55rem; color: #333; margin-top: 5px; }
 
+        /* TEXTO TREM (MARQUEE) */
+        .news-ticker { position: fixed; bottom: 0; left: 0; width: 100%; background: #000; border-top: 1px solid #1a1a1a; padding: 10px 0; overflow: hidden; z-index: 999; }
+        .ticker-content { display: inline-block; white-space: nowrap; padding-left: 100%; animation: ticker 30s linear infinite; font-family: 'Orbitron'; font-size: 0.6rem; color: var(--neon); letter-spacing: 2px; }
+
+        @keyframes ticker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-200%); }
+        }
     </style>
 </head>
 <body>
 
+    <div class="ad-banner-top">ADS - PREMIUM PARTNER SPACE</div>
+
     <div class="profile-section">
         <div class="avatar-container">
-            <div class="avatar-main" id="u-avatar" onclick="window.location.href='config.html'">👤</div>
+            <div class="avatar-main" id="u-avatar">👤</div>
             <div class="level-badge">LVL <span id="u-level">1</span></div>
         </div>
-        <h2 id="u-nome">CARREGANDO...</h2>
-        <span class="user-balance">R$ <span id="u-saldo">0,00</span></span>
-        
-        <div class="xp-container">
-            <div class="xp-bar" id="u-xp-bar"></div>
+        <div class="user-data">
+            <h2 id="u-nome">OPERADOR</h2>
+            <div class="user-balance">R$ <span id="u-saldo">0,00</span></div>
+            <div class="xp-mini-bar"><div class="xp-fill" id="u-xp-fill"></div></div>
         </div>
-        <span class="xp-text">SISTEMA DE SINCRONIA: <span id="u-xp-pct">0</span>%</span>
+        <button class="btn-config-side" onclick="window.location.href='config.html'">⚙️</button>
     </div>
 
     <div class="container">
+        
         <div class="main-grid">
-            <button class="btn-card" onclick="window.location.href='rifas.html'">
-                <span>🎟️</span>
-                RIFAS ATIVAS
-            </button>
-            <button class="btn-card" onclick="window.location.href='leiloes.html'">
-                <span>🔨</span>
-                LEILÕES IA
-            </button>
-            <button class="btn-card" onclick="window.location.href='trades.html'">
-                <span>📈</span>
-                IA TRADES
-            </button>
-            <button class="btn-card" onclick="window.location.href='config.html'">
-                <span>⚙️</span>
-                CONFIGURAÇÃO
-            </button>
+            <button class="btn-card" onclick="window.location.href='rifas.html'"><span>🎟️</span>RIFAS</button>
+            <button class="btn-card" onclick="window.location.href='leiloes.html'"><span>🔨</span>LEILÕES</button>
+            <button class="btn-card" onclick="window.location.href='trades.html'"><span>📈</span>TRADES IA</button>
+            <button class="btn-card" onclick="window.location.href='minigames.html'"><span>🎮</span>MINIGAMES</button>
         </div>
 
-        <div class="nexus-wrapper">
-            <button class="btn-nexus" onclick="window.location.href='market.html'">
-                🛒 NEXUS S
-            </button>
+        <div class="secondary-grid">
+            <button class="btn-sec" onclick="window.location.href='deposito.html'">💰 DEPÓSITO</button>
+            <button class="btn-sec" onclick="window.location.href='ranking.html'">🏆 RANKING</button>
         </div>
 
-        <div class="system-status">
-            <div>
-                <span class="status-dot"></span>
-                <span class="status-text">SISTEMA OPERACIONAL ATIVO</span>
-            </div>
-            <span class="status-text" id="system-time">00:00:00</span>
+        <button class="btn-nexus" onclick="window.location.href='market.html'">🛒 NEXUS S</button>
+
+        <div class="ad-banner-bottom">PUBLICIDADE — ADS 320x100</div>
+
+    </div>
+
+    <div class="news-ticker">
+        <div class="ticker-content" id="ticker-text">
+            ••• BEM-VINDO AO NEXUS S ••• SISTEMA OPERACIONAL ATUALIZADO V6.2.1 ••• APROVEITE AS NOVAS RIFAS DE CRIPTOMOEDAS ••• TRADES IA COM ALTA PERFORMANCE ESTE MÊS •••
         </div>
     </div>
 
@@ -102,43 +109,61 @@
         import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", authDomain: "minharifadigital.firebaseapp.com", projectId: "minharifadigital", appId: "1:59630725905:web:396c8cfca385dc3d957ab0" };
+        // Configuração do Firebase
+        const firebaseConfig = { 
+            apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", 
+            authDomain: "minharifadigital.firebaseapp.com", 
+            projectId: "minharifadigital", 
+            appId: "1:59630725905:web:396c8cfca385dc3d957ab0" 
+        };
+        
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
 
         onAuthStateChanged(auth, user => {
             if (user) {
+                // Escuta em tempo real os dados do usuário
                 onSnapshot(doc(db, "usuarios", user.uid), snap => {
                     const d = snap.data();
                     if(!d) return;
-                    
-                    // Básico
+
+                    // Atualização de UI
                     document.getElementById('u-nome').innerText = (d.nome || "OPERADOR").toUpperCase();
                     document.getElementById('u-saldo').innerText = (d.saldo || 0).toLocaleString('pt-br', {minimumFractionDigits: 2});
                     
-                    // Avatar & Level
-                    if(d.avatarEmoji) document.getElementById('u-avatar').innerText = d.avatarEmoji;
-                    const level = d.level || 1;
-                    document.getElementById('u-level').innerText = level;
+                    // Avatar/Emoji
+                    if(d.avatarEmoji) {
+                        document.getElementById('u-avatar').innerText = d.avatarEmoji;
+                    }
 
-                    // Lógica de XP
+                    // Lógica de Nível e XP
+                    const level = d.level || 1;
                     const xpAtual = d.xp || 0;
-                    const xpProximoNivel = level * 100;
-                    const porcentagem = Math.min((xpAtual / xpProximoNivel) * 100, 100);
-                    document.getElementById('u-xp-bar').style.width = porcentagem + "%";
-                    document.getElementById('u-xp-pct').innerText = Math.floor(porcentagem);
+                    const xpNecessario = level * 100;
+                    const porcentagem = (xpAtual / xpNecessario) * 100;
+
+                    document.getElementById('u-level').innerText = level;
+                    document.getElementById('u-xp-fill').style.width = Math.min(porcentagem, 100) + "%";
+                }, error => {
+                    console.error("Erro ao carregar dados:", error);
                 });
             } else {
+                // Se não houver usuário logado, redireciona
                 window.location.href = "login.html";
             }
         });
 
-        // Relógio do Sistema
-        setInterval(() => {
-            const now = new Date();
-            document.getElementById('system-time').innerText = now.toLocaleTimeString('pt-br');
-        }, 1000);
+        // Otimização para o Ticker (Texto Trem) - Mensagens dinâmicas
+        const messages = [
+            "BEM-VINDO AO NEXUS S",
+            "SISTEMA OPERACIONAL V6.2.1 ONLINE",
+            "NOVO LEILÃO DE IPHONE 15 DISPONÍVEL",
+            "IA TRADES: LUCROS DE HOJE +4.2%",
+            "DESBLOQUEIE EMOJIS EXCLUSIVOS NO MARKET"
+        ];
+        document.getElementById('ticker-text').innerText = " ••• " + messages.join(" ••• ") + " ••• ";
+
     </script>
 </body>
 </html>
