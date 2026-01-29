@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Rifas Progressivas IA v5.5.1</title>
+    <title>Rifas Progressivas IA v5.5.2</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root { --neon: #00f2ff; --green: #00ff88; --pink: #ff0055; --bg: #000; }
@@ -25,7 +25,6 @@
         .rifa-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; }
         .num { background: #111; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; font-size: 0.55rem; font-family: 'Orbitron'; border-radius: 3px; color: #333; border: 1px solid #1a1a1a; cursor: pointer; }
         
-        /* Estados do Número */
         .num.selected { background: var(--neon); color: #000; border-color: #fff; box-shadow: 0 0 8px var(--neon); }
         .num.sold { background: #300 !important; color: #ff0000 !important; border: 1px solid #500 !important; pointer-events: none; opacity: 0.8; position: relative; }
         .num.sold::after { content: 'X'; position: absolute; font-size: 0.4rem; top: 1px; right: 2px; }
@@ -43,24 +42,23 @@
 
     <div class="header">
         <button onclick="window.location.href='index.html'" style="background:none; border:none; color:var(--neon); font-size:1.2rem; position:absolute; left:15px;">⬅</button>
-        RIFAS DA SORTE v5.5.1
+        RIFAS DA SORTE v5.5.2
     </div>
 
     <div class="ads-space">SUA PROPAGANDA AQUI</div>
 
-    <div class="level-slider" id="main-slider">
-        </div>
+    <div class="level-slider" id="main-slider"></div>
 
     <div class="ads-space">SUA PROPAGANDA AQUI</div>
 
     <div id="checkout">
         <div class="checkout-row">
             <div>
-                <div style="font-size:0.5rem; color:#444; font-family:'Orbitron'; uppercase">NÚMEROS: <span id="num-list" style="color:var(--neon);">-</span></div>
+                <div style="font-size:0.5rem; color:#444; font-family:'Orbitron';">NÚMEROS: <span id="num-list" style="color:var(--neon);">-</span></div>
                 <div style="font-size:1.2rem; color:#fff; font-family:'Orbitron';">R$ <span id="total-price">0.00</span></div>
             </div>
             <div style="text-align:right">
-                <div style="font-size:0.5rem; color:#444; font-family:'Orbitron'; uppercase">SALDO</div>
+                <div style="font-size:0.5rem; color:#444; font-family:'Orbitron';">SALDO</div>
                 <div id="u-balance" style="font-size:0.8rem; color:var(--green); font-family:'Orbitron';">R$ 0.00</div>
             </div>
         </div>
@@ -87,7 +85,6 @@
         const precoCota = 8.0;
         let user, saldoAtual = 0, selecionados = [], vendidosGlobal = [];
 
-        // 1. GERAÇÃO DINÂMICA
         const niveis = [
             { id: 1, start: 1, end: 50, prize: 110 },
             { id: 2, start: 51, end: 100, prize: 220 },
@@ -98,7 +95,8 @@
         const slider = document.getElementById('main-slider');
         niveis.forEach(lvl => {
             const card = document.createElement('div');
-            card.className = `level-card locked`;
+            // Inicializa apenas o lvl 1 sem a classe locked
+            card.className = `level-card ${lvl.id === 1 ? '' : 'locked'}`;
             card.id = `lvl-${lvl.id}`;
             card.innerHTML = `
                 <div class="lock-msg">ESGOTAR NÍVEL ANTERIOR 🔒</div>
@@ -120,33 +118,36 @@
             }
         });
 
-        // 2. SINCRONIZAÇÃO GLOBAL (VENDIDOS E NÍVEIS)
         onSnapshot(doc(db, "rifas_vendas", "global"), (snap) => {
             const data = snap.data();
-            if (!data) return;
-            vendidosGlobal = data.vendidos || [];
+            vendidosGlobal = data ? (data.vendidos || []) : [];
             
-            // Marcar vendidos
+            document.querySelectorAll('.num').forEach(el => el.classList.remove('sold'));
             vendidosGlobal.forEach(num => {
                 const el = document.getElementById(`num-${num}`);
                 if (el) el.classList.add('sold');
             });
 
-            // Lógica de Desbloqueio de Níveis
-            document.getElementById('lvl-1').classList.remove('locked');
-            if (vendidosGlobal.filter(n => n <= 50).length >= 50) document.getElementById('lvl-2').classList.remove('locked');
-            if (vendidosGlobal.filter(n => n > 50 && n <= 100).length >= 50) document.getElementById('lvl-3').classList.remove('locked');
-            if (vendidosGlobal.filter(n => n > 100 && n <= 150).length >= 50) document.getElementById('lvl-4').classList.remove('locked');
+            // Lógica de Desbloqueio Dinâmico
+            const vendidosLvl1 = vendidosGlobal.filter(n => n <= 50).length;
+            const vendidosLvl2 = vendidosGlobal.filter(n => n > 50 && n <= 100).length;
+            const vendidosLvl3 = vendidosGlobal.filter(n => n > 100 && n <= 150).length;
+
+            if (vendidosLvl1 >= 50) document.getElementById('lvl-2')?.classList.remove('locked');
+            if (vendidosLvl2 >= 50) document.getElementById('lvl-3')?.classList.remove('locked');
+            if (vendidosLvl3 >= 50) document.getElementById('lvl-4')?.classList.remove('locked');
         });
 
-        // 3. MONITORAR USUÁRIO
         onAuthStateChanged(auth, (u) => {
             if (u) {
                 user = u;
                 onSnapshot(doc(db, "usuarios", u.uid), (snap) => {
-                    saldoAtual = snap.data().saldo || 0;
-                    document.getElementById('u-balance').innerText = `R$ ${saldoAtual.toFixed(2)}`;
-                    atualizarPainel();
+                    const data = snap.data();
+                    if(data) {
+                        saldoAtual = data.saldo || 0;
+                        document.getElementById('u-balance').innerText = `R$ ${saldoAtual.toFixed(2)}`;
+                        atualizarPainel();
+                    }
                 });
             }
         });
@@ -187,7 +188,7 @@
 
                 alert("Sucesso! Números reservados.");
                 selecionados = [];
-                location.reload();
+                atualizarPainel();
             } catch(e) { alert("Erro na reserva."); }
         };
     </script>
