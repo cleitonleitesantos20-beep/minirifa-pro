@@ -1,108 +1,102 @@
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Central IA v5.6.2 - Definitiva</title>
+    <title>Central IA v5.6.4 - Estável</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --dark: #0a0a0a; }
-        body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; overflow-x: hidden; }
+        body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; overflow: hidden; touch-action: manipulation; }
         
         .header { height: 60px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #111; font-family: 'Orbitron'; font-size: 0.7rem; position: relative; }
         .btn-back { position: absolute; left: 15px; background: none; border: none; color: var(--neon); font-size: 1.2rem; cursor: pointer; }
 
-        .container { padding: 15px; }
+        .container { padding: 15px; height: calc(100vh - 60px); overflow-y: auto; }
         .ads-space { background: rgba(255,255,255,0.02); border: 1px dashed #222; color: #333; text-align: center; padding: 10px; font-family: 'Orbitron'; font-size: 0.45rem; margin: 10px 0; border-radius: 8px; }
 
-        /* Check-in Diário */
         .daily-section { background: var(--dark); padding: 15px; border-radius: 15px; border: 1px solid #1a1a1a; margin-bottom: 15px; }
         .daily-grid { display: flex; justify-content: space-between; margin-top: 10px; }
-        .day-dot { width: 30px; height: 30px; border-radius: 50%; border: 1px solid #222; display: flex; align-items: center; justify-content: center; font-size: 0.5rem; font-family: 'Orbitron'; color: #444; }
+        .day-dot { width: 30px; height: 30px; border-radius: 50%; border: 1px solid #222; display: flex; align-items: center; justify-content: center; font-size: 0.5rem; font-family: 'Orbitron'; }
         .day-dot.active { border-color: var(--green); color: var(--green); }
         .day-dot.done { background: var(--green); color: #000; border: none; }
         .btn-checkin { width: 100%; margin-top: 12px; background: #111; border: 1px solid var(--green); color: var(--green); padding: 10px; border-radius: 8px; font-family: 'Orbitron'; font-size: 0.6rem; cursor: pointer; }
 
-        /* Barra de Progresso Progressiva */
         .lvl-section { background: var(--dark); padding: 15px; border-radius: 15px; border: 1px solid #1a1a1a; margin-bottom: 15px; }
-        .progress-container { background: #111; height: 10px; border-radius: 5px; margin-top: 10px; overflow: hidden; border: 1px solid #222; }
+        .progress-container { background: #111; height: 10px; border-radius: 5px; margin-top: 10px; overflow: hidden; }
         .progress-bar { height: 100%; background: linear-gradient(90deg, var(--neon), var(--green)); width: 0%; transition: 0.4s; }
 
-        /* Games */
-        .game-card { background: var(--dark); border: 1px solid #1a1a1a; border-radius: 20px; padding: 20px; margin-bottom: 15px; position: relative; }
-        .game-card h3 { font-family: 'Orbitron'; font-size: 0.7rem; margin: 0; color: var(--neon); }
-        .game-stat { font-size: 0.5rem; color: #444; font-family: 'Orbitron'; margin-top: 4px; display: block; }
-        .best-score { color: var(--green); }
+        .game-card { background: var(--dark); border: 1px solid #1a1a1a; border-radius: 20px; padding: 15px; margin-bottom: 15px; position: relative; }
+        .game-card h3 { font-family: 'Orbitron'; font-size: 0.65rem; margin: 0; color: var(--neon); }
+        .game-stat { font-size: 0.5rem; color: #555; font-family: 'Orbitron'; margin-bottom: 5px; display: block; }
         
-        .screen { background: #000; border: 1px solid #111; border-radius: 10px; height: 130px; margin-top: 10px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+        .screen { background: #050505; border: 1px solid #111; border-radius: 10px; height: 130px; margin-top: 10px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
 
-        /* Ad Overlay */
         #ad-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; }
         
-        #cube-hero { width: 20px; height: 20px; background: var(--neon); position: absolute; bottom: 20px; left: 40px; transition: 0.3s; box-shadow: 0 0 10px var(--neon); }
-        .obstacle { width: 20px; height: 35px; background: var(--pink); position: absolute; right: -30px; bottom: 20px; }
+        #cube-hero { width: 22px; height: 22px; background: var(--neon); position: absolute; bottom: 20px; left: 40px; box-shadow: 0 0 10px var(--neon); z-index: 10; }
+        .obstacle { width: 18px; height: 35px; background: var(--pink); position: absolute; bottom: 20px; box-shadow: 0 0 10px var(--pink); border-radius: 2px; }
 
-        .btn-game { background: var(--neon); color: #000; border: none; padding: 10px 20px; font-family: 'Orbitron'; font-weight: bold; border-radius: 5px; cursor: pointer; z-index: 5; }
+        .btn-game { background: var(--neon); color: #000; border: none; padding: 10px 20px; font-family: 'Orbitron'; font-weight: bold; border-radius: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div id="ad-overlay">
-        <div style="font-family:'Orbitron'; color:var(--neon); margin-bottom:20px;">VÍDEO EM EXIBIÇÃO...</div>
-        <div style="font-size:0.8rem; color:#444; text-align:center;">SUA PROPAGANDA AQUI<br>Aguarde o bônus de R$ 0,02</div>
-        <div id="ad-timer" style="font-family:'Orbitron'; font-size:2.5rem; color:var(--pink); margin-top:20px;">30</div>
+        <div style="font-family:'Orbitron'; color:var(--neon); margin-bottom:20px;">PROCESSANDO DADOS...</div>
+        <div id="ad-timer" style="font-family:'Orbitron'; font-size:2.5rem; color:var(--pink);">30</div>
     </div>
 
     <div class="header">
         <button class="btn-back" onclick="window.location.href='index.html'">⬅</button>
-        CENTRAL IA v5.6.2
+        CENTRAL IA v5.6.4
     </div>
 
     <div class="container">
         
         <div class="daily-section">
-            <div style="font-family:'Orbitron'; font-size:0.5rem; color:#888;">CHECK-IN SEMANAL</div>
             <div class="daily-grid" id="daily-dots">
                 <div class="day-dot" data-day="1">S</div><div class="day-dot" data-day="2">T</div><div class="day-dot" data-day="3">Q</div>
                 <div class="day-dot" data-day="4">Q</div><div class="day-dot" data-day="5">S</div><div class="day-dot" data-day="6">S</div>
                 <div class="day-dot" data-day="0">D</div>
             </div>
-            <button class="btn-checkin" id="btn-do-checkin" onclick="processCheckIn()">RESGATAR DIÁRIO (+R$ 0,02)</button>
+            <button class="btn-checkin" id="btn-do-checkin" onclick="processCheckIn()">CHECK-IN DIÁRIO (+R$ 0,02)</button>
         </div>
 
         <div class="lvl-section">
             <div style="display: flex; justify-content: space-between; font-family: 'Orbitron'; font-size: 0.55rem;">
-                <span id="u-nome">CARREGANDO...</span>
+                <span id="u-nome">...</span>
                 <span style="color: var(--neon);">LVL <span id="u-lvl">1</span></span>
             </div>
             <div class="progress-container"><div class="progress-bar" id="xp-bar"></div></div>
-            <div style="display:flex; justify-content:space-between; margin-top:5px; font-family:'Orbitron'; font-size:0.45rem; color:#444;">
+            <div style="display:flex; justify-content:space-between; margin-top:5px; font-family:'Orbitron'; font-size:0.45rem;">
                 <span>XP: <span id="xp-num">0</span> / <span id="xp-target">1000</span></span>
-                <span style="color:var(--green);">BÔNUS: R$ 0,10 / LVL</span>
+                <span style="color:var(--green);">+R$ 0,10 / LEVEL</span>
             </div>
         </div>
 
         <div class="game-grid">
             <div class="game-card">
-                <span class="game-stat">MELHOR TEMPO: <span id="best-runner" class="best-score">0</span>s</span>
-                <h3>RUNNER CYBERPUNK (+1 XP)</h3>
-                <div class="screen" onclick="jumpCube()">
-                    <div id="cube-hero"></div>
-                    <div style="position:absolute; bottom:0; width:100%; height:20px; background:#111;"></div>
+                <span class="game-stat">MELHOR TEMPO: <span id="best-runner" style="color:var(--green)">0</span>s</span>
+                <h3>RUNNER CYBERPUNK (+1 XP / 2 BLOCOS)</h3>
+                <div class="screen" onclick="jumpCube()" id="runner-screen">
+                    <div id="cube-hero" style="bottom: 20px;"></div>
+                    <div style="position:absolute; bottom:0; width:100%; height:20px; background:#111; border-top:1px solid #222;"></div>
                 </div>
             </div>
 
             <div class="game-card">
-                <span class="game-stat">MELHOR TEMPO: <span id="best-click" class="best-score">0</span>s</span>
+                <span class="game-stat">MELHOR TEMPO: <span id="best-click" style="color:var(--green)">0</span>s</span>
                 <h3>DATA CLICKER (+1 XP)</h3>
                 <div class="screen">
-                    <div id="click-fill" style="width:0%; height:100%; background:rgba(0,242,255,0.1); position:absolute; left:0; transition: 0.1s;"></div>
-                    <button class="btn-game" onclick="doClickGame()">CLICK!</button>
+                    <div id="click-fill" style="width:0%; height:100%; background:rgba(0,242,255,0.1); position:absolute; left:0;"></div>
+                    <button class="btn-game" onclick="doClickGame()">HACKEAR!</button>
                 </div>
             </div>
 
             <div class="game-card">
-                <span class="game-stat">MELHOR PONTUAÇÃO: <span id="best-math" class="best-score">0</span> acertos</span>
+                <span class="game-stat">MELHOR SCORE: <span id="best-math" style="color:var(--green)">0</span> acertos</span>
                 <h3>MATH IA (+1 XP)</h3>
                 <div class="screen">
                     <div id="math-quest" style="font-family:'Orbitron'; font-size:1.5rem; margin-bottom:10px;">0 + 0</div>
@@ -110,7 +104,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 
     <script type="module">
@@ -123,67 +116,129 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        let user, currentXP = 0, currentLevel = 1, bests = { runner:0, click:0, math:0 };
+        let user, currentXP = 0, currentLevel = 1, globalBests = { runner:0, click:0, math:0 };
 
-        onAuthStateChanged(auth, async (u) => {
+        onAuthStateChanged(auth, u => {
             if (u) {
                 user = u;
-                onSnapshot(doc(db, "usuarios", u.uid), (snap) => {
-                    const data = snap.data();
-                    if(data) {
-                        currentXP = data.xp || 0;
-                        // Cálculo Progressivo Dobrado
-                        currentLevel = Math.floor(Math.log2(currentXP/1000 + 1)) + 1;
-                        if (currentXP < 1000) currentLevel = 1;
+                onSnapshot(doc(db, "usuarios", u.uid), snap => {
+                    const d = snap.data();
+                    if(!d) return;
+                    currentXP = d.xp || 0;
+                    currentLevel = Math.floor(Math.log2(currentXP/1000 + 1)) + 1;
+                    if(currentXP < 1000) currentLevel = 1;
 
-                        let targetXPForThisLevel = Math.pow(2, currentLevel - 1) * 1000;
-                        let prevLevelsTotalXP = currentLevel === 1 ? 0 : (Math.pow(2, currentLevel - 1) - 1) * 1000;
-                        let progressInLevel = currentXP - prevLevelsTotalXP;
-
-                        document.getElementById('u-nome').innerText = (data.nome || "OPERADOR").toUpperCase();
-                        document.getElementById('u-lvl').innerText = currentLevel;
-                        document.getElementById('xp-target').innerText = targetXPForThisLevel;
-                        document.getElementById('xp-num').innerText = Math.floor(progressInLevel);
-                        document.getElementById('xp-bar').style.width = (progressInLevel / targetXPForThisLevel * 100) + "%";
-                        
-                        // Atualiza recordes
-                        bests.runner = data.bestRunner || 0;
-                        bests.click = data.bestClick || 0;
-                        bests.math = data.bestMath || 0;
-                        document.getElementById('best-runner').innerText = bests.runner;
-                        document.getElementById('best-click').innerText = bests.click;
-                        document.getElementById('best-math').innerText = bests.math;
-
-                        updateCheckInUI(data.lastCheckIn);
-                    }
+                    let targetXP = Math.pow(2, currentLevel - 1) * 1000;
+                    let prevTotal = currentLevel === 1 ? 0 : (Math.pow(2, currentLevel-1)-1)*1000;
+                    
+                    document.getElementById('u-nome').innerText = (d.nome || "OPERADOR").toUpperCase();
+                    document.getElementById('u-lvl').innerText = currentLevel;
+                    document.getElementById('xp-target').innerText = targetXP;
+                    document.getElementById('xp-num').innerText = Math.floor(currentXP - prevTotal);
+                    document.getElementById('xp-bar').style.width = ((currentXP - prevTotal) / targetXP * 100) + "%";
+                    
+                    globalBests = { runner: d.bestRunner||0, click: d.bestClick||0, math: d.bestMath||0 };
+                    document.getElementById('best-runner').innerText = globalBests.runner;
+                    document.getElementById('best-click').innerText = globalBests.click;
+                    document.getElementById('best-math').innerText = globalBests.math;
+                    updateCheckInUI(d.lastCheckIn);
                 });
             }
         });
 
         async function addXP(v) { await updateDoc(doc(db, "usuarios", user.uid), { xp: increment(v) }); }
-        async function saveBest(field, value) {
-            if(value > bests[field]) {
-                const update = {}; update[`best${field.charAt(0).toUpperCase() + field.slice(1)}`] = value;
-                await updateDoc(doc(db, "usuarios", user.uid), update);
+        async function saveBest(f, v) {
+            if(v > globalBests[f]) {
+                const up = {}; up[`best${f.charAt(0).toUpperCase() + f.slice(1)}`] = v;
+                await updateDoc(doc(db, "usuarios", user.uid), up);
             }
         }
 
-        // --- CHECK-IN & ANÚNCIO ---
-        window.processCheckIn = () => {
-            document.getElementById('ad-overlay').style.display = 'flex';
-            let tl = 30;
-            const t = setInterval(() => {
-                tl--; document.getElementById('ad-timer').innerText = tl;
-                if(tl <= 0) { clearInterval(t); finalizeCheckIn(); }
-            }, 1000);
+        // --- RUNNER ENGINE V2.1 ---
+        let rActive = false, rStart = 0, isJumping = false, blockCounter = 0;
+        window.jumpCube = () => {
+            const h = document.getElementById('cube-hero');
+            if(isJumping) return;
+            isJumping = true;
+            h.style.transition = "bottom 0.35s cubic-bezier(0.4, 0, 0.2, 1)";
+            h.style.bottom = "90px";
+            setTimeout(() => {
+                h.style.bottom = "20px";
+                setTimeout(() => { isJumping = false; }, 350);
+            }, 350);
+            if(!rActive) startRunner();
         };
 
-        async function finalizeCheckIn() {
-            await updateDoc(doc(db, "usuarios", user.uid), { lastCheckIn: new Date().toLocaleDateString(), saldo: increment(0.02) });
-            document.getElementById('ad-overlay').style.display = 'none';
-            alert("Check-in concluído! +R$ 0,02");
+        function startRunner() {
+            rActive = true; rStart = Date.now(); blockCounter = 0;
+            const screen = document.getElementById('runner-screen');
+            const obs = document.createElement('div');
+            obs.className = 'obstacle';
+            obs.style.right = "-50px";
+            screen.appendChild(obs);
+
+            let loop = setInterval(() => {
+                let x = parseInt(obs.style.right) + 7;
+                obs.style.right = x + "px";
+
+                let h = document.getElementById('cube-hero');
+                let hBot = parseInt(h.style.bottom);
+                
+                if(x > 260 && x < 295 && hBot < 55) {
+                    clearInterval(loop); obs.remove(); rActive = false;
+                    saveBest('runner', Math.floor((Date.now() - rStart)/1000));
+                    alert("FALHA NA REDE! Recorde: " + Math.floor((Date.now() - rStart)/1000) + "s");
+                }
+                
+                if(x > 380) {
+                    blockCounter++;
+                    if(blockCounter % 2 === 0) {
+                        addXP(1); // GANHA 1 XP A CADA 2 BLOCOS
+                    }
+                    x = -30;
+                    obs.style.right = "-30px";
+                }
+            }, 20);
         }
 
+        // --- CLICKER ---
+        let cVal = 0, cStart = null;
+        window.doClickGame = () => {
+            if(!cStart) cStart = Date.now();
+            cVal += 5;
+            document.getElementById('click-fill').style.width = cVal + "%";
+            if(cVal >= 100) {
+                addXP(1);
+                saveBest('click', Math.floor((Date.now() - cStart)/1000));
+                cVal = 0; cStart = null;
+                document.getElementById('click-fill').style.width = "0%";
+            }
+        };
+
+        // --- MATH ---
+        let n1, n2, res, mCount = 0;
+        function nextM() { n1=Math.floor(Math.random()*15); n2=Math.floor(Math.random()*15); res=n1+n2; document.getElementById('math-quest').innerText = n1+"+"+n2; }
+        nextM();
+        window.checkMath = el => {
+            if(parseInt(el.value) === res) {
+                mCount++; addXP(1); saveBest('math', mCount);
+                el.value = ""; nextM();
+            }
+        };
+
+        // --- CHECKIN ---
+        window.processCheckIn = () => {
+            document.getElementById('ad-overlay').style.display='flex';
+            let t = 30;
+            let i = setInterval(() => {
+                t--; document.getElementById('ad-timer').innerText = t;
+                if(t <= 0) { clearInterval(i); finishCheckIn(); }
+            }, 1000);
+        };
+        async function finishCheckIn() {
+            await updateDoc(doc(db, "usuarios", user.uid), { lastCheckIn: new Date().toLocaleDateString(), saldo: increment(0.02) });
+            document.getElementById('ad-overlay').style.display='none';
+        }
         function updateCheckInUI(ld) {
             const today = new Date().toLocaleDateString();
             const day = new Date().getDay();
@@ -191,52 +246,11 @@
                 if(parseInt(d.dataset.day) === day) d.classList.add('active');
                 if(ld === today && parseInt(d.dataset.day) === day) {
                     d.classList.add('done');
-                    const btn = document.getElementById('btn-do-checkin');
-                    btn.innerText = "HOJE CONCLUÍDO"; btn.disabled = true; btn.style.opacity = "0.5";
+                    const b = document.getElementById('btn-do-checkin');
+                    b.innerText = "CHECK-IN OK"; b.disabled = true; b.style.opacity = "0.5";
                 }
             });
         }
-
-        // --- GAME CLICKER ---
-        let cVal = 0, cStart = null;
-        window.doClickGame = () => {
-            if(!cStart) cStart = Date.now();
-            cVal += 5; document.getElementById('click-fill').style.width = cVal + "%";
-            if(cVal >= 100) {
-                addXP(1);
-                saveBest('click', Math.floor((Date.now() - cStart) / 1000));
-                cVal = 0; cStart = null;
-                setTimeout(() => document.getElementById('click-fill').style.width = "0%", 100);
-            }
-        };
-
-        // --- GAME RUNNER ---
-        let rActive = false, rStart = 0;
-        window.jumpCube = () => {
-            const h = document.getElementById('cube-hero');
-            if(h.style.bottom === "80px") return;
-            h.style.bottom = "80px"; setTimeout(() => h.style.bottom = "20px", 400);
-            if(!rActive) { rActive = true; rStart = Date.now(); spawnObs(); }
-        };
-        function spawnObs() {
-            const obs = document.createElement('div');
-            obs.className = 'obstacle'; document.querySelector('.screen').appendChild(obs);
-            let p = -30;
-            let l = setInterval(() => {
-                p += 6; obs.style.right = p + 'px';
-                if(p > 250 && p < 280 && parseInt(document.getElementById('cube-hero').style.bottom) < 50) {
-                    clearInterval(l); obs.remove(); rActive = false;
-                    saveBest('runner', Math.floor((Date.now() - rStart) / 1000));
-                }
-                if(p > 350) { clearInterval(l); obs.remove(); rActive = false; addXP(1); spawnObs(); }
-            }, 20);
-        }
-
-        // --- MATH IA ---
-        let n1, n2, res, mScore = 0;
-        function newM() { n1 = Math.floor(Math.random()*15); n2 = Math.floor(Math.random()*15); res = n1+n2; document.getElementById('math-quest').innerText = n1+'+'+n2; }
-        newM();
-        window.checkMath = (el) => { if(parseInt(el.value) === res) { mScore++; addXP(1); saveBest('math', mScore); el.value=""; newM(); } };
     </script>
 </body>
 </html>
