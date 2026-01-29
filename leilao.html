@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mundo dos Lances - RoboSorteio</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --orange: #ff7b00; --neon: #00f2ff; }
+        
+        .auction-card {
+            background: linear-gradient(180deg, #0a0a0a 0%, #000 100%);
+            border: 1px solid #1a1a1a;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            margin: 20px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .timer-display {
+            font-family: 'Orbitron';
+            font-size: 2.5rem;
+            color: #fff;
+            text-shadow: 0 0 15px var(--orange);
+            margin: 15px 0;
+        }
+
+        .current-bidder {
+            background: rgba(255, 123, 0, 0.1);
+            color: var(--orange);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-family: 'Orbitron';
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .bid-price {
+            font-size: 1.8rem;
+            color: var(--green);
+            font-family: 'Orbitron';
+            font-weight: bold;
+        }
+
+        .btn-bid {
+            background: var(--orange);
+            color: #000;
+            border: none;
+            width: 100%;
+            padding: 20px;
+            border-radius: 15px;
+            font-family: 'Orbitron';
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(255, 123, 0, 0.3);
+        }
+
+        .btn-bid:active { transform: scale(0.95); }
+
+        .bids-status {
+            background: #050505;
+            border: 1px solid #111;
+            padding: 10px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .status-item span { display: block; font-family: 'Orbitron'; font-size: 0.5rem; color: #444; }
+        .status-item b { color: #fff; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <button onclick="window.location.href='index.html'" style="background:none; border:none; color:var(--orange); font-size:1.2rem; position:absolute; left:15px;">⬅</button>
+        <span>ARENA DE LANCES</span>
+    </div>
+
+    <div class="container">
+        
+        <div class="bids-status" style="margin: 20px;">
+            <div class="status-item">
+                <span>SEUS BIDS</span>
+                <b id="u-bids">0</b>
+            </div>
+            <div class="status-item">
+                <span>SEU SALDO</span>
+                <b id="u-saldo">R$ 0.00</b>
+            </div>
+        </div>
+
+        <div class="auction-card">
+            <div style="font-family:'Orbitron'; color:#444; font-size:0.6rem; letter-spacing:2px;">PRÊMIO EM DISPUTA</div>
+            <div style="font-size: 1.4rem; color:#fff; font-weight:bold; margin: 10px 0;">PIX DE R$ 200,00</div>
+            
+            <div class="timer-display" id="timer">00:15</div>
+            
+            <div class="current-bidder" id="bidder">AGUARDANDO LANCE...</div>
+            
+            <div style="font-family:'Orbitron'; font-size:0.55rem; color:#444;">VALOR ATUAL DO ARREMATE</div>
+            <div class="bid-price">R$ <span id="current-price">0.00</span></div>
+
+            <button class="btn-bid" onclick="darLance()">
+                DAR LANCE (1 BID)
+            </button>
+            
+            <p style="font-size:0.55rem; color:#333; margin-top:15px; font-family:'Orbitron';">
+                Cada lance aumenta o preço em R$ 0,01 e o tempo em 10s.
+            </p>
+        </div>
+
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, increment } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8",
+            authDomain: "minharifadigital.firebaseapp.com",
+            projectId: "minharifadigital",
+            appId: "1:59630725905:web:396c8cfca385dc3d957ab0"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        let user;
+        let userBids = 0;
+        let tempoRestante = 15;
+        let precoAtual = 0.00;
+        let nomeUsuario = "";
+
+        onAuthStateChanged(auth, (u) => {
+            if (u) {
+                user = u;
+                onSnapshot(doc(db, "usuarios", u.uid), (snap) => {
+                    const data = snap.data();
+                    if (data) {
+                        nomeUsuario = data.nome;
+                        userBids = data.bids || 0;
+                        document.getElementById('u-bids').innerText = userBids;
+                        document.getElementById('u-saldo').innerText = `R$ ${(data.saldo || 0).toFixed(2)}`;
+                    }
+                });
+            }
+        });
+
+        // Lógica do Cronômetro (Simulada para o Front-end)
+        const timerInterval = setInterval(() => {
+            if (tempoRestante > 0) {
+                tempoRestante--;
+                let min = Math.floor(tempoRestante / 60);
+                let seg = tempoRestante % 60;
+                document.getElementById('timer').innerText = 
+                    `${min.toString().padStart(2,'0')}:${seg.toString().padStart(2,'0')}`;
+                
+                if(tempoRestante <= 5) {
+                    document.getElementById('timer').style.color = "#ff0000";
+                } else {
+                    document.getElementById('timer').style.color = "#fff";
+                }
+            } else {
+                document.getElementById('timer').innerText = "ENCERRADO";
+            }
+        }, 1000);
+
+        window.darLance = async () => {
+            if (userBids <= 0) {
+                alert("Você não tem Bids suficientes! Jogue os minigames ou compre na loja.");
+                return;
+            }
+
+            if (tempoRestante <= 0) {
+                alert("Este leilão já foi encerrado.");
+                return;
+            }
+
+            // Atualiza no Firebase (Consome 1 Bid)
+            await updateDoc(doc(db, "usuarios", user.uid), {
+                bids: increment(-1)
+            });
+
+            // Atualiza Interface (Simulação de tempo real)
+            tempoRestante = 15; // Reseta para 15 segundos (O Pulo do Gato)
+            precoAtual += 0.01; // Sobe 1 centavo
+            
+            document.getElementById('current-price').innerText = precoAtual.toFixed(2);
+            document.getElementById('bidder').innerText = `ÚLTIMO LANCE: ${nomeUsuario.toUpperCase()}`;
+            document.getElementById('bidder').style.background = "rgba(0, 255, 136, 0.1)";
+            document.getElementById('bidder').style.color = "#00ff88";
+        };
+    </script>
+</body>
+</html>
