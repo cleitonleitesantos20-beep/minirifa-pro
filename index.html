@@ -3,185 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RobodaSorte IA - Em Desenvolvimento</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Nexus S - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --neon: #00f2ff; 
-            --pink: #ff0055; 
-            --green: #00ff88; 
-            --orange: #ff7b00; 
-            --gold: #ffd700; 
-            --dark: #050505;
-        }
+        :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --gold: #ffcc00; --dark: #0a0a0a; }
+        body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden; }
 
-        body { background-color: #000; color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; overflow-x: hidden; }
+        /* HEADER & PERFIL COMPLETO */
+        .profile-section { padding: 30px 20px; background: radial-gradient(circle at top, #111 0%, #000 100%); border-bottom: 1px solid #1a1a1a; text-align: center; position: relative; }
+        
+        .avatar-container { position: relative; width: 90px; height: 90px; margin: 0 auto 15px; }
+        .avatar-main { width: 100%; height: 100%; background: #000; border: 2px solid var(--neon); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; box-shadow: 0 0 20px rgba(0,242,255,0.2); cursor: pointer; transition: 0.3s; }
+        .avatar-main:hover { transform: scale(1.05); border-color: #fff; }
+        
+        .level-badge { position: absolute; bottom: -5px; right: -5px; background: var(--neon); color: #000; font-family: 'Orbitron'; font-size: 0.6rem; font-weight: bold; padding: 4px 8px; border-radius: 10px; box-shadow: 0 0 10px var(--neon); }
 
-        .header { 
-            height: 60px; display: flex; align-items: center; justify-content: center; 
-            background: #000; border-bottom: 1px solid #111; font-family: 'Orbitron'; 
-            font-size: 0.7rem; letter-spacing: 1px; color: #fff;
-        }
+        .user-info h2 { font-family: 'Orbitron'; font-size: 1.1rem; margin: 10px 0 5px; letter-spacing: 2px; }
+        .user-balance { color: var(--green); font-weight: bold; font-size: 1.3rem; margin-bottom: 15px; display: block; }
 
-        .container { padding: 15px; }
+        /* BARRA DE PROGRESSO XP */
+        .xp-container { width: 80%; max-width: 250px; margin: 0 auto; background: #111; height: 6px; border-radius: 10px; overflow: hidden; border: 1px solid #222; }
+        .xp-bar { height: 100%; background: linear-gradient(90deg, var(--neon), var(--pink)); width: 0%; transition: 1s ease-in-out; }
+        .xp-text { font-size: 0.55rem; font-family: 'Orbitron'; color: #444; margin-top: 5px; display: block; }
 
-        /* PROPAGANDA */
-        .ads-space {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px dashed #222;
-            color: #333;
-            text-align: center;
-            padding: 12px;
-            font-family: 'Orbitron';
-            font-size: 0.5rem;
-            border-radius: 8px;
-            margin: 10px 0;
-        }
+        .container { padding: 25px; max-width: 450px; margin: 0 auto; }
 
-        /* PERFIL */
-        .wallet-card {
-            background: linear-gradient(180deg, #0a0a0a 0%, #000 100%);
-            border: 1px solid #111;
-            border-radius: 20px;
-            padding: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
+        /* GRID DE BOTÕES */
+        .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .btn-card { background: #080808; border: 1px solid #1a1a1a; padding: 25px 15px; border-radius: 20px; color: #fff; font-family: 'Orbitron'; font-size: 0.7rem; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden; }
+        .btn-card:active { transform: scale(0.95); border-color: var(--neon); }
+        .btn-card i { font-size: 1.8rem; }
+        
+        /* BOTÃO NEXUS S */
+        .nexus-wrapper { width: 100%; display: flex; justify-content: center; margin-top: 5px; }
+        .btn-nexus { width: 100%; background: linear-gradient(135deg, #0a0a0a 0%, #151515 100%); border: 1px solid var(--gold); padding: 22px; border-radius: 20px; color: var(--gold); font-family: 'Orbitron'; font-size: 1rem; font-weight: bold; cursor: pointer; letter-spacing: 4px; box-shadow: 0 0 20px rgba(255, 204, 0, 0.05); transition: 0.3s; }
+        .btn-nexus:active { transform: scale(0.98); background: #1a1a1a; }
 
-        /* GRID DE 6 BOTÕES */
-        .main-menu-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 12px; 
-            margin-top: 15px; 
-        }
+        /* STATUS DO SISTEMA */
+        .system-status { margin-top: 30px; background: #050505; border: 1px solid #111; padding: 15px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .status-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; display: inline-block; margin-right: 5px; box-shadow: 0 0 10px var(--green); }
+        .status-text { font-family: 'Orbitron'; font-size: 0.55rem; color: #444; }
 
-        .menu-card {
-            background: #0a0a0a;
-            border: 1px solid #1a1a1a;
-            border-radius: 15px;
-            padding: 20px 10px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .menu-card:active { transform: scale(0.95); }
-        .menu-card i { font-size: 1.8rem; }
-        .menu-card span { font-family: 'Orbitron'; font-size: 0.55rem; font-weight: bold; letter-spacing: 1px; }
-
-        /* LETREIRO DIGITAL (TREM) */
-        .news-ticker-container {
-            background: #050505;
-            border-top: 1px solid #111;
-            border-bottom: 1px solid #111;
-            margin: 20px -15px; /* Sai da margem do container para ocupar largura total */
-            padding: 12px 0;
-            overflow: hidden;
-            white-space: nowrap;
-            position: relative;
-        }
-
-        .ticker-title {
-            position: absolute;
-            left: 0;
-            top: 0;
-            background: var(--pink);
-            color: #000;
-            font-family: 'Orbitron';
-            font-size: 0.5rem;
-            font-weight: bold;
-            padding: 13px 10px;
-            z-index: 10;
-        }
-
-        .ticker-wrapper {
-            display: inline-block;
-            padding-left: 100%;
-            animation: ticker-animation 30s linear infinite;
-        }
-
-        .ticker-item {
-            display: inline-block;
-            color: #888;
-            font-size: 0.75rem;
-            margin-right: 60px;
-            font-family: 'Rajdhani';
-        }
-
-        .ticker-item b { color: var(--neon); }
-
-        @keyframes ticker-animation {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-100%); }
-        }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        🤖 ROBODASORTE IA EM DESENVOLVIMENTO
+    <div class="profile-section">
+        <div class="avatar-container">
+            <div class="avatar-main" id="u-avatar" onclick="window.location.href='config.html'">👤</div>
+            <div class="level-badge">LVL <span id="u-level">1</span></div>
+        </div>
+        <h2 id="u-nome">CARREGANDO...</h2>
+        <span class="user-balance">R$ <span id="u-saldo">0,00</span></span>
+        
+        <div class="xp-container">
+            <div class="xp-bar" id="u-xp-bar"></div>
+        </div>
+        <span class="xp-text">SISTEMA DE SINCRONIA: <span id="u-xp-pct">0</span>%</span>
     </div>
 
     <div class="container">
-        
-        <div class="ads-space">SUA PROPAGANDA AQUI</div>
-
-        <div class="wallet-card">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <div style="width:40px; height:40px; background:#111; border-radius:50%; display:flex; align-items:center; justify-content:center; border:1px solid var(--neon); font-size:1.2rem;">👤</div>
-                    <div>
-                        <div style="color:#fff; font-weight:bold; font-size:0.85rem;" id="u-nome">Carregando...</div>
-                        <div style="font-size:0.55rem; color:#444; font-family:'Orbitron'; uppercase">LVL <span id="u-lvl">1</span> | <span id="u-code">---</span></div>
-                    </div>
-                </div>
-                <button onclick="window.location.href='config.html'" style="background:#111; border:1px solid #333; color:var(--neon); padding:8px 12px; border-radius:8px; cursor:pointer;">⚙️</button>
-            </div>
-            
-            <div style="background:#050505; padding:12px; border-radius:12px; margin-top:10px; display:flex; justify-content:space-between; align-items:center; border:1px solid #111;">
-                <span style="font-family:'Orbitron'; font-size:0.5rem; color:#444;">CARTEIRA DISPONÍVEL</span>
-                <span style="font-family:'Orbitron'; font-size:1rem; color:var(--green);">R$ <span id="u-saldo">0.00</span></span>
-            </div>
+        <div class="main-grid">
+            <button class="btn-card" onclick="window.location.href='rifas.html'">
+                <span>🎟️</span>
+                RIFAS ATIVAS
+            </button>
+            <button class="btn-card" onclick="window.location.href='leiloes.html'">
+                <span>🔨</span>
+                LEILÕES IA
+            </button>
+            <button class="btn-card" onclick="window.location.href='trades.html'">
+                <span>📈</span>
+                IA TRADES
+            </button>
+            <button class="btn-card" onclick="window.location.href='config.html'">
+                <span>⚙️</span>
+                CONFIGURAÇÃO
+            </button>
         </div>
 
-        <div class="main-menu-grid">
-            <div class="menu-card" style="border-bottom: 3px solid var(--neon);" onclick="window.location.href='rifas.html'">
-                <i>🎟️</i><span>RIFAS</span>
-            </div>
-            <div class="menu-card" style="border-bottom: 3px solid var(--pink);" onclick="window.location.href='central.html'">
-                <i>🎮</i><span>GAMES</span>
-            </div>
-            <div class="menu-card" style="border-bottom: 3px solid #00a2ff;" onclick="window.location.href='trades.html'">
-                <i>📈</i><span>TRADES IA</span>
-            </div>
-            <div class="menu-card" style="border-bottom: 3px solid var(--orange);" onclick="window.location.href='leilao.html'">
-                <i>🏆</i><span>LEILÕES</span>
-            </div>
-            <div class="menu-card" style="border-bottom: 3px solid var(--green);" onclick="window.location.href='depositar.html'">
-                <i>💰</i><span>DEPOSITAR</span>
-            </div>
-            <div class="menu-card" style="border-bottom: 3px solid var(--gold);" onclick="window.location.href='rank.html'">
-                <i>📊</i><span>RANKING</span>
-            </div>
+        <div class="nexus-wrapper">
+            <button class="btn-nexus" onclick="window.location.href='market.html'">
+                🛒 NEXUS S
+            </button>
         </div>
 
-        <div class="news-ticker-container">
-            <div class="ticker-title">LIVE FEED</div>
-            <div class="ticker-wrapper">
-                <div class="ticker-item">🏆 <b>@Davi_M</b> arrematou o PIX de R$ 200 no Leilão!</div>
-                <div class="ticker-item">🔥 <b>@Ana_S</b> acaba de atingir o Nível 15!</div>
-                <div class="ticker-item">🎟️ Rifa #042: O vencedor foi o número <b>27 (@Carlos_01)</b></div>
-                <div class="ticker-item">📈 Robô IA: Meta de 15% de lucro atingida hoje!</div>
-                <div class="ticker-item">💰 <b>@Marcos_Trade</b> realizou um saque de R$ 450,00!</div>
+        <div class="system-status">
+            <div>
+                <span class="status-dot"></span>
+                <span class="status-text">SISTEMA OPERACIONAL ATIVO</span>
             </div>
+            <span class="status-text" id="system-time">00:00:00</span>
         </div>
-
-        <div class="ads-space">SUA PROPAGANDA AQUI</div>
-
     </div>
 
     <script type="module">
@@ -189,32 +102,43 @@
         import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8",
-            authDomain: "minharifadigital.firebaseapp.com",
-            projectId: "minharifadigital",
-            appId: "1:59630725905:web:396c8cfca385dc3d957ab0"
-        };
-
+        const firebaseConfig = { apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", authDomain: "minharifadigital.firebaseapp.com", projectId: "minharifadigital", appId: "1:59630725905:web:396c8cfca385dc3d957ab0" };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        onAuthStateChanged(auth, (u) => {
-            if (u) {
-                onSnapshot(doc(db, "usuarios", u.uid), (snap) => {
-                    const data = snap.data();
-                    if (data) {
-                        document.getElementById('u-nome').innerText = data.nome || "Usuário";
-                        document.getElementById('u-saldo').innerText = (data.saldo || 0).toFixed(2);
-                        document.getElementById('u-code').innerText = data.meuCodigo || "ID---";
-                        document.getElementById('u-lvl').innerText = Math.floor((data.xp || 0) / 100) + 1;
-                    }
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                onSnapshot(doc(db, "usuarios", user.uid), snap => {
+                    const d = snap.data();
+                    if(!d) return;
+                    
+                    // Básico
+                    document.getElementById('u-nome').innerText = (d.nome || "OPERADOR").toUpperCase();
+                    document.getElementById('u-saldo').innerText = (d.saldo || 0).toLocaleString('pt-br', {minimumFractionDigits: 2});
+                    
+                    // Avatar & Level
+                    if(d.avatarEmoji) document.getElementById('u-avatar').innerText = d.avatarEmoji;
+                    const level = d.level || 1;
+                    document.getElementById('u-level').innerText = level;
+
+                    // Lógica de XP
+                    const xpAtual = d.xp || 0;
+                    const xpProximoNivel = level * 100;
+                    const porcentagem = Math.min((xpAtual / xpProximoNivel) * 100, 100);
+                    document.getElementById('u-xp-bar').style.width = porcentagem + "%";
+                    document.getElementById('u-xp-pct').innerText = Math.floor(porcentagem);
                 });
-            } else { 
-                window.location.href = 'login.html'; 
+            } else {
+                window.location.href = "login.html";
             }
         });
+
+        // Relógio do Sistema
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('system-time').innerText = now.toLocaleTimeString('pt-br');
+        }, 1000);
     </script>
 </body>
 </html>
