@@ -3,106 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Leilões IA v5.8.0</title>
+    <title>Leilões IA v5.8.1</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --dark: #0a0a0a; --gold: #ffcc00; }
+        :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --dark: #0a0a0a; --gold: #ffcc00; --glass: rgba(255,255,255,0.03); }
         body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; padding: 0; min-height: 100vh; overflow-y: auto; }
         
-        /* BARRA DE STATUS FIXA */
-        .status-bar { position: sticky; top: 0; z-index: 100; background: rgba(0,0,0,0.9); padding: 10px 20px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; backdrop-filter: blur(10px); }
-        .stat-item { font-family: 'Orbitron'; font-size: 0.65rem; display: flex; flex-direction: column; }
-        .stat-val { font-size: 0.9rem; font-weight: bold; }
-        .val-cash { color: var(--green); }
-        .val-bids { color: var(--neon); }
+        /* STATUS BAR PREMIUM */
+        .status-bar { position: sticky; top: 0; z-index: 100; background: rgba(0,0,0,0.9); padding: 12px 20px; border-bottom: 1px solid #1a1a1a; display: flex; justify-content: space-between; backdrop-filter: blur(15px); }
+        .stat-box { display: flex; align-items: center; gap: 10px; }
+        .stat-label { font-family: 'Orbitron'; font-size: 0.5rem; color: #555; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-val { font-family: 'Orbitron'; font-size: 0.85rem; font-weight: bold; }
+        .val-cash { color: var(--green); text-shadow: 0 0 10px rgba(0,255,136,0.3); }
+        .val-bids { color: var(--neon); text-shadow: 0 0 10px rgba(0,242,255,0.3); }
 
         .container { padding: 20px; max-width: 500px; margin: 0 auto; }
-        .header-title { font-family: 'Orbitron'; font-size: 0.8rem; color: #555; text-align: center; margin-bottom: 25px; letter-spacing: 2px; }
 
-        /* CARDS DE LEILÃO */
-        .auction-card { background: #080808; border: 1px solid #1a1a1a; border-radius: 20px; padding: 20px; margin-bottom: 30px; position: relative; overflow: hidden; }
-        .auction-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; }
+        /* CARDS REESTILIZADOS */
+        .auction-card { background: linear-gradient(145deg, #0f0f0f 0%, #050505 100%); border: 1px solid #1a1a1a; border-radius: 24px; padding: 25px; margin-bottom: 35px; position: relative; transition: 0.4s; }
+        .auction-card:hover { border-color: #333; transform: translateY(-5px); }
         
-        /* CORES POR TIPO */
-        .type-classic::before { background: var(--neon); }
-        .type-reverse::before { background: var(--pink); }
-        .type-blind::before { background: var(--gold); }
-
-        .badge-type { font-family: 'Orbitron'; font-size: 0.5rem; padding: 3px 8px; border-radius: 4px; position: absolute; top: 15px; right: 15px; }
-        .badge-classic { background: rgba(0, 242, 255, 0.1); color: var(--neon); border: 1px solid var(--neon); }
-        .badge-reverse { background: rgba(255, 0, 85, 0.1); color: var(--pink); border: 1px solid var(--pink); }
-        .badge-blind { background: rgba(255, 204, 0, 0.1); color: var(--gold); border: 1px solid var(--gold); }
-
-        .item-img { width: 100%; height: 120px; background: #111; border-radius: 12px; margin: 15px 0; display: flex; align-items: center; justify-content: center; font-size: 3rem; }
-        .item-name { font-family: 'Orbitron'; font-size: 1.1rem; display: block; }
-        .item-timer { font-family: 'Orbitron'; font-size: 0.7rem; color: #ff0055; margin-bottom: 10px; display: block; }
+        .header-info { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+        .type-tag { font-family: 'Orbitron'; font-size: 0.45rem; padding: 4px 10px; border-radius: 20px; letter-spacing: 1px; }
         
-        .bid-info { display: flex; justify-content: space-between; align-items: flex-end; margin: 15px 0; border-top: 1px solid #1a1a1a; padding-top: 15px; }
-        .current-price { font-family: 'Orbitron'; font-size: 1.3rem; }
-        .last-bidder { font-size: 0.6rem; color: #555; text-transform: uppercase; }
+        /* TEMAS */
+        .tag-classic { color: var(--neon); border: 1px solid var(--neon); background: rgba(0,242,255,0.05); }
+        .tag-reverse { color: var(--pink); border: 1px solid var(--pink); background: rgba(255,0,85,0.05); }
+        .tag-blind { color: var(--gold); border: 1px solid var(--gold); background: rgba(255,204,0,0.05); }
 
-        .btn-bid { width: 100%; background: var(--neon); color: #000; border: none; padding: 15px; border-radius: 10px; font-family: 'Orbitron'; font-weight: bold; cursor: pointer; font-size: 0.8rem; transition: 0.3s; }
-        .btn-bid:disabled { background: #222; color: #444; }
+        .item-name { font-family: 'Orbitron'; font-size: 1.2rem; color: #fff; display: block; margin-top: 5px; }
+        .item-display { width: 100%; height: 140px; background: radial-gradient(#1a1a1a, #080808); border-radius: 16px; margin: 20px 0; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; border: 1px solid #111; }
         
-        .auction-desc { font-size: 0.7rem; color: #666; margin-bottom: 15px; line-height: 1.4; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .info-item { background: var(--glass); padding: 10px; border-radius: 12px; border: 1px solid #1a1a1a; }
+        .info-label { font-size: 0.55rem; color: #444; font-family: 'Orbitron'; display: block; margin-bottom: 4px; }
+        .info-data { font-family: 'Orbitron'; font-size: 0.8rem; color: #eee; }
+
+        .desc-box { background: rgba(0,0,0,0.3); padding: 12px; border-radius: 10px; margin-bottom: 20px; border-left: 2px solid #222; }
+        .desc-text { font-size: 0.75rem; color: #888; line-height: 1.5; margin: 0; }
+
+        .btn-bid { width: 100%; padding: 16px; border-radius: 14px; font-family: 'Orbitron'; font-size: 0.8rem; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .btn-bid:active { transform: scale(0.96); }
+
+        .btn-back { width: 100%; background: none; border: 1px solid #222; color: #444; padding: 15px; border-radius: 14px; font-family: 'Orbitron'; font-size: 0.7rem; cursor: pointer; margin-top: 20px; margin-bottom: 50px; }
     </style>
 </head>
 <body>
 
     <div class="status-bar">
-        <div class="stat-item">
-            <span>CARTEIRA (BRL)</span>
-            <span class="stat-val val-cash">R$ <span id="u-saldo">0,00</span></span>
+        <div class="stat-box">
+            <div class="stat-label">Carteira</div>
+            <div class="stat-val val-cash">R$ <span id="u-saldo">0,00</span></div>
         </div>
-        <div class="stat-item" style="align-items: flex-end;">
-            <span>MEUS BIDS</span>
-            <span class="stat-val val-bids"><span id="u-bids">0</span> BIDS</span>
+        <div class="stat-box">
+            <div class="stat-label">Créditos Bids</div>
+            <div class="stat-val val-bids"><span id="u-bids">0</span> BIDS</div>
         </div>
     </div>
 
     <div class="container">
-        <div class="header-title">SISTEMA DE LEILÕES IA</div>
-
-        <div class="auction-card type-classic">
-            <span class="badge-type badge-classic">CENTAVOS CLÁSSICO</span>
+        
+        <div class="auction-card">
+            <div class="header-info">
+                <span class="type-tag tag-classic">CLÁSSICO DE CENTAVOS</span>
+                <span style="font-family:'Orbitron'; font-size:0.6rem; color:var(--pink);">⏱ 15s</span>
+            </div>
             <span class="item-name">IPHONE 15 PRO MAX</span>
-            <div class="item-img">📱</div>
-            <span class="item-timer">⏱ 00:00:15</span>
-            <p class="auction-desc">Cada lance aumenta o valor em R$ 0,01 e reinicia o cronômetro. O último a dar o lance vence.</p>
-            <div class="bid-info">
-                <div>
-                    <span class="last-bidder">ÚLTIMO: @CyberPlayer</span>
-                    <div class="current-price">R$ 1,42</div>
+            <div class="item-display">📱</div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">PREÇO ATUAL</span>
+                    <span class="info-data" style="color:var(--green)">R$ 1,42</span>
                 </div>
-                <button class="btn-bid" onclick="darLance(1)">DAR LANCE (1 BID)</button>
+                <div class="info-item">
+                    <span class="info-label">ARREMATANTE</span>
+                    <span class="info-data">@CYBER_X</span>
+                </div>
+            </div>
+
+            <div class="desc-box">
+                <p class="desc-text">O tempo reinicia a cada lance. O último operador antes do cronômetro zerar arremata o item pelo preço atual.</p>
+            </div>
+            
+            <button class="btn-bid" style="background:var(--neon); color:#000;" onclick="darLance(1)">EXECUTAR LANCE (1 BID)</button>
+        </div>
+
+        <div class="auction-card">
+            <div class="header-info">
+                <span class="type-tag tag-reverse">MENOR LANCE ÚNICO</span>
+                <span style="font-family:'Orbitron'; font-size:0.6rem; color:#666;">⏱ 23:45:10</span>
+            </div>
+            <span class="item-name">PLAYSTATION 5 SLIM</span>
+            <div class="item-display">🎮</div>
+
+            <div class="desc-box">
+                <p class="desc-text"><b>Regra de Ouro:</b> O vencedor é quem oferecer o menor valor (Ex: R$ 0,02) que <b>ninguém mais</b> tenha oferecido.</p>
+            </div>
+
+            <div style="display:flex; gap:10px; margin-bottom:10px;">
+                <input type="number" step="0.01" id="val-reverse" placeholder="0,00" style="flex:1; background:#000; border:1px solid #222; color:#fff; padding:15px; border-radius:12px; font-family:'Orbitron';">
+                <button class="btn-bid" style="flex:1.2; background:var(--pink); color:#fff;" onclick="darLance(5)">LANÇAR (5 BIDS)</button>
             </div>
         </div>
 
-        <div class="auction-card type-reverse">
-            <span class="badge-type badge-reverse">REVERSO</span>
-            <span class="item-name">PLAYSTATION 5</span>
-            <div class="item-img">🎮</div>
-            <span class="item-timer">⏱ 02:45:12</span>
-            <p class="auction-desc">O vencedor é aquele que der o **MENOR LANCE ÚNICO**. Se duas pessoas derem o mesmo valor, ele deixa de ser único.</p>
-            <div class="bid-info">
-                <input type="number" step="0.01" placeholder="0,00" style="width: 40%; background: #000; border: 1px solid var(--pink); color: #fff; padding: 10px; border-radius: 8px; font-family: 'Orbitron';">
-                <button class="btn-bid" style="width: 55%; background: var(--pink);" onclick="darLance(2)">DAR LANCE (5 BIDS)</button>
+        <div class="auction-card">
+            <div class="header-info">
+                <span class="type-tag tag-blind">BLIND BIDDING</span>
+                <span style="font-family:'Orbitron'; font-size:0.6rem; color:#666;">FECHAMENTO HOJE</span>
+            </div>
+            <span class="item-name">PACK 0.1 BITCOIN</span>
+            <div class="item-display">₿</div>
+
+            <div class="desc-box">
+                <p class="desc-text">Lances ocultos de alto volume. Ao término do ciclo, o sistema revela o maior investidor de Bids como vencedor.</p>
+            </div>
+
+            <div style="display:flex; gap:10px;">
+                <input type="number" id="val-blind" placeholder="Qtd Bids" style="flex:1; background:#000; border:1px solid #222; color:#fff; padding:15px; border-radius:12px; font-family:'Orbitron';">
+                <button class="btn-bid" style="flex:1.2; background:var(--gold); color:#000;" onclick="darLance(10)">ALOCAR (10+ BIDS)</button>
             </div>
         </div>
 
-        <div class="auction-card type-blind">
-            <span class="badge-type badge-blind">CEGO (BLIND)</span>
-            <span class="item-name">BITCOIN (0.1 BTC)</span>
-            <div class="item-img">₿</div>
-            <span class="item-timer">FECHAMENTO: 20:00</span>
-            <p class="auction-desc">Ninguém vê os lances dos outros. Ao final do tempo, o maior lance secreto leva o prêmio.</p>
-            <div class="bid-info">
-                <input type="number" placeholder="Quantos Bids?" style="width: 40%; background: #000; border: 1px solid var(--gold); color: #fff; padding: 10px; border-radius: 8px; font-family: 'Orbitron';">
-                <button class="btn-bid" style="width: 55%; background: var(--gold);" onclick="darLance(10)">DAR LANCE (10 BIDS)</button>
-            </div>
-        </div>
-
-        <button class="btn-bid" style="background:none; border: 1px solid #333; color:#555;" onclick="window.location.href='central.html'">VOLTAR À CENTRAL</button>
+        <button class="btn-back" onclick="window.location.href='index.html'">SAIR E VOLTAR AO MENU</button>
     </div>
 
     <script type="module">
@@ -131,12 +154,14 @@
 
         window.darLance = async (custo) => {
             if (userBids >= custo) {
-                await updateDoc(doc(db, "usuarios", auth.currentUser.uid), {
-                    bids: increment(-custo)
-                });
-                alert("LANCE REGISTRADO NO SISTEMA!");
+                try {
+                    await updateDoc(doc(db, "usuarios", auth.currentUser.uid), {
+                        bids: increment(-custo)
+                    });
+                    alert("SISTEMA: Lance registrado com sucesso.");
+                } catch(e) { alert("Erro de conexão."); }
             } else {
-                alert("BIDS INSUFICIENTES! Adquira mais no Market.");
+                alert("ACESSO NEGADO: Saldo de Bids insuficiente.");
             }
         };
     </script>
