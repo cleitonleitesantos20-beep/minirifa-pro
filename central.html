@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Central IA v5.7.2 - Completa</title>
+    <title>Central IA v5.7.3</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --dark: #0a0a0a; }
         body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; padding: 0; min-height: 100vh; overflow-y: auto; }
         
-        /* BARRA DE PROGRESSO FIXA NO TOPO */
         .top-progress-bar { position: sticky; top: 0; z-index: 100; background: #000; padding: 10px 15px; border-bottom: 1px solid #1a1a1a; }
         .lvl-section { background: var(--dark); padding: 10px; border-radius: 10px; border: 1px solid #222; }
         .progress-container { background: #111; height: 8px; border-radius: 4px; margin-top: 5px; overflow: hidden; }
@@ -19,11 +18,8 @@
         .btn-exit { background: var(--pink); color: #fff; border: none; padding: 5px 12px; border-radius: 4px; font-family: 'Orbitron'; cursor: pointer; font-size: 0.5rem; }
 
         .container { padding: 10px 15px; padding-bottom: 40px; }
-        
-        /* ANÚNCIOS */
         .ad-banner { background: #0a0a0a; border: 1px dashed #333; color: #444; text-align: center; padding: 12px; font-family: 'Orbitron'; font-size: 0.45rem; margin: 10px 0; border-radius: 8px; }
 
-        /* CHECK-IN */
         .daily-section { background: var(--dark); padding: 15px; border-radius: 15px; border: 1px solid #1a1a1a; margin-bottom: 15px; }
         .daily-grid { display: flex; justify-content: space-between; margin-top: 10px; }
         .day-dot { width: 28px; height: 28px; border-radius: 50%; border: 1px solid #222; display: flex; align-items: center; justify-content: center; font-size: 0.5rem; font-family: 'Orbitron'; color: #444; }
@@ -31,11 +27,9 @@
         .day-dot.done { background: var(--green); color: #000; border: none; }
         .btn-checkin { width: 100%; margin-top: 12px; background: #111; border: 1px solid var(--green); color: var(--green); padding: 10px; border-radius: 8px; font-family: 'Orbitron'; font-size: 0.6rem; cursor: pointer; }
 
-        /* OVERLAYS */
         #ad-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; }
         .game-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); z-index: 20; display: flex; align-items: center; justify-content: center; border-radius: 12px; }
 
-        /* GAMES */
         .game-card { background: var(--dark); border: 1px solid #1a1a1a; border-radius: 20px; padding: 15px; margin-bottom: 20px; position: relative; }
         .game-card h3 { font-family: 'Orbitron'; font-size: 0.65rem; margin: 0; color: var(--neon); }
         .game-stat { font-size: 0.5rem; color: #555; font-family: 'Orbitron'; margin-bottom: 5px; display: block; }
@@ -43,6 +37,12 @@
         
         #cube-hero { width: 20px; height: 20px; background: var(--neon); position: absolute; bottom: 20px; left: 45px; box-shadow: 0 0 10px var(--neon); z-index: 10; }
         .obstacle { width: 14px; height: 28px; background: var(--pink); position: absolute; bottom: 20px; box-shadow: 0 0 8px var(--pink); }
+
+        /* CLICK DUEL STYLE */
+        .duel-track { width: 80%; height: 12px; background: #111; border-radius: 6px; margin: 5px 0; overflow: hidden; border: 1px solid #222; position: relative; }
+        .duel-bar-player { height: 100%; background: var(--neon); width: 0%; box-shadow: 0 0 10px var(--neon); }
+        .duel-bar-ia { height: 100%; background: var(--pink); width: 0%; box-shadow: 0 0 10px var(--pink); }
+        .duel-label { font-family: 'Orbitron'; font-size: 0.4rem; color: #555; align-self: flex-start; margin-left: 10%; }
 
         .btn-game { background: var(--neon); color: #000; border: none; padding: 10px 20px; font-family: 'Orbitron'; font-weight: bold; border-radius: 8px; cursor: pointer; }
     </style>
@@ -69,7 +69,7 @@
     </div>
 
     <div class="header">
-        <span>CENTRAL IA v5.7.2</span>
+        <span>CENTRAL IA v5.7.3</span>
         <button class="btn-exit" onclick="window.location.href='index.html'">SAIR</button>
     </div>
 
@@ -99,11 +99,16 @@
 
         <div class="game-card">
             <span class="game-stat">MELHOR TEMPO: <span id="best-click" style="color:var(--green)">0</span>s</span>
-            <h3>DATA CLICKER (+1 XP)</h3>
-            <div class="screen">
-                <div id="click-fill-bar" style="position:absolute; left:0; top:0; height:100%; width:0%; background: rgba(0,242,255,0.15); transition: 0.1s;"></div>
-                <div id="click-txt" style="font-family:'Orbitron'; font-size:0.9rem; z-index:5; margin-bottom:10px;">META: 20 CLIQUES</div>
-                <button class="btn-game" onclick="doClickGame()">CLICK!</button>
+            <h3>DATA DUEL (+1 XP)</h3>
+            <div class="screen" id="click-screen">
+                <div id="click-start-ui" class="game-overlay">
+                    <button class="btn-game" onclick="startClickDuel()">INICIAR DUELO</button>
+                </div>
+                <div class="duel-label">VOCÊ (NEON)</div>
+                <div class="duel-track"><div id="duel-player-bar" class="duel-bar-player"></div></div>
+                <div class="duel-label">IA (SYSTEM)</div>
+                <div class="duel-track"><div id="duel-ia-bar" class="duel-bar-bar duel-bar-ia"></div></div>
+                <button class="btn-game" style="margin-top:10px; padding:5px 15px; font-size:0.6rem;" onclick="doDuelClick()">CLICK!</button>
             </div>
         </div>
 
@@ -223,18 +228,44 @@
         }
         document.getElementById('runner-screen').addEventListener('click', jump);
 
-        // --- CLICKER ---
-        let clicks = 0, cStart = null;
-        window.doClickGame = () => {
-            if(!cStart) cStart = Date.now();
-            clicks++;
-            document.getElementById('click-fill-bar').style.width = (clicks/20*100) + "%";
-            if(clicks >= 20) {
-                addXP(1); saveBest('click', Math.floor((Date.now() - cStart)/1000));
-                clicks = 0; cStart = null;
-                setTimeout(() => document.getElementById('click-fill-bar').style.width = "0%", 200);
-            }
+        // --- CLICK DUEL ENGINE ---
+        let duelActive = false, pScore = 0, iaScore = 0, duelStart = 0, iaLoop = null;
+        window.startClickDuel = () => {
+            document.getElementById('click-start-ui').style.display = 'none';
+            duelActive = true; pScore = 0; iaScore = 0; duelStart = Date.now();
+            updateDuelUI();
+            iaLoop = setInterval(() => {
+                if(!duelActive) return;
+                iaScore += Math.random() * 2.5; // Velocidade da IA
+                updateDuelUI();
+                checkDuelWinner();
+            }, 100);
         };
+        window.doDuelClick = () => {
+            if(!duelActive) return;
+            pScore += 4; // Progresso por clique
+            updateDuelUI();
+            checkDuelWinner();
+        };
+        function updateDuelUI() {
+            document.getElementById('duel-player-bar').style.width = Math.min(pScore, 100) + "%";
+            document.getElementById('duel-ia-bar').style.width = Math.min(iaScore, 100) + "%";
+        }
+        function checkDuelWinner() {
+            if(pScore >= 100) {
+                endDuel(true);
+                addXP(1);
+                saveBest('click', Math.floor((Date.now() - duelStart)/1000));
+            } else if (iaScore >= 100) {
+                endDuel(false);
+            }
+        }
+        function endDuel(win) {
+            duelActive = false;
+            clearInterval(iaLoop);
+            alert(win ? "VOCÊ VENCEU O SISTEMA!" : "IA VENCEU! TENTE NOVAMENTE.");
+            document.getElementById('click-start-ui').style.display = 'flex';
+        }
 
         // --- MATH ---
         let n1, n2, res, mScore = 0;
