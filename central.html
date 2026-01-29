@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Central IA v5.5.2 - Farm & Records</title>
+    <title>Central IA v5.6.0 - Recompensas</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --dark: #0a0a0a; }
@@ -15,90 +15,109 @@
         .container { padding: 15px; }
         .ads-space { background: rgba(255,255,255,0.02); border: 1px dashed #222; color: #333; text-align: center; padding: 10px; font-family: 'Orbitron'; font-size: 0.45rem; margin: 10px 0; border-radius: 8px; }
 
-        /* Barra de Progresso e Recompensa */
-        .lvl-section { background: var(--dark); padding: 15px; border-radius: 15px; border: 1px solid #1a1a1a; margin-bottom: 15px; position: relative; }
+        /* Check-in Diário */
+        .daily-section { background: var(--dark); padding: 15px; border-radius: 15px; border: 1px solid #1a1a1a; margin-bottom: 15px; }
+        .daily-grid { display: flex; justify-content: space-between; margin-top: 10px; }
+        .day-dot { width: 30px; height: 30px; border-radius: 50%; border: 1px solid #222; display: flex; align-items: center; justify-content: center; font-size: 0.5rem; font-family: 'Orbitron'; color: #444; }
+        .day-dot.active { border-color: var(--green); color: var(--green); box-shadow: 0 0 10px rgba(0,255,136,0.2); }
+        .day-dot.done { background: var(--green); color: #000; border: none; }
+        .btn-checkin { width: 100%; margin-top: 12px; background: #111; border: 1px solid var(--green); color: var(--green); padding: 10px; border-radius: 8px; font-family: 'Orbitron'; font-size: 0.6rem; cursor: pointer; }
+
+        /* Barra de Progresso (1000 XP) */
+        .lvl-section { background: var(--dark); padding: 15px; border-radius: 15px; border: 1px solid #1a1a1a; margin-bottom: 15px; }
         .progress-container { background: #111; height: 10px; border-radius: 5px; margin-top: 10px; overflow: hidden; border: 1px solid #222; }
         .progress-bar { height: 100%; background: linear-gradient(90deg, var(--neon), var(--green)); width: 0%; transition: 0.4s; }
-        .bonus-tag { position: absolute; bottom: -8px; right: 20px; background: var(--green); color: #000; font-family: 'Orbitron'; font-size: 0.45rem; padding: 2px 8px; border-radius: 4px; font-weight: bold; }
 
-        .game-grid { display: grid; gap: 15px; margin-bottom: 80px; }
-        .game-card { background: var(--dark); border: 1px solid #1a1a1a; border-radius: 20px; padding: 20px; position: relative; overflow: hidden; }
-        .game-card h3 { font-family: 'Orbitron'; font-size: 0.75rem; margin: 0 0 10px 0; color: var(--neon); }
+        /* Games */
+        .game-card { background: var(--dark); border: 1px solid #1a1a1a; border-radius: 20px; padding: 20px; margin-bottom: 15px; position: relative; }
+        .game-card h3 { font-family: 'Orbitron'; font-size: 0.75rem; margin: 0 0 5px 0; color: var(--neon); }
+        .screen { background: #000; border: 1px solid #111; border-radius: 10px; height: 140px; margin-top: 10px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; cursor: pointer; }
+
+        /* Ad Overlay */
+        #ad-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; }
         
-        .record-badge { position: absolute; top: 10px; right: 15px; font-size: 0.5rem; font-family: 'Orbitron'; text-align: right; color: #555; }
-        .record-badge b { color: var(--green); display: block; font-size: 0.7rem; }
-
-        .screen { background: #000; border: 1px solid #111; border-radius: 10px; height: 140px; margin-top: 10px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
-        
-        /* Runner Elements */
-        #cube-hero { width: 20px; height: 20px; background: var(--neon); box-shadow: 0 0 10px var(--neon); position: absolute; bottom: 20px; left: 30px; transition: bottom 0.3s; }
-        .obstacle { width: 20px; height: 30px; background: var(--pink); position: absolute; right: -30px; bottom: 20px; box-shadow: 0 0 10px var(--pink); }
-
-        /* Clicker Elements */
-        .click-btn { background: var(--neon); color: #000; border: none; padding: 12px 20px; font-family: 'Orbitron'; font-weight: bold; border-radius: 5px; cursor: pointer; transition: 0.1s; }
-        .click-btn:active { transform: scale(0.9); background: #fff; }
-        .mini-progress { width: 80%; height: 6px; background: #111; margin-top: 15px; border-radius: 3px; }
-        .mini-fill { height: 100%; background: var(--neon); width: 0%; }
+        #cube-hero { width: 20px; height: 20px; background: var(--neon); position: absolute; bottom: 20px; left: 40px; transition: 0.3s; box-shadow: 0 0 10px var(--neon); }
+        .obstacle { width: 20px; height: 35px; background: var(--pink); position: absolute; right: -30px; bottom: 20px; }
     </style>
 </head>
 <body>
 
+    <div id="ad-overlay">
+        <div style="font-family:'Orbitron'; color:var(--neon); margin-bottom:20px;">CARREGANDO VÍDEO...</div>
+        <div style="width:250px; height:150px; border:1px dashed #333; display:flex; align-items:center; justify-content:center; text-align:center; padding:20px; font-size:0.8rem; color:#444;">
+            SUA PROPAGANDA AQUI<br>(Aguarde 30s)
+        </div>
+        <div id="ad-timer" style="font-family:'Orbitron'; font-size:2rem; margin-top:20px; color:var(--pink);">30</div>
+    </div>
+
     <div class="header">
         <button class="btn-back" onclick="window.location.href='index.html'">⬅</button>
-        CENTRAL IA v5.5.2
+        CENTRAL IA v5.6.0
     </div>
 
     <div class="container">
+        
+        <div class="daily-section">
+            <div style="font-family:'Orbitron'; font-size:0.55rem; color:#888;">CHECK-IN SEMANAL (+R$ 0,02)</div>
+            <div class="daily-grid" id="daily-dots">
+                <div class="day-dot" data-day="1">S</div>
+                <div class="day-dot" data-day="2">T</div>
+                <div class="day-dot" data-day="3">Q</div>
+                <div class="day-dot" data-day="4">Q</div>
+                <div class="day-dot" data-day="5">S</div>
+                <div class="day-dot" data-day="6">S</div>
+                <div class="day-dot" data-day="0">D</div>
+            </div>
+            <button class="btn-checkin" id="btn-do-checkin" onclick="processCheckIn()">FAZER CHECK-IN DE HOJE</button>
+        </div>
+
         <div class="ads-space">SUA PROPAGANDA AQUI</div>
 
         <div class="lvl-section">
             <div style="display: flex; justify-content: space-between; font-family: 'Orbitron'; font-size: 0.55rem;">
-                <span>SESSÃO DE: <b id="u-nome">...</b></span>
+                <span id="u-nome">OPERADOR...</span>
                 <span style="color: var(--neon);">LEVEL <span id="u-lvl">1</span></span>
             </div>
             <div class="progress-container"><div class="progress-bar" id="xp-bar"></div></div>
-            <div class="bonus-tag">+ R$ 0,10 POR NÍVEL</div>
-            <div style="text-align: left; font-size: 0.5rem; color: #333; margin-top: 5px; font-family: 'Orbitron';">XP PROGRESS: <span id="xp-num">0</span>/100</div>
+            <div style="display:flex; justify-content:space-between; margin-top:5px; font-family:'Orbitron'; font-size:0.45rem; color:#444;">
+                <span><span id="xp-num">0</span> / 1000 XP</span>
+                <span style="color:var(--green);">BÔNUS: R$ 0,10 / LVL</span>
+            </div>
         </div>
 
         <div class="game-grid">
-            
-            <div class="game-card" onclick="jumpCube()">
-                <div class="record-badge">MELHOR TEMPO <b id="rec-runner">0s</b></div>
-                <h3>RUNNER CYBERPUNK</h3>
-                <div class="screen" id="runner-screen">
+            <div class="game-card">
+                <h3>RUNNER: TOQUE PARA SALTAR (+1 XP)</h3>
+                <div class="screen" onclick="jumpCube()">
                     <div id="cube-hero"></div>
-                    <div style="position: absolute; bottom: 0; width: 100%; height: 20px; background: #111;"></div>
+                    <div style="position:absolute; bottom:0; width:100%; height:20px; background:#111;"></div>
                 </div>
             </div>
 
             <div class="game-card">
-                <div class="record-badge">MAX PRESS <b id="rec-click">0s</b></div>
-                <h3>DATA EXTRACTION</h3>
-                <div class="screen">
-                    <button class="click-btn" onmousedown="startClickGame()" onmouseup="stopClickGame()" ontouchstart="startClickGame()" ontouchend="stopClickGame()">PRESSIONAR</button>
-                    <div class="mini-progress"><div class="mini-fill" id="click-fill"></div></div>
+                <h3>EXTRAÇÃO: PRESSIONE (+1 XP)</h3>
+                <div class="screen" onmousedown="startHold()" onmouseup="stopHold()" ontouchstart="startHold()" ontouchend="stopHold()">
+                    <div id="hold-fill" style="width:0%; height:100%; background:rgba(0,242,255,0.1); position:absolute; left:0;"></div>
+                    <div style="font-family:'Orbitron'; font-size:0.6rem; z-index:2; color:var(--neon);">SEGURE PARA CARREGAR</div>
                 </div>
             </div>
 
             <div class="game-card">
-                <div class="record-badge">RECORDE <b id="rec-math">0 acertos</b></div>
-                <h3>CÁLCULO RÁPIDO</h3>
-                <div class="screen">
-                    <div id="math-timer" style="color:var(--pink); font-family:'Orbitron'; font-size:0.6rem; margin-bottom:5px;">TIME: 5s</div>
-                    <div id="math-quest" style="font-family:'Orbitron'; font-size:1.5rem;">0 + 0</div>
-                    <input type="number" id="math-ans" style="background:#111; border:1px solid var(--neon); color:#fff; width:70px; text-align:center; font-family:'Orbitron';" oninput="checkMath(this)">
+                <h3>CÁLCULO RÁPIDO (+1 XP)</h3>
+                <div class="screen" style="cursor:default">
+                    <div id="math-quest" style="font-family:'Orbitron'; font-size:1.5rem; margin-bottom:10px;">0 + 0</div>
+                    <input type="number" id="math-ans" placeholder="?" style="background:#111; border:1px solid var(--neon); color:#fff; width:80px; text-align:center; padding:8px; font-family:'Orbitron';" oninput="checkMath(this)">
                 </div>
             </div>
-
         </div>
 
         <div class="ads-space">SUA PROPAGANDA AQUI</div>
+
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, updateDoc, increment } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, increment, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -113,122 +132,128 @@
         const auth = getAuth(app);
 
         let user, currentXP = 0, currentLevel = 1;
-        let records = { runner: 0, click: 0, math: 0 };
 
-        onAuthStateChanged(auth, (u) => {
+        onAuthStateChanged(auth, async (u) => {
             if (u) {
                 user = u;
                 onSnapshot(doc(db, "usuarios", u.uid), (snap) => {
                     const data = snap.data();
                     if(data) {
                         const newXP = data.xp || 0;
-                        const newLevel = Math.floor(newXP / 100) + 1;
+                        const newLevel = Math.floor(newXP / 1000) + 1;
+                        if(newLevel > currentLevel) payBonus(0.10, "LEVEL UP!");
                         
-                        // Lógica de Pagamento por Nível
-                        if(newLevel > currentLevel) {
-                            payLevelBonus();
-                        }
-
                         currentXP = newXP;
                         currentLevel = newLevel;
-                        document.getElementById('u-nome').innerText = data.nome || "User";
+                        document.getElementById('u-nome').innerText = (data.nome || "User").toUpperCase();
                         document.getElementById('u-lvl').innerText = currentLevel;
-                        document.getElementById('xp-num').innerText = (currentXP % 100).toFixed(0);
-                        document.getElementById('xp-bar').style.width = (currentXP % 100) + "%";
+                        document.getElementById('xp-bar').style.width = ((currentXP % 1000) / 10) + "%";
+                        document.getElementById('xp-num').innerText = Math.floor(currentXP % 1000);
+                        
+                        updateCheckInUI(data.lastCheckIn);
                     }
                 });
             }
         });
 
-        async function addXP(val) {
-            if(!user) return;
-            await updateDoc(doc(db, "usuarios", user.uid), { xp: increment(val) });
+        async function addXP(v) { await updateDoc(doc(db, "usuarios", user.uid), { xp: increment(v) }); }
+        async function payBonus(v, msg) { 
+            await updateDoc(doc(db, "usuarios", user.uid), { saldo: increment(v) });
+            if(msg) alert(msg);
         }
 
-        async function payLevelBonus() {
-            await updateDoc(doc(db, "usuarios", user.uid), { saldo: increment(0.10) });
-            alert("🎊 LEVEL UP! +R$ 0,10 adicionado ao seu saldo.");
+        // --- CHECK-IN LOGIC ---
+        function updateCheckInUI(lastDate) {
+            const today = new Date().toLocaleDateString();
+            const dayOfWeek = new Date().getDay();
+            const dots = document.querySelectorAll('.day-dot');
+            
+            dots.forEach(dot => {
+                if(parseInt(dot.dataset.day) === dayOfWeek) dot.classList.add('active');
+                if(lastDate === today && parseInt(dot.dataset.day) === dayOfWeek) {
+                    dot.classList.add('done');
+                    document.getElementById('btn-do-checkin').innerText = "CHECK-IN CONCLUÍDO";
+                    document.getElementById('btn-do-checkin').disabled = true;
+                    document.getElementById('btn-do-checkin').style.opacity = "0.5";
+                }
+            });
+        }
+
+        window.processCheckIn = () => {
+            document.getElementById('ad-overlay').style.display = 'flex';
+            let timeLeft = 30;
+            const timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('ad-timer').innerText = timeLeft;
+                if(timeLeft <= 0) {
+                    clearInterval(timer);
+                    finalizeCheckIn();
+                }
+            }, 1000);
+        };
+
+        async function finalizeCheckIn() {
+            const today = new Date().toLocaleDateString();
+            await updateDoc(doc(db, "usuarios", user.uid), {
+                lastCheckIn: today,
+                saldo: increment(0.02)
+            });
+            document.getElementById('ad-overlay').style.display = 'none';
+            alert("Check-in realizado! +R$ 0,02");
         }
 
         // --- GAME: RUNNER ---
-        let runActive = false, runTime = 0;
+        let runActive = false;
         window.jumpCube = () => {
-            if(!runActive) startRunner();
             const hero = document.getElementById('cube-hero');
             if(hero.style.bottom === "80px") return;
             hero.style.bottom = "80px";
-            setTimeout(() => hero.style.bottom = "20px", 400);
-        }
-        function startRunner() {
-            runActive = true; runTime = 0;
-            const screen = document.getElementById('runner-screen');
+            setTimeout(() => { hero.style.bottom = "20px"; }, 400);
+            if(!runActive) spawnObstacle();
+        };
+
+        function spawnObstacle() {
+            runActive = true;
+            const screen = document.querySelector('.screen');
             const obs = document.createElement('div');
             obs.className = 'obstacle';
             screen.appendChild(obs);
+            
+            let pos = -30;
             let loop = setInterval(() => {
-                runTime += 0.1;
-                let oPos = parseInt(window.getComputedStyle(obs).getPropertyValue('right'));
-                let hBot = parseInt(window.getComputedStyle(document.getElementById('cube-hero')).getPropertyValue('bottom'));
-                obs.style.right = (oPos + 6) + 'px';
-                if(oPos > 350) obs.style.right = '-30px';
-                if(oPos > 260 && oPos < 290 && hBot < 50) {
+                pos += 5;
+                obs.style.right = pos + 'px';
+                const hBot = parseInt(document.getElementById('cube-hero').style.bottom);
+                if(pos > 250 && pos < 280 && hBot < 50) {
                     clearInterval(loop); obs.remove(); runActive = false;
-                    if(runTime > records.runner) {
-                        records.runner = Math.floor(runTime);
-                        document.getElementById('rec-runner').innerText = records.runner + 's';
-                        addXP(records.runner * 0.2);
-                    }
+                }
+                if(pos > 350) {
+                    clearInterval(loop); obs.remove(); runActive = false; addXP(1);
                 }
             }, 20);
         }
 
-        // --- GAME: CLICKER ---
-        let cTimer, cTime = 0;
-        window.startClickGame = () => {
-            cTime = 0;
-            cTimer = setInterval(() => {
-                cTime += 0.1;
-                document.getElementById('click-fill').style.width = (cTime * 20 % 100) + "%";
-            }, 100);
+        // --- GAME: HOLD ---
+        let holdInt, holdVal = 0;
+        window.startHold = () => {
+            holdInt = setInterval(() => {
+                holdVal += 2;
+                document.getElementById('hold-fill').style.width = holdVal + "%";
+                if(holdVal >= 100) { addXP(1); holdVal = 0; }
+            }, 50);
         };
-        window.stopClickGame = () => {
-            clearInterval(cTimer);
-            if(cTime > records.click) {
-                records.click = Math.floor(cTime);
-                document.getElementById('rec-click').innerText = records.click + 's';
-                addXP(records.click * 0.1);
-            }
-            document.getElementById('click-fill').style.width = "0%";
-        };
+        window.stopHold = () => { clearInterval(holdInt); holdVal = 0; document.getElementById('hold-fill').style.width = "0%"; };
 
         // --- GAME: MATH ---
-        let mTime = 5, mScore = 0, mInt, n1, n2, res;
+        let n1, n2, res;
         function newM() {
-            n1 = Math.floor(Math.random()*20); n2 = Math.floor(Math.random()*20);
-            res = n1 + n2; mTime = 5;
-            document.getElementById('math-quest').innerText = `${n1} + ${n2}`;
+            n1 = Math.floor(Math.random()*15); n2 = Math.floor(Math.random()*15);
+            res = n1 + n2; document.getElementById('math-quest').innerText = `${n1} + ${n2}`;
         }
+        newM();
         window.checkMath = (el) => {
-            if(!mInt) startM();
-            if(parseInt(el.value) === res) {
-                mScore++; el.value = ""; newM(); addXP(0.8);
-            }
+            if(parseInt(el.value) === res) { addXP(1); el.value = ""; newM(); }
         };
-        function startM() {
-            newM();
-            mInt = setInterval(() => {
-                mTime--;
-                document.getElementById('math-timer').innerText = `TIME: ${mTime}s`;
-                if(mTime <= 0) {
-                    clearInterval(mInt); mInt = null;
-                    if(mScore > records.math) {
-                        records.math = mScore;
-                        document.getElementById('rec-math').innerText = records.math + ' acertos';
-                    }
-                    mScore = 0;
-                }
-            }, 1000);
-        }
     </script>
 </body>
 </html>
