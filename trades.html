@@ -14,7 +14,6 @@
 
         .container { padding: 20px; max-width: 500px; margin: 0 auto; }
 
-        /* TEXTO TÉCNICO EXPLICATIVO - Ajustado para Alocação de Ecossistema */
         .whitepaper-box { background: var(--card); border: 1px solid #222; padding: 20px; border-radius: 15px; margin-bottom: 25px; line-height: 1.6; }
         .whitepaper-box h2 { font-family: 'Orbitron'; font-size: 0.9rem; color: var(--neon); margin-top: 0; }
         .whitepaper-box p { font-size: 0.85rem; color: #aaa; text-align: justify; }
@@ -31,10 +30,28 @@
         .invest-info span { font-size: 0.7rem; color: var(--green); font-family: 'Orbitron'; }
         .btn-buy { background: var(--green); color: #000; border: none; padding: 10px 15px; border-radius: 8px; font-family: 'Orbitron'; font-size: 0.6rem; font-weight: bold; cursor: pointer; }
 
+        /* LISTA DE ALOCAÇÕES NO RODAPÉ */
+        .active-allocations { margin-top: 30px; border-top: 1px solid #222; padding-top: 20px; }
+        .alloc-item { background: #050505; border: 1px solid #111; padding: 10px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; font-family: 'Orbitron'; font-size: 0.6rem; }
+        .alloc-item span { color: var(--neon); }
+
+        /* OVERLAY DE AGRADECIMENTO */
+        #thanks-overlay { 
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9); border: 1px solid var(--neon);
+            padding: 20px; border-radius: 15px; z-index: 1000; display: none;
+            text-align: center; box-shadow: 0 0 20px var(--neon);
+        }
+
         .footer-note { font-size: 0.6rem; color: #444; text-align: center; margin-top: 20px; font-family: 'Orbitron'; }
     </style>
 </head>
 <body>
+
+    <div id="thanks-overlay">
+        <h3 style="font-family:'Orbitron'; color:var(--green); margin:0;">NEXUS AI</h3>
+        <p style="font-family:'Rajdhani'; color:#fff;">Obrigado por ajudar a fortalecer nosso ecossistema!</p>
+    </div>
 
     <div class="header">
         <button class="btn-back" onclick="window.location.href='index.html'">VOLTAR</button>
@@ -46,13 +63,10 @@
         <div class="whitepaper-box">
             <h2>ALOCAÇÃO DE LIQUIDEZ ESTRATÉGICA (IA)</h2>
             <p>
-                O sistema <b>Nexus IA</b> utiliza processamento de dados para otimizar o fluxo de liquidez do ecossistema. Ao alocar pontos (NP), você participa da sustentabilidade da plataforma. A IA realiza operações de <b>arbitragem tecnológica</b> e reequilíbrio de ativos digitais para sustentar as recompensas do projeto.
-            </p>
-            <p>
-                Os resultados são baseados na performance global do site (Ads, Lances e Operações), garantindo um ciclo de recompensas dinâmico para os participantes ativos.
+                O sistema <b>Nexus IA</b> utiliza processamento de dados para otimizar o fluxo de liquidez do ecossistema. Ao alocar pontos (NP), você participa da sustentabilidade da plataforma.
             </p>
             <div class="risk-alert">
-                IMPORTANTE: ESTA É UMA ATIVIDADE DE ALOCAÇÃO DIGITAL. OS RESULTADOS SÃO ESTIMATIVAS E DEPENDEM DA PERFORMANCE DO ALGORITMO E DO ECOSSISTEMA.
+                IMPORTANTE: ESTA É UMA ATIVIDADE DE ALOCAÇÃO DIGITAL. OS RESULTADOS SÃO ESTIMATIVAS.
             </div>
         </div>
 
@@ -65,15 +79,20 @@
 
         <div class="invest-grid" id="cards-container"></div>
 
+        <div class="active-allocations">
+            <span style="font-family:'Orbitron'; font-size:0.6rem; color:#555; display:block; margin-bottom:10px;">MINHAS ALOCAÇÕES ATIVAS:</span>
+            <div id="active-list">
+                </div>
+        </div>
+
         <div class="footer-note">SISTEMA MONITORADO E PROTEGIDO POR SSL END-TO-END</div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, doc, getDoc, updateDoc, increment, setDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, updateDoc, increment, setDoc, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-        // CONFIGURAÇÃO SEGURA: Use variáveis ou garanta que as regras do Firebase (Rules) protejam os dados
         const firebaseConfig = { 
             apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", 
             authDomain: "minharifadigital.firebaseapp.com", 
@@ -88,7 +107,6 @@
         let userSaldo = 0;
         let selectedMonth = 1;
 
-        // Tabela interna de alocação
         const table = {
             1: [ {c: 50, r: 70}, {c: 100, r: 130}, {c: 200, r: 250} ],
             2: [ {c: 50, r: 100}, {c: 100, r: 200}, {c: 200, r: 300} ],
@@ -98,11 +116,28 @@
         onAuthStateChanged(auth, async user => {
             if (user) {
                 const userRef = doc(db, "usuarios", user.uid);
-                const snap = await getDoc(userRef);
-                if (snap.exists()) {
-                    userSaldo = snap.data().saldo || 0;
-                    renderCards();
-                }
+                onSnapshot(userRef, (snap) => {
+                    if (snap.exists()) {
+                        userSaldo = snap.data().saldo || 0;
+                        renderCards();
+                    }
+                });
+                
+                // Monitorar alocações em tempo real para exibir embaixo
+                const q = query(collection(db, "alocacoes"), where("uid", "==", user.uid), where("status", "==", "ativo"));
+                onSnapshot(q, (snap) => {
+                    const listContainer = document.getElementById('active-list');
+                    listContainer.innerHTML = '';
+                    snap.forEach(doc => {
+                        const data = doc.data();
+                        listContainer.innerHTML += `
+                            <div class="alloc-item">
+                                ALOCAÇÃO: <span>${data.valor} NP</span>
+                                ESTIMATIVA: <span>${data.estimativa} NP</span>
+                            </div>
+                        `;
+                    });
+                });
             } else { window.location.href = "login.html"; }
         });
 
@@ -134,16 +169,11 @@
             if (!auth.currentUser) return;
             
             if (userSaldo >= valor) {
-                if(confirm(`Confirmar alocação de ${valor} NP por ${selectedMonth * 30} dias?`)) {
+                if(confirm(`Confirmar alocação de ${valor} NP?`)) {
                     try {
                         const userRef = doc(db, "usuarios", auth.currentUser.uid);
-                        
-                        // Atualiza saldo e registra a alocação em uma subcoleção para segurança
-                        await updateDoc(userRef, {
-                            saldo: increment(-valor)
-                        });
+                        await updateDoc(userRef, { saldo: increment(-valor) });
 
-                        // É fundamental registrar a operação para o admin validar depois
                         const investID = "inv_" + Date.now();
                         await setDoc(doc(db, "alocacoes", investID), {
                             uid: auth.currentUser.uid,
@@ -154,16 +184,18 @@
                             status: "ativo"
                         });
 
-                        alert("Alocação iniciada! Verifique seu painel.");
-                        window.location.href = "perfil.html";
+                        // MOSTRAR AGRADECIMENTO
+                        const overlay = document.getElementById('thanks-overlay');
+                        overlay.style.display = 'block';
+                        setTimeout(() => { overlay.style.display = 'none'; }, 3000);
+
                     } catch (e) {
-                        alert("Erro ao processar. Tente novamente.");
+                        alert("Erro ao processar.");
                         console.error(e);
                     }
                 }
             } else {
                 alert("Saldo insuficiente.");
-                window.location.href = "deposito.html"; 
             }
         };
     </script>
