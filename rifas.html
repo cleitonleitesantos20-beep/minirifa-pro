@@ -78,7 +78,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, updateDoc, increment, arrayUnion } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, setDoc, increment, arrayUnion } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -92,7 +92,7 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        const custoPorToken = 8; // Equivalente aos 8.00 anteriores mas tratado como NP
+        const custoPorToken = 8;
         let user, saldoAtual = 0, selecionados = [], vendidosGlobal = [];
 
         const niveis = [
@@ -102,7 +102,6 @@
             { id: 4, start: 151, end: 200, prize: 4400 }
         ];
 
-        // Montagem do Slider
         const slider = document.getElementById('main-slider');
         niveis.forEach(lvl => {
             const card = document.createElement('div');
@@ -128,7 +127,6 @@
             }
         });
 
-        // Escuta Números Vendidos no Firebase
         onSnapshot(doc(db, "rifas_vendas", "global"), (snap) => {
             const data = snap.data();
             vendidosGlobal = data ? (data.vendidos || []) : [];
@@ -139,7 +137,6 @@
                 if (el) el.classList.add('sold');
             });
 
-            // Lógica de Desbloqueio
             const v1 = vendidosGlobal.filter(n => n <= 50).length;
             const v2 = vendidosGlobal.filter(n => n > 50 && n <= 100).length;
             const v3 = vendidosGlobal.filter(n => n > 100 && n <= 150).length;
@@ -149,7 +146,6 @@
             if (v3 >= 50) document.getElementById('lvl-4')?.classList.remove('locked');
         });
 
-        // Autenticação e Saldo
         onAuthStateChanged(auth, (u) => {
             if (u) {
                 user = u;
@@ -201,15 +197,16 @@
                 const userRef = doc(db, "usuarios", user.uid);
                 const globalRef = doc(db, "rifas_vendas", "global");
 
-                // Atualização atômica no Firebase
+                // Atualiza o saldo do usuário
                 await updateDoc(userRef, { 
                     saldo: increment(-total), 
                     xp: increment(selecionados.length * 10) 
                 });
                 
-                await updateDoc(globalRef, { 
+                // setDoc com merge: true evita o erro caso o documento 'global' não exista no banco
+                await setDoc(globalRef, { 
                     vendidos: arrayUnion(...selecionados) 
-                });
+                }, { merge: true });
 
                 alert("Alocação concluída com sucesso!");
                 selecionados = [];
