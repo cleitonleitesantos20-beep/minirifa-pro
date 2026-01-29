@@ -9,98 +9,96 @@
         :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --gold: #ffcc00; --dark: #0a0a0a; --bg-card: #080808; }
         
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden; }
+        body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden; display: flex; flex-direction: column; }
 
-        /* PROPAGANDA TOPO */
-        .ad-banner-top { width: 100%; height: 50px; background: #050505; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 0.55rem; color: #444; letter-spacing: 2px; }
+        /* ADS TOP */
+        .ad-banner-top { width: 100%; height: 50px; background: #050505; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 0.55rem; color: #444; letter-spacing: 2px; flex-shrink: 0; }
 
         /* HEADER & PERFIL */
-        .profile-section { padding: 20px; background: linear-gradient(to bottom, #111, #000); border-bottom: 1px solid #1a1a1a; display: flex; align-items: center; gap: 15px; position: relative; }
+        .profile-section { padding: 20px; background: linear-gradient(to bottom, #111, #000); border-bottom: 1px solid #1a1a1a; display: flex; align-items: center; gap: 15px; position: relative; flex-shrink: 0; }
         
         .avatar-container { position: relative; width: 65px; height: 65px; flex-shrink: 0; }
         .avatar-main { width: 100%; height: 100%; background: #000; border: 2px solid var(--neon); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; box-shadow: 0 0 15px rgba(0,242,255,0.1); }
-        .level-badge { position: absolute; bottom: -2px; right: -2px; background: var(--neon); color: #000; font-family: 'Orbitron'; font-size: 0.5rem; font-weight: bold; padding: 2px 5px; border-radius: 6px; }
-
+        
         .user-data { flex-grow: 1; min-width: 0; }
-        .user-data h2 { font-family: 'Orbitron'; font-size: 0.85rem; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #eee; }
+        .user-data h2 { font-family: 'Orbitron'; font-size: 0.85rem; margin: 0; color: #eee; text-transform: uppercase; }
         .user-balance { color: var(--green); font-weight: bold; font-size: 1.1rem; display: block; margin: 2px 0; }
-        
-        .xp-mini-bar { width: 100%; background: #1a1a1a; height: 4px; border-radius: 2px; margin-top: 6px; overflow: hidden; }
-        .xp-fill { height: 100%; background: var(--neon); width: 0%; transition: width 1.5s cubic-bezier(0.1, 0, 0.3, 1); }
+        .lvl-tag { font-family: 'Orbitron'; font-size: 0.55rem; color: var(--neon); background: rgba(0,242,255,0.05); padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(0,242,255,0.2); }
 
-        .btn-config-side { background: #0a0a0a; border: 1px solid #222; color: #666; width: 40px; height: 40px; border-radius: 10px; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .btn-config-side:active { border-color: var(--neon); color: var(--neon); transform: rotate(45deg); }
+        .btn-config-side { background: #0a0a0a; border: 1px solid #222; color: #666; width: 42px; height: 42px; border-radius: 12px; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+        .btn-config-side:active { border-color: var(--neon); color: var(--neon); transform: rotate(90deg); }
 
-        .container { padding: 15px; max-width: 450px; margin: 0 auto; padding-bottom: 80px; }
+        .container { padding: 15px; max-width: 450px; margin: 0 auto; width: 100%; flex-grow: 1; }
 
-        /* GRID PRINCIPAL (4 BOTÕES) */
-        .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-        .btn-card { background: var(--bg-card); border: 1px solid #1a1a1a; padding: 22px 10px; border-radius: 20px; color: #fff; font-family: 'Orbitron'; font-size: 0.65rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 10px; transition: 0.2s; }
-        .btn-card span { font-size: 1.6rem; }
-        .btn-card:active { background: #111; transform: translateY(2px); border-color: var(--neon); }
-        
-        /* GRID SECUNDÁRIO */
-        .secondary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
-        .btn-sec { background: #050505; border: 1px solid #1a1a1a; padding: 14px; border-radius: 14px; color: #888; font-family: 'Orbitron'; font-size: 0.6rem; cursor: pointer; transition: 0.2s; letter-spacing: 1px; }
-        .btn-sec:active { color: #fff; border-color: #333; }
+        /* GRID UNIFORME DE 6 BOTÕES */
+        .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+        .btn-card { background: var(--bg-card); border: 1px solid #1a1a1a; padding: 20px 10px; border-radius: 20px; color: #fff; font-family: 'Orbitron'; font-size: 0.65rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 10px; transition: 0.2s; position: relative; overflow: hidden; }
+        .btn-card span { font-size: 1.5rem; }
+        .btn-card::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.02); opacity: 0; transition: 0.2s; }
+        .btn-card:active { transform: translateY(2px); border-color: var(--neon); }
+        .btn-card:active::after { opacity: 1; }
 
         /* BOTÃO NEXUS S */
-        .btn-nexus { width: 100%; background: linear-gradient(90deg, #000, #151515, #000); border: 1px solid var(--gold); padding: 18px; border-radius: 18px; color: var(--gold); font-family: 'Orbitron'; font-size: 0.9rem; font-weight: bold; cursor: pointer; letter-spacing: 4px; margin-bottom: 15px; text-shadow: 0 0 10px rgba(255,204,0,0.2); }
-        .btn-nexus:active { transform: scale(0.98); background: #000; }
+        .btn-nexus { width: 100%; background: linear-gradient(90deg, #000, #151515, #000); border: 1px solid var(--gold); padding: 20px; border-radius: 20px; color: var(--gold); font-family: 'Orbitron'; font-size: 0.95rem; font-weight: bold; cursor: pointer; letter-spacing: 4px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
 
-        /* ANÚNCIO INFERIOR */
-        .ad-banner-bottom { width: 100%; min-height: 70px; background: #050505; border: 1px solid #111; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 0.55rem; color: #333; margin-top: 5px; }
+        /* STATUS DO SISTEMA */
+        .sys-info { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #050505; border-radius: 10px; border: 1px solid #111; margin-bottom: 20px; }
+        .sys-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; display: inline-block; margin-right: 5px; box-shadow: 0 0 8px var(--green); }
+        .sys-text { font-family: 'Orbitron'; font-size: 0.5rem; color: #444; }
 
-        /* TEXTO TREM (MARQUEE) */
-        .news-ticker { position: fixed; bottom: 0; left: 0; width: 100%; background: #000; border-top: 1px solid #1a1a1a; padding: 10px 0; overflow: hidden; z-index: 999; }
-        .ticker-content { display: inline-block; white-space: nowrap; padding-left: 100%; animation: ticker 30s linear infinite; font-family: 'Orbitron'; font-size: 0.6rem; color: var(--neon); letter-spacing: 2px; }
+        .ad-banner-bottom { width: 100%; min-height: 80px; background: #050505; border: 1px solid #111; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 0.55rem; color: #222; text-align: center; padding: 10px; }
+
+        /* TEXTO TREM */
+        .news-ticker { position: fixed; bottom: 0; left: 0; width: 100%; background: #000; border-top: 1px solid #1a1a1a; padding: 12px 0; overflow: hidden; z-index: 1000; }
+        .ticker-content { display: inline-block; white-space: nowrap; animation: ticker 25s linear infinite; font-family: 'Orbitron'; font-size: 0.6rem; color: var(--neon); letter-spacing: 2px; }
 
         @keyframes ticker {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-200%); }
+            0% { transform: translateX(100vw); }
+            100% { transform: translateX(-100%); }
         }
     </style>
 </head>
 <body>
 
-    <div class="ad-banner-top">ADS - PREMIUM PARTNER SPACE</div>
+    <div class="ad-banner-top">NEXUS S GLOBAL ADVERTISING NETWORK</div>
 
     <div class="profile-section">
         <div class="avatar-container">
             <div class="avatar-main" id="u-avatar">👤</div>
-            <div class="level-badge">LVL <span id="u-level">1</span></div>
         </div>
         <div class="user-data">
-            <h2 id="u-nome">OPERADOR</h2>
+            <h2 id="u-nome">CARREGANDO...</h2>
             <div class="user-balance">R$ <span id="u-saldo">0,00</span></div>
-            <div class="xp-mini-bar"><div class="xp-fill" id="u-xp-fill"></div></div>
+            <span class="lvl-tag">NÍVEL <span id="u-level">1</span></span>
         </div>
         <button class="btn-config-side" onclick="window.location.href='config.html'">⚙️</button>
     </div>
 
     <div class="container">
         
-        <div class="main-grid">
-            <button class="btn-card" onclick="window.location.href='rifas.html'"><span>🎟️</span>RIFAS</button>
-            <button class="btn-card" onclick="window.location.href='leiloes.html'"><span>🔨</span>LEILÕES</button>
-            <button class="btn-card" onclick="window.location.href='trades.html'"><span>📈</span>TRADES IA</button>
-            <button class="btn-card" onclick="window.location.href='minigames.html'"><span>🎮</span>MINIGAMES</button>
+        <div class="sys-info">
+            <div><span class="sys-dot"></span><span class="sys-text">ESTADO: OPERACIONAL</span></div>
+            <span class="sys-text" id="sys-clock">00:00:00</span>
         </div>
 
-        <div class="secondary-grid">
-            <button class="btn-sec" onclick="window.location.href='deposito.html'">💰 DEPÓSITO</button>
-            <button class="btn-sec" onclick="window.location.href='ranking.html'">🏆 RANKING</button>
+        <div class="main-grid">
+            <button class="btn-card" onclick="window.location.href='rifas.html'"><span>🎟️</span>RIFAS</button>
+            <button class="btn-card" onclick="window.location.href='leilao.html'"><span>🔨</span>LEILÕES</button>
+            <button class="btn-card" onclick="window.location.href='trades.html'"><span>📈</span>TRADES IA</button>
+            <button class="btn-card" onclick="window.location.href='mini.html'"><span>🎮</span>MINIGAMES</button>
+            <button class="btn-card" onclick="window.location.href='deposito.html'"><span>💰</span>DEPÓSITO</button>
+            <button class="btn-card" onclick="window.location.href='ranking.html'"><span>🏆</span>RANKING</button>
         </div>
 
         <button class="btn-nexus" onclick="window.location.href='market.html'">🛒 NEXUS S</button>
 
-        <div class="ad-banner-bottom">PUBLICIDADE — ADS 320x100</div>
+        <div class="ad-banner-bottom">PUBLICIDADE AD-SENSE<br>REALIZE O UPGRADE PARA REMOVER</div>
 
     </div>
 
     <div class="news-ticker">
-        <div class="ticker-content" id="ticker-text">
-            ••• BEM-VINDO AO NEXUS S ••• SISTEMA OPERACIONAL ATUALIZADO V6.2.1 ••• APROVEITE AS NOVAS RIFAS DE CRIPTOMOEDAS ••• TRADES IA COM ALTA PERFORMANCE ESTE MÊS •••
+        <div class="ticker-content">
+            ••• VEM JOGAR COM A NOSSA IA ••• COMPRE SUA RIFA AGORA E CONCORRA A PRÊMIOS ••• NOVO RANKING DISPONÍVEL ••• NEXUS S: O FUTURO DOS INVESTIMENTOS DIGITAIS •••
         </div>
     </div>
 
@@ -109,7 +107,6 @@
         import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-        // Configuração do Firebase
         const firebaseConfig = { 
             apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", 
             authDomain: "minharifadigital.firebaseapp.com", 
@@ -123,47 +120,21 @@
 
         onAuthStateChanged(auth, user => {
             if (user) {
-                // Escuta em tempo real os dados do usuário
                 onSnapshot(doc(db, "usuarios", user.uid), snap => {
                     const d = snap.data();
                     if(!d) return;
-
-                    // Atualização de UI
                     document.getElementById('u-nome').innerText = (d.nome || "OPERADOR").toUpperCase();
                     document.getElementById('u-saldo').innerText = (d.saldo || 0).toLocaleString('pt-br', {minimumFractionDigits: 2});
-                    
-                    // Avatar/Emoji
-                    if(d.avatarEmoji) {
-                        document.getElementById('u-avatar').innerText = d.avatarEmoji;
-                    }
-
-                    // Lógica de Nível e XP
-                    const level = d.level || 1;
-                    const xpAtual = d.xp || 0;
-                    const xpNecessario = level * 100;
-                    const porcentagem = (xpAtual / xpNecessario) * 100;
-
-                    document.getElementById('u-level').innerText = level;
-                    document.getElementById('u-xp-fill').style.width = Math.min(porcentagem, 100) + "%";
-                }, error => {
-                    console.error("Erro ao carregar dados:", error);
+                    if(d.avatarEmoji) document.getElementById('u-avatar').innerText = d.avatarEmoji;
+                    document.getElementById('u-level').innerText = d.level || 1;
                 });
-            } else {
-                // Se não houver usuário logado, redireciona
-                window.location.href = "login.html";
-            }
+            } else { window.location.href = "login.html"; }
         });
 
-        // Otimização para o Ticker (Texto Trem) - Mensagens dinâmicas
-        const messages = [
-            "BEM-VINDO AO NEXUS S",
-            "SISTEMA OPERACIONAL V6.2.1 ONLINE",
-            "NOVO LEILÃO DE IPHONE 15 DISPONÍVEL",
-            "IA TRADES: LUCROS DE HOJE +4.2%",
-            "DESBLOQUEIE EMOJIS EXCLUSIVOS NO MARKET"
-        ];
-        document.getElementById('ticker-text').innerText = " ••• " + messages.join(" ••• ") + " ••• ";
-
+        // Relógio
+        setInterval(() => {
+            document.getElementById('sys-clock').innerText = new Date().toLocaleTimeString('pt-br');
+        }, 1000);
     </script>
 </body>
 </html>
