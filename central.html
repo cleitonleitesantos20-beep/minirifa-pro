@@ -3,84 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IA - Central de Operações v5.2.1</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Central IA v5.5.2 - Farm & Records</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --neon: #00f2ff; --green: #00ff88; --pink: #ff0055; }
-        .level-bar { width: 100%; height: 6px; background: #111; border-radius: 3px; margin-top: 10px; border: 1px solid #222; }
-        .level-progress { height: 100%; background: var(--neon); width: 0%; transition: 0.5s; box-shadow: 0 0 10px var(--neon); }
+        :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --dark: #0a0a0a; }
+        body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; overflow-x: hidden; }
         
-        /* Modal de Jogo Neon */
-        .game-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-        .wire-board { width: 280px; height: 250px; background: #050505; border: 2px solid #111; border-radius: 15px; position: relative; box-shadow: inset 0 0 20px rgba(0,242,255,0.1); }
-        .wire-node { width: 50px; height: 20px; border-radius: 4px; position: absolute; cursor: pointer; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid rgba(255,255,255,0.1); }
-        .wire-node.connected { transform: translateX(200px); box-shadow: 0 0 20px currentColor; border: 1px solid #fff; }
-        
-        /* Botões de Redes Sociais */
-        .social-grid { display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 20px; width: 100%; }
-        .social-btn { padding: 12px; border-radius: 8px; text-align: center; font-size: 0.65rem; font-family: 'Orbitron'; background: #080808; border: 1px solid #222; color: #fff; text-decoration: none; transition: 0.3s; }
-        .social-btn:hover { border-color: var(--neon); background: rgba(0,242,255,0.05); }
-        
-        .ads-box { width: 100%; background: #050505; border: 1px dashed #222; padding: 12px; text-align: center; border-radius: 8px; margin: 15px 0; color: #333; font-family: 'Orbitron'; font-size: 0.6rem; }
-        .hidden { display: none !important; }
+        .header { height: 60px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #111; font-family: 'Orbitron'; font-size: 0.7rem; position: relative; }
+        .btn-back { position: absolute; left: 15px; background: none; border: none; color: var(--neon); font-size: 1.2rem; cursor: pointer; }
 
-        /* Obstáculo Neon */
-        .obstacle { position: absolute; bottom: 10px; right: -50px; width: 20px; height: 30px; background: var(--pink); box-shadow: 0 0 15px var(--pink); animation: slide 2s infinite linear; }
-        @keyframes slide { from { right: -50px; } to { right: 300px; } }
+        .container { padding: 15px; }
+        .ads-space { background: rgba(255,255,255,0.02); border: 1px dashed #222; color: #333; text-align: center; padding: 10px; font-family: 'Orbitron'; font-size: 0.45rem; margin: 10px 0; border-radius: 8px; }
+
+        /* Barra de Progresso e Recompensa */
+        .lvl-section { background: var(--dark); padding: 15px; border-radius: 15px; border: 1px solid #1a1a1a; margin-bottom: 15px; position: relative; }
+        .progress-container { background: #111; height: 10px; border-radius: 5px; margin-top: 10px; overflow: hidden; border: 1px solid #222; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--neon), var(--green)); width: 0%; transition: 0.4s; }
+        .bonus-tag { position: absolute; bottom: -8px; right: 20px; background: var(--green); color: #000; font-family: 'Orbitron'; font-size: 0.45rem; padding: 2px 8px; border-radius: 4px; font-weight: bold; }
+
+        .game-grid { display: grid; gap: 15px; margin-bottom: 80px; }
+        .game-card { background: var(--dark); border: 1px solid #1a1a1a; border-radius: 20px; padding: 20px; position: relative; overflow: hidden; }
+        .game-card h3 { font-family: 'Orbitron'; font-size: 0.75rem; margin: 0 0 10px 0; color: var(--neon); }
+        
+        .record-badge { position: absolute; top: 10px; right: 15px; font-size: 0.5rem; font-family: 'Orbitron'; text-align: right; color: #555; }
+        .record-badge b { color: var(--green); display: block; font-size: 0.7rem; }
+
+        .screen { background: #000; border: 1px solid #111; border-radius: 10px; height: 140px; margin-top: 10px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+        
+        /* Runner Elements */
+        #cube-hero { width: 20px; height: 20px; background: var(--neon); box-shadow: 0 0 10px var(--neon); position: absolute; bottom: 20px; left: 30px; transition: bottom 0.3s; }
+        .obstacle { width: 20px; height: 30px; background: var(--pink); position: absolute; right: -30px; bottom: 20px; box-shadow: 0 0 10px var(--pink); }
+
+        /* Clicker Elements */
+        .click-btn { background: var(--neon); color: #000; border: none; padding: 12px 20px; font-family: 'Orbitron'; font-weight: bold; border-radius: 5px; cursor: pointer; transition: 0.1s; }
+        .click-btn:active { transform: scale(0.9); background: #fff; }
+        .mini-progress { width: 80%; height: 6px; background: #111; margin-top: 15px; border-radius: 3px; }
+        .mini-fill { height: 100%; background: var(--neon); width: 0%; }
     </style>
 </head>
 <body>
 
-    <div class="header">🎮 CENTRAL IA v5.2.1</div>
-
-    <div class="container">
-        <div class="ads-box">PUBLICIDADE_TOP_01</div>
-
-        <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-family:'Orbitron'; font-size:0.6rem; color:var(--neon);">DATA_SYNC: LVL <span id="u-lvl">1</span></span>
-                <span style="font-size:0.6rem; color:#444;"><span id="u-xp">0.00</span> XP</span>
-            </div>
-            <div class="level-bar"><div id="lvl-fill" class="level-progress"></div></div>
-        </div>
-
-        <div class="card" onclick="openGame('fio')" style="border-left: 4px solid var(--neon);">
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <div style="color:var(--neon); font-size:1.5rem;">⚡</div>
-                <div style="flex-grow: 1;">
-                    <h3 style="font-family: 'Orbitron'; color: #fff; font-size: 0.75rem;">DESCRIPTOGRAFAR</h3>
-                    <p style="font-size: 0.6rem; color: #444;">Estabilize a fiação de dados.</p>
-                </div>
-                <div style="color:var(--neon); font-size:0.6rem;">+0.05 XP</div>
-            </div>
-        </div>
-
-        <div class="card" onclick="openGame('hack')" style="border-left: 4px solid var(--pink);">
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <div style="color:var(--pink); font-size:1.5rem;">💻</div>
-                <div style="flex-grow: 1;">
-                    <h3 style="font-family: 'Orbitron'; color: #fff; font-size: 0.75rem;">HACKEANDO</h3>
-                    <p style="font-size: 0.6rem; color: #444;">Bypass de firewall (Tron).</p>
-                </div>
-                <div style="color:var(--pink); font-size:0.6rem;">+0.01 XP</div>
-            </div>
-        </div>
-
-        <div class="section-title" style="color:#333; font-size:0.5rem; margin-top:20px;">CONEXÕES EXTERNAS</div>
-        <div class="social-grid">
-            <a href="https://facebook.com/SEU_USER" target="_blank" class="social-btn">FACEBOOK OFFICIAL</a>
-            <a href="https://instagram.com/SEU_USER" target="_blank" class="social-btn">INSTAGRAM FEED</a>
-            <a href="https://tiktok.com/@SEU_USER" target="_blank" class="social-btn">TIKTOK CHANNEL</a>
-        </div>
-
-        <div class="ads-box">PUBLICIDADE_BOT_02</div>
-        <button onclick="window.location.href='index.html'" class="btn-outline" style="margin-top: 10px; font-size: 0.6rem;">RETORNAR AO TERMINAL</button>
+    <div class="header">
+        <button class="btn-back" onclick="window.location.href='index.html'">⬅</button>
+        CENTRAL IA v5.5.2
     </div>
 
-    <div id="game-overlay" class="game-modal hidden">
-        <div id="game-content" style="width:100%; display:flex; flex-direction:column; align-items:center;"></div>
-        <button onclick="closeGame()" class="btn-outline" style="width:180px; margin-top:30px; border-color:#444; color:#444;">CANCELAR</button>
+    <div class="container">
+        <div class="ads-space">SUA PROPAGANDA AQUI</div>
+
+        <div class="lvl-section">
+            <div style="display: flex; justify-content: space-between; font-family: 'Orbitron'; font-size: 0.55rem;">
+                <span>SESSÃO DE: <b id="u-nome">...</b></span>
+                <span style="color: var(--neon);">LEVEL <span id="u-lvl">1</span></span>
+            </div>
+            <div class="progress-container"><div class="progress-bar" id="xp-bar"></div></div>
+            <div class="bonus-tag">+ R$ 0,10 POR NÍVEL</div>
+            <div style="text-align: left; font-size: 0.5rem; color: #333; margin-top: 5px; font-family: 'Orbitron';">XP PROGRESS: <span id="xp-num">0</span>/100</div>
+        </div>
+
+        <div class="game-grid">
+            
+            <div class="game-card" onclick="jumpCube()">
+                <div class="record-badge">MELHOR TEMPO <b id="rec-runner">0s</b></div>
+                <h3>RUNNER CYBERPUNK</h3>
+                <div class="screen" id="runner-screen">
+                    <div id="cube-hero"></div>
+                    <div style="position: absolute; bottom: 0; width: 100%; height: 20px; background: #111;"></div>
+                </div>
+            </div>
+
+            <div class="game-card">
+                <div class="record-badge">MAX PRESS <b id="rec-click">0s</b></div>
+                <h3>DATA EXTRACTION</h3>
+                <div class="screen">
+                    <button class="click-btn" onmousedown="startClickGame()" onmouseup="stopClickGame()" ontouchstart="startClickGame()" ontouchend="stopClickGame()">PRESSIONAR</button>
+                    <div class="mini-progress"><div class="mini-fill" id="click-fill"></div></div>
+                </div>
+            </div>
+
+            <div class="game-card">
+                <div class="record-badge">RECORDE <b id="rec-math">0 acertos</b></div>
+                <h3>CÁLCULO RÁPIDO</h3>
+                <div class="screen">
+                    <div id="math-timer" style="color:var(--pink); font-family:'Orbitron'; font-size:0.6rem; margin-bottom:5px;">TIME: 5s</div>
+                    <div id="math-quest" style="font-family:'Orbitron'; font-size:1.5rem;">0 + 0</div>
+                    <input type="number" id="math-ans" style="background:#111; border:1px solid var(--neon); color:#fff; width:70px; text-align:center; font-family:'Orbitron';" oninput="checkMath(this)">
+                </div>
+            </div>
+
+        </div>
+
+        <div class="ads-space">SUA PROPAGANDA AQUI</div>
     </div>
 
     <script type="module">
@@ -98,68 +111,124 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
-        let user;
+
+        let user, currentXP = 0, currentLevel = 1;
+        let records = { runner: 0, click: 0, math: 0 };
 
         onAuthStateChanged(auth, (u) => {
-            if(u) {
+            if (u) {
                 user = u;
                 onSnapshot(doc(db, "usuarios", u.uid), (snap) => {
                     const data = snap.data();
-                    const xp = data.xp || 0;
-                    document.getElementById('u-xp').innerText = xp.toFixed(2);
-                    document.getElementById('u-lvl').innerText = Math.floor(xp / 100) + 1;
-                    document.getElementById('lvl-fill').style.width = (xp % 100) + "%";
+                    if(data) {
+                        const newXP = data.xp || 0;
+                        const newLevel = Math.floor(newXP / 100) + 1;
+                        
+                        // Lógica de Pagamento por Nível
+                        if(newLevel > currentLevel) {
+                            payLevelBonus();
+                        }
+
+                        currentXP = newXP;
+                        currentLevel = newLevel;
+                        document.getElementById('u-nome').innerText = data.nome || "User";
+                        document.getElementById('u-lvl').innerText = currentLevel;
+                        document.getElementById('xp-num').innerText = (currentXP % 100).toFixed(0);
+                        document.getElementById('xp-bar').style.width = (currentXP % 100) + "%";
+                    }
                 });
-            } else { window.location.href = 'login.html'; }
+            }
         });
 
-        window.openGame = (tipo) => {
-            const content = document.getElementById('game-content');
-            document.getElementById('game-overlay').classList.remove('hidden');
-            if(tipo === 'fio') {
-                content.innerHTML = `
-                    <h2 style="color:var(--neon); font-family:'Orbitron'; font-size:0.9rem; margin-bottom:20px;">SYNC_WIRE_NODES</h2>
-                    <div class="wire-board">
-                        <div class="wire-node" style="background:var(--pink); top:40px; left:15px;" onclick="connectWire(this)"></div>
-                        <div class="wire-node" style="background:var(--neon); top:115px; left:15px;" onclick="connectWire(this)"></div>
-                        <div class="wire-node" style="background:var(--green); top:190px; left:15px;" onclick="connectWire(this)"></div>
-                    </div>`;
-            } else {
-                content.innerHTML = `
-                    <h2 style="color:var(--pink); font-family:'Orbitron'; font-size:0.9rem;">TRON_RUNNER</h2>
-                    <div style="width:260px; height:120px; border:1px solid #111; margin:20px; overflow:hidden; position:relative; background:#020202;">
-                        <div id="runner" style="position:absolute; bottom:10px; left:20px; font-size:1.5rem; transition:0.2s;">🏃</div>
-                        <div class="obstacle"></div>
-                    </div>
-                    <button class="btn-primary" onclick="jump()" style="background:var(--pink); border:none; box-shadow:0 0 10px var(--pink);">JUMP_DATA</button>
-                `;
+        async function addXP(val) {
+            if(!user) return;
+            await updateDoc(doc(db, "usuarios", user.uid), { xp: increment(val) });
+        }
+
+        async function payLevelBonus() {
+            await updateDoc(doc(db, "usuarios", user.uid), { saldo: increment(0.10) });
+            alert("🎊 LEVEL UP! +R$ 0,10 adicionado ao seu saldo.");
+        }
+
+        // --- GAME: RUNNER ---
+        let runActive = false, runTime = 0;
+        window.jumpCube = () => {
+            if(!runActive) startRunner();
+            const hero = document.getElementById('cube-hero');
+            if(hero.style.bottom === "80px") return;
+            hero.style.bottom = "80px";
+            setTimeout(() => hero.style.bottom = "20px", 400);
+        }
+        function startRunner() {
+            runActive = true; runTime = 0;
+            const screen = document.getElementById('runner-screen');
+            const obs = document.createElement('div');
+            obs.className = 'obstacle';
+            screen.appendChild(obs);
+            let loop = setInterval(() => {
+                runTime += 0.1;
+                let oPos = parseInt(window.getComputedStyle(obs).getPropertyValue('right'));
+                let hBot = parseInt(window.getComputedStyle(document.getElementById('cube-hero')).getPropertyValue('bottom'));
+                obs.style.right = (oPos + 6) + 'px';
+                if(oPos > 350) obs.style.right = '-30px';
+                if(oPos > 260 && oPos < 290 && hBot < 50) {
+                    clearInterval(loop); obs.remove(); runActive = false;
+                    if(runTime > records.runner) {
+                        records.runner = Math.floor(runTime);
+                        document.getElementById('rec-runner').innerText = records.runner + 's';
+                        addXP(records.runner * 0.2);
+                    }
+                }
+            }, 20);
+        }
+
+        // --- GAME: CLICKER ---
+        let cTimer, cTime = 0;
+        window.startClickGame = () => {
+            cTime = 0;
+            cTimer = setInterval(() => {
+                cTime += 0.1;
+                document.getElementById('click-fill').style.width = (cTime * 20 % 100) + "%";
+            }, 100);
+        };
+        window.stopClickGame = () => {
+            clearInterval(cTimer);
+            if(cTime > records.click) {
+                records.click = Math.floor(cTime);
+                document.getElementById('rec-click').innerText = records.click + 's';
+                addXP(records.click * 0.1);
+            }
+            document.getElementById('click-fill').style.width = "0%";
+        };
+
+        // --- GAME: MATH ---
+        let mTime = 5, mScore = 0, mInt, n1, n2, res;
+        function newM() {
+            n1 = Math.floor(Math.random()*20); n2 = Math.floor(Math.random()*20);
+            res = n1 + n2; mTime = 5;
+            document.getElementById('math-quest').innerText = `${n1} + ${n2}`;
+        }
+        window.checkMath = (el) => {
+            if(!mInt) startM();
+            if(parseInt(el.value) === res) {
+                mScore++; el.value = ""; newM(); addXP(0.8);
             }
         };
-
-        let wires = 0;
-        window.connectWire = async (el) => {
-            if(el.classList.contains('connected')) return;
-            el.classList.add('connected');
-            wires++;
-            if(wires === 3) {
-                await updateDoc(doc(db, "usuarios", user.uid), { xp: increment(0.05) });
-                closeGame();
-            }
-        };
-
-        window.jump = async () => {
-            const runner = document.getElementById('runner');
-            runner.style.bottom = "60px";
-            setTimeout(() => { 
-                runner.style.bottom = "10px";
-                updateDoc(doc(db, "usuarios", user.uid), { xp: increment(0.01) });
-            }, 350);
-        };
-
-        window.closeGame = () => {
-            document.getElementById('game-overlay').classList.add('hidden');
-            wires = 0;
-        };
+        function startM() {
+            newM();
+            mInt = setInterval(() => {
+                mTime--;
+                document.getElementById('math-timer').innerText = `TIME: ${mTime}s`;
+                if(mTime <= 0) {
+                    clearInterval(mInt); mInt = null;
+                    if(mScore > records.math) {
+                        records.math = mScore;
+                        document.getElementById('rec-math').innerText = records.math + ' acertos';
+                    }
+                    mScore = 0;
+                }
+            }, 1000);
+        }
     </script>
 </body>
 </html>
