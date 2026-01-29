@@ -3,116 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RoboSorteio IA - Terminal v5.3.0</title>
+    <title>RobodaSorte IA - Em Desenvolvimento</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        /* Layout Principal */
+        :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --orange: #ff7b00; --gold: #ffd700; }
+        
+        /* Grid de 6 Botões */
         .main-menu-grid { 
             display: grid; 
             grid-template-columns: 1fr 1fr; 
-            gap: 15px; 
-            margin-top: 20px; 
+            gap: 12px; 
+            margin-top: 15px; 
         }
 
-        /* Botões Grandes Estilizados */
         .menu-card {
             background: #0a0a0a;
             border: 1px solid #1a1a1a;
-            border-radius: 20px;
-            padding: 25px 15px;
+            border-radius: 15px;
+            padding: 20px 10px;
             text-align: center;
-            transition: 0.3s;
-            cursor: pointer;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            gap: 12px;
+            gap: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .menu-card:active { transform: scale(0.95); }
+        .menu-card i { font-size: 1.8rem; }
+        .menu-card span { font-family: 'Orbitron'; font-size: 0.55rem; font-weight: bold; letter-spacing: 1px; }
+
+        /* Cores dos novos botões */
+        .card-deposito { border-bottom: 3px solid var(--green); }
+        .card-rank { border-bottom: 3px solid var(--gold); }
+
+        /* Feed de Notícias */
+        .news-ticker {
+            background: #050505;
+            border: 1px solid #111;
+            border-radius: 12px;
+            margin-top: 20px;
+            padding: 15px;
             position: relative;
             overflow: hidden;
         }
+        .news-title { font-family: 'Orbitron'; font-size: 0.55rem; color: #444; margin-bottom: 10px; display: flex; align-items: center; gap: 5px; }
+        .news-content { height: 80px; overflow-y: hidden; }
+        .news-item { font-size: 0.75rem; color: #888; margin-bottom: 8px; border-left: 2px solid var(--neon); padding-left: 8px; animation: slideUp 10s infinite; }
 
-        .menu-card:active { transform: scale(0.95); }
-        .menu-card i { font-size: 2.5rem; display: block; }
-        .menu-card span { 
-            font-family: 'Orbitron'; 
-            font-size: 0.65rem; 
-            letter-spacing: 1px; 
-            font-weight: bold;
+        @keyframes slideUp {
+            0% { transform: translateY(0); }
+            20% { transform: translateY(-30px); }
+            40% { transform: translateY(-60px); }
+            100% { transform: translateY(0); }
         }
 
-        /* Cores Específicas para Identificação Rápida */
-        .card-rifa { border-bottom: 4px solid var(--neon); }
-        .card-games { border-bottom: 4px solid var(--pink); }
-        .card-trade { border-bottom: 4px solid #0055ff; }
-        .card-leilao { border-bottom: 4px solid #ff7b00; }
-
-        .wallet-mini {
-            background: #050505;
-            border: 1px solid #111;
-            border-radius: 15px;
-            padding: 15px;
-            margin-top: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        /* Espaço Propaganda */
+        .ads-space {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px dashed #222;
+            color: #222;
+            text-align: center;
+            padding: 10px;
+            font-family: 'Orbitron';
+            font-size: 0.5rem;
+            border-radius: 8px;
+            margin: 15px 0;
         }
     </style>
 </head>
 <body>
 
     <div class="header" style="justify-content: center;">
-        <span>🤖 ROBOSORTEIO IA v5.3.0</span>
+        <span style="font-size: 0.7rem;">🤖 ROBODASORTE IA EM DESENVOLVIMENTO</span>
     </div>
 
     <div class="container">
         
+        <div class="ads-space">SUA PROPAGANDA AQUI</div>
+
         <div class="wallet-card" style="padding: 15px; margin-bottom: 10px;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div style="display: flex; align-items: center; gap: 12px;">
-                    <div style="width:45px; height:45px; background:#111; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.5rem; border:1px solid #222;">👤</div>
+                    <div style="width:40px; height:40px; background:#111; border-radius:50%; display:flex; align-items:center; justify-content:center; border:1px solid var(--neon);">👤</div>
                     <div>
-                        <div style="color:#fff; font-weight:bold; font-size:0.9rem;" id="u-nome">Carregando...</div>
-                        <div style="font-size:0.55rem; color:#444; font-family:'Orbitron';">LVL <span id="u-lvl">1</span> | ID: <span id="u-code">---</span></div>
+                        <div style="color:#fff; font-weight:bold; font-size:0.85rem;" id="u-nome">Carregando...</div>
+                        <div style="font-size:0.55rem; color:#444; font-family:'Orbitron';">LVL <span id="u-lvl">1</span> | <span id="u-code">---</span></div>
                     </div>
                 </div>
-                <button class="btn-config" onclick="window.location.href='config.html'" style="background:#111; border:1px solid #333; color:var(--neon); width:38px; height:38px; border-radius:10px; cursor:pointer;">⚙️</button>
+                <button onclick="window.location.href='config.html'" style="background:#111; border:1px solid #333; color:var(--neon); padding:8px 12px; border-radius:8px;">⚙️</button>
             </div>
             
-            <div class="wallet-mini">
-                <span style="font-family:'Orbitron'; font-size:0.55rem; color:#444;">SALDO DISPONÍVEL</span>
-                <span style="font-family:'Orbitron'; font-size:1.1rem; color:var(--green);">R$ <span id="u-saldo">0.00</span></span>
+            <div style="background:#050505; padding:12px; border-radius:12px; margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-family:'Orbitron'; font-size:0.5rem; color:#444;">CARTEIRA DISPONÍVEL</span>
+                <span style="font-family:'Orbitron'; font-size:1rem; color:var(--green);">R$ <span id="u-saldo">0.00</span></span>
             </div>
         </div>
 
         <div class="main-menu-grid">
+            <div class="menu-card" style="border-bottom: 3px solid var(--neon);" onclick="window.location.href='rifas.html'">
+                <i>🎟️</i><span>RIFAS</span>
+            </div>
+            <div class="menu-card" style="border-bottom: 3px solid var(--pink);" onclick="window.location.href='central.html'">
+                <i>🎮</i><span>GAMES</span>
+            </div>
+            <div class="menu-card" style="border-bottom: 3px solid #00a2ff;" onclick="window.location.href='trades.html'">
+                <i>📈</i><span>TRADES IA</span>
+            </div>
+            <div class="menu-card" style="border-bottom: 3px solid var(--orange);" onclick="window.location.href='leilao.html'">
+                <i>🏆</i><span>LEILÕES</span>
+            </div>
             
-            <div class="menu-card card-rifa" onclick="window.location.href='rifas.html'">
-                <i>🎟️</i>
-                <span style="color:var(--neon);">RIFAS DA SORTE</span>
+            <div class="menu-card card-deposito" onclick="window.location.href='depositar.html'">
+                <i>💰</i><span>DEPOSITAR</span>
             </div>
-
-            <div class="menu-card card-games" onclick="window.location.href='central.html'">
-                <i>🎮</i>
-                <span style="color:var(--pink);">CENTRAL GAMES</span>
+            <div class="menu-card card-rank" onclick="window.location.href='rank.html'">
+                <i>📊</i><span>RANKING</span>
             </div>
-
-            <div class="menu-card card-trade" onclick="window.location.href='trades.html'">
-                <i>📈</i>
-                <span style="color:#00a2ff;">TRADES DA IA</span>
-            </div>
-
-            <div class="menu-card card-leilao" onclick="window.location.href='leilao.html'">
-                <i>🏆</i>
-                <span style="color:#ff7b00;">MUNDO LANCES</span>
-            </div>
-
         </div>
 
-        <div style="text-align:center; margin-top:30px; opacity:0.3; font-family:'Orbitron'; font-size:0.45rem;">
-            SISTEMA OPERACIONAL ATIVO | CONEXÃO ENCRIPTADA
+        <div class="news-ticker">
+            <div class="news-title">📡 ATIVIDADE DO TERMINAL</div>
+            <div class="news-content" id="news-feed">
+                <div class="news-item"><b>@Davi_M</b> ganhou o PIX de R$ 200 no leilão!</div>
+                <div class="news-item"><b>@Ana_S</b> subiu para o Nível 15 no Mines!</div>
+                <div class="news-item">Rifa #042 encerrada: Vencedor <b>@Carlos_01</b></div>
+                <div class="news-item">Nova meta de lucro atingida no Robô de Trade!</div>
+            </div>
         </div>
+
+        <div class="ads-space">SUA PROPAGANDA AQUI</div>
 
     </div>
 
