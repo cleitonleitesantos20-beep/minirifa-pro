@@ -7,9 +7,48 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --orange: #ff7b00; --gold: #ffd700; }
-        
-        /* Grid de 6 Botões */
+        :root { 
+            --neon: #00f2ff; 
+            --pink: #ff0055; 
+            --green: #00ff88; 
+            --orange: #ff7b00; 
+            --gold: #ffd700; 
+            --dark: #050505;
+        }
+
+        body { background-color: #000; color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; overflow-x: hidden; }
+
+        .header { 
+            height: 60px; display: flex; align-items: center; justify-content: center; 
+            background: #000; border-bottom: 1px solid #111; font-family: 'Orbitron'; 
+            font-size: 0.7rem; letter-spacing: 1px; color: #fff;
+        }
+
+        .container { padding: 15px; }
+
+        /* PROPAGANDA */
+        .ads-space {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px dashed #222;
+            color: #333;
+            text-align: center;
+            padding: 12px;
+            font-family: 'Orbitron';
+            font-size: 0.5rem;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        /* PERFIL */
+        .wallet-card {
+            background: linear-gradient(180deg, #0a0a0a 0%, #000 100%);
+            border: 1px solid #111;
+            border-radius: 20px;
+            padding: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* GRID DE 6 BOTÕES */
         .main-menu-grid { 
             display: grid; 
             grid-template-columns: 1fr 1fr; 
@@ -34,68 +73,76 @@
         .menu-card i { font-size: 1.8rem; }
         .menu-card span { font-family: 'Orbitron'; font-size: 0.55rem; font-weight: bold; letter-spacing: 1px; }
 
-        /* Cores dos novos botões */
-        .card-deposito { border-bottom: 3px solid var(--green); }
-        .card-rank { border-bottom: 3px solid var(--gold); }
-
-        /* Feed de Notícias */
-        .news-ticker {
+        /* LETREIRO DIGITAL (TREM) */
+        .news-ticker-container {
             background: #050505;
-            border: 1px solid #111;
-            border-radius: 12px;
-            margin-top: 20px;
-            padding: 15px;
-            position: relative;
+            border-top: 1px solid #111;
+            border-bottom: 1px solid #111;
+            margin: 20px -15px; /* Sai da margem do container para ocupar largura total */
+            padding: 12px 0;
             overflow: hidden;
-        }
-        .news-title { font-family: 'Orbitron'; font-size: 0.55rem; color: #444; margin-bottom: 10px; display: flex; align-items: center; gap: 5px; }
-        .news-content { height: 80px; overflow-y: hidden; }
-        .news-item { font-size: 0.75rem; color: #888; margin-bottom: 8px; border-left: 2px solid var(--neon); padding-left: 8px; animation: slideUp 10s infinite; }
-
-        @keyframes slideUp {
-            0% { transform: translateY(0); }
-            20% { transform: translateY(-30px); }
-            40% { transform: translateY(-60px); }
-            100% { transform: translateY(0); }
+            white-space: nowrap;
+            position: relative;
         }
 
-        /* Espaço Propaganda */
-        .ads-space {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px dashed #222;
-            color: #222;
-            text-align: center;
-            padding: 10px;
+        .ticker-title {
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: var(--pink);
+            color: #000;
             font-family: 'Orbitron';
             font-size: 0.5rem;
-            border-radius: 8px;
-            margin: 15px 0;
+            font-weight: bold;
+            padding: 13px 10px;
+            z-index: 10;
+        }
+
+        .ticker-wrapper {
+            display: inline-block;
+            padding-left: 100%;
+            animation: ticker-animation 30s linear infinite;
+        }
+
+        .ticker-item {
+            display: inline-block;
+            color: #888;
+            font-size: 0.75rem;
+            margin-right: 60px;
+            font-family: 'Rajdhani';
+        }
+
+        .ticker-item b { color: var(--neon); }
+
+        @keyframes ticker-animation {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
         }
     </style>
 </head>
 <body>
 
-    <div class="header" style="justify-content: center;">
-        <span style="font-size: 0.7rem;">🤖 ROBODASORTE IA EM DESENVOLVIMENTO</span>
+    <div class="header">
+        🤖 ROBODASORTE IA EM DESENVOLVIMENTO
     </div>
 
     <div class="container">
         
         <div class="ads-space">SUA PROPAGANDA AQUI</div>
 
-        <div class="wallet-card" style="padding: 15px; margin-bottom: 10px;">
+        <div class="wallet-card">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div style="display: flex; align-items: center; gap: 12px;">
-                    <div style="width:40px; height:40px; background:#111; border-radius:50%; display:flex; align-items:center; justify-content:center; border:1px solid var(--neon);">👤</div>
+                    <div style="width:40px; height:40px; background:#111; border-radius:50%; display:flex; align-items:center; justify-content:center; border:1px solid var(--neon); font-size:1.2rem;">👤</div>
                     <div>
                         <div style="color:#fff; font-weight:bold; font-size:0.85rem;" id="u-nome">Carregando...</div>
-                        <div style="font-size:0.55rem; color:#444; font-family:'Orbitron';">LVL <span id="u-lvl">1</span> | <span id="u-code">---</span></div>
+                        <div style="font-size:0.55rem; color:#444; font-family:'Orbitron'; uppercase">LVL <span id="u-lvl">1</span> | <span id="u-code">---</span></div>
                     </div>
                 </div>
-                <button onclick="window.location.href='config.html'" style="background:#111; border:1px solid #333; color:var(--neon); padding:8px 12px; border-radius:8px;">⚙️</button>
+                <button onclick="window.location.href='config.html'" style="background:#111; border:1px solid #333; color:var(--neon); padding:8px 12px; border-radius:8px; cursor:pointer;">⚙️</button>
             </div>
             
-            <div style="background:#050505; padding:12px; border-radius:12px; margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
+            <div style="background:#050505; padding:12px; border-radius:12px; margin-top:10px; display:flex; justify-content:space-between; align-items:center; border:1px solid #111;">
                 <span style="font-family:'Orbitron'; font-size:0.5rem; color:#444;">CARTEIRA DISPONÍVEL</span>
                 <span style="font-family:'Orbitron'; font-size:1rem; color:var(--green);">R$ <span id="u-saldo">0.00</span></span>
             </div>
@@ -114,22 +161,22 @@
             <div class="menu-card" style="border-bottom: 3px solid var(--orange);" onclick="window.location.href='leilao.html'">
                 <i>🏆</i><span>LEILÕES</span>
             </div>
-            
-            <div class="menu-card card-deposito" onclick="window.location.href='depositar.html'">
+            <div class="menu-card" style="border-bottom: 3px solid var(--green);" onclick="window.location.href='depositar.html'">
                 <i>💰</i><span>DEPOSITAR</span>
             </div>
-            <div class="menu-card card-rank" onclick="window.location.href='rank.html'">
+            <div class="menu-card" style="border-bottom: 3px solid var(--gold);" onclick="window.location.href='rank.html'">
                 <i>📊</i><span>RANKING</span>
             </div>
         </div>
 
-        <div class="news-ticker">
-            <div class="news-title">📡 ATIVIDADE DO TERMINAL</div>
-            <div class="news-content" id="news-feed">
-                <div class="news-item"><b>@Davi_M</b> ganhou o PIX de R$ 200 no leilão!</div>
-                <div class="news-item"><b>@Ana_S</b> subiu para o Nível 15 no Mines!</div>
-                <div class="news-item">Rifa #042 encerrada: Vencedor <b>@Carlos_01</b></div>
-                <div class="news-item">Nova meta de lucro atingida no Robô de Trade!</div>
+        <div class="news-ticker-container">
+            <div class="ticker-title">LIVE FEED</div>
+            <div class="ticker-wrapper">
+                <div class="ticker-item">🏆 <b>@Davi_M</b> arrematou o PIX de R$ 200 no Leilão!</div>
+                <div class="ticker-item">🔥 <b>@Ana_S</b> acaba de atingir o Nível 15!</div>
+                <div class="ticker-item">🎟️ Rifa #042: O vencedor foi o número <b>27 (@Carlos_01)</b></div>
+                <div class="ticker-item">📈 Robô IA: Meta de 15% de lucro atingida hoje!</div>
+                <div class="ticker-item">💰 <b>@Marcos_Trade</b> realizou um saque de R$ 450,00!</div>
             </div>
         </div>
 
@@ -158,13 +205,15 @@
                 onSnapshot(doc(db, "usuarios", u.uid), (snap) => {
                     const data = snap.data();
                     if (data) {
-                        document.getElementById('u-nome').innerText = data.nome;
+                        document.getElementById('u-nome').innerText = data.nome || "Usuário";
                         document.getElementById('u-saldo').innerText = (data.saldo || 0).toFixed(2);
-                        document.getElementById('u-code').innerText = data.meuCodigo;
+                        document.getElementById('u-code').innerText = data.meuCodigo || "ID---";
                         document.getElementById('u-lvl').innerText = Math.floor((data.xp || 0) / 100) + 1;
                     }
                 });
-            } else { window.location.href = 'login.html'; }
+            } else { 
+                window.location.href = 'login.html'; 
+            }
         });
     </script>
 </body>
