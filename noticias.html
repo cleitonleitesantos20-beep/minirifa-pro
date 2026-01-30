@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nexus News - Feed</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            background: #000;
+            overflow: hidden; /* Trava o scroll do body para usar o container */
+        }
+
+        /* Container estilo TikTok */
+        #news-feed {
+            width: 100%;
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory; /* Efeito de trava por página */
+            padding-top: 75px; /* Espaço para o Nexus Header */
+        }
+
+        .news-card {
+            width: 100%;
+            height: calc(100vh - 75px);
+            scroll-snap-align: start;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            background-size: cover;
+            background-position: center;
+            border-bottom: 2px solid #111;
+        }
+
+        /* Overlay escuro para ler o texto */
+        .news-overlay {
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%);
+            padding: 30px 20px 80px 20px;
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        .news-tag {
+            background: #ff0055;
+            color: #fff;
+            font-family: 'Orbitron';
+            font-size: 0.6rem;
+            padding: 4px 10px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .news-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            line-height: 1.2;
+            color: #00f2ff;
+        }
+
+        .news-desc {
+            font-size: 0.9rem;
+            color: #ccc;
+            line-height: 1.4;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        /* Estilo para quando não há notícias */
+        .loading {
+            display: flex; align-items: center; justify-content: center;
+            height: 100%; color: #555; font-family: 'Orbitron';
+        }
+    </style>
+</head>
+<body>
+
+    <div id="news-feed">
+        <div class="loading">CONECTANDO AO NEXUS NEWS...</div>
+    </div>
+
+    <script type="module">
+        import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8",
+            authDomain: "minharifadigital.firebaseapp.com",
+            projectId: "minharifadigital",
+            appId: "1:59630725905:web:396c8cfca385dc3d957ab0"
+        };
+
+        const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+        const db = getFirestore(app);
+
+        // Referência para o container
+        const feed = document.getElementById('news-feed');
+
+        // Escuta em tempo real a coleção de notícias
+        const q = query(collection(db, "noticias"), orderBy("timestamp", "desc"));
+
+        onSnapshot(q, (snap) => {
+            feed.innerHTML = ""; // Limpa o loading
+
+            if (snap.empty) {
+                feed.innerHTML = '<div class="loading">NENHUMA NOTÍCIA NO MOMENTO</div>';
+                return;
+            }
+
+            snap.forEach((doc) => {
+                const data = doc.data();
+                const card = document.createElement('div');
+                card.className = 'news-card';
+                card.style.backgroundImage = `url('${data.imagem || 'https://via.placeholder.com/800x1200'}')`;
+                
+                card.innerHTML = `
+                    <div class="news-overlay">
+                        <span class="news-tag">NEXUS UPDATE</span>
+                        <div class="news-title">${data.titulo}</div>
+                        <div class="news-desc">${data.resumo}</div>
+                    </div>
+                `;
+                feed.appendChild(card);
+            });
+        });
+    </script>
+
+    <script type="module" src="nexus-overlay.js"></script>
+
+</body>
+</html>
