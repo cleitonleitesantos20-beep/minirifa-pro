@@ -3,94 +3,213 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nexus S - Dashboard</title>
+    <title>NexusVL - Home</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --gold: #ffcc00; --dark: #0a0a0a; --bg-card: #080808; }
+        :root { 
+            --bg-color: #050505;
+            --neon: #00f2ff; 
+            --purple: #bd00ff;
+            --green: #00ff88; 
+            --gold: #ffcc00; 
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+        }
         
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden; display: flex; flex-direction: column; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+        body { 
+            background: var(--bg-color); 
+            color: #fff; 
+            font-family: 'Rajdhani'; 
+            margin: 0; 
+            padding: 0; 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            overflow-x: hidden;
+        }
 
-        .ad-banner-top { width: 100%; height: 60px; background: #050505; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 0.55rem; color: #333; letter-spacing: 2px; flex-shrink: 0; text-align: center; }
+        /* --- CABEÇALHO INTEGRADO (Perfil + Saldo/Depósito) --- */
+        .header-status-bar {
+            padding: 20px 20px 10px 20px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
 
-        .profile-section { padding: 20px; background: linear-gradient(to bottom, #111, #000); border-bottom: 1px solid #1a1a1a; display: flex; align-items: center; gap: 15px; position: relative; flex-shrink: 0; }
+        .user-info { display: flex; align-items: center; gap: 12px; }
+        .avatar-ring {
+            width: 55px; height: 55px;
+            border-radius: 50%;
+            background: #111;
+            border: 2px solid var(--neon);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
+        }
+
+        .user-text h2 { margin: 0; font-family: 'Orbitron'; font-size: 0.9rem; letter-spacing: 1px; }
+        .lvl-badge { font-size: 0.6rem; color: #888; background: #111; padding: 2px 6px; border-radius: 4px; }
+
+        /* Botão de Créditos "Grudado" no Perfil */
+        .balance-box {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid var(--green);
+            padding: 8px 15px;
+            border-radius: 12px;
+            text-align: right;
+            cursor: pointer; /* Clicável para depósito */
+            transition: 0.2s;
+        }
+        .balance-box:active { transform: scale(0.95); background: rgba(0, 255, 136, 0.2); }
+        .balance-val { display: block; font-family: 'Orbitron'; font-size: 1rem; color: var(--green); }
+        .balance-lbl { font-size: 0.5rem; color: #aaa; display: block; margin-top: -2px; }
+
+        /* --- ÁREA DE WIDGETS (Relógio) --- */
+        .widget-area {
+            padding: 10px 20px;
+            text-align: center;
+        }
+        .clock-widget {
+            font-family: 'Orbitron';
+            font-size: 2.5rem;
+            color: rgba(255,255,255,0.1);
+            letter-spacing: 5px;
+            margin-bottom: 20px;
+        }
+
+        /* --- GRID DE APLICATIVOS (Design Celular) --- */
+        .app-drawer {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 3 Apps por linha */
+            gap: 20px 10px;
+            padding: 10px 20px;
+            max-width: 500px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .app-icon-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .app-icon-container:active { transform: scale(0.9); }
+
+        .app-box {
+            width: 65px; height: 65px;
+            border-radius: 18px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
         
-        .avatar-container { position: relative; width: 65px; height: 65px; flex-shrink: 0; }
-        .avatar-main { width: 100%; height: 100%; background: #000; border: 2px solid var(--neon); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; box-shadow: 0 0 15px rgba(0,242,255,0.1); }
-        
-        .user-data { flex-grow: 1; min-width: 0; }
-        .user-data h2 { font-family: 'Orbitron'; font-size: 0.85rem; margin: 0; color: #eee; text-transform: uppercase; }
-        .user-balance { color: var(--green); font-weight: bold; font-size: 1.1rem; display: block; margin: 2px 0; }
-        .balance-label { font-size: 0.5rem; color: #555; font-family: 'Orbitron'; letter-spacing: 1px; }
-        .lvl-tag { font-family: 'Orbitron'; font-size: 0.55rem; color: var(--neon); background: rgba(0,242,255,0.05); padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(0,242,255,0.2); }
+        /* Cores específicas para cada "App" */
+        .app-box.news { background: linear-gradient(135deg, #ff4b1f, #ff9068); border:none; }
+        .app-box.games { background: linear-gradient(135deg, #11998e, #38ef7d); border:none; }
+        .app-box.market { background: linear-gradient(135deg, #FDC830, #F37335); border:none; }
+        .app-box.faq { background: linear-gradient(135deg, #00c6ff, #0072ff); border:none; }
+        .app-box.drops { background: linear-gradient(135deg, #8E2DE2, #4A00E0); border:none; }
+        .app-box.rifas { background: linear-gradient(135deg, #fc00ff, #00dbde); border:none; }
 
-        .btn-config-side { background: #0a0a0a; border: 1px solid #222; color: #666; width: 42px; height: 42px; border-radius: 10px; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+        .app-label {
+            font-family: 'Rajdhani';
+            font-weight: bold;
+            font-size: 0.75rem;
+            color: #ddd;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
 
-        .container { padding: 15px; max-width: 450px; margin: 0 auto; width: 100%; flex-grow: 1; }
+        /* Brilho no ícone */
+        .app-box::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 50%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.2), transparent);
+            border-radius: 18px 18px 0 0;
+        }
 
-        .sys-info { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #050505; border-radius: 12px; border: 1px solid #111; margin-bottom: 15px; }
-        .sys-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; display: inline-block; margin-right: 5px; box-shadow: 0 0 8px var(--green); animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-        .sys-text { font-family: 'Orbitron'; font-size: 0.5rem; color: #444; }
+        /* --- NEWS TICKER (Rodapé) --- */
+        .nexus-ticker {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: rgba(0,0,0,0.9);
+            border-top: 1px solid #222;
+            padding: 8px 0;
+            z-index: 100;
+        }
+        .ticker-track { white-space: nowrap; animation: scroll 20s linear infinite; font-family: 'Orbitron'; font-size: 0.6rem; color: var(--neon); }
+        @keyframes scroll { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
 
-        .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
-        .btn-card { background: var(--bg-card); border: 1px solid #1a1a1a; padding: 20px 10px; border-radius: 20px; color: #fff; font-family: 'Orbitron'; font-size: 0.65rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 10px; transition: 0.2s; text-decoration: none; }
-        .btn-card span { font-size: 1.5rem; }
-        .btn-card:active { transform: translateY(2px); border-color: var(--neon); background: #111; }
-
-        .btn-nexus { width: 100%; background: linear-gradient(90deg, #000, #151515, #000); border: 1px solid var(--gold); padding: 20px; border-radius: 20px; color: var(--gold); font-family: 'Orbitron'; font-size: 0.95rem; font-weight: bold; cursor: pointer; letter-spacing: 4px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-
-        .ad-banner-bottom { width: 100%; min-height: 80px; background: #050505; border: 1px solid #111; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 0.55rem; color: #222; text-align: center; padding: 10px; margin-bottom: 20px; }
-
-        .news-ticker { position: fixed; bottom: 0; left: 0; width: 100%; background: #000; border-top: 1px solid #1a1a1a; padding: 12px 0; overflow: hidden; z-index: 1000; }
-        .ticker-content { display: inline-block; white-space: nowrap; animation: ticker 25s linear infinite; font-family: 'Orbitron'; font-size: 0.6rem; color: var(--neon); letter-spacing: 2px; }
-
-        @keyframes ticker { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
     </style>
 </head>
 <body>
 
-    <div class="ad-banner-top">
-        CONTEÚDO DIGITAL EXCLUSIVO<br>PLATAFORMA DE CRÉDITOS NEXUS
+    <div class="header-status-bar">
+        <div class="user-info" onclick="window.location.href='perfil.html'">
+            <div class="avatar-ring" id="u-avatar">👤</div>
+            <div class="user-text">
+                <h2 id="u-nome">NEXUS USER</h2>
+                <span class="lvl-badge">LEVEL <span id="u-level">1</span></span>
+            </div>
+        </div>
+
+        <div class="balance-box" onclick="window.location.href='deposito.html'">
+            <span class="balance-val" id="u-saldo">0</span>
+            <span class="balance-lbl">ADICIONAR +</span>
+        </div>
     </div>
 
-    <div class="profile-section">
-        <div class="avatar-container">
-            <div class="avatar-main" id="u-avatar">👤</div>
-        </div>
-        <div class="user-data">
-            <h2 id="u-nome">CARREGANDO...</h2>
-            <div class="user-balance"><span id="u-saldo">0</span> <span class="balance-label">NP</span></div>
-            <span class="lvl-tag">NÍVEL <span id="u-level">1</span></span>
-        </div>
-        <button class="btn-config-side" onclick="window.location.href='config.html'">⚙️</button>
+    <div class="widget-area">
+        <div class="clock-widget" id="sys-clock">00:00</div>
     </div>
 
-    <div class="container">
+    <div class="app-drawer">
         
-        <div class="sys-info">
-            <div><span class="sys-dot"></span><span class="sys-text">NEXUS CORE: ATIVO</span></div>
-            <span class="sys-text" id="sys-clock">00:00:00</span>
+        <div class="app-icon-container" onclick="window.location.href='noticias.html'">
+            <div class="app-box news">📰</div>
+            <span class="app-label">Notícias VL</span>
         </div>
 
-        <div class="main-grid">
-            <button class="btn-card" onclick="window.location.href='rifas.html'"><span>🎟️</span>CAMPANHAS</button>
-            <button class="btn-card" onclick="window.location.href='leilao.html'"><span>🔨</span>DROPS</button>
-            <button class="btn-card" onclick="window.location.href='trades.html'"><span>📈</span>ALGORITMOS</button>
-            <button class="btn-card" onclick="window.location.href='minigames.html'"><span>🎮</span>NEXUS GAMES</button>
-            <button class="btn-card" onclick="window.location.href='deposito.html'"><span>💎</span>CRÉDITOS</button>
-            <button class="btn-card" onclick="window.location.href='ranking.html'"><span>🏆</span>MESTRES</button>
+        <div class="app-icon-container" onclick="window.location.href='minigames.html'">
+            <div class="app-box games">🎮</div>
+            <span class="app-label">Games</span>
         </div>
 
-        <button class="btn-nexus" onclick="window.location.href='market.html'">🛒 MARKETPLACE</button>
+        <div class="app-icon-container" onclick="window.location.href='market.html'">
+            <div class="app-box market">🛒</div>
+            <span class="app-label">Market</span>
+        </div>
 
-        <div class="ad-banner-bottom">MEMBROS PREMIUM<br>ACESSO AO GUIA DE ESTRATÉGIAS DIGITAIS</div>
+        <div class="app-icon-container" onclick="window.location.href='rifas.html'">
+            <div class="app-box rifas">🎟️</div>
+            <span class="app-label">Campanhas</span>
+        </div>
+
+        <div class="app-icon-container" onclick="window.location.href='leilao.html'">
+            <div class="app-box drops">🔨</div>
+            <span class="app-label">Drops</span>
+        </div>
+
+        <div class="app-icon-container" onclick="window.location.href='faq.html'">
+            <div class="app-box faq">❓</div>
+            <span class="app-label">Perguntas</span>
+        </div>
 
     </div>
 
-    <div class="news-ticker">
-        <div class="ticker-content">
-            ••• ADQUIRA CRÉDITOS E RECEBA CONTEÚDO EXCLUSIVO ••• PARTICIPE DAS CAMPANHAS DE FIDELIDADE ••• NOVA TEMPORADA NEXUS S DISPONÍVEL ••• O FUTURO DA ECONOMIA TOKENIZADA •••
+    <div class="nexus-ticker">
+        <div class="ticker-track">
+            ••• BEM-VINDO AO SISTEMA NEXUS VL ••• NOVIDADES EM BREVE NA LOJA ••• CONFIRA A ABA DE NOTÍCIAS ••• MANTENHA SEU PERFIL ATUALIZADO •••
         </div>
     </div>
 
@@ -110,26 +229,29 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
+        // Relógio Simples (HH:MM)
+        setInterval(() => {
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('sys-clock').innerText = `${h}:${m}`;
+        }, 1000);
+
         onAuthStateChanged(auth, user => {
             if (user) {
                 onSnapshot(doc(db, "usuarios", user.uid), snap => {
-                    const d = snap.data();
-                    if(!d) return;
-                    document.getElementById('u-nome').innerText = (d.nome || "OPERADOR").toUpperCase();
-                    
-                    // Mostra saldo em pontos inteiros (NP)
-                    const saldoPontos = Math.floor(d.saldo || 0);
-                    document.getElementById('u-saldo').innerText = saldoPontos.toLocaleString('pt-br');
-                    
-                    if(d.avatarEmoji) document.getElementById('u-avatar').innerText = d.avatarEmoji;
-                    document.getElementById('u-level').innerText = d.level || 1;
+                    if(snap.exists()) {
+                        const d = snap.data();
+                        document.getElementById('u-nome').innerText = (d.nome || "Usuário").split(' ')[0].toUpperCase();
+                        document.getElementById('u-saldo').innerText = Math.floor(d.saldo || 0).toLocaleString('pt-br');
+                        if(d.avatarEmoji) document.getElementById('u-avatar').innerText = d.avatarEmoji;
+                        document.getElementById('u-level').innerText = d.xp ? Math.floor(d.xp / 100) + 1 : 1;
+                    }
                 });
-            } else { window.location.href = "login.html"; }
+            } else {
+                window.location.href = "login.html";
+            }
         });
-
-        setInterval(() => {
-            document.getElementById('sys-clock').innerText = new Date().toLocaleTimeString('pt-br');
-        }, 1000);
     </script>
 </body>
 </html>
