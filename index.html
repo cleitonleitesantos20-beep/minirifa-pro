@@ -3,88 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexusVL - Home</title>
+    <title>NexusVL - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root { 
             --bg-color: #050505;
             --neon: #00f2ff; 
-            --purple: #bd00ff;
-            --green: #00ff88; 
-            --gold: #ffcc00; 
             --glass: rgba(255, 255, 255, 0.05);
             --border: rgba(255, 255, 255, 0.1);
         }
         
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+        
         body { 
             background: var(--bg-color); 
             color: #fff; 
             font-family: 'Rajdhani'; 
             margin: 0; 
-            padding: 0; 
+            padding: 85px 0 60px 0 !important; /* Espaço para o Overlay fixo */
             min-height: 100vh; 
             display: flex; 
             flex-direction: column; 
             overflow-x: hidden;
         }
 
-        /* --- CABEÇALHO INTEGRADO (Perfil + Saldo/Depósito) --- */
-        .header-status-bar {
-            padding: 20px 20px 10px 20px;
-            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .user-info { display: flex; align-items: center; gap: 12px; }
-        .avatar-ring {
-            width: 55px; height: 55px;
-            border-radius: 50%;
-            background: #111;
-            border: 2px solid var(--neon);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem;
-            box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
-        }
-
-        .user-text h2 { margin: 0; font-family: 'Orbitron'; font-size: 0.9rem; letter-spacing: 1px; }
-        .lvl-badge { font-size: 0.6rem; color: #888; background: #111; padding: 2px 6px; border-radius: 4px; }
-
-        /* Botão de Créditos "Grudado" no Perfil */
-        .balance-box {
-            background: rgba(0, 255, 136, 0.1);
-            border: 1px solid var(--green);
-            padding: 8px 15px;
-            border-radius: 12px;
-            text-align: right;
-            cursor: pointer; /* Clicável para depósito */
-            transition: 0.2s;
-        }
-        .balance-box:active { transform: scale(0.95); background: rgba(0, 255, 136, 0.2); }
-        .balance-val { display: block; font-family: 'Orbitron'; font-size: 1rem; color: var(--green); }
-        .balance-lbl { font-size: 0.5rem; color: #aaa; display: block; margin-top: -2px; }
-
-        /* --- ÁREA DE WIDGETS (Relógio) --- */
-        .widget-area {
-            padding: 10px 20px;
-            text-align: center;
-        }
-        .clock-widget {
-            font-family: 'Orbitron';
-            font-size: 2.5rem;
-            color: rgba(255,255,255,0.1);
-            letter-spacing: 5px;
-            margin-bottom: 20px;
-        }
-
         /* --- GRID DE APLICATIVOS (Design Celular) --- */
         .app-drawer {
             display: grid;
-            grid-template-columns: repeat(3, 1fr); /* 3 Apps por linha */
-            gap: 20px 10px;
-            padding: 10px 20px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px 15px;
+            padding: 20px;
             max-width: 500px;
             margin: 0 auto;
             width: 100%;
@@ -97,161 +45,103 @@
             gap: 8px;
             cursor: pointer;
             transition: 0.2s;
+            text-decoration: none;
         }
+        
         .app-icon-container:active { transform: scale(0.9); }
 
         .app-box {
-            width: 65px; height: 65px;
-            border-radius: 18px;
+            width: 70px; height: 70px;
+            border-radius: 20px;
             display: flex; align-items: center; justify-content: center;
             font-size: 1.8rem;
             background: var(--glass);
             border: 1px solid var(--border);
             backdrop-filter: blur(10px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
             position: relative;
             overflow: hidden;
         }
         
-        /* Cores específicas para cada "App" */
-        .app-box.news { background: linear-gradient(135deg, #ff4b1f, #ff9068); border:none; }
-        .app-box.games { background: linear-gradient(135deg, #11998e, #38ef7d); border:none; }
-        .app-box.market { background: linear-gradient(135deg, #FDC830, #F37335); border:none; }
-        .app-box.faq { background: linear-gradient(135deg, #00c6ff, #0072ff); border:none; }
-        .app-box.drops { background: linear-gradient(135deg, #8E2DE2, #4A00E0); border:none; }
-        .app-box.rifas { background: linear-gradient(135deg, #fc00ff, #00dbde); border:none; }
+        /* Gradientes dos ícones */
+        .icon-news { background: linear-gradient(135deg, #ff4b1f, #ff9068); }
+        .icon-games { background: linear-gradient(135deg, #11998e, #38ef7d); }
+        .icon-market { background: linear-gradient(135deg, #FDC830, #F37335); }
+        .icon-rifas { background: linear-gradient(135deg, #fc00ff, #00dbde); }
+        .icon-drops { background: linear-gradient(135deg, #8E2DE2, #4A00E0); }
+        .icon-quests { background: linear-gradient(135deg, #00c6ff, #0072ff); }
 
         .app-label {
-            font-family: 'Rajdhani';
+            font-family: 'Orbitron';
             font-weight: bold;
-            font-size: 0.75rem;
-            color: #ddd;
+            font-size: 0.7rem;
+            color: #888;
             text-align: center;
             letter-spacing: 0.5px;
         }
 
-        /* Brilho no ícone */
         .app-box::after {
             content: '';
             position: absolute;
             top: 0; left: 0; width: 100%; height: 50%;
             background: linear-gradient(to bottom, rgba(255,255,255,0.2), transparent);
-            border-radius: 18px 18px 0 0;
+            border-radius: 20px 20px 0 0;
         }
 
-        /* --- NEWS TICKER (Rodapé) --- */
+        /* --- NEWS TICKER --- */
         .nexus-ticker {
             position: fixed; bottom: 0; left: 0; width: 100%;
             background: rgba(0,0,0,0.9);
-            border-top: 1px solid #222;
-            padding: 8px 0;
+            border-top: 1px solid #111;
+            padding: 10px 0;
             z-index: 100;
         }
-        .ticker-track { white-space: nowrap; animation: scroll 20s linear infinite; font-family: 'Orbitron'; font-size: 0.6rem; color: var(--neon); }
+        .ticker-track { white-space: nowrap; animation: scroll 25s linear infinite; font-family: 'Orbitron'; font-size: 0.55rem; color: var(--neon); letter-spacing: 2px; }
         @keyframes scroll { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
 
     </style>
 </head>
 <body>
 
-    <div class="header-status-bar">
-        <div class="user-info" onclick="window.location.href='perfil.html'">
-            <div class="avatar-ring" id="u-avatar">👤</div>
-            <div class="user-text">
-                <h2 id="u-nome">NEXUS USER</h2>
-                <span class="lvl-badge">LEVEL <span id="u-level">1</span></span>
-            </div>
-        </div>
-
-        <div class="balance-box" onclick="window.location.href='deposito.html'">
-            <span class="balance-val" id="u-saldo">0</span>
-            <span class="balance-lbl">ADICIONAR +</span>
-        </div>
-    </div>
-
-    <div class="widget-area">
-        <div class="clock-widget" id="sys-clock">00:00</div>
-    </div>
-
     <div class="app-drawer">
-        
-        <div class="app-icon-container" onclick="window.location.href='noticias.html'">
-            <div class="app-box news">📰</div>
+        <a href="noticias.html" class="app-icon-container">
+            <div class="app-box icon-news">📰</div>
             <span class="app-label">Notícias VL</span>
-        </div>
+        </a>
 
-        <div class="app-icon-container" onclick="window.location.href='minigames.html'">
-            <div class="app-box games">🎮</div>
+        <a href="minigames.html" class="app-icon-container">
+            <div class="app-box icon-games">🎮</div>
             <span class="app-label">Games</span>
-        </div>
+        </a>
 
-        <div class="app-icon-container" onclick="window.location.href='market.html'">
-            <div class="app-box market">🛒</div>
+        <a href="market.html" class="app-icon-container">
+            <div class="app-box icon-market">🛒</div>
             <span class="app-label">Market</span>
-        </div>
+        </a>
 
-        <div class="app-icon-container" onclick="window.location.href='rifas.html'">
-            <div class="app-box rifas">🎟️</div>
+        <a href="rifas.html" class="app-icon-container">
+            <div class="app-box icon-rifas">🎟️</div>
             <span class="app-label">Campanhas</span>
-        </div>
+        </a>
 
-        <div class="app-icon-container" onclick="window.location.href='leilao.html'">
-            <div class="app-box drops">🔨</div>
+        <a href="leilao.html" class="app-icon-container">
+            <div class="app-box icon-drops">🔨</div>
             <span class="app-label">Drops</span>
-        </div>
+        </a>
 
-        <div class="app-icon-container" onclick="window.location.href='faq.html'">
-            <div class="app-box faq">❓</div>
-            <span class="app-label">Perguntas</span>
-        </div>
-
+        <a href="quests.html" class="app-icon-container">
+            <div class="app-box icon-quests">📝</div>
+            <span class="app-label">Nexus Quest</span>
+        </a>
     </div>
 
     <div class="nexus-ticker">
         <div class="ticker-track">
-            ••• BEM-VINDO AO SISTEMA NEXUS VL ••• NOVIDADES EM BREVE NA LOJA ••• CONFIRA A ABA DE NOTÍCIAS ••• MANTENHA SEU PERFIL ATUALIZADO •••
+            ••• BEM-VINDO AO SISTEMA NEXUS VL ••• COMPLETE O NEXUS QUEST E GANHE NP HOJE ••• NOVOS DROPS DISPONÍVEIS NA PRÓXIMA HORA •••
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+    <script type="module" src="nexus-overlay.js"></script>
 
-        const firebaseConfig = { 
-            apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", 
-            authDomain: "minharifadigital.firebaseapp.com", 
-            projectId: "minharifadigital", 
-            appId: "1:59630725905:web:396c8cfca385dc3d957ab0" 
-        };
-        
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-
-        // Relógio Simples (HH:MM)
-        setInterval(() => {
-            const now = new Date();
-            const h = String(now.getHours()).padStart(2, '0');
-            const m = String(now.getMinutes()).padStart(2, '0');
-            document.getElementById('sys-clock').innerText = `${h}:${m}`;
-        }, 1000);
-
-        onAuthStateChanged(auth, user => {
-            if (user) {
-                onSnapshot(doc(db, "usuarios", user.uid), snap => {
-                    if(snap.exists()) {
-                        const d = snap.data();
-                        document.getElementById('u-nome').innerText = (d.nome || "Usuário").split(' ')[0].toUpperCase();
-                        document.getElementById('u-saldo').innerText = Math.floor(d.saldo || 0).toLocaleString('pt-br');
-                        if(d.avatarEmoji) document.getElementById('u-avatar').innerText = d.avatarEmoji;
-                        document.getElementById('u-level').innerText = d.xp ? Math.floor(d.xp / 100) + 1 : 1;
-                    }
-                });
-            } else {
-                window.location.href = "login.html";
-            }
-        });
-    </script>
 </body>
 </html>
