@@ -1,5 +1,4 @@
-// ARQUIVO: nexus-overlay.js
-import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getFirestore, doc, onSnapshot, collection, addDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
@@ -10,112 +9,84 @@ const firebaseConfig = {
     appId: "1:59630725905:web:396c8cfca385dc3d957ab0"
 };
 
-// Inicialização segura do Firebase
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// Função que constrói o sistema visual
-function injectNexusSystem() {
-    // 1. Injeta o CSS Global
+function initOverlay() {
+    // 1. Injeta CSS do Overlay
     const style = document.createElement('style');
     style.textContent = `
-        :root { --bg-nav: #111; --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --txt: #fff; }
-        body.light-mode { --bg-nav: #fff; --txt: #000; --border: #ddd; }
-        
-        .nexus-top-bar { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 70px; 
-            background: var(--bg-nav); border-bottom: 1px solid #222; 
-            display: flex; align-items: center; justify-content: space-between; 
-            padding: 0 15px; z-index: 10000; box-sizing: border-box;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.5);
+        .nexus-header {
+            position: fixed; top: 0; left: 0; width: 100%; height: 75px;
+            background: #0a0a0a; border-bottom: 1px solid #222;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 15px; z-index: 10000; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
-        .user-block { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-        .u-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--neon); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; background: #000; }
-        .u-info { font-family: 'Orbitron'; line-height: 1.2; }
-        .u-info b { display: block; font-size: 0.7rem; color: var(--txt); }
-        .u-info span { font-size: 0.6rem; color: var(--green); }
-
-        .nexus-btns { display: flex; align-items: center; gap: 10px; }
-        .n-btn { background: #222; border: 1px solid #333; color: #fff; width: 35px; height: 35px; border-radius: 8px; cursor: pointer; }
+        .user-pill { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .u-av { width: 45px; height: 45px; border-radius: 50%; border: 2px solid #00f2ff; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; background: #000; }
+        .u-det { font-family: 'Orbitron'; font-size: 0.7rem; color: #fff; line-height: 1.3; }
+        .u-np { color: #00ff88; font-weight: bold; display: block; }
         
-        /* Alavanca de Tema */
-        .t-switch { position: relative; width: 40px; height: 20px; background: #333; border-radius: 20px; cursor: pointer; }
-        .t-circle { position: absolute; width: 16px; height: 16px; background: #fff; border-radius: 50%; top: 2px; left: 2px; transition: 0.3s; }
-        body.light-mode .t-switch { background: var(--neon); }
-        body.light-mode .t-circle { left: 22px; }
+        .ctrl-group { display: flex; align-items: center; gap: 10px; }
+        .mode-toggle { width: 40px; height: 20px; background: #333; border-radius: 20px; position: relative; cursor: pointer; border: 1px solid #444; }
+        .mode-toggle::after { content: '🌙'; position: absolute; left: 2px; top: 1px; font-size: 10px; transition: 0.3s; }
+        body.light-mode .mode-toggle::after { content: '☀️'; left: 22px; }
+        body.light-mode { background: #f0f0f0 !important; color: #000; }
 
-        .chat-btn { position: fixed; bottom: 80px; right: 20px; width: 55px; height: 55px; background: var(--pink); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; z-index: 9999; cursor: pointer; box-shadow: 0 5px 15px rgba(255,0,85,0.4); }
-        .chat-box { position: fixed; bottom: 145px; right: 20px; width: 300px; height: 350px; background: var(--bg-nav); border: 1px solid var(--pink); border-radius: 15px; display: none; flex-direction: column; z-index: 10000; overflow: hidden; }
-        .chat-box.open { display: flex; }
+        .nexus-chat-fab { position: fixed; bottom: 80px; right: 20px; width: 55px; height: 55px; background: #ff0055; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; z-index: 9999; cursor: pointer; box-shadow: 0 0 15px rgba(255,0,85,0.4); }
+        .chat-panel { position: fixed; bottom: 145px; right: 20px; width: 300px; height: 380px; background: #111; border: 1px solid #ff0055; border-radius: 15px; display: none; flex-direction: column; z-index: 10000; overflow: hidden; }
+        .chat-panel.active { display: flex; }
     `;
     document.head.appendChild(style);
 
-    // 2. Injeta o HTML
-    const overlay = document.createElement('div');
-    overlay.innerHTML = `
-        <div class="nexus-top-bar">
-            <div class="user-block" onclick="window.location.href='perfil.html'">
-                <div class="u-avatar" id="nav-avatar">👤</div>
-                <div class="u-info"><b id="nav-nome">CARREGANDO...</b><span id="nav-np">0 NP</span></div>
+    // 2. Injeta HTML do Overlay
+    const ui = document.createElement('div');
+    ui.innerHTML = `
+        <div class="nexus-header">
+            <div class="user-pill" onclick="window.location.href='perfil.html'">
+                <div class="u-av" id="nav-av">👤</div>
+                <div class="u-det">
+                    <span id="nav-name">CARREGANDO...</span>
+                    <span class="u-np" id="nav-np">0 NP</span>
+                </div>
             </div>
-            <div class="nexus-btns">
-                <button class="n-btn" onclick="window.location.href='deposito.html'">💰</button>
-                <div class="t-switch" onclick="document.body.classList.toggle('light-mode')"><div class="t-circle"></div></div>
-                <button class="n-btn" onclick="window.location.href='config.html'">⚙️</button>
+            <div class="ctrl-group">
+                <div class="mode-toggle" id="theme-btn"></div>
+                <button onclick="window.location.href='config.html'" style="background:none; border:none; font-size:1.2rem; cursor:pointer;">⚙️</button>
             </div>
         </div>
-        <div class="chat-btn" onclick="document.getElementById('nexus-chat').classList.toggle('open')">💬</div>
-        <div class="chat-box" id="nexus-chat">
-            <div style="background:var(--pink); padding:10px; font-family:Orbitron; font-size:0.7rem;">CHAT GLOBAL NEXUSVL</div>
-            <div id="chat-msg-area" style="flex:1; overflow-y:auto; padding:10px; font-size:0.8rem;"></div>
-            <div style="padding:10px; display:flex; gap:5px; border-top:1px solid #333;">
-                <input id="chat-txt" type="text" style="flex:1; background:#000; color:#fff; border:1px solid #444; padding:5px; border-radius:5px;">
-                <button id="chat-send" style="background:var(--pink); border:none; color:#fff; border-radius:5px; padding:0 10px;">➤</button>
+        <div class="nexus-chat-fab" id="chat-fab">💬</div>
+        <div class="chat-panel" id="chat-panel">
+            <div style="background:#ff0055; padding:10px; font-family:Orbitron; font-size:0.7rem; color:#fff;">NEXUS CHAT</div>
+            <div id="chat-msgs" style="flex:1; overflow-y:auto; padding:10px; color:#fff; font-size:0.8rem;"></div>
+            <div style="padding:10px; display:flex; gap:5px; border-top:1px solid #222;">
+                <input id="chat-in" type="text" placeholder="Sua mensagem..." style="flex:1; background:#000; color:#fff; border:1px solid #333; padding:5px; border-radius:5px;">
+                <button id="chat-go" style="background:#ff0055; border:none; color:#fff; border-radius:5px; padding:0 10px;">➤</button>
             </div>
         </div>
     `;
-    document.body.prepend(overlay);
+    document.body.prepend(ui);
 
-    // 3. Lógica Firebase
-    onAuthStateChanged(auth, (user) => {
+    // 3. Lógica de Tema e Chat
+    document.getElementById('theme-btn').onclick = () => document.body.classList.toggle('light-mode');
+    document.getElementById('chat-fab').onclick = () => document.getElementById('chat-panel').classList.toggle('active');
+
+    // 4. Firebase Sync
+    onAuthStateChanged(auth, user => {
         if (user) {
-            onSnapshot(doc(db, "usuarios", user.uid), (snap) => {
-                const d = snap.data();
-                if(d) {
-                    document.getElementById('nav-nome').innerText = (d.nome || "OPERADOR").toUpperCase();
-                    document.getElementById('nav-avatar').innerText = d.avatarEmoji || "👤";
+            onSnapshot(doc(db, "usuarios", user.uid), snap => {
+                if(snap.exists()){
+                    const d = snap.data();
+                    document.getElementById('nav-name').innerText = (d.nome || "USER").toUpperCase();
+                    document.getElementById('nav-av').innerText = d.avatarEmoji || "👤";
                     document.getElementById('nav-np').innerText = Math.floor(d.saldo || 0) + " NP";
                 }
             });
-        }
-    });
-
-    // Lógica simples do Chat
-    document.getElementById('chat-send').onclick = async () => {
-        const input = document.getElementById('chat-txt');
-        if(!input.value || !auth.currentUser) return;
-        await addDoc(collection(db, "global_chat"), {
-            text: input.value, uid: auth.currentUser.uid, timestamp: new Date().toISOString()
-        });
-        input.value = "";
-    };
-
-    const q = query(collection(db, "global_chat"), orderBy("timestamp", "desc"), limit(20));
-    onSnapshot(q, (snap) => {
-        const area = document.getElementById('chat-msg-area');
-        area.innerHTML = "";
-        snap.docs.reverse().forEach(d => {
-            const m = d.data();
-            area.innerHTML += `<div style="margin-bottom:8px; color:${m.uid === auth.currentUser?.uid ? 'var(--neon)' : '#ccc'}">${m.text}</div>`;
-        });
-        area.scrollTop = area.scrollHeight;
+        } else { window.location.href = "login.html"; }
     });
 }
 
-// Garante que a injeção só ocorra quando o BODY existir
-if (document.body) {
-    injectNexusSystem();
-} else {
-    window.addEventListener('DOMContentLoaded', injectNexusSystem);
-}
+// Inicializa apenas quando o DOM estiver pronto
+if (document.readyState === "complete") { initOverlay(); } 
+else { window.addEventListener("load", initOverlay); }
