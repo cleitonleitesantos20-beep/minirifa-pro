@@ -40,19 +40,22 @@ function initOverlay() {
         .xp-num { font-size: 0.45rem; color: #aaa; }
         .bonus-tag { font-size: 0.45rem; color: #ff0055; font-weight: bold; animation: pulse 1.5s infinite; }
 
-        /* SELETOR DE EMOJIS */
+        /* SELETOR DE EMOJIS EXPANDIDO */
         .emoji-picker {
             position: absolute; top: 80px; left: 10px; background: #0a0a0a; border: 1px solid #333;
-            border-radius: 12px; padding: 10px; display: none; grid-template-columns: repeat(4, 1fr);
-            gap: 8px; z-index: 10001; box-shadow: 0 10px 30px rgba(0,0,0,0.8); width: 180px;
+            border-radius: 12px; padding: 12px; display: none; grid-template-columns: repeat(5, 1fr);
+            gap: 8px; z-index: 10001; box-shadow: 0 10px 30px rgba(0,0,0,0.9); width: 230px;
+            max-height: 300px; overflow-y: auto;
         }
         .emoji-picker.active { display: grid; }
         .emoji-item { 
-            width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; 
-            background: #151515; border-radius: 5px; cursor: pointer; font-size: 1.1rem; position: relative;
+            width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; 
+            background: #151515; border-radius: 8px; cursor: pointer; font-size: 1.2rem; position: relative;
+            transition: 0.2s; border: 1px solid transparent;
         }
-        .emoji-item.locked { opacity: 0.4; cursor: not-allowed; }
-        .emoji-item.locked::after { content: '🔒'; position: absolute; font-size: 0.5rem; bottom: 2px; right: 2px; }
+        .emoji-item:hover:not(.locked) { border-color: #00f2ff; background: #222; }
+        .emoji-item.locked { opacity: 0.3; cursor: not-allowed; filter: grayscale(1); }
+        .emoji-item.locked::after { content: '🔒'; position: absolute; font-size: 0.55rem; bottom: -2px; right: -2px; filter: none; opacity: 1; }
 
         @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 
@@ -114,9 +117,13 @@ function initOverlay() {
     `;
     document.body.prepend(ui);
 
-    // Configuração de Emojis
-    const emojisDisponiveis = ["👤", "🔥", "💎", "⚡", "👑", "🚀", "🎮", "👾", "🤖", "👻", "🦄", "💀"];
-    const emojisGratis = ["👤", "🔥"]; // Apenas exemplos que começam liberados
+    // CONFIGURAÇÃO DE EMOJIS (Lista ampliada)
+    const emojisDisponiveis = [
+        "👤", "🔥", "🐱", "🐶", "🦊", // Grátis iniciais
+        "💎", "⚡", "👑", "🚀", "🎮", "👾", "🤖", "👻", "🦄", "💀", "👽", "💊", "🔫", "💰", "🌈", "⭐", "🍀", "🧿", "👺", "🐱‍👤"
+    ];
+    // Emojis que o usuário ganha assim que cria a conta
+    const emojisIniciais = ["👤", "🔥", "🐱", "🐶", "🦊"]; 
 
     let currentLvl = 0;
     let userData = {};
@@ -124,7 +131,6 @@ function initOverlay() {
     document.getElementById('theme-btn').onclick = () => document.body.classList.toggle('light-mode');
     document.getElementById('chat-fab').onclick = () => document.getElementById('chat-panel').classList.toggle('active');
     
-    // Abrir/Fechar Seletor de Emoji
     const navAv = document.getElementById('nav-av');
     const picker = document.getElementById('emoji-picker');
     navAv.onclick = (e) => { e.stopPropagation(); picker.classList.toggle('active'); };
@@ -137,7 +143,6 @@ function initOverlay() {
                     const d = snap.data();
                     userData = d;
                     
-                    // Atualiza Interface
                     const xpTotal = d.xp || 0;
                     const level = Math.floor(xpTotal / 1000) + 1;
                     const xpNoNivel = xpTotal % 1000;
@@ -156,8 +161,8 @@ function initOverlay() {
                     document.getElementById('nav-xp').style.width = (xpNoNivel / 10) + "%";
                     document.getElementById('xp-val').innerText = `${xpNoNivel}/1000`;
 
-                    // Renderiza Emojis no Seletor
-                    renderEmojiPicker(user.uid, d.mochilaEmojis || emojisGratis);
+                    // Renderiza seletor com a mochila do banco de dados ou os iniciais
+                    renderEmojiPicker(user.uid, d.mochilaEmojis || emojisIniciais);
                 }
             });
 
@@ -189,7 +194,7 @@ function initOverlay() {
             
             item.onclick = async () => {
                 if(isLocked) {
-                    alert("Este emoji deve ser adquirido no Mercado!");
+                    alert("Bloqueado! Adquira este item no Nexus Market.");
                     return;
                 }
                 await updateDoc(doc(db, "usuarios", uid), { avatarEmoji: emo });
