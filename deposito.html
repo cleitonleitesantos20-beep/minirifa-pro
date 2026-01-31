@@ -3,85 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nexus S - Depósito</title>
+    <title>NexusVL - Créditos</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --gold: #ffcc00; --dark: #0a0a0a; --bg-card: #080808; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; padding: 0; min-height: 100vh; display: flex; flex-direction: column; }
 
-        /* HEADER */
         .header { padding: 20px; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100; }
         .btn-back { background: none; border: 1px solid var(--neon); color: var(--neon); padding: 8px 15px; border-radius: 8px; font-family: 'Orbitron'; font-size: 0.6rem; cursor: pointer; }
         .page-title { font-family: 'Orbitron'; font-size: 0.9rem; letter-spacing: 2px; color: #fff; margin: 0; }
 
         .container { padding: 20px; max-width: 450px; margin: 0 auto; width: 100%; flex-grow: 1; }
 
-        /* SALDO DISPLAY */
-        .balance-card { background: var(--bg-card); border: 1px solid #1a1a1a; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 20px; }
-        .balance-label { font-family: 'Orbitron'; font-size: 0.6rem; color: #444; letter-spacing: 2px; }
-        .balance-value { font-family: 'Orbitron'; font-size: 1.5rem; color: var(--green); margin-top: 5px; }
+        .balance-card { background: var(--bg-card); border: 1px solid #1a1a1a; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 20px; box-shadow: 0 0 20px rgba(0,242,255,0.05); }
+        .balance-label { font-family: 'Orbitron'; font-size: 0.6rem; color: #555; letter-spacing: 2px; }
+        .balance-value { font-family: 'Orbitron'; font-size: 1.5rem; color: var(--neon); margin-top: 5px; }
 
-        /* TABS */
         .method-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab { flex: 1; padding: 15px; border-radius: 12px; border: 1px solid #1a1a1a; background: #0a0a0a; text-align: center; font-family: 'Orbitron'; font-size: 0.55rem; cursor: pointer; position: relative; overflow: hidden; }
+        .tab { flex: 1; padding: 15px; border-radius: 12px; border: 1px solid #1a1a1a; background: #0a0a0a; text-align: center; font-family: 'Orbitron'; font-size: 0.55rem; color: #666; }
         .tab.active { border-color: var(--neon); color: var(--neon); background: rgba(0,242,255,0.05); }
-        .tab.locked { opacity: 0.4; cursor: not-allowed; color: #555; }
-        .tab.locked::after { content: 'LOCK'; position: absolute; top: 5px; right: 5px; color: var(--pink); font-size: 0.4rem; }
 
-        /* INPUT AREA */
         .input-group { background: var(--bg-card); border: 1px solid #1a1a1a; padding: 20px; border-radius: 20px; margin-bottom: 20px; }
-        .amount-input { width: 100%; background: #000; border: 1px solid #222; padding: 20px; border-radius: 15px; color: var(--green); font-family: 'Orbitron'; font-size: 1.5rem; text-align: center; }
-        .min-warning { color: var(--pink); font-size: 0.55rem; font-family: 'Orbitron'; display: block; margin-top: 10px; text-align: center; }
+        .amount-input { width: 100%; background: #000; border: 1px solid #222; padding: 15px; border-radius: 12px; color: var(--green); font-family: 'Orbitron'; font-size: 1.5rem; text-align: center; outline: none; }
+        .amount-input:focus { border-color: var(--neon); }
+        .min-warning { color: #555; font-size: 0.6rem; font-family: 'Rajdhani'; display: block; margin-top: 12px; text-align: center; text-transform: uppercase; }
 
         .quick-amounts { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 25px; }
-        .btn-quick { background: #080808; border: 1px solid #1a1a1a; padding: 12px; border-radius: 12px; color: #fff; font-family: 'Orbitron'; font-size: 0.65rem; cursor: pointer; }
+        .btn-quick { background: #080808; border: 1px solid #1a1a1a; padding: 12px; border-radius: 12px; color: #fff; font-family: 'Orbitron'; font-size: 0.65rem; cursor: pointer; transition: 0.3s; }
+        .btn-quick:active { background: var(--neon); color: #000; }
 
-        .btn-generate { width: 100%; background: linear-gradient(90deg, #00f2ff, #00ff88); border: none; padding: 22px; border-radius: 20px; color: #000; font-family: 'Orbitron'; font-size: 0.85rem; font-weight: bold; cursor: pointer; letter-spacing: 2px; }
+        .btn-generate { width: 100%; background: linear-gradient(90deg, var(--neon), var(--green)); border: none; padding: 20px; border-radius: 15px; color: #000; font-family: 'Orbitron'; font-size: 0.8rem; font-weight: bold; cursor: pointer; letter-spacing: 1px; }
 
-        /* PIX AREA */
-        .pix-area { display: none; margin-top: 25px; background: #fff; padding: 25px; border-radius: 25px; text-align: center; color: #000; }
+        .legal-notice { margin-top: 30px; font-size: 0.6rem; color: #333; text-align: center; line-height: 1.4; padding: 0 10px; }
+
+        .pix-area { display: none; margin-top: 25px; background: #fff; padding: 25px; border-radius: 25px; text-align: center; color: #000; animation: slideUp 0.4s ease; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
         .copy-box { background: #f0f0f0; padding: 10px; border-radius: 10px; font-family: monospace; font-size: 0.6rem; word-break: break-all; margin: 15px 0; border: 1px dashed #ccc; }
         .btn-copy { width: 100%; background: #000; color: #fff; border: none; padding: 15px; border-radius: 10px; font-family: 'Orbitron'; cursor: pointer; }
     </style>
 </head>
 <body>
 
+    <script type="module" src="nexus-overlay.js"></script>
+
     <div class="header">
-        <button class="btn-back" onclick="window.location.href='index.html'">VOLTAR</button>
-        <h1 class="page-title">DEPOSITAR</h1>
+        <button class="btn-back" onclick="window.location.href='dashboard.html'">VOLTAR</button>
+        <h1 class="page-title">ADQUIRIR CRÉDITOS</h1>
         <div style="width: 40px;"></div>
     </div>
 
     <div class="container">
         
         <div class="balance-card">
-            <div class="balance-label">SALDO ATUAL</div>
+            <div class="balance-label">CRÉDITOS DISPONÍVEIS</div>
             <div class="balance-value">R$ <span id="u-saldo">0,00</span></div>
         </div>
 
         <div class="method-tabs">
-            <div class="tab active">PIX (AUTO-TESTE)</div>
-            <div class="tab locked">CARTÃO</div>
+            <div class="tab active">PIX INSTANTÂNEO</div>
         </div>
 
         <div class="input-group">
             <input type="number" id="deposit-amount" class="amount-input" placeholder="0.00">
-            <span class="min-warning">MÍNIMO PARA TESTE: R$ 5,00</span>
+            <span class="min-warning">Valor mínimo para aquisição: R$ 5,00</span>
         </div>
 
         <div class="quick-amounts">
-            <button class="btn-quick" onclick="setAmount(10)">R$ 10</button>
+            <button class="btn-quick" onclick="setAmount(20)">R$ 20</button>
             <button class="btn-quick" onclick="setAmount(50)">R$ 50</button>
             <button class="btn-quick" onclick="setAmount(100)">R$ 100</button>
         </div>
 
-        <button class="btn-generate" id="main-btn" onclick="generateDeposit()">CONFIRMAR DEPÓSITO</button>
+        <button class="btn-generate" id="main-btn" onclick="generateDeposit()">CONFIRMAR AQUISIÇÃO</button>
 
         <div id="pix-area" class="pix-area">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=NEXUS-S-TEST-PAY" alt="QR Code">
-            <div class="copy-box" id="pix-string">00020126360014BR.GOV.BCB.PIX0114NEXUS624DEP5...</div>
-            <button class="btn-copy" onclick="copyPix()">COPIAR E FINALIZAR</button>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=NEXUS-VIRTUAL-LICENSE" alt="QR Code">
+            <div class="copy-box" id="pix-string">nexus_protocol_payment_hash_v1_secure_gate_...</div>
+            <button class="btn-copy" onclick="copyPix()">COPIAR CÓDIGO PIX</button>
+        </div>
+
+        <div class="legal-notice">
+            Ao adquirir créditos, você concorda com os Termos de Uso do NexusVL. Os créditos adquiridos são destinados exclusivamente para interações dentro da plataforma e não possuem valor de resgate externo imediato fora das regras de licenciamento.
         </div>
 
     </div>
@@ -91,13 +96,7 @@
         import { getFirestore, doc, onSnapshot, updateDoc, increment } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-        const firebaseConfig = { 
-            apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", 
-            authDomain: "minharifadigital.firebaseapp.com", 
-            projectId: "minharifadigital", 
-            appId: "1:59630725905:web:396c8cfca385dc3d957ab0" 
-        };
-        
+        const firebaseConfig = { apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", authDomain: "minharifadigital.firebaseapp.com", projectId: "minharifadigital", appId: "1:59630725905:web:396c8cfca385dc3d957ab0" };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
@@ -119,29 +118,35 @@
 
         window.generateDeposit = async () => {
             const amount = parseFloat(document.getElementById('deposit-amount').value);
-            if (isNaN(amount) || amount < 5) return alert("Valor mínimo: R$ 5,00");
+            if (isNaN(amount) || amount < 5) {
+                return Swal.fire({ icon: 'error', title: 'Valor Inválido', text: 'O valor mínimo é R$ 5,00', background: '#111', color: '#fff' });
+            }
 
             const btn = document.getElementById('main-btn');
-            btn.innerText = "ATUALIZANDO SALDO...";
+            btn.innerText = "PROCESSANDO LICENÇA...";
             btn.disabled = true;
 
             try {
                 if (userUID) {
-                    await updateDoc(doc(db, "usuarios", userUID), {
-                        saldo: increment(amount)
-                    });
+                    await updateDoc(doc(db, "usuarios", userUID), { saldo: increment(amount) });
                     document.getElementById('pix-area').style.display = 'block';
-                    btn.innerText = "SALDO CREDITADO!";
+                    btn.innerText = "LICENÇA APROVADA";
                 }
             } catch (e) {
-                alert("Erro ao processar.");
                 btn.disabled = false;
+                btn.innerText = "TENTAR NOVAMENTE";
             }
         };
 
         window.copyPix = () => {
             navigator.clipboard.writeText(document.getElementById('pix-string').innerText);
-            alert("Sucesso! Saldo adicionado para testes.");
+            Swal.fire({
+                icon: 'success',
+                title: 'Copiado!',
+                text: 'Créditos liberados para uso no NexusVL.',
+                background: '#111',
+                color: '#fff'
+            });
         };
     </script>
 </body>
