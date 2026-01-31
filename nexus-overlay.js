@@ -20,7 +20,6 @@ function initOverlay() {
         body { margin: 0; padding-top: 75px; transition: background 0.3s; background: #050505; color: #fff; }
         body.light-mode { background: #f5f5f5 !important; color: #000 !important; }
 
-        /* HEADER SEMPRE DARK */
         .nexus-header {
             position: fixed; top: 0; left: 0; width: 100%; height: 75px;
             background: #050505 !important; border-bottom: 1px solid #1a1a1a;
@@ -29,7 +28,7 @@ function initOverlay() {
         }
 
         .user-pill { display: flex; align-items: center; gap: 8px; }
-        .u-av { width: 40px; height: 40px; border-radius: 10px; border: 2px solid #00f2ff; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; background: #111; }
+        .u-av { width: 40px; height: 40px; border-radius: 10px; border: 2px solid #00f2ff; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; background: #111; cursor: pointer; position: relative; }
         .u-det { font-family: 'Orbitron'; font-size: 0.58rem; line-height: 1.2; }
         .stats-row { display: flex; gap: 6px; font-weight: 700; }
         .u-np { color: #00ff88; }
@@ -40,6 +39,20 @@ function initOverlay() {
         .xp-bar { height: 100%; background: linear-gradient(90deg, #bd00ff, #ff0055); width: 0%; transition: 1s; }
         .xp-num { font-size: 0.45rem; color: #aaa; }
         .bonus-tag { font-size: 0.45rem; color: #ff0055; font-weight: bold; animation: pulse 1.5s infinite; }
+
+        /* SELETOR DE EMOJIS */
+        .emoji-picker {
+            position: absolute; top: 80px; left: 10px; background: #0a0a0a; border: 1px solid #333;
+            border-radius: 12px; padding: 10px; display: none; grid-template-columns: repeat(4, 1fr);
+            gap: 8px; z-index: 10001; box-shadow: 0 10px 30px rgba(0,0,0,0.8); width: 180px;
+        }
+        .emoji-picker.active { display: grid; }
+        .emoji-item { 
+            width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; 
+            background: #151515; border-radius: 5px; cursor: pointer; font-size: 1.1rem; position: relative;
+        }
+        .emoji-item.locked { opacity: 0.4; cursor: not-allowed; }
+        .emoji-item.locked::after { content: '🔒'; position: absolute; font-size: 0.5rem; bottom: 2px; right: 2px; }
 
         @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 
@@ -64,6 +77,7 @@ function initOverlay() {
         <div class="nexus-header">
             <div class="user-pill">
                 <div class="u-av" id="nav-av">👤</div>
+                <div class="emoji-picker" id="emoji-picker"></div>
                 <div class="u-det">
                     <div style="display:flex; justify-content:space-between; min-width:80px;">
                         <span id="nav-name">...</span>
@@ -100,11 +114,21 @@ function initOverlay() {
     `;
     document.body.prepend(ui);
 
+    // Configuração de Emojis
+    const emojisDisponiveis = ["👤", "🔥", "💎", "⚡", "👑", "🚀", "🎮", "👾", "🤖", "👻", "🦄", "💀"];
+    const emojisGratis = ["👤", "🔥"]; // Apenas exemplos que começam liberados
+
     let currentLvl = 0;
     let userData = {};
 
     document.getElementById('theme-btn').onclick = () => document.body.classList.toggle('light-mode');
     document.getElementById('chat-fab').onclick = () => document.getElementById('chat-panel').classList.toggle('active');
+    
+    // Abrir/Fechar Seletor de Emoji
+    const navAv = document.getElementById('nav-av');
+    const picker = document.getElementById('emoji-picker');
+    navAv.onclick = (e) => { e.stopPropagation(); picker.classList.toggle('active'); };
+    document.addEventListener('click', () => picker.classList.remove('active'));
 
     onAuthStateChanged(auth, user => {
         if (user) {
@@ -112,6 +136,8 @@ function initOverlay() {
                 if(snap.exists()){
                     const d = snap.data();
                     userData = d;
+                    
+                    // Atualiza Interface
                     const xpTotal = d.xp || 0;
                     const level = Math.floor(xpTotal / 1000) + 1;
                     const xpNoNivel = xpTotal % 1000;
@@ -129,6 +155,9 @@ function initOverlay() {
                     document.getElementById('nav-lvl').innerText = "LVL " + level;
                     document.getElementById('nav-xp').style.width = (xpNoNivel / 10) + "%";
                     document.getElementById('xp-val').innerText = `${xpNoNivel}/1000`;
+
+                    // Renderiza Emojis no Seletor
+                    renderEmojiPicker(user.uid, d.mochilaEmojis || emojisGratis);
                 }
             });
 
@@ -149,6 +178,26 @@ function initOverlay() {
             document.getElementById('chat-in').onkeypress = (e) => { if(e.key === 'Enter') sendMsg(); };
         } else { window.location.href = "login.html"; }
     });
+
+    function renderEmojiPicker(uid, mochila) {
+        picker.innerHTML = "";
+        emojisDisponiveis.forEach(emo => {
+            const isLocked = !mochila.includes(emo);
+            const item = document.createElement('div');
+            item.className = `emoji-item ${isLocked ? 'locked' : ''}`;
+            item.innerText = emo;
+            
+            item.onclick = async () => {
+                if(isLocked) {
+                    alert("Este emoji deve ser adquirido no Mercado!");
+                    return;
+                }
+                await updateDoc(doc(db, "usuarios", uid), { avatarEmoji: emo });
+                picker.classList.remove('active');
+            };
+            picker.appendChild(item);
+        });
+    }
 
     const q = query(collection(db, "global_chat"), orderBy("timestamp", "desc"), limit(30));
     onSnapshot(q, snap => {
