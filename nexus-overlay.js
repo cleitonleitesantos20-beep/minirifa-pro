@@ -99,11 +99,11 @@ function initOverlay() {
         .nexus-week-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #333; background: rgba(0,0,0,0.3); }
         .week-day { width: 25px; height: 25px; border-radius: 50%; border: 1px solid #444; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; color: #666; font-family: 'Orbitron'; }
         .week-day.today { border-color: #00f2ff; color: #fff; box-shadow: 0 0 5px #00f2ff; }
-        .week-day.checked { background: #00ff88; color: #000; border-color: #00ff88; }
+        .week-day.checked { background: #00ff88; color: #000 !important; border-color: #00ff88; }
 
         .mission-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #222; font-family: 'Rajdhani'; font-size: 0.8rem; position: relative; }
         .mission-item.locked-mission { opacity: 0.5; pointer-events: none; filter: grayscale(1); }
-        .mission-check { font-size: 0.65rem; color: #00ff88; font-family: 'Orbitron'; cursor: pointer; border: 1px solid #00ff88; padding: 3px 8px; border-radius: 4px; transition: 0.2s; }
+        .mission-check { font-size: 0.65rem; color: #00ff88; font-family: 'Orbitron'; cursor: pointer; border: 1px solid #00ff88; padding: 3px 8px; border-radius: 4px; transition: 0.2s; white-space: nowrap; }
         .mission-check:hover { background: #00ff88; color: #000; }
         .mission-check.done { background: transparent; border: none; font-size: 1rem; cursor: default; }
         .mission-check.disabled { border-color: #444; color: #444; cursor: not-allowed; }
@@ -146,24 +146,22 @@ function initOverlay() {
         <div class="nexus-chat-fab" id="chat-fab">💬</div>
 
         <div class="mission-panel" id="mission-panel">
-            <div style="background:#00f2ff; color:#000; padding:8px; font-family:Orbitron; font-size:0.55rem; display:flex; justify-content:space-between;">
+            <div style="background:#00f2ff; color:#000; padding:8px; font-family:Orbitron; font-size:0.55rem; display:flex; justify-content:space-between; align-items:center;">
                 <span>CENTRAL DE MISSÕES</span>
-                <span style="cursor:pointer" onclick="document.getElementById('mission-panel').classList.remove('active')">×</span>
+                <span style="cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('mission-panel').classList.remove('active')">×</span>
             </div>
             <div class="chat-tabs">
                 <div class="chat-tab active-tab" id="mtab-daily" onclick="switchMissionTab('daily')">DIÁRIAS</div>
                 <div class="chat-tab" id="mtab-monthly" onclick="switchMissionTab('monthly')">MENSAIS</div>
             </div>
-            <div class="nexus-week-row" id="week-row" style="display:flex;">
-                </div>
-            <div id="mission-content" style="flex:1; overflow-y:auto; padding:0;">
-                </div>
+            <div class="nexus-week-row" id="week-row" style="display:flex;"></div>
+            <div id="mission-content" style="flex:1; overflow-y:auto; padding:0;"></div>
         </div>
 
         <div class="chat-panel" id="chat-panel">
-            <div style="background:#ff0055; padding:8px; font-family:Orbitron; font-size:0.55rem; display:flex; justify-content:space-between;">
+            <div style="background:#ff0055; padding:8px; font-family:Orbitron; font-size:0.55rem; display:flex; justify-content:space-between; align-items:center;">
                 <span id="chat-header-title">NEXUS CHAT</span>
-                <span style="cursor:pointer" onclick="document.getElementById('chat-panel').classList.remove('active')">×</span>
+                <span style="cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('chat-panel').classList.remove('active')">×</span>
             </div>
             <div class="chat-tabs">
                 <div class="chat-tab active-tab" id="tab-global" onclick="switchChatTab('global')">GLOBAL</div>
@@ -185,7 +183,7 @@ function initOverlay() {
     `;
     document.body.prepend(ui);
 
-    // Variáveis Globais
+    // Variáveis Globais de Estado Local
     let currentChatMode = 'global';
     let currentPrivateUser = null;
     let currentMissionTab = 'daily';
@@ -211,9 +209,10 @@ function initOverlay() {
         document.getElementById('mission-panel').classList.remove('active');
     };
     document.getElementById('mission-fab').onclick = () => {
-        document.getElementById('mission-panel').classList.toggle('active');
+        const p = document.getElementById('mission-panel');
+        p.classList.toggle('active');
         document.getElementById('chat-panel').classList.remove('active');
-        renderMissions('daily');
+        if(p.classList.contains('active')) renderMissions(currentMissionTab);
     };
     
     const navAv = document.getElementById('nav-av');
@@ -221,7 +220,7 @@ function initOverlay() {
     navAv.onclick = (e) => { e.stopPropagation(); picker.classList.toggle('active'); };
     document.addEventListener('click', () => picker.classList.remove('active'));
 
-    // --- FUNÇÕES GLOBAIS ---
+    // --- FUNÇÕES DE INTERFACE ---
 
     window.switchChatTab = (tab) => {
         document.querySelectorAll('.chat-tab').forEach(t => t.classList.remove('active-tab'));
@@ -255,22 +254,20 @@ function initOverlay() {
         weekRow.innerHTML = "";
         weekRow.style.display = type === 'daily' ? 'flex' : 'none';
 
-        const today = new Date();
-        const hour = today.getHours();
+        const now = new Date();
+        const hour = now.getHours();
         const completedDaily = userData.daily_missions || [];
         const completedMonthly = userData.monthly_missions || [];
         
         // Renderizar Dias da Semana (Visual)
         if(type === 'daily') {
             const days = ['D','S','T','Q','Q','S','S'];
-            const dayIndex = today.getDay();
+            const dayIndex = now.getDay();
             days.forEach((d, i) => {
                 const el = document.createElement('div');
                 el.className = `week-day ${i === dayIndex ? 'today' : ''}`;
-                // Se já fez checkin hoje (qualquer um), pinta a bolinha
-                if(i === dayIndex && (completedDaily.includes('chk_day') || completedDaily.includes('chk_night'))) {
-                    el.classList.add('checked');
-                }
+                // Marcador de concluído se fez qualquer missão do dia
+                if(i === dayIndex && completedDaily.length > 0) el.classList.add('checked');
                 el.innerText = d;
                 weekRow.appendChild(el);
             });
@@ -280,44 +277,39 @@ function initOverlay() {
         let missions = [];
         if (type === 'daily') {
             const canCheckDay = (hour >= 7 && hour < 19);
-            const canCheckNight = (hour >= 19 || hour < 6); // Ajuste simples
+            const canCheckNight = (hour >= 19 || hour < 7);
             
             missions = [
-                // Check-ins são independentes, mas limitados pelo horário
                 { txt: "Check-in Manhã (07h-18h)", id: 'chk_day', active: canCheckDay, isCheckin: true },
                 { txt: "Check-in Noite (19h-06h)", id: 'chk_night', active: canCheckNight, isCheckin: true },
-                
-                // Missões Sequenciais
-                { txt: "Jogar 10min (Games)", id: 'm_game', xp: 2 },
-                { txt: "Visitar 3 Lojas", id: 'm_visit', xp: 2 },
-                { txt: "Ler Notícias (2min)", id: 'm_news', xp: 2 },
-                { txt: "Indicar 1 Amigo", id: 'm_ref', xp: 2 }
+                { txt: "Jogar 10min (Games)", id: 'm_game', xp: 5 },
+                { txt: "Visitar 3 Lojas", id: 'm_visit', xp: 5 },
+                { txt: "Ler Notícias (2min)", id: 'm_news', xp: 5 },
+                { txt: "Indicar 1 Amigo", id: 'm_ref', xp: 10 }
             ];
         } else {
             missions = [
-                { txt: "Participar de Drops", id: 'mm_drop', xp: 2 },
-                { txt: "Campanha Nexus", id: 'mm_camp', xp: 2 },
-                { txt: "Comprar no Mercado", id: 'mm_buy', xp: 2 }
+                { txt: "Participar de 5 Drops", id: 'mm_drop', xp: 50 },
+                { txt: "Campanha Nexus", id: 'mm_camp', xp: 100 },
+                { txt: "Comprar no Mercado", id: 'mm_buy', xp: 30 }
             ];
         }
 
         const completedList = type === 'daily' ? completedDaily : completedMonthly;
-        let isPreviousDone = true; // A primeira missão sequencial está sempre liberada
+        let isPreviousDone = true; 
 
         missions.forEach((m) => {
             const isDone = completedList.includes(m.id);
             const div = document.createElement('div');
             
-            // Lógica de Bloqueio (Cadeado) para sequenciais
             let locked = false;
+            // Bloqueio sequencial apenas para missões que não são check-in
             if (!m.isCheckin && !isDone && !isPreviousDone) {
                 locked = true;
             }
 
-            // Atualiza status para a próxima iteração
-            if (!m.isCheckin) {
-                isPreviousDone = isDone; 
-            }
+            // Atualiza status para a próxima missão (checkins não travam a sequência)
+            if (!m.isCheckin) isPreviousDone = isDone; 
 
             div.className = `mission-item ${locked ? 'locked-mission' : ''}`;
             
@@ -326,13 +318,10 @@ function initOverlay() {
                 btnHtml = `<span class="mission-check done">✅</span>`;
             } else if (locked) {
                 btnHtml = `<span class="mission-check disabled">🔒</span>`;
+            } else if (m.isCheckin && !m.active) {
+                btnHtml = `<span class="mission-check disabled" style="font-size:0.4rem">FORA HORÁRIO</span>`;
             } else {
-                // Botão Ativo ou Inativo (por horário)
-                if (m.isCheckin && !m.active) {
-                    btnHtml = `<span class="mission-check disabled">FORA DO HORÁRIO</span>`;
-                } else {
-                    btnHtml = `<span class="mission-check" onclick="claimMission('${m.id}', '${type}', ${m.xp || 2})">RESGATAR</span>`;
-                }
+                btnHtml = `<span class="mission-check" onclick="claimMission('${m.id}', '${type}', ${m.xp || 2})">RESGATAR</span>`;
             }
 
             div.innerHTML = `
@@ -344,41 +333,28 @@ function initOverlay() {
             `;
             content.appendChild(div);
         });
-
-        if (type === 'monthly') {
-            // Verificar se completou todas as mensais para o bônus
-            const allMonthlyIds = ['mm_drop', 'mm_camp', 'mm_buy'];
-            const allDone = allMonthlyIds.every(id => completedMonthly.includes(id));
-            
-            if(allDone) {
-                const fullBonus = document.createElement('div');
-                fullBonus.style.cssText = "margin-top:20px; text-align:center; border:1px solid #00ff88; padding:10px; border-radius:8px; background:rgba(0,255,136,0.1);";
-                fullBonus.innerHTML = "<div style='color:#00ff88; font-size:0.7rem'>BÔNUS MENSAL</div><div style='font-size:1.2rem; font-weight:bold'>COMPLETO ✅</div>";
-                content.appendChild(fullBonus);
-            }
-        }
     };
 
     window.claimMission = async (id, type, xpVal) => {
-        // Verifica novamente restrição de checkin para segurança visual
-        if(id === 'chk_day' || id === 'chk_night') {
-            const h = new Date().getHours();
-            if(id === 'chk_day' && (h < 7 || h >= 19)) return alert("Horário inválido!");
-            if(id === 'chk_night' && (h >= 6 && h < 19)) return alert("Horário inválido!");
-        }
+        try {
+            if(id.startsWith('chk_')) {
+                const h = new Date().getHours();
+                if(id === 'chk_day' && (h < 7 || h >= 19)) return alert("Horário de Brasília: Manhã é das 07h às 18:59h.");
+                if(id === 'chk_night' && (h >= 7 && h < 19)) return alert("Horário de Brasília: Noite é das 19h às 06:59h.");
+            }
 
-        const field = type === 'daily' ? 'daily_missions' : 'monthly_missions';
-        
-        await updateDoc(doc(db, "usuarios", auth.currentUser.uid), { 
-            xp: increment(xpVal),
-            [field]: arrayUnion(id)
-        });
-        
-        // Feedback visual imediato é tratado pelo onSnapshot
+            const field = type === 'daily' ? 'daily_missions' : 'monthly_missions';
+            await updateDoc(doc(db, "usuarios", auth.currentUser.uid), { 
+                xp: increment(xpVal),
+                [field]: arrayUnion(id)
+            });
+        } catch (e) { console.error("Erro ao resgatar:", e); }
     };
 
+    // --- AMIGOS E CHAT ---
+
     window.addFriendUI = async () => {
-        const nameQuery = prompt("Digite o NOME exato do usuário para buscar:");
+        const nameQuery = prompt("Digite o NOME exato do usuário:");
         if(!nameQuery) return;
         
         const q = query(collection(db, "usuarios"), where("nome", "==", nameQuery));
@@ -386,23 +362,21 @@ function initOverlay() {
         
         if(!snap.empty) {
             const friendDoc = snap.docs[0];
-            // Evitar adicionar a si mesmo
-            if(friendDoc.id === auth.currentUser.uid) { alert("Você não pode adicionar a si mesmo."); return; }
+            if(friendDoc.id === auth.currentUser.uid) return alert("Você não pode adicionar a si mesmo.");
 
             await updateDoc(doc(db, "usuarios", auth.currentUser.uid), {
                 amigos: arrayUnion({ uid: friendDoc.id, nome: friendDoc.data().nome, avatar: friendDoc.data().avatarEmoji || '👤' })
             });
-            alert(`Usuário ${nameQuery} adicionado!`);
+            alert(`Amigo ${nameQuery} adicionado!`);
             loadFriendsList();
         } else {
-            alert("Usuário não encontrado. Verifique se digitou o nome corretamente (Maiúsculas/Minúsculas importam).");
+            alert("Usuário não encontrado.");
         }
     };
 
     window.loadFriendsList = () => {
         const list = document.getElementById('friends-list');
         list.innerHTML = "";
-        
         if(userData.amigos && userData.amigos.length > 0) {
             userData.amigos.forEach(f => {
                 const item = document.createElement('div');
@@ -411,14 +385,14 @@ function initOverlay() {
                     <div style="font-size:1.2rem">${f.avatar || '👤'}</div>
                     <div style="flex:1">
                         <div style="font-size:0.7rem; color:#00f2ff">${f.nome}</div>
-                        <div style="font-size:0.5rem; color:#666">Toque para conversar</div>
+                        <div style="font-size:0.5rem; color:#666">Online agora</div>
                     </div>
                 `;
                 item.onclick = () => openPrivateChat(f);
                 list.appendChild(item);
             });
         } else {
-            list.innerHTML = "<div style='text-align:center; padding:20px; color:#555'>Nenhum amigo. Clique em ADD.</div>";
+            list.innerHTML = "<div style='text-align:center; padding:20px; color:#555; font-size:0.7rem;'>Nenhum amigo adicionado.</div>";
         }
     };
 
@@ -427,18 +401,15 @@ function initOverlay() {
         document.getElementById('chat-msgs').style.display = 'block';
         document.getElementById('chat-input-area').style.display = 'flex';
         document.getElementById('chat-header-title').innerText = `CHAT: ${friend.nome.toUpperCase()}`;
-        
         currentChatMode = 'private';
         currentPrivateUser = friend;
         
         const box = document.getElementById('chat-msgs');
-        box.innerHTML = `<div style="text-align:center; color:#444; margin-top:50px; font-size:0.7rem;">
-            Iniciando canal seguro com ${friend.nome}...<br>
-            <span style="color:#00f2ff">🔒 CRYPTO-LINK ESTABELECIDO</span>
-        </div>`;
+        box.innerHTML = `<div style="text-align:center; color:#444; margin-top:50px; font-size:0.7rem;">Criptografia ponta-a-ponta com ${friend.nome}...</div>`;
     };
 
-    // AUTH & LOGICA DE RESET
+    // --- MONITORAMENTO AUTH E DADOS ---
+
     onAuthStateChanged(auth, user => {
         if (user) {
             onSnapshot(doc(db, "usuarios", user.uid), async snap => {
@@ -446,42 +417,37 @@ function initOverlay() {
                     const d = snap.data();
                     userData = d;
                     
-                    // --- LÓGICA DE RESET DIÁRIO E MENSAL ---
+                    // Reset Temporal
                     const now = new Date();
-                    const todayStr = now.toLocaleDateString('pt-BR'); // "DD/MM/AAAA"
+                    const todayStr = now.toLocaleDateString('pt-BR');
                     const monthStr = `${now.getMonth()+1}/${now.getFullYear()}`;
-                    
                     let updates = {};
                     
-                    // Reset Diário
                     if (d.last_daily_reset !== todayStr) {
                         updates.last_daily_reset = todayStr;
-                        updates.daily_missions = []; // Limpa missões diárias
+                        updates.daily_missions = [];
                     }
-                    
-                    // Reset Mensal
                     if (d.last_monthly_reset !== monthStr) {
                         updates.last_monthly_reset = monthStr;
-                        updates.monthly_missions = []; // Limpa missões mensais
+                        updates.monthly_missions = [];
                     }
-                    
-                    // Se houver resets pendentes, aplica
                     if (Object.keys(updates).length > 0) {
                         await updateDoc(doc(db, "usuarios", user.uid), updates);
-                        return; // O snapshot vai rodar de novo após o update, então paramos aqui
+                        return; 
                     }
                     
-                    // --- ATUALIZA UI ---
+                    // Lógica de Nível
                     const xpTotal = d.xp || 0;
                     const level = Math.floor(xpTotal / 1000) + 1;
                     const xpNoNivel = xpTotal % 1000;
 
                     if(currentLvl !== 0 && level > currentLvl) {
                         await updateDoc(doc(db, "usuarios", user.uid), { saldo: increment(10) });
-                        alert(`UP! Nível ${level}: +10 NP!`);
+                        alert(`PARABÉNS! Você atingiu o Nível ${level} e ganhou +10 NP!`);
                     }
                     currentLvl = level;
 
+                    // Atualizar UI
                     document.getElementById('nav-name').innerText = (d.nome || "PLAYER").toUpperCase().split(' ')[0];
                     document.getElementById('nav-av').innerText = d.avatarEmoji || "👤";
                     document.getElementById('nav-np').innerText = Math.floor(d.saldo || 0) + " NP";
@@ -491,19 +457,14 @@ function initOverlay() {
                     document.getElementById('xp-val').innerText = `${xpNoNivel}/1000`;
 
                     renderEmojiPicker(user.uid, d.mochilaEmojis || emojisIniciais);
-                    
-                    // Se o painel de missões estiver aberto, re-renderiza para atualizar checks/cadeados
-                    if(document.getElementById('mission-panel').classList.contains('active')) {
-                        renderMissions(currentMissionTab);
-                    }
+                    if(document.getElementById('mission-panel').classList.contains('active')) renderMissions(currentMissionTab);
                 }
             });
 
-            // CHAT SEND
             const sendMsg = async () => {
                 const input = document.getElementById('chat-in');
                 const txt = input.value.trim();
-                if(txt === "") return;
+                if(!txt) return;
 
                 if(currentChatMode === 'global') {
                     await addDoc(collection(db, "global_chat"), {
@@ -511,7 +472,6 @@ function initOverlay() {
                         avatar: userData.avatarEmoji || "👤", timestamp: serverTimestamp()
                     });
                 } else {
-                    // Simulação visual de msg privada
                     const box = document.getElementById('chat-msgs');
                     const item = document.createElement('div');
                     item.className = "chat-msg-item";
@@ -526,7 +486,6 @@ function initOverlay() {
             document.getElementById('chat-in').onkeypress = (e) => { if(e.key === 'Enter') sendMsg(); };
             
             loadGlobalChat();
-
         } else { window.location.href = "login.html"; }
     });
 
@@ -556,12 +515,8 @@ function initOverlay() {
             const item = document.createElement('div');
             item.className = `emoji-item ${isLocked ? 'locked' : ''}`;
             item.innerText = emo;
-            
             item.onclick = async () => {
-                if(isLocked) {
-                    alert("Bloqueado! Adquira este item no Nexus Market.");
-                    return;
-                }
+                if(isLocked) return alert("Este emoji está bloqueado na sua mochila!");
                 await updateDoc(doc(db, "usuarios", uid), { avatarEmoji: emo });
                 picker.classList.remove('active');
             };
