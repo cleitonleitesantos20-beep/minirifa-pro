@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Nexus Admin - Gerador de Ativos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        body { background: #050505; color: #fff; font-family: 'Rajdhani'; padding: 40px; }
+        .admin-box { max-width: 600px; margin: 0 auto; background: #0a0a0a; border: 1px solid var(--neon); padding: 30px; border-radius: 20px; box-shadow: 0 0 30px rgba(0,242,255,0.1); }
+        h2 { font-family: 'Orbitron'; color: #00f2ff; font-size: 1rem; margin-bottom: 25px; text-align: center; }
+        
+        .field { margin-bottom: 15px; }
+        label { display: block; font-size: 0.7rem; font-family: 'Orbitron'; color: #555; margin-bottom: 5px; }
+        input, select, textarea { width: 100%; background: #000; border: 1px solid #1a1a1a; padding: 12px; border-radius: 8px; color: #fff; font-family: 'Rajdhani'; outline: none; }
+        input:focus { border-color: #00f2ff; }
+
+        .btn-generate { width: 100%; background: #00f2ff; color: #000; border: none; padding: 15px; border-radius: 10px; font-family: 'Orbitron'; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        
+        #result-code { width: 100%; height: 150px; margin-top: 20px; background: #000; color: #00ff88; font-family: monospace; font-size: 0.7rem; padding: 10px; border: 1px solid #1a1a1a; display: none; }
+    </style>
+</head>
+<body>
+
+    <script type="module" src="nexus-overlay.js"></script>
+
+    <div class="admin-box">
+        <h2>GERADOR DE CARDS NEXUS</h2>
+        
+        <div class="field">
+            <label>NOME DO ITEM</label>
+            <input type="text" id="name" placeholder="Ex: Nexus Tech Tee">
+        </div>
+
+        <div class="field">
+            <label>TAG (HOTMART, AMAZON, E-BOOK...)</label>
+            <input type="text" id="tag" placeholder="Ex: AMAZON">
+        </div>
+
+        <div class="field">
+            <label>URL DA IMAGEM</label>
+            <input type="text" id="img" placeholder="Link da foto do produto">
+        </div>
+
+        <div class="field">
+            <label>DESCRIÇÃO CURTA</label>
+            <input type="text" id="desc" placeholder="Ex: Camiseta minimalista Black">
+        </div>
+
+        <div class="field">
+            <label>PREÇO EM NP</label>
+            <input type="number" id="price" placeholder="Ex: 50.00">
+        </div>
+
+        <div class="field">
+            <label>LINK DE DESTINO (URL AFILIADO)</label>
+            <input type="text" id="link" placeholder="https://...">
+        </div>
+
+        <button class="btn-generate" onclick="generateCode()">GERAR CÓDIGO DO CARD</button>
+
+        <textarea id="result-code" readonly></textarea>
+        <p id="copy-msg" style="font-size: 0.6rem; color: #00ff88; text-align: center; display: none;">CÓDIGO GERADO! COPIE E COLE NA 'SHELF-ROW' DO MERCADO.</p>
+    </div>
+
+    <script>
+        function generateCode() {
+            const name = document.getElementById('name').value;
+            const tag = document.getElementById('tag').value;
+            const img = document.getElementById('img').value;
+            const desc = document.getElementById('desc').value;
+            const price = document.getElementById('price').value;
+            const link = document.getElementById('link').value;
+
+            const html = `
+                <div class="market-card">
+                    <span class="partner-tag">${tag}</span>
+                    <img src="${img}" class="item-img">
+                    <div class="item-info">
+                        <span class="item-name">${name}</span>
+                        <span class="item-desc">${desc}</span>
+                        <span class="price-tag">${parseFloat(price).toFixed(2)} <small>NP</small></span>
+                        <button class="btn-buy" onclick="externalLink('${link}')">ACESSAR ITEM</button>
+                    </div>
+                </div>`;
+
+            const res = document.getElementById('result-code');
+            res.value = html.trim();
+            res.style.display = 'block';
+            document.getElementById('copy-msg').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
