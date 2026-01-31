@@ -14,7 +14,7 @@
 
         .container { padding: 20px; padding-bottom: 60px; max-width: 500px; margin: 0 auto; }
 
-        /* Dashboard Hero - Estilo Nexus Overlay */
+        /* Dashboard Hero - Nexus Style */
         .dashboard-hero { text-align: center; padding: 25px; background: var(--card); border-radius: 25px; border: 1px solid #1a1a1a; margin-bottom: 25px; box-shadow: 0 0 20px rgba(0, 242, 255, 0.05); }
         
         .balance-main { font-size: 2.5rem; font-weight: 700; color: var(--green); margin: 5px 0; text-shadow: 0 0 10px rgba(0, 255, 136, 0.3); }
@@ -139,12 +139,12 @@
         };
 
         window.copyLink = () => {
-            // Redireciona para a página de CADASTRO com o código de indicação
+            // Gera o link apontando para login.html com o parâmetro de referência
             const siteURL = window.location.origin;
-            const refLink = `${siteURL}/cadastro.html?ref=${currentUser.uid}`;
+            const refLink = `${siteURL}/login.html?ref=${currentUser.uid}`;
             
             navigator.clipboard.writeText(refLink).then(() => {
-                alert("Link de indicação copiado! Envie para seus amigos se cadastrarem.");
+                alert("Link de indicação copiado! Ele direciona para o seu cadastro.");
             }).catch(err => {
                 console.error('Erro ao copiar: ', err);
             });
@@ -154,5 +154,7 @@
             signOut(auth).then(() => window.location.href = "index.html");
         });
     </script>
+
+    <script type="module" src="nexus-overlay.js"></script>
 </body>
 </html>
