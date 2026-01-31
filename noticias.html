@@ -23,6 +23,23 @@
             padding-top: 75px;
         }
 
+        /* Botão Sair/Voltar */
+        .btn-exit {
+            position: fixed;
+            top: 85px;
+            right: 15px;
+            z-index: 10001;
+            background: rgba(255, 0, 85, 0.8);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-family: 'Orbitron';
+            font-size: 0.7rem;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+        }
+
         .news-card {
             width: 100%;
             height: calc(100vh - 75px);
@@ -30,7 +47,6 @@
             position: relative;
             display: flex;
             flex-direction: column;
-            /* Centraliza o conteúdo verticalmente e horizontalmente */
             justify-content: center; 
             align-items: center;
             background-size: cover;
@@ -38,19 +54,24 @@
             border-bottom: 2px solid #111;
         }
 
-        /* Overlay Compacto e Centralizado no Topo da Imagem */
+        /* Estilo para o Card de Propaganda */
+        .ad-card {
+            background: linear-gradient(45deg, #050505, #111);
+            border: 2px dashed #00f2ff;
+        }
+
         .news-overlay {
-            background: rgba(0, 0, 0, 0.6); /* Fundo escuro sutil para destacar o néon */
-            backdrop-filter: blur(4px); /* Leve desfoque no fundo do texto */
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
             padding: 20px;
             color: #fff;
             font-family: 'Rajdhani', sans-serif;
             text-align: center;
-            width: 90%;
-            max-width: 400px; /* Deixa o texto compacto */
+            width: 85%;
+            max-width: 400px;
             border-radius: 15px;
             border: 1px solid rgba(0, 242, 255, 0.3);
-            margin-bottom: 100px; /* Sobe o texto para cima */
+            margin-bottom: 50px;
         }
 
         .news-tag {
@@ -65,6 +86,8 @@
             box-shadow: 0 0 10px #ff0055;
         }
 
+        .ad-tag { background: #00f2ff; box-shadow: 0 0 10px #00f2ff; color: #000; }
+
         .news-title {
             font-size: 1.4rem;
             font-weight: bold;
@@ -73,8 +96,7 @@
             color: #00f2ff;
             text-transform: uppercase;
             font-family: 'Orbitron';
-            /* Efeito Néon */
-            text-shadow: 0 0 5px #00f2ff, 0 0 10px #00f2ff;
+            text-shadow: 0 0 5px #00f2ff;
         }
 
         .news-desc {
@@ -93,6 +115,8 @@
     </style>
 </head>
 <body>
+
+    <button class="btn-exit" onclick="window.location.href='index.html'">VOLTAR</button>
 
     <div id="news-feed">
         <div class="loading">CONECTANDO AO NEXUS NEWS...</div>
@@ -123,8 +147,12 @@
                 return;
             }
 
+            let count = 0;
             snap.forEach((doc) => {
+                count++;
                 const data = doc.data();
+                
+                // Cria o card da notícia
                 const card = document.createElement('div');
                 card.className = 'news-card';
                 card.style.backgroundImage = `url('${data.imagem || 'https://via.placeholder.com/800x1200'}')`;
@@ -137,6 +165,20 @@
                     </div>
                 `;
                 feed.appendChild(card);
+
+                // A cada 4 notícias, insere uma propaganda
+                if (count % 4 === 0) {
+                    const adCard = document.createElement('div');
+                    adCard.className = 'news-card ad-card';
+                    adCard.innerHTML = `
+                        <div class="news-overlay">
+                            <span class="news-tag ad-tag">ANÚNCIO</span>
+                            <div class="news-title">SUA PROPAGANDA AQUI</div>
+                            <div class="news-desc">Anuncie no NexusVL e alcance milhares de jogadores. Entre em contato com o suporte para garantir este espaço!</div>
+                        </div>
+                    `;
+                    feed.appendChild(adCard);
+                }
             });
         });
     </script>
