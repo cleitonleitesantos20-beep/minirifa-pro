@@ -9,13 +9,7 @@
         :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --dark: #0a0a0a; --card: #111; }
         body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; padding: 0; min-height: 100vh; overflow-y: auto; }
         
-        /* Header & Progress */
-        .top-progress-bar { position: sticky; top: 0; z-index: 100; background: #000; padding: 10px 15px; border-bottom: 1px solid #1a1a1a; }
-        .lvl-section { background: var(--dark); padding: 10px; border-radius: 10px; border: 1px solid #222; }
-        .progress-container { background: #111; height: 8px; border-radius: 4px; margin-top: 5px; overflow: hidden; }
-        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--neon), var(--green)); width: 0%; transition: 0.5s; }
-
-        .header { height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; font-family: 'Orbitron'; font-size: 0.6rem; }
+        .header { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; font-family: 'Orbitron'; font-size: 0.6rem; border-bottom: 1px solid #1a1a1a; margin-bottom: 10px; }
         .btn-exit { background: none; border: 1px solid var(--pink); color: var(--pink); padding: 5px 12px; border-radius: 4px; font-family: 'Orbitron'; cursor: pointer; font-size: 0.5rem; }
 
         .container { padding: 15px; padding-bottom: 60px; max-width: 500px; margin: 0 auto; }
@@ -26,9 +20,10 @@
         .day-dot { width: 28px; height: 28px; border-radius: 50%; border: 1px solid #222; display: flex; align-items: center; justify-content: center; font-size: 0.5rem; font-family: 'Orbitron'; color: #444; }
         .day-dot.active { border-color: var(--neon); color: var(--neon); }
         .day-dot.done { background: var(--green); color: #000; border: none; }
-        .btn-checkin { width: 100%; margin-top: 12px; background: #000; border: 1px solid var(--green); color: var(--green); padding: 10px; border-radius: 8px; font-family: 'Orbitron'; font-size: 0.6rem; cursor: pointer; }
+        .btn-checkin { width: 100%; margin-top: 12px; background: #000; border: 1px solid var(--green); color: var(--green); padding: 12px; border-radius: 8px; font-family: 'Orbitron'; font-size: 0.65rem; cursor: pointer; transition: 0.3s; }
+        .btn-checkin:active { transform: scale(0.98); }
 
-        /* Grid de Jogos (Estilo Index) */
+        /* Grid de Jogos */
         .games-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
         .game-select-card { background: var(--card); border: 1px solid #1a1a1a; border-radius: 15px; padding: 15px; text-align: center; transition: 0.3s; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
         .game-select-card:active { transform: scale(0.95); border-color: var(--neon); }
@@ -47,42 +42,28 @@
 <body>
 
     <div id="ad-overlay">
-        <div style="font-family:'Orbitron'; color:var(--neon); margin-bottom:20px; font-size: 0.8rem;">SINCRONIZANDO DADOS...</div>
+        <div style="font-family:'Orbitron'; color:var(--neon); margin-bottom:20px; font-size: 0.8rem;">SINCRONIZANDO RECOMPENSA...</div>
         <div id="ad-timer" style="font-family:'Orbitron'; font-size:3rem; color:var(--pink);">30</div>
     </div>
 
-    <div class="top-progress-bar">
-        <div class="lvl-section">
-            <div style="display: flex; justify-content: space-between; font-family: 'Orbitron'; font-size: 0.5rem;">
-                <span id="u-nome">CARREGANDO...</span>
-                <span style="color: var(--neon);">LVL <span id="u-lvl">1</span></span>
-            </div>
-            <div class="progress-container"><div class="progress-bar" id="xp-bar"></div></div>
-            <div style="display:flex; justify-content:space-between; margin-top:4px; font-family:'Orbitron'; font-size:0.4rem; color: #666;">
-                <span>XP: <span id="xp-num">0</span> / <span id="xp-target">1000</span></span>
-                <span style="color:var(--green);">+R$ 0,10 / LVL</span>
-            </div>
-        </div>
-    </div>
-
     <div class="header">
-        <span>SISTEMA DE TREINAMENTO NEXUS</span>
+        <span style="color:var(--neon)">SISTEMA DE TREINAMENTO</span>
         <button class="btn-exit" onclick="window.location.href='dashboard.html'">VOLTAR</button>
     </div>
 
     <div class="container">
         
         <div class="daily-section">
-            <div style="font-family:'Orbitron'; font-size:0.55rem; color:var(--green); letter-spacing:1px;">RECOMPENSA DIÁRIA</div>
+            <div style="font-family:'Orbitron'; font-size:0.55rem; color:var(--green); letter-spacing:1px; text-align: center;">RECOMPENSA DIÁRIA</div>
             <div class="daily-grid" id="daily-dots">
                 <div class="day-dot" data-day="1">S</div><div class="day-dot" data-day="2">T</div><div class="day-dot" data-day="3">Q</div>
                 <div class="day-dot" data-day="4">Q</div><div class="day-dot" data-day="5">S</div><div class="day-dot" data-day="6">S</div>
                 <div class="day-dot" data-day="0">D</div>
             </div>
-            <button class="btn-checkin" id="btn-do-checkin" onclick="processCheckIn()">RESGATAR CHECK-IN (+R$ 0,02)</button>
+            <button class="btn-checkin" id="btn-do-checkin" onclick="processCheckIn()">RESGATAR CHECK-IN (10 NP)</button>
         </div>
 
-        <div class="ad-banner">ESPAÇO PUBLICITÁRIO</div>
+        <div class="ad-banner">ANÚNCIO DISPONÍVEL</div>
 
         <div class="games-grid">
             <div class="game-select-card" onclick="window.location.href='game-runner.html'">
@@ -114,7 +95,7 @@
             </div>
         </div>
 
-        <div class="ad-banner">ESPAÇO PUBLICITÁRIO</div>
+        <div class="ad-banner">ANÚNCIO DISPONÍVEL</div>
     </div>
 
     <script type="module">
@@ -134,17 +115,6 @@
                 user = u;
                 onSnapshot(doc(db, "usuarios", u.uid), snap => {
                     const d = snap.data(); if(!d) return;
-                    const currentXP = d.xp || 0;
-                    const currentLevel = Math.floor(Math.log2(currentXP/1000 + 1)) + 1;
-                    
-                    let targetXP = Math.pow(2, currentLevel - 1) * 1000;
-                    let prevTotal = currentLevel === 1 ? 0 : (Math.pow(2, currentLevel-1)-1)*1000;
-                    
-                    document.getElementById('u-nome').innerText = (d.nome || "PLAYER").toUpperCase();
-                    document.getElementById('u-lvl').innerText = currentLevel;
-                    document.getElementById('xp-target').innerText = targetXP;
-                    document.getElementById('xp-num').innerText = Math.floor(currentXP - prevTotal);
-                    document.getElementById('xp-bar').style.width = Math.min(((currentXP - prevTotal) / targetXP * 100), 100) + "%";
                     
                     document.getElementById('best-runner').innerText = d.bestRunner || 0;
                     document.getElementById('best-click').innerText = d.bestClick || 0;
@@ -155,7 +125,6 @@
             } else { window.location.href = "index.html"; }
         });
 
-        // --- LÓGICA DE CHECK-IN ---
         window.processCheckIn = () => {
             document.getElementById('ad-overlay').style.display='flex';
             let t = 30;
@@ -166,12 +135,13 @@
         };
 
         async function finishCheckIn() {
+            // Agora incrementa o saldo em 10 (referente aos 10 NP)
             await updateDoc(doc(db, "usuarios", user.uid), { 
                 lastCheckIn: new Date().toLocaleDateString(), 
-                saldo: increment(0.02) 
+                saldo: increment(10) 
             });
             document.getElementById('ad-overlay').style.display='none';
-            alert("Check-in concluído! +R$ 0,02 adicionados.");
+            alert("Check-in concluído! +10 NP creditados em sua conta.");
         }
 
         function updateCheckInUI(ld) {
@@ -182,7 +152,7 @@
                 if(ld === today && parseInt(d.dataset.day) === day) {
                     d.classList.add('done');
                     const b = document.getElementById('btn-do-checkin');
-                    b.innerText = "TREINAMENTO DIÁRIO CONCLUÍDO"; 
+                    b.innerText = "CHECK-IN REALIZADO"; 
                     b.disabled = true; 
                     b.style.opacity = "0.5";
                 }
