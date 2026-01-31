@@ -3,90 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nexus S - Campanhas Ativas</title>
+    <title>Nexus Tower - Edifício de Investimento</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        :root { --neon: #00f2ff; --green: #00ff88; --pink: #ff0055; --bg: #000; --red-sold: #ff0000; }
-        body { background: var(--bg); color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; overflow-x: hidden; }
+        :root { --neon: #00f2ff; --green: #00ff88; --pink: #ff0055; --bg: #050505; --gray-dead: #1a1a1a; }
         
-        .header { height: 60px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #111; font-family: 'Orbitron'; font-size: 0.7rem; position: relative; }
-        .ads-space { background: rgba(255,255,255,0.02); border: 1px dashed #222; color: #333; text-align: center; padding: 10px; font-family: 'Orbitron'; font-size: 0.45rem; margin: 10px 15px; border-radius: 8px; }
+        body { background: var(--bg); color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; padding-bottom: 120px; }
 
-        .my-tokens-box { margin: 10px 15px; padding: 10px; background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 8px; }
-        .my-tokens-title { font-family: 'Orbitron'; font-size: 0.5rem; color: var(--green); margin-bottom: 5px; text-transform: uppercase; }
-        .my-tokens-list { font-size: 0.8rem; color: #aaa; word-wrap: break-word; }
+        /* Estrutura do Prédio */
+        .tower-container { 
+            display: flex; 
+            flex-direction: column-reverse; /* Prédio sobe de baixo para cima */
+            align-items: center; 
+            padding: 20px;
+            gap: 10px;
+        }
 
-        .level-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 15px; padding: 10px 15px; scrollbar-width: none; }
-        .level-slider::-webkit-scrollbar { display: none; }
+        .floor {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* 4 aptos na frente, 4 atrás (visualizado em 2 linhas) */
+            gap: 5px;
+            background: rgba(255,255,255,0.02);
+            padding: 10px;
+            border-left: 3px solid #222;
+            border-right: 3px solid #222;
+            position: relative;
+            width: 280px;
+        }
 
-        .level-card { min-width: 88vw; scroll-snap-align: center; background: #080808; border: 1px solid #151515; border-radius: 15px; padding: 12px; position: relative; box-sizing: border-box; }
-        .level-card.locked { filter: grayscale(1) blur(2px); opacity: 0.3; pointer-events: none; }
+        .floor::after {
+            content: attr(data-floor);
+            position: absolute;
+            left: -35px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-family: 'Orbitron';
+            font-size: 0.6rem;
+            color: #444;
+        }
+
+        .apt {
+            aspect-ratio: 1.2/1;
+            background: var(--gray-dead);
+            border: 1px solid #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron';
+            font-size: 0.5rem;
+            color: #333;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        /* Estados dos Apartamentos */
+        .apt.active { background: #111; color: var(--neon); border-color: var(--neon); box-shadow: inset 0 0 10px rgba(0,242,255,0.2); }
+        .apt.selected { background: var(--neon) !important; color: #000 !important; box-shadow: 0 0 15px var(--neon); }
+        .apt.sold { background: var(--pink) !important; color: #fff !important; opacity: 1; box-shadow: 0 0 5px var(--pink); border-color: #ff0055; }
+
+        /* Placar de Valor do Prédio */
+        .tower-info {
+            position: sticky;
+            top: 85px;
+            z-index: 90;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            padding: 15px;
+            margin: 10px;
+            border: 1px solid var(--green);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .prize-pool { font-family: 'Orbitron'; font-size: 1.5rem; color: var(--green); text-shadow: 0 0 10px var(--green); }
         
-        .level-header { text-align: center; margin-bottom: 10px; border-bottom: 1px solid #111; padding-bottom: 8px; }
-        .level-title { font-family: 'Orbitron'; font-size: 0.55rem; color: var(--neon); letter-spacing: 1px; }
-        .level-prize { font-family: 'Orbitron'; font-size: 1rem; color: var(--green); margin-top: 4px; }
-
-        .rifa-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; }
-        .num { background: #111; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; font-size: 0.55rem; font-family: 'Orbitron'; border-radius: 3px; color: #333; border: 1px solid #1a1a1a; cursor: pointer; transition: 0.2s; }
-        
-        .num.selected { background: var(--neon); color: #000; border-color: #fff; box-shadow: 0 0 8px var(--neon); }
-        .num.sold { background: #300 !important; color: var(--red-sold) !important; border: 1px solid #600 !important; pointer-events: none; position: relative; box-shadow: inset 0 0 5px #f00; }
-        .num.sold::after { content: 'X'; position: absolute; font-size: 0.4rem; top: 1px; right: 2px; color: #f00; }
-
-        .lock-msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: 'Orbitron'; font-size: 0.6rem; background: #000; padding: 5px 10px; border: 1px solid var(--pink); color: var(--pink); z-index: 5; display: none; }
-        .level-card.locked .lock-msg { display: block; }
-
-        #winner-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-        .winner-token { font-family: 'Orbitron'; font-size: 5rem; color: var(--neon); text-shadow: 0 0 20px var(--neon); }
-
-        #checkout { position: fixed; bottom: 0; width: 100%; background: #050505; border-top: 2px solid var(--neon); padding: 15px; box-sizing: border-box; transform: translateY(100%); transition: 0.4s ease; z-index: 100; }
+        #checkout { 
+            position: fixed; bottom: 0; width: 100%; background: #0a0a0a; 
+            border-top: 2px solid var(--neon); padding: 15px; z-index: 10001; 
+            transform: translateY(100%); transition: 0.4s;
+        }
         #checkout.active { transform: translateY(0); }
-        .btn-action { font-family: 'Orbitron'; font-weight: bold; font-size: 0.75rem; width: 100%; padding: 15px; border-radius: 10px; border: none; cursor: pointer; }
+        
+        .btn-action { 
+            font-family: 'Orbitron'; font-weight: bold; width: 100%; 
+            padding: 12px; border-radius: 5px; border: none; cursor: pointer; 
+        }
     </style>
 </head>
 <body>
 
-    <div id="winner-overlay">
-        <div style="font-family:'Orbitron'; color:var(--green); margin-bottom:10px;">TOKEN PREMIADO!</div>
-        <div class="winner-token" id="display-winner-num">00</div>
-        <button class="btn-action" style="width:200px; margin-top:20px; background:var(--neon);" onclick="document.getElementById('winner-overlay').style.display='none'">COLETAR RECOMPENSA</button>
+    <script type="module" src="nexus-overlay.js"></script>
+
+    <div class="tower-info">
+        <div style="font-size: 0.6rem; font-family: 'Orbitron'; color: #888;">VALOR ACUMULADO DO PRÉDIO</div>
+        <div class="prize-pool" id="tower-prize">0 NP</div>
+        <div style="font-size: 0.5rem; color: var(--neon); margin-top: 5px;">CADA BLOCO ADICIONA +15 NP AO SORTEIO</div>
     </div>
 
-    <div class="header">
-        <button onclick="window.location.href='index.html'" style="background:none; border:none; color:var(--neon); font-size:1.2rem; position:absolute; left:15px;">⬅</button>
-        NEXUS CAMPANHAS v5.5.2
-    </div>
-
-    <div class="ads-space">ACESSANDO SERVIDOR DE TOKENS...</div>
-
-    <div class="level-slider" id="main-slider"></div>
-
-    <div class="my-tokens-box">
-        <div class="my-tokens-title">Minhas Alocações Privadas</div>
-        <div id="my-tokens-display" class="my-tokens-list">Nenhum token alocado.</div>
-    </div>
-
-    <div class="ads-space">ESPAÇO PARA ADS PARCEIROS</div>
+    <div class="tower-container" id="nexus-tower">
+        </div>
 
     <div id="checkout">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
             <div>
-                <div style="font-size:0.5rem; color:#444; font-family:'Orbitron';">TOKENS ALOCADOS: <span id="num-list" style="color:var(--neon);">-</span></div>
-                <div style="font-size:1.2rem; color:#fff; font-family:'Orbitron';"><span id="total-price">0</span> <span style="font-size: 0.6rem; color: #555;">NP</span></div>
-            </div>
-            <div style="text-align:right">
-                <div style="font-size:0.5rem; color:#444; font-family:'Orbitron';">DISPONÍVEL</div>
-                <div id="u-balance" style="font-size:0.8rem; color:var(--green); font-family:'Orbitron';">0 NP</div>
+                <div style="font-size:0.5rem; color:#444; font-family:'Orbitron';">BLOCOS SELECIONADOS: <span id="num-list" style="color:var(--neon);">-</span></div>
+                <div style="font-size:1.2rem; color:#fff; font-family:'Orbitron';"><span id="total-price">0</span> NP</div>
             </div>
         </div>
-        <button id="btn-pay" class="btn-action" style="background:var(--green); color:#000;" onclick="confirmarCompra()">CONFIRMAR ALOCAÇÃO</button>
-        <button id="btn-deposit" class="btn-action" style="background:var(--pink); color:#fff; display:none;" onclick="window.location.href='deposito.html'">OBTER MAIS NP</button>
+        <button id="btn-pay" class="btn-action" style="background:var(--green); color:#000;" onclick="confirmarCompra()">RESERVAR APARTAMENTOS</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, updateDoc, setDoc, increment, arrayUnion, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, setDoc, increment, arrayUnion } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -100,143 +130,86 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        const custoPorToken = 8;
-        let user, saldoAtual = 0, selecionados = [], vendidosGlobal = [], meusTokens = [];
+        const TOTAL_FLOORS = 10;
+        const APT_PER_FLOOR = 8;
+        const CUSTO_POR_BLOCO = 10;
+        const PREMIO_POR_BLOCO = 15;
 
-        const niveis = [
-            { id: 1, start: 1, end: 50, prize: 1100 },
-            { id: 2, start: 51, end: 100, prize: 2200 },
-            { id: 3, start: 101, end: 150, prize: 3300 },
-            { id: 4, start: 151, end: 200, prize: 4400 }
-        ];
+        let user, selecionados = [], vendidosGlobal = [];
 
-        const slider = document.getElementById('main-slider');
-        niveis.forEach(lvl => {
-            const card = document.createElement('div');
-            card.className = `level-card ${lvl.id === 1 ? '' : 'locked'}`;
-            card.id = `lvl-${lvl.id}`;
-            card.innerHTML = `
-                <div class="lock-msg">ESGOTAR NÍVEL ANTERIOR 🔒</div>
-                <div class="level-header">
-                    <div class="level-title">CAMPANHA 0${lvl.id} (${lvl.start}-${lvl.end})</div>
-                    <div class="level-prize">RECOMPENSA ${lvl.prize} NP</div>
-                </div>
-                <div class="rifa-grid" id="grid-${lvl.id}"></div>
-            `;
-            slider.appendChild(card);
-            const grid = document.getElementById(`grid-${lvl.id}`);
-            for(let i=lvl.start; i<=lvl.end; i++) {
-                const n = document.createElement('div');
-                n.className = 'num';
-                n.id = `num-${i}`;
-                n.innerText = String(i).padStart(2,'0');
-                n.onclick = () => window.toggleNum(i, n);
-                grid.appendChild(n);
+        // Gerar Prédio
+        const tower = document.getElementById('nexus-tower');
+        for (let f = 1; f <= TOTAL_FLOORS; f++) {
+            const floorDiv = document.createElement('div');
+            floorDiv.className = 'floor';
+            floorDiv.setAttribute('data-floor', `ANDAR ${f}`);
+            
+            for (let a = 1; a <= APT_PER_FLOOR; a++) {
+                const id = `${f}-${a}`;
+                const apt = document.createElement('div');
+                apt.className = 'apt';
+                apt.id = `apt-${id}`;
+                apt.innerText = id;
+                apt.onclick = () => toggleApt(id);
+                floorDiv.appendChild(apt);
             }
-        });
+            tower.appendChild(floorDiv);
+        }
 
+        // Sincronização em Tempo Real
         onSnapshot(doc(db, "rifas_vendas", "global"), (snap) => {
             const data = snap.data();
             vendidosGlobal = data ? (data.vendidos || []) : [];
             
-            document.querySelectorAll('.num').forEach(el => el.classList.remove('sold'));
-            vendidosGlobal.forEach(num => {
-                const el = document.getElementById(`num-${num}`);
+            document.querySelectorAll('.apt').forEach(el => el.classList.remove('sold'));
+            vendidosGlobal.forEach(id => {
+                const el = document.getElementById(`apt-${id}`);
                 if (el) el.classList.add('sold');
             });
 
-            const v1 = vendidosGlobal.filter(n => n <= 50).length;
-            const v2 = vendidosGlobal.filter(n => n > 50 && n <= 100).length;
-            const v3 = vendidosGlobal.filter(n => n > 100 && n <= 150).length;
-
-            if (v1 >= 50) document.getElementById('lvl-2')?.classList.remove('locked');
-            if (v2 >= 50) document.getElementById('lvl-3')?.classList.remove('locked');
-            if (v3 >= 50) document.getElementById('lvl-4')?.classList.remove('locked');
-            
-            verificarVencedorGlobal(data);
+            // Atualiza prêmio acumulado
+            const valorTotal = vendidosGlobal.length * PREMIO_POR_BLOCO;
+            document.getElementById('tower-prize').innerText = `${valorTotal} NP`;
         });
 
-        onAuthStateChanged(auth, (u) => {
-            if (u) {
-                user = u;
-                onSnapshot(doc(db, "usuarios", u.uid), (snap) => {
-                    const data = snap.data();
-                    if(data) {
-                        saldoAtual = data.saldo || 0;
-                        meusTokens = data.meus_tokens || [];
-                        document.getElementById('u-balance').innerText = `${Math.floor(saldoAtual)} NP`;
-                        document.getElementById('my-tokens-display').innerText = meusTokens.length > 0 ? meusTokens.sort((a,b)=>a-b).join(', ') : 'Nenhum token alocado.';
-                        atualizarPainel();
-                    }
-                });
-            } else { window.location.href = "login.html"; }
-        });
+        onAuthStateChanged(auth, u => { if (!u) window.location.href = "login.html"; else user = u; });
 
-        function verificarVencedorGlobal(data) {
-            if (data && data.sorteado && meusTokens.includes(data.sorteado)) {
-                document.getElementById('display-winner-num').innerText = String(data.sorteado).padStart(2,'0');
-                document.getElementById('winner-overlay').style.display = 'flex';
-                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#00f2ff', '#00ff88', '#ff0055'] });
-            }
-        }
-
-        window.toggleNum = (n, el) => {
+        window.toggleApt = (id) => {
+            const el = document.getElementById(`apt-${id}`);
             if (el.classList.contains('sold')) return;
-            if (selecionados.includes(n)) {
-                selecionados = selecionados.filter(i => i !== n);
+
+            if (selecionados.includes(id)) {
+                selecionados = selecionados.filter(i => i !== id);
                 el.classList.remove('selected');
             } else {
-                selecionados.push(n);
+                selecionados.push(id);
                 el.classList.add('selected');
             }
             atualizarPainel();
         };
 
         function atualizarPainel() {
-            const total = selecionados.length * custoPorToken;
+            const total = selecionados.length * CUSTO_POR_BLOCO;
             document.getElementById('total-price').innerText = total;
-            document.getElementById('num-list').innerText = selecionados.sort((a,b)=>a-b).join(', ') || '-';
+            document.getElementById('num-list').innerText = selecionados.join(', ') || '-';
             document.getElementById('checkout').classList.toggle('active', selecionados.length > 0);
-            const insuficiente = total > saldoAtual;
-            document.getElementById('btn-pay').style.display = insuficiente ? 'none' : 'block';
-            document.getElementById('btn-deposit').style.display = insuficiente ? 'block' : 'none';
         }
 
         window.confirmarCompra = async () => {
-            const total = selecionados.length * custoPorToken;
-            if (saldoAtual < total || !confirm(`Confirmar alocação de ${total} NP?`)) return;
-
+            const total = selecionados.length * CUSTO_POR_BLOCO;
             try {
-                const userRef = doc(db, "usuarios", user.uid);
-                const globalRef = doc(db, "rifas_vendas", "global");
-
+                const userRef = doc(db, "usuarios", auth.currentUser.uid);
                 await updateDoc(userRef, { 
-                    saldo: increment(-total), 
+                    saldo: increment(-total),
                     meus_tokens: arrayUnion(...selecionados),
-                    xp: increment(selecionados.length * 10) 
+                    xp: increment(selecionados.length * 20)
                 });
+                await setDoc(doc(db, "rifas_vendas", "global"), { vendidos: arrayUnion(...selecionados) }, { merge: true });
                 
-                await setDoc(globalRef, { vendidos: arrayUnion(...selecionados) }, { merge: true });
-
-                // Lógica de Premiação por Nível Completo
-                const snap = await getDoc(globalRef);
-                const todosVendidos = snap.data().vendidos || [];
-                let premioTotal = 0;
-                
-                niveis.forEach(lvl => {
-                    const vendidosNoNivel = todosVendidos.filter(n => n >= lvl.start && n <= lvl.end).length;
-                    if (vendidosNoNivel >= 50) {
-                        const meusNesseNivel = selecionados.filter(n => n >= lvl.start && n <= lvl.end).length;
-                        if (meusNesseNivel > 0) premioTotal += lvl.prize; 
-                    }
-                });
-
-                if (premioTotal > 0) await updateDoc(userRef, { saldo: increment(premioTotal) });
-
-                alert("Alocação concluída!");
+                alert("Blocos adquiridos! O prédio subiu!");
                 selecionados = [];
                 atualizarPainel();
-            } catch(e) { alert("Erro no servidor Nexus."); console.error(e); }
+            } catch(e) { console.error(e); }
         };
     </script>
 </body>
