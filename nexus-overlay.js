@@ -73,9 +73,9 @@ function initOverlay() {
         .week-day.checked { background: #00ff88; color: #000; }
 
         .mission-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #222; font-size: 0.8rem; }
-        .mission-check { font-size: 0.65rem; color: #00ff88; border: 1px solid #00ff88; padding: 3px 8px; border-radius: 4px; cursor: pointer; }
+        .mission-check { font-size: 0.65rem; color: #00ff88; border: 1px solid #00ff88; padding: 3px 8px; border-radius: 4px; cursor: pointer; transition: 0.3s; }
         .mission-check.done { border: none; font-size: 1rem; }
-        .mission-check.disabled { border-color: #444; color: #444; cursor: not-allowed; }
+        .mission-check.disabled { border-color: #444; color: #444; cursor: not-allowed; opacity: 0.5; }
     `;
     document.head.appendChild(style);
 
@@ -129,6 +129,21 @@ function initOverlay() {
     const emojisDisponiveis = ["👤", "🔥", "🐱", "🐶", "🦊", "💎", "⚡", "👑", "🚀", "🎮"];
     const emojisIniciais = ["👤", "🔥", "🐱", "🐶", "🦊"];
 
+    // Lógica de monitoramento de missões em tempo real (Local)
+    let sessionTimer = 0;
+    setInterval(() => {
+        sessionTimer++;
+        // Se ficar 1 minuto (60s) logado, marca internamente que pode resgatar a missão de tempo
+        if(sessionTimer >= 60 && !localStorage.getItem('m_time_ready')) {
+            localStorage.setItem('m_time_ready', 'true');
+            if(document.getElementById('mission-panel').classList.contains('active')) renderMissions(currentMissionTab);
+        }
+    }, 1000);
+
+    // Monitorar se ele está em páginas específicas
+    if(window.location.href.includes('noticias.html')) localStorage.setItem('m_news_ready', 'true');
+    if(window.location.href.includes('games.html')) localStorage.setItem('m_game_ready', 'true');
+
     document.getElementById('theme-btn').onclick = () => {
         document.body.classList.toggle('light-mode');
         localStorage.setItem('nexusTheme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
@@ -173,13 +188,16 @@ function initOverlay() {
             });
         }
 
+        // Definição das Missões com Gatilhos
         let missions = type === 'daily' ? [
-            { txt: "Check-in Manhã (07h-18h)", id: 'chk_day', active: (hour >= 7 && hour < 19), isCheckin: true },
-            { txt: "Check-in Noite (19h-06h)", id: 'chk_night', active: (hour >= 19 || hour < 7), isCheckin: true },
-            { txt: "Visitar 3 Lojas", id: 'm_visit', xp: 5 }
+            { txt: "Check-in Manhã (07h-18h)", id: 'chk_day', ready: (hour >= 7 && hour < 19) },
+            { txt: "Check-in Noite (19h-06h)", id: 'chk_night', ready: (hour >= 19 || hour < 7) },
+            { txt: "Ficar Online (1 min)", id: 'm_time', ready: localStorage.getItem('m_time_ready') === 'true', xp: 5 },
+            { txt: "Ler Notícias", id: 'm_news', ready: localStorage.getItem('m_news_ready') === 'true', xp: 5 },
+            { txt: "Entrar nos Games", id: 'm_game', ready: localStorage.getItem('m_game_ready') === 'true', xp: 5 }
         ] : [
-            { txt: "Participar de 5 Drops", id: 'mm_drop', xp: 50 },
-            { txt: "Campanha Nexus", id: 'mm_camp', xp: 100 }
+            { txt: "Participar de Drops", id: 'mm_drop', ready: true, xp: 50 },
+            { txt: "Apoiar Campanha Nexus", id: 'mm_camp', ready: true, xp: 100 }
         ];
 
         const completedList = type === 'daily' ? completedDaily : completedMonthly;
@@ -189,11 +207,16 @@ function initOverlay() {
             const div = document.createElement('div');
             div.className = "mission-item";
             
-            let btnHtml = isDone ? `<span class="mission-check done">✅</span>` : 
-                          (m.isCheckin && !m.active) ? `<span class="mission-check disabled">FORA HORA</span>` :
-                          `<span class="mission-check" onclick="claimMission('${m.id}', '${type}', ${m.xp || 2})">RESGATAR</span>`;
+            let btn;
+            if (isDone) {
+                btn = `<span class="mission-check done">✅</span>`;
+            } else if (m.ready) {
+                btn = `<span class="mission-check" onclick="claimMission('${m.id}', '${type}', ${m.xp || 2})">RESGATAR</span>`;
+            } else {
+                btn = `<span class="mission-check disabled">BLOQUEADO</span>`;
+            }
 
-            div.innerHTML = `<span>${m.txt}</span>${btnHtml}`;
+            div.innerHTML = `<span>${m.txt}</span>${btn}`;
             content.appendChild(div);
         });
     };
@@ -205,6 +228,8 @@ function initOverlay() {
                 xp: increment(xpVal),
                 [field]: arrayUnion(id)
             });
+            // Limpa o gatilho local após resgatar (opcional, o reset diário do firebase já resolve)
+            localStorage.removeItem(`${id}_ready`);
         } catch (e) { console.error(e); }
     };
 
@@ -219,6 +244,10 @@ function initOverlay() {
                     const todayStr = now.toLocaleDateString('pt-BR');
                     if (d.last_daily_reset !== todayStr) {
                         await updateDoc(doc(db, "usuarios", user.uid), { last_daily_reset: todayStr, daily_missions: [] });
+                        // Limpa gatilhos locais no novo dia
+                        localStorage.removeItem('m_time_ready');
+                        localStorage.removeItem('m_news_ready');
+                        localStorage.removeItem('m_game_ready');
                         return;
                     }
 
