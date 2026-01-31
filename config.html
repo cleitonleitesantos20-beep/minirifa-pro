@@ -14,7 +14,7 @@
 
         .container { padding: 20px; padding-bottom: 60px; max-width: 500px; margin: 0 auto; }
 
-        /* Estilo para o Dashboard (Antigo Profile Hero) */
+        /* Dashboard Hero - Estilo Nexus Overlay */
         .dashboard-hero { text-align: center; padding: 25px; background: var(--card); border-radius: 25px; border: 1px solid #1a1a1a; margin-bottom: 25px; box-shadow: 0 0 20px rgba(0, 242, 255, 0.05); }
         
         .balance-main { font-size: 2.5rem; font-weight: 700; color: var(--green); margin: 5px 0; text-shadow: 0 0 10px rgba(0, 255, 136, 0.3); }
@@ -139,12 +139,12 @@
         };
 
         window.copyLink = () => {
-            // Usa a URL atual do site dinamicamente
+            // Redireciona para a página de CADASTRO com o código de indicação
             const siteURL = window.location.origin;
-            const refLink = `${siteURL}/index.html?ref=${currentUser.uid}`;
+            const refLink = `${siteURL}/cadastro.html?ref=${currentUser.uid}`;
             
             navigator.clipboard.writeText(refLink).then(() => {
-                alert("Link de convite copiado!");
+                alert("Link de indicação copiado! Envie para seus amigos se cadastrarem.");
             }).catch(err => {
                 console.error('Erro ao copiar: ', err);
             });
