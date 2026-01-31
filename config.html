@@ -39,7 +39,6 @@
         .feedback-area { width: 100%; background: #000; border: 1px solid #222; color: #fff; padding: 15px; border-radius: 10px; min-height: 100px; font-family: 'Rajdhani'; margin-bottom: 12px; box-sizing: border-box; resize: none; outline: none; }
         .btn-logout { width: 100%; background: none; border: 1px solid #333; color: #666; padding: 14px; border-radius: 10px; font-family: 'Orbitron'; font-size: 0.7rem; cursor: pointer; margin-top: 30px; }
 
-        /* Estilo para o botão de instalar */
         .install-box { border: 1px dashed var(--pink); text-align: center; }
         .btn-install { background: var(--pink); color: #fff; border: none; padding: 12px; border-radius: 10px; font-family: 'Orbitron'; font-size: 0.7rem; cursor: pointer; width: 100%; margin-top: 10px; display: none; }
     </style>
@@ -77,8 +76,16 @@
 
         <span class="section-title">Afiliados</span>
         <div class="box-dark" style="text-align: center;">
-            <div style="font-size: 0.9rem; margin-bottom: 12px; font-family:'Orbitron'">Tokens Gerados: <span id="u-indicados" style="color:var(--neon)">0</span></div>
+            <div style="font-size: 0.65rem; color: #666; margin-bottom: 5px; font-family: 'Orbitron';">SEU ID DE AFILIADO:</div>
+            <div id="u-uid-display" style="font-size: 0.7rem; color: #aaa; margin-bottom: 15px; word-break: break-all;">Aguardando terminal...</div>
+            
+            <div style="font-size: 0.9rem; margin-bottom: 12px; font-family:'Orbitron'">Ganhos de Indicação: <span id="u-indicados" style="color:var(--neon)">0</span> NP</div>
+            
             <button class="btn-nav" style="width:100%; padding:12px;" onclick="copyLink()">COPIAR LINK DE CONVITE</button>
+            <div style="font-size: 0.6rem; color: var(--pink); margin-top: 10px; font-family: 'Orbitron'; line-height: 1.4;">
+                GANHE 50 NP POR INDICAÇÃO<br>
+                <span style="color: #444;">*Válido após a primeira compra do indicado no site.</span>
+            </div>
         </div>
 
         <span class="section-title">Comunidade Global</span>
@@ -142,22 +149,23 @@
             iosNotice.style.display = 'block';
         }
 
-        // REGISTRO DO SERVICE WORKER (Necessário para o ícone)
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js')
-            .then(() => console.log("Nexus Service Worker: Registrado"));
+            navigator.serviceWorker.register('sw.js').then(() => console.log("Nexus SW Ativo"));
         }
 
         onAuthStateChanged(auth, user => {
             if (user) {
                 currentUser = user;
+                document.getElementById('u-uid-display').innerText = user.uid;
+                
                 onSnapshot(doc(db, "usuarios", user.uid), snap => {
                     const d = snap.data();
                     if(!d) return;
                     userSaldo = d.saldo || 0;
                     document.getElementById('u-nome').innerText = (d.nome || "OPERADOR").toUpperCase();
                     document.getElementById('u-saldo').innerText = Math.floor(userSaldo).toLocaleString('pt-br');
-                    document.getElementById('u-indicados').innerText = (d.indicadosCount || 0) * 100;
+                    // Ganhos totais baseados em indicações que compraram
+                    document.getElementById('u-indicados').innerText = (d.indicadosCount || 0) * 50;
                     if(d.pixPadrao) document.getElementById('pix-key').value = d.pixPadrao;
                 });
             } else { window.location.href = "index.html"; }
@@ -187,10 +195,15 @@
         };
 
         window.copyLink = () => {
+            if (!currentUser) return;
             const siteURL = window.location.origin;
+            // Link funcional apontando para a página de login/cadastro com o ID de quem indicou
             const refLink = `${siteURL}/login.html?ref=${currentUser.uid}`;
+            
             navigator.clipboard.writeText(refLink).then(() => {
-                alert("Link de indicação copiado!");
+                alert("Link de convite copiado! Você ganhará 50 NP após a primeira compra do seu indicado.");
+            }).catch(err => {
+                console.error('Erro ao copiar: ', err);
             });
         };
 
