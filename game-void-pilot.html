@@ -3,23 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nexus Invaders - Combat Module</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <title>Nexus Invaders</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; }
-        body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; padding: 0; min-height: 100vh; overflow: hidden; touch-action: none; }
-        
-        .header { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; font-family: 'Orbitron'; font-size: 0.6rem; border-bottom: 1px solid #1a1a1a; background: #000; box-sizing: border-box; }
-        .btn-exit { background: none; border: 1px solid var(--pink); color: var(--pink); padding: 5px 12px; border-radius: 4px; font-family: 'Orbitron'; cursor: pointer; font-size: 0.5rem; }
-
-        .game-container { position: relative; width: 100vw; height: calc(100vh - 60px); overflow: hidden; background: radial-gradient(circle at center, #050505 0%, #000 100%); }
-        
-        canvas { display: block; width: 100%; height: 100%; }
-
-        .overlay-ui { position: absolute; top: 10px; left: 0; width: 100%; pointer-events: none; display: flex; justify-content: space-around; font-family: 'Orbitron'; font-size: 0.7rem; color: var(--neon); }
-        
-        .controls-hint { position: absolute; bottom: 20px; width: 100%; text-align: center; font-size: 0.8rem; color: #444; pointer-events: none; }
+        body { background: #000; color: #fff; margin: 0; overflow: hidden; font-family: sans-serif; touch-action: none; }
+        .header { height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; background: #111; border-bottom: 1px solid #333; }
+        .stats { font-family: 'Orbitron'; font-size: 12px; color: #00f2ff; }
+        canvas { display: block; background: #000; }
+        .btn-exit { background: none; border: 1px solid #ff0055; color: #ff0055; padding: 4px 10px; border-radius: 4px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -27,18 +19,11 @@
     <script type="module" src="nexus-overlay.js"></script>
 
     <div class="header">
-        <span style="color:var(--neon)">NEXUS INVADERS // STRIKE</span>
+        <div class="stats">SCORE: <span id="score">0</span> | XP: <span id="xp">0</span></div>
         <button class="btn-exit" onclick="window.location.href='minigames.html'">SAIR</button>
     </div>
 
-    <div class="game-container">
-        <div class="overlay-ui">
-            <div>SCORE: <span id="score">0</span></div>
-            <div>XP: <span id="xp-display">0</span></div>
-        </div>
-        <canvas id="gameCanvas"></canvas>
-        <div class="controls-hint">DESLIZE PARA MOVER E ATIRAR</div>
-    </div>
+    <canvas id="gameCanvas"></canvas>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
@@ -51,137 +36,110 @@
         const auth = getAuth(app);
 
         let user;
-        onAuthStateChanged(auth, u => { if(u) user = u; else window.location.href="index.html"; });
+        onAuthStateChanged(auth, u => { if(u) user = u; });
 
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        const scoreEl = document.getElementById('score');
-        const xpEl = document.getElementById('xp-display');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight - 50;
 
         let score = 0;
         let xpGained = 0;
         let gameActive = true;
 
-        // Ajuste de tamanho
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight - 60;
-
-        const player = { x: canvas.width / 2, y: canvas.height - 80, w: 40, h: 40, speed: 15 };
-        const projectiles = [];
+        const player = { x: canvas.width / 2, y: canvas.height - 50, w: 30, h: 30 };
+        const bullets = [];
         const enemies = [];
-        const particles = [];
 
-        // Ganho de XP por tempo
-        setInterval(() => { if(gameActive) { xpGained++; xpEl.innerText = xpGained; } }, 1000);
+        // Ganho de XP simples
+        setInterval(() => { if(gameActive) { xpGained++; document.getElementById('xp').innerText = xpGained; } }, 1000);
 
-        // Controles Touch
-        window.addEventListener('touchmove', (e) => {
-            if(!gameActive) return;
+        // Movimento Touch
+        canvas.addEventListener('touchmove', (e) => {
             const touch = e.touches[0];
-            player.x = touch.clientX;
-            // Limites
-            if(player.x < 20) player.x = 20;
-            if(player.x > canvas.width - 20) player.x = canvas.width - 20;
+            player.x = touch.clientX - canvas.offsetLeft;
         });
 
-        // Auto-shoot
+        // Tiro Automático
         setInterval(() => {
-            if(gameActive) projectiles.push({ x: player.x, y: player.y, r: 4, speed: 7 });
-        }, 250);
+            if(gameActive) bullets.push({ x: player.x, y: player.y, r: 3 });
+        }, 300);
 
-        function spawnEnemy() {
+        // Criar Inimigos
+        function spawn() {
             if(!gameActive) return;
-            enemies.push({
-                x: Math.random() * (canvas.width - 30) + 15,
-                y: -30,
-                w: 30,
-                h: 30,
-                speed: 2 + Math.random() * 3
-            });
-            setTimeout(spawnEnemy, 1000 - Math.min(score/10, 500));
+            enemies.push({ x: Math.random() * (canvas.width - 20), y: -20, size: 20 });
+            setTimeout(spawn, 1000);
         }
 
-        function update() {
+        function loop() {
             if(!gameActive) return;
 
-            projectiles.forEach((p, i) => {
-                p.y -= p.speed;
-                if(p.y < 0) projectiles.splice(i, 1);
-            });
+            // Limpar tela
+            ctx.fillStyle = "black";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            enemies.forEach((e, ei) => {
-                e.y += e.speed;
-                
-                // Colisão com Player
-                if(e.y + e.h > player.y && e.x < player.x + player.w/2 && e.x + e.w > player.x - player.w/2) {
-                    endGame();
-                }
-
-                if(e.y > canvas.height) enemies.splice(ei, 1);
-
-                // Colisão com Projetil
-                projectiles.forEach((p, pi) => {
-                    if(p.x > e.x && p.x < e.x + e.w && p.y > e.y && p.y < e.y + e.h) {
-                        enemies.splice(ei, 1);
-                        projectiles.splice(pi, 1);
-                        score += 10;
-                        scoreEl.innerText = score;
-                    }
-                });
-            });
-        }
-
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Desenhar Nave
-            ctx.fillStyle = '#fff';
+            // Player (Triângulo Azul)
+            ctx.fillStyle = "#00f2ff";
             ctx.beginPath();
             ctx.moveTo(player.x, player.y);
-            ctx.lineTo(player.x - 20, player.y + 30);
-            ctx.lineTo(player.x + 20, player.y + 30);
-            ctx.closePath();
+            ctx.lineTo(player.x - 15, player.y + 25);
+            ctx.lineTo(player.x + 15, player.y + 25);
             ctx.fill();
-            ctx.shadowBlur = 15;
-            ctx.shadowColor = var(--neon);
 
-            // Projetéis
-            ctx.fillStyle = var(--neon);
-            projectiles.forEach(p => {
+            // Balas
+            ctx.fillStyle = "white";
+            bullets.forEach((b, i) => {
+                b.y -= 5;
                 ctx.beginPath();
-                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.arc(b.x, b.y, b.r, 0, Math.PI*2);
                 ctx.fill();
+                if(b.y < 0) bullets.splice(i, 1);
             });
 
-            // Inimigos
-            ctx.fillStyle = var(--pink);
-            enemies.forEach(e => {
-                ctx.fillRect(e.x, e.y, e.w, e.h);
-                ctx.strokeStyle = '#fff';
-                ctx.strokeRect(e.x, e.y, e.w, e.h);
+            // Inimigos (Quadrados Vermelhos)
+            ctx.fillStyle = "#ff0055";
+            enemies.forEach((e, i) => {
+                e.y += 3;
+                ctx.fillRect(e.x, e.y, e.size, e.size);
+
+                // Colisão com Bala
+                bullets.forEach((b, bi) => {
+                    if(b.x > e.x && b.x < e.x + e.size && b.y > e.y && b.y < e.y + e.size) {
+                        enemies.splice(i, 1);
+                        bullets.splice(bi, 1);
+                        score += 10;
+                        document.getElementById('score').innerText = score;
+                    }
+                });
+
+                // Colisão com Player
+                if(e.y + e.size > player.y && e.x < player.x + 15 && e.x + e.size > player.x - 15) {
+                    gameOver();
+                }
+
+                if(e.y > canvas.height) enemies.splice(i, 1);
             });
 
-            requestAnimationFrame(() => {
-                update();
-                draw();
-            });
+            requestAnimationFrame(loop);
         }
 
-        async function endGame() {
+        async function gameOver() {
             gameActive = false;
             if(user) await updateDoc(doc(db, "usuarios", user.uid), { xp: increment(xpGained) });
             
             Swal.fire({
-                title: 'NAVE DESTRUÍDA',
-                text: `Score: ${score} | XP extraído: ${xpGained}`,
+                title: 'FIM DE JOGO',
+                text: `Score: ${score}`,
                 confirmButtonText: 'REINICIAR',
-                background: '#0a0a0a',
+                background: '#111',
                 color: '#fff'
             }).then(() => location.reload());
         }
 
-        spawnEnemy();
-        draw();
+        spawn();
+        loop();
     </script>
 </body>
 </html>
