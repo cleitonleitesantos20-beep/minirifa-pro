@@ -8,11 +8,11 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body { background: #000; color: #fff; margin: 0; overflow: hidden; font-family: sans-serif; touch-action: none; }
-        .header { height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; background: #111; border-bottom: 1px solid #333; }
-        .stats { font-family: 'Orbitron'; font-size: 11px; color: #00f2ff; display: flex; gap: 10px; align-items: center; }
-        .lives { color: #ff0055; font-size: 16px; letter-spacing: 2px; }
+        .header { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; background: #111; border-bottom: 2px solid #00f2ff; box-sizing: border-box; }
+        .stats-group { font-family: 'Orbitron'; font-size: 10px; color: #00f2ff; display: flex; flex-direction: column; gap: 2px; }
+        .lives { color: #ff0055; font-size: 18px; }
         canvas { display: block; background: #000; }
-        .btn-exit { background: none; border: 1px solid #ff0055; color: #ff0055; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-family: 'Orbitron'; font-size: 10px; }
+        .btn-exit { background: none; border: 1px solid #ff0055; color: #ff0055; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-family: 'Orbitron'; font-size: 10px; }
     </style>
 </head>
 <body>
@@ -20,11 +20,11 @@
     <script type="module" src="nexus-overlay.js"></script>
 
     <div class="header">
-        <div class="stats">
-            <div>SCORE: <span id="score">0</span></div>
-            <div>XP: <span id="xp">0</span></div>
-            <div class="lives" id="lives-display">❤️❤️❤️</div>
+        <div class="stats-group">
+            <span>SCORE: <span id="score">0</span></span>
+            <span>XP: <span id="xp">0</span></span>
         </div>
+        <div class="lives" id="lives-display">❤️❤️❤️</div>
         <button class="btn-exit" onclick="window.location.href='minigames.html'">SAIR</button>
     </div>
 
@@ -47,41 +47,52 @@
         const ctx = canvas.getContext('2d');
         
         canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight - 50;
+        canvas.height = window.innerHeight - 60;
 
         let score = 0;
         let xpGained = 0;
         let lives = 3;
         let gameActive = true;
 
-        const player = { x: canvas.width / 2, y: canvas.height - 60, w: 30, h: 30 };
+        // Nave agora é um objeto mais robusto
+        const player = {
+            x: canvas.width / 2,
+            y: canvas.height - 70, // Subi um pouco para garantir que apareça
+            w: 40,
+            h: 20
+        };
+
         const bullets = [];
         const enemies = [];
 
-        // XP por tempo
         setInterval(() => { if(gameActive) { xpGained++; document.getElementById('xp').innerText = xpGained; } }, 1000);
 
-        // Movimento
         canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
             if(!gameActive) return;
             const touch = e.touches[0];
-            player.x = touch.clientX;
+            // Centraliza a nave no dedo
+            player.x = touch.clientX - player.w / 2;
         });
 
-        // Tiro automático
         setInterval(() => {
-            if(gameActive) bullets.push({ x: player.x, y: player.y, r: 4 });
+            if(gameActive) bullets.push({ x: player.x + player.w / 2, y: player.y, r: 4 });
         }, 300);
 
         function spawn() {
             if(!gameActive) return;
-            enemies.push({ x: Math.random() * (canvas.width - 30), y: -30, size: 25, speed: 2 + Math.random() * 2 });
-            setTimeout(spawn, 1200);
+            enemies.push({ 
+                x: Math.random() * (canvas.width - 30), 
+                y: -30, 
+                size: 25, 
+                speed: 3
+            });
+            setTimeout(spawn, 1000);
         }
 
         function updateLives() {
             const display = document.getElementById('lives-display');
-            display.innerText = "❤️".repeat(lives);
+            display.innerText = "❤️".repeat(lives) || "💀";
             if (lives <= 0) gameOver();
         }
 
@@ -91,35 +102,32 @@
             ctx.fillStyle = "black";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Nave (Néon Blue)
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = "#00f2ff";
+            // DESENHAR NAVE (Retângulo Neon para garantir visão)
             ctx.fillStyle = "#00f2ff";
-            ctx.beginPath();
-            ctx.moveTo(player.x, player.y);
-            ctx.lineTo(player.x - 20, player.y + 30);
-            ctx.lineTo(player.x + 20, player.y + 30);
-            ctx.closePath();
-            ctx.fill();
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = "#00f2ff";
+            ctx.fillRect(player.x, player.y, player.w, player.h);
+            // Detalhe no topo da nave
+            ctx.fillRect(player.x + 15, player.y - 10, 10, 10);
             ctx.shadowBlur = 0;
 
-            // Tiros
-            ctx.fillStyle = "white";
+            // BALAS
+            ctx.fillStyle = "#fff";
             bullets.forEach((b, i) => {
-                b.y -= 7;
+                b.y -= 8;
                 ctx.beginPath();
                 ctx.arc(b.x, b.y, b.r, 0, Math.PI*2);
                 ctx.fill();
                 if(b.y < 0) bullets.splice(i, 1);
             });
 
-            // Asteroides
+            // INIMIGOS
             ctx.fillStyle = "#ff0055";
             enemies.forEach((e, i) => {
                 e.y += e.speed;
                 ctx.fillRect(e.x, e.y, e.size, e.size);
 
-                // Colisão com Tiro
+                // Colisão Bala/Inimigo
                 bullets.forEach((b, bi) => {
                     if(b.x > e.x && b.x < e.x + e.size && b.y > e.y && b.y < e.y + e.size) {
                         enemies.splice(i, 1);
@@ -129,15 +137,15 @@
                     }
                 });
 
-                // Passou da tela (perde vida)
+                // Passou da base da tela (perde vida)
                 if(e.y > canvas.height) {
                     enemies.splice(i, 1);
                     lives--;
                     updateLives();
                 }
 
-                // Bateu na nave (perde vida)
-                if(e.y + e.size > player.y && e.x < player.x + 20 && e.x + e.size > player.x - 20) {
+                // Colisão com a Nave
+                if(e.y + e.size > player.y && e.x < player.x + player.w && e.x + e.size > player.x) {
                     enemies.splice(i, 1);
                     lives--;
                     updateLives();
@@ -152,9 +160,9 @@
             if(user) await updateDoc(doc(db, "usuarios", user.uid), { xp: increment(xpGained) });
             
             Swal.fire({
-                title: 'SISTEMA DANIFICADO',
+                title: 'CONEXÃO PERDIDA',
                 text: `Score: ${score} | XP: ${xpGained}`,
-                confirmButtonText: 'REPARAR',
+                confirmButtonText: 'RECONECTAR',
                 background: '#111',
                 color: '#fff'
             }).then(() => location.reload());
