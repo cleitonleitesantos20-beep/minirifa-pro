@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nexus S - Global Store</title>
+    <title>Nexus Store - Global Assets</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --gold: #ffcc00; --dark: #0a0a0a; }
         body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden; }
         
-        /* HEADER FIXO */
         .header { height: 70px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #1a1a1a; position: sticky; top: 0; background: rgba(0,0,0,0.9); z-index: 100; backdrop-filter: blur(10px); }
         .user-stats { display: flex; gap: 15px; }
         .stat-mini { font-family: 'Orbitron'; font-size: 0.6rem; color: var(--green); display: flex; flex-direction: column; }
@@ -17,127 +16,107 @@
 
         .container { padding: 20px 0; }
         
-        /* PRATELEIRAS HORIZONTAIS */
-        .shelf-section { margin-bottom: 35px; }
-        .shelf-title { font-family: 'Orbitron'; font-size: 0.7rem; color: var(--neon); padding: 0 20px; margin-bottom: 15px; letter-spacing: 2px; text-transform: uppercase; }
+        .shelf-section { margin-bottom: 40px; }
+        .shelf-title { font-family: 'Orbitron'; font-size: 0.75rem; color: var(--neon); padding: 0 20px; margin-bottom: 20px; letter-spacing: 3px; border-left: 3px solid var(--neon); margin-left: 20px; padding-left: 10px; }
         
-        .shelf-row { display: flex; overflow-x: auto; padding: 0 20px; gap: 15px; scroll-snap-type: x mandatory; scrollbar-width: none; }
+        .shelf-row { display: flex; overflow-x: auto; padding: 0 20px; gap: 20px; scroll-snap-type: x mandatory; scrollbar-width: none; }
         .shelf-row::-webkit-scrollbar { display: none; }
 
-        /* CARDS DE ITEM */
-        .market-card { min-width: 160px; max-width: 160px; background: #080808; border: 1px solid #1a1a1a; border-radius: 20px; padding: 15px; scroll-snap-align: start; flex-shrink: 0; transition: 0.3s; position: relative; }
-        .market-card:active { transform: scale(0.95); border-color: var(--neon); }
+        .market-card { min-width: 180px; max-width: 180px; background: #080808; border: 1px solid #1a1a1a; border-radius: 15px; padding: 0; scroll-snap-align: start; flex-shrink: 0; transition: 0.3s; position: relative; overflow: hidden; }
+        .market-card:hover { border-color: var(--neon); transform: translateY(-5px); }
         
-        .item-icon { width: 100%; height: 80px; background: rgba(255,255,255,0.02); border-radius: 12px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; border: 1px solid #111; }
-        .item-name { font-family: 'Orbitron'; font-size: 0.75rem; color: #fff; display: block; margin-bottom: 5px; height: 30px; }
-        .item-desc { font-size: 0.65rem; color: #555; height: 30px; line-height: 1.2; display: block; }
+        .item-img { width: 100%; height: 120px; background: #111; object-fit: cover; border-bottom: 1px solid #1a1a1a; }
         
-        .price-tag { font-family: 'Orbitron'; font-size: 0.85rem; color: var(--green); display: block; margin: 10px 0; }
-        .btn-buy { width: 100%; background: var(--neon); color: #000; border: none; padding: 8px; border-radius: 8px; font-family: 'Orbitron'; font-size: 0.6rem; font-weight: bold; cursor: pointer; }
+        .item-info { padding: 15px; }
+        .item-name { font-family: 'Orbitron'; font-size: 0.7rem; color: #fff; display: block; margin-bottom: 8px; height: 35px; overflow: hidden; }
+        .item-desc { font-size: 0.6rem; color: #555; height: 30px; line-height: 1.2; display: block; margin-bottom: 12px; }
+        
+        .price-tag { font-family: 'Orbitron'; font-size: 0.9rem; color: var(--green); display: block; margin-bottom: 12px; }
+        .price-tag small { font-size: 0.5rem; color: #444; margin-left: 4px; }
 
-        /* BADGE DE XP */
-        .xp-multiplier { position: absolute; top: -5px; right: -5px; background: var(--pink); color: #fff; font-size: 0.5rem; padding: 3px 6px; border-radius: 5px; font-family: 'Orbitron'; }
+        .btn-buy { width: 100%; background: transparent; color: var(--neon); border: 1px solid var(--neon); padding: 10px; border-radius: 5px; font-family: 'Orbitron'; font-size: 0.55rem; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-buy:hover { background: var(--neon); color: #000; }
+        
+        .partner-tag { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.8); padding: 4px 8px; border-radius: 4px; font-size: 0.5rem; font-family: 'Orbitron'; color: var(--gold); border: 1px solid var(--gold); }
     </style>
 </head>
 <body>
 
+    <script type="module" src="nexus-overlay.js"></script>
+
     <div class="header">
-        <button onclick="window.location.href='index.html'" style="background:none; border:1px solid var(--neon); color:var(--neon); padding:5px 10px; border-radius:5px; font-family:'Orbitron'; font-size:0.5rem;">VOLTAR</button>
+        <button onclick="window.location.href='index.html'" style="background:none; border:1px solid var(--neon); color:var(--neon); padding:8px 15px; border-radius:5px; font-family:'Orbitron'; font-size:0.55rem; cursor:pointer;">VOLTAR</button>
         <div class="user-stats">
-            <div class="stat-mini">SALDO <span id="u-saldo">R$ 0,00</span></div>
-            <div class="stat-mini" style="color:var(--neon)">BIDS <span id="u-bids">0</span></div>
+            <div class="stat-mini">SALDO PROTOCOLO <span id="u-saldo">0.00 NP</span></div>
         </div>
     </div>
 
     <div class="container">
 
         <div class="shelf-section">
-            <div class="shelf-title">⚡ Pacotes de Bids</div>
+            <div class="shelf-title">CONHECIMENTO DIGITAL</div>
             <div class="shelf-row">
                 <div class="market-card">
-                    <div class="item-icon">📦</div>
-                    <span class="item-name">Starter Pack</span>
-                    <span class="item-desc">10 Bids para iniciantes</span>
-                    <span class="price-tag">R$ 5,00</span>
-                    <button class="btn-buy" onclick="comprarItem('bids', 10, 5)">COMPRAR</button>
+                    <span class="partner-tag">HOTMART</span>
+                    <img src="https://images.unsplash.com/photo-1512428559087-560fa5ceab42?auto=format&fit=crop&w=200&q=80" class="item-img">
+                    <div class="item-info">
+                        <span class="item-name">Mastering AI Prompting</span>
+                        <span class="item-desc">Guia definitivo para engenharia de prompts.</span>
+                        <span class="price-tag">45.00 <small>NP</small></span>
+                        <button class="btn-buy" onclick="externalLink('https://hotmart.com')">ACESSAR ITEM</button>
+                    </div>
                 </div>
                 <div class="market-card">
-                    <div class="item-icon">🎁</div>
-                    <span class="item-name">Advanced Pack</span>
-                    <span class="item-desc">50 Bids com desconto</span>
-                    <span class="price-tag">R$ 20,00</span>
-                    <button class="btn-buy" onclick="comprarItem('bids', 50, 20)">COMPRAR</button>
-                </div>
-                <div class="market-card">
-                    <div class="item-icon">💎</div>
-                    <span class="item-name">Whale Pack</span>
-                    <span class="item-desc">200 Bids + Bônus</span>
-                    <span class="price-tag">R$ 70,00</span>
-                    <button class="btn-buy" onclick="comprarItem('bids', 200, 70)">COMPRAR</button>
+                    <span class="partner-tag">E-BOOK</span>
+                    <img src="https://images.unsplash.com/photo-1532012197367-e83802163959?auto=format&fit=crop&w=200&q=80" class="item-img">
+                    <div class="item-info">
+                        <span class="item-name">Cyber Security 2026</span>
+                        <span class="item-desc">Proteção de dados em redes neurais.</span>
+                        <span class="price-tag">30.00 <small>NP</small></span>
+                        <button class="btn-buy" onclick="externalLink('#')">ACESSAR ITEM</button>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="shelf-section">
-            <div class="shelf-title">📈 Boosters de XP</div>
+            <div class="shelf-title">NEXUS LIFESTYLE</div>
             <div class="shelf-row">
                 <div class="market-card">
-                    <div class="xp-multiplier">2x XP</div>
-                    <div class="item-icon">🧪</div>
-                    <span class="item-name">Poção Azul</span>
-                    <span class="item-desc">Dobre seu XP por 24h</span>
-                    <span class="price-tag">R$ 10,00</span>
-                    <button class="btn-buy" onclick="comprarItem('xp', 2, 10)">COMPRAR</button>
+                    <span class="partner-tag">AMAZON</span>
+                    <img src="https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=200&q=80" class="item-img">
+                    <div class="item-info">
+                        <span class="item-name">Nexus Tech Tee - Black</span>
+                        <span class="item-desc">Camiseta em algodão egípcio minimalista.</span>
+                        <span class="price-tag">89.00 <small>NP</small></span>
+                        <button class="btn-buy" onclick="externalLink('https://amazon.com')">VER NA LOJA</button>
+                    </div>
                 </div>
                 <div class="market-card">
-                    <div class="xp-multiplier">5x XP</div>
-                    <div class="item-icon">🔥</div>
-                    <span class="item-name">Super Combustível</span>
-                    <span class="item-desc">5x XP por 12h</span>
-                    <span class="price-tag">R$ 25,00</span>
-                    <button class="btn-buy" onclick="comprarItem('xp', 5, 25)">COMPRAR</button>
-                </div>
-                <div class="market-card">
-                    <div class="xp-multiplier">MAX</div>
-                    <div class="item-icon">🌟</div>
-                    <span class="item-name">Benção da IA</span>
-                    <span class="item-desc">XP Máximo Permanente</span>
-                    <span class="price-tag">R$ 150,00</span>
-                    <button class="btn-buy" onclick="comprarItem('xp', 99, 150)">COMPRAR</button>
+                    <span class="partner-tag">PREMIUM</span>
+                    <img src="https://images.unsplash.com/photo-1550246140-5119ae4790b8?auto=format&fit=crop&w=200&q=80" class="item-img">
+                    <div class="item-info">
+                        <span class="item-name">Cyber Hoodie V1</span>
+                        <span class="item-desc">Moletom com detalhes refletivos.</span>
+                        <span class="price-tag">150.00 <small>NP</small></span>
+                        <button class="btn-buy" onclick="externalLink('#')">VER NA LOJA</button>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="shelf-section">
-            <div class="shelf-title">🎭 Emojis Premium</div>
+            <div class="shelf-title">HARDWARE & ASSETS</div>
             <div class="shelf-row">
                 <div class="market-card">
-                    <div class="item-icon">👑</div>
-                    <span class="item-name">Emoji Rei</span>
-                    <span class="item-desc">Exclusivo para vips</span>
-                    <span class="price-tag">R$ 15,00</span>
-                    <button class="btn-buy" onclick="comprarItem('emoji', '👑', 15)">COMPRAR</button>
-                </div>
-                <div class="market-card">
-                    <div class="item-icon">🦄</div>
-                    <span class="item-name">Emoji Unicórnio</span>
-                    <span class="item-desc">Raridade Mística</span>
-                    <span class="price-tag">R$ 12,00</span>
-                    <button class="btn-buy" onclick="comprarItem('emoji', '🦄', 12)">COMPRAR</button>
-                </div>
-                <div class="market-card">
-                    <div class="item-icon">🛸</div>
-                    <span class="item-name">Emoji UFO</span>
-                    <span class="item-desc">Viajante do tempo</span>
-                    <span class="price-tag">R$ 20,00</span>
-                    <button class="btn-buy" onclick="comprarItem('emoji', '🛸', 20)">COMPRAR</button>
-                </div>
-                <div class="market-card">
-                    <div class="item-icon">🏴‍☠️</div>
-                    <span class="item-name">Pirata Cyber</span>
-                    <span class="item-desc">Pack Explorador</span>
-                    <span class="price-tag">R$ 8,00</span>
-                    <button class="btn-buy" onclick="comprarItem('emoji', '🏴‍☠️', 8)">COMPRAR</button>
+                    <span class="partner-tag">TECH</span>
+                    <img src="https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=200&q=80" class="item-img">
+                    <div class="item-info">
+                        <span class="item-name">Nexus Pad Pro</span>
+                        <span class="item-desc">Mousepad de alta performance 90x40.</span>
+                        <span class="price-tag">65.00 <small>NP</small></span>
+                        <button class="btn-buy" onclick="externalLink('#')">REQUISITAR</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -146,7 +125,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, updateDoc, increment, arrayUnion } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
         const firebaseConfig = { apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", authDomain: "minharifadigital.firebaseapp.com", projectId: "minharifadigital", appId: "1:59630725905:web:396c8cfca385dc3d957ab0" };
@@ -154,36 +133,22 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        let userSaldo = 0;
-
         onAuthStateChanged(auth, user => {
             if (user) {
                 onSnapshot(doc(db, "usuarios", user.uid), snap => {
                     const d = snap.data();
                     if(!d) return;
-                    userSaldo = d.saldo || 0;
-                    document.getElementById('u-saldo').innerText = userSaldo.toLocaleString('pt-br', {style: 'currency', currency: 'BRL'});
-                    document.getElementById('u-bids').innerText = d.bids || 0;
+                    const saldo = d.saldo || 0;
+                    document.getElementById('u-saldo').innerText = saldo.toFixed(2) + " NP";
                 });
             } else { window.location.href = "login.html"; }
         });
 
-        window.comprarItem = async (tipo, valor, preco) => {
-            if (userSaldo >= preco) {
-                if(confirm(`Confirmar compra de R$ ${preco},00?`)) {
-                    const userRef = doc(db, "usuarios", auth.currentUser.uid);
-                    
-                    let updateData = { saldo: increment(-preco) };
-
-                    if(tipo === 'bids') updateData.bids = increment(valor);
-                    if(tipo === 'xp') updateData.xpMultiplier = valor;
-                    if(tipo === 'emoji') updateData.emojisDesbloqueados = arrayUnion(valor);
-
-                    await updateDoc(userRef, updateData);
-                    alert("COMPRA REALIZADA COM SUCESSO!");
-                }
+        window.externalLink = (url) => {
+            if(url === '#') {
+                alert("Item em fase de pré-lançamento no protocolo.");
             } else {
-                alert("SALDO INSUFICIENTE! Vá para a página de Depósito.");
+                window.open(url, '_blank');
             }
         };
     </script>
