@@ -17,13 +17,11 @@
 
         .container { padding: 20px; max-width: 450px; margin: 0 auto; width: 100%; flex-grow: 1; }
 
-        /* BALANÇO NP */
         .balance-card { background: var(--bg-card); border: 1px solid #1a1a1a; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 25px; border-left: 4px solid var(--neon); }
         .balance-label { font-family: 'Orbitron'; font-size: 0.6rem; color: #555; letter-spacing: 2px; }
         .balance-value { font-family: 'Orbitron'; font-size: 1.8rem; color: #fff; margin-top: 5px; }
         .np-symbol { color: var(--neon); font-size: 1rem; margin-left: 5px; }
 
-        /* MECÂNICA DE COMBOS */
         .combo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
         .combo-card { background: #0a0a0a; border: 1px solid #1a1a1a; padding: 15px; border-radius: 15px; text-align: center; cursor: pointer; transition: 0.3s; position: relative; overflow: hidden; }
         .combo-card.active { border-color: var(--neon); background: rgba(0,242,255,0.05); transform: scale(1.03); }
@@ -31,7 +29,6 @@
         .combo-np { display: block; font-family: 'Orbitron'; font-size: 1.2rem; color: var(--green); }
         .combo-price { font-size: 0.7rem; color: #444; font-family: 'Orbitron'; }
 
-        /* INPUT MANUAL */
         .input-group { background: var(--bg-card); border: 1px solid #1a1a1a; padding: 20px; border-radius: 20px; margin-bottom: 25px; }
         .input-label { font-size: 0.6rem; font-family: 'Orbitron'; color: #444; margin-bottom: 10px; display: block; text-align: center; }
         .amount-input-container { display: flex; align-items: center; justify-content: center; gap: 10px; }
@@ -39,7 +36,6 @@
 
         .btn-generate { width: 100%; background: linear-gradient(90deg, var(--neon), var(--green)); border: none; padding: 22px; border-radius: 15px; color: #000; font-family: 'Orbitron'; font-size: 0.8rem; font-weight: bold; cursor: pointer; letter-spacing: 2px; }
 
-        /* ÁREA PIX */
         .pix-area { display: none; margin-top: 25px; background: #fff; padding: 25px; border-radius: 25px; text-align: center; color: #000; }
         .copy-box { background: #f0f0f0; padding: 10px; border-radius: 10px; font-family: monospace; font-size: 0.55rem; word-break: break-all; margin: 15px 0; border: 1px dashed #ccc; }
         .btn-copy { width: 100%; background: #000; color: #fff; border: none; padding: 15px; border-radius: 10px; font-family: 'Orbitron'; cursor: pointer; }
@@ -52,7 +48,7 @@
     <script type="module" src="nexus-overlay.js"></script>
 
     <div class="header">
-        <button class="btn-back" onclick="window.location.href='dashboard.html'">VOLTAR</button>
+        <button class="btn-back" onclick="window.location.href='index.html'">VOLTAR</button>
         <h1 class="page-title">NEXUS STORE</h1>
         <div style="width: 40px;"></div>
     </div>
@@ -98,7 +94,7 @@
 
         <div id="pix-area" class="pix-area">
             <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=NEXUS-PROTOCOL-ASSET" alt="QR Code">
-            <div class="copy-box" id="pix-string">nexus_assets_protocol_id_992837_hash_check...</div>
+            <div class="copy-box" id="pix-string">nexus_protocol_asset_hash_v1_secure_...</div>
             <button class="btn-copy" onclick="copyPix()">COPIAR CHAVE DE ATIVAÇÃO</button>
         </div>
 
