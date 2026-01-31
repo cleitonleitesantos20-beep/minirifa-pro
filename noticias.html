@@ -12,16 +12,15 @@
             margin: 0; padding: 0;
             width: 100%; height: 100%;
             background: #000;
-            overflow: hidden; /* Trava o scroll do body para usar o container */
+            overflow: hidden;
         }
 
-        /* Container estilo TikTok */
         #news-feed {
             width: 100%;
             height: 100vh;
             overflow-y: scroll;
-            scroll-snap-type: y mandatory; /* Efeito de trava por página */
-            padding-top: 75px; /* Espaço para o Nexus Header */
+            scroll-snap-type: y mandatory;
+            padding-top: 75px;
         }
 
         .news-card {
@@ -31,18 +30,27 @@
             position: relative;
             display: flex;
             flex-direction: column;
-            justify-content: flex-end;
+            /* Centraliza o conteúdo verticalmente e horizontalmente */
+            justify-content: center; 
+            align-items: center;
             background-size: cover;
             background-position: center;
             border-bottom: 2px solid #111;
         }
 
-        /* Overlay escuro para ler o texto */
+        /* Overlay Compacto e Centralizado no Topo da Imagem */
         .news-overlay {
-            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%);
-            padding: 30px 20px 80px 20px;
+            background: rgba(0, 0, 0, 0.6); /* Fundo escuro sutil para destacar o néon */
+            backdrop-filter: blur(4px); /* Leve desfoque no fundo do texto */
+            padding: 20px;
             color: #fff;
             font-family: 'Rajdhani', sans-serif;
+            text-align: center;
+            width: 90%;
+            max-width: 400px; /* Deixa o texto compacto */
+            border-radius: 15px;
+            border: 1px solid rgba(0, 242, 255, 0.3);
+            margin-bottom: 100px; /* Sobe o texto para cima */
         }
 
         .news-tag {
@@ -54,28 +62,33 @@
             border-radius: 4px;
             display: inline-block;
             margin-bottom: 10px;
+            box-shadow: 0 0 10px #ff0055;
         }
 
         .news-title {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: bold;
             margin-bottom: 10px;
             line-height: 1.2;
             color: #00f2ff;
+            text-transform: uppercase;
+            font-family: 'Orbitron';
+            /* Efeito Néon */
+            text-shadow: 0 0 5px #00f2ff, 0 0 10px #00f2ff;
         }
 
         .news-desc {
-            font-size: 0.9rem;
-            color: #ccc;
+            font-size: 0.85rem;
+            color: #fff;
             line-height: 1.4;
-            max-height: 120px;
+            max-height: 100px;
             overflow-y: auto;
         }
 
-        /* Estilo para quando não há notícias */
         .loading {
             display: flex; align-items: center; justify-content: center;
-            height: 100%; color: #555; font-family: 'Orbitron';
+            height: 100%; color: #00f2ff; font-family: 'Orbitron';
+            text-shadow: 0 0 10px #00f2ff;
         }
     </style>
 </head>
@@ -98,15 +111,12 @@
 
         const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
         const db = getFirestore(app);
-
-        // Referência para o container
         const feed = document.getElementById('news-feed');
 
-        // Escuta em tempo real a coleção de notícias
         const q = query(collection(db, "noticias"), orderBy("timestamp", "desc"));
 
         onSnapshot(q, (snap) => {
-            feed.innerHTML = ""; // Limpa o loading
+            feed.innerHTML = ""; 
 
             if (snap.empty) {
                 feed.innerHTML = '<div class="loading">NENHUMA NOTÍCIA NO MOMENTO</div>';
