@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Nexus S - Configurações</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
         :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --dark: #0a0a0a; --card: #111; }
         body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; padding: 0; min-height: 100vh; overflow-y: auto; }
@@ -14,7 +16,6 @@
 
         .container { padding: 20px; padding-bottom: 60px; max-width: 500px; margin: 0 auto; }
 
-        /* Dashboard Hero - Nexus Style */
         .dashboard-hero { text-align: center; padding: 25px; background: var(--card); border-radius: 25px; border: 1px solid #1a1a1a; margin-bottom: 25px; box-shadow: 0 0 20px rgba(0, 242, 255, 0.05); }
         
         .balance-main { font-size: 2.5rem; font-weight: 700; color: var(--green); margin: 5px 0; text-shadow: 0 0 10px rgba(0, 255, 136, 0.3); }
@@ -34,6 +35,10 @@
         
         .feedback-area { width: 100%; background: #000; border: 1px solid #222; color: #fff; padding: 15px; border-radius: 10px; min-height: 100px; font-family: 'Rajdhani'; margin-bottom: 12px; box-sizing: border-box; resize: none; outline: none; }
         .btn-logout { width: 100%; background: none; border: 1px solid #333; color: #666; padding: 14px; border-radius: 10px; font-family: 'Orbitron'; font-size: 0.7rem; cursor: pointer; margin-top: 30px; }
+
+        /* Estilo para o botão de instalar */
+        .install-box { border: 1px dashed var(--pink); text-align: center; }
+        .btn-install { background: var(--pink); color: #fff; border: none; padding: 12px; border-radius: 10px; font-family: 'Orbitron'; font-size: 0.7rem; cursor: pointer; width: 100%; margin-top: 10px; display: none; }
     </style>
 </head>
 <body>
@@ -49,6 +54,15 @@
             <span class="section-title" style="margin-top:0;">Saldo Disponível</span>
             <div class="balance-main"><span id="u-saldo">0</span> <span class="balance-label">NP</span></div>
             <h2 id="u-nome" style="font-family:'Orbitron'; font-size: 1rem; margin: 10px 0; color: #888;">...</h2>
+        </div>
+
+        <span class="section-title">Acesso Rápido</span>
+        <div class="box-dark install-box">
+            <div style="font-size: 0.8rem; color: #aaa;">Instale o Nexus no seu celular para acessar como um aplicativo.</div>
+            <button id="btnInstall" class="btn-install">ADICIONAR À TELA INICIAL</button>
+            <div id="ios-notice" style="display:none; font-size: 0.7rem; color: var(--neon); margin-top: 10px;">
+                No iPhone: Toque em <span style="font-size: 1rem;">⎋</span> e depois em "Adicionar à Tela de Início"
+            </div>
         </div>
 
         <span class="section-title">Cashback & Recompensas</span>
@@ -100,6 +114,32 @@
         let userSaldo = 0;
         let currentUser = null;
 
+        // LÓGICA DE INSTALAÇÃO (PWA)
+        let deferredPrompt;
+        const btnInstall = document.getElementById('btnInstall');
+        const iosNotice = document.getElementById('ios-notice');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            btnInstall.style.display = 'block';
+        });
+
+        btnInstall.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') btnInstall.style.display = 'none';
+                deferredPrompt = null;
+            }
+        });
+
+        // Detectar iOS para mostrar instrução manual
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        if (isIOS && !window.navigator.standalone) {
+            iosNotice.style.display = 'block';
+        }
+
         onAuthStateChanged(auth, user => {
             if (user) {
                 currentUser = user;
@@ -139,14 +179,10 @@
         };
 
         window.copyLink = () => {
-            // Gera o link apontando para login.html com o parâmetro de referência
             const siteURL = window.location.origin;
             const refLink = `${siteURL}/login.html?ref=${currentUser.uid}`;
-            
             navigator.clipboard.writeText(refLink).then(() => {
-                alert("Link de indicação copiado! Ele direciona para o seu cadastro.");
-            }).catch(err => {
-                console.error('Erro ao copiar: ', err);
+                alert("Link de indicação copiado!");
             });
         };
 
