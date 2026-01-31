@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Click Hero - Nexus Training</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --dark: #050505; }
+        body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; padding: 0; min-height: 100vh; overflow: hidden; touch-action: none; }
+        
+        .header { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; font-family: 'Orbitron'; font-size: 0.6rem; border-bottom: 1px solid #1a1a1a; background: #000; box-sizing: border-box; }
+        .btn-exit { background: none; border: 1px solid var(--pink); color: var(--pink); padding: 5px 12px; border-radius: 4px; font-family: 'Orbitron'; cursor: pointer; font-size: 0.5rem; }
+
+        .game-container { display: flex; flex-direction: column; align-items: center; padding: 10px; height: calc(100vh - 60px); position: relative; }
+
+        .stats-bar { display: flex; gap: 15px; font-family: 'Orbitron'; font-size: 0.7rem; color: var(--neon); z-index: 10; margin-bottom: 20px; }
+        .stat-box { text-align: center; background: rgba(0, 242, 255, 0.05); padding: 5px 12px; border-radius: 8px; border: 1px solid rgba(0, 242, 255, 0.2); min-width: 80px; }
+
+        /* Área de Jogo */
+        #click-area {
+            width: 95vw;
+            max-width: 400px;
+            height: 60vh;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid #111;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .target {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle, var(--neon), transparent);
+            border: 2px solid var(--neon);
+            border-radius: 50%;
+            box-shadow: 0 0 20px var(--neon);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            animation: pulse 1s infinite alternate;
+            transform: translate(-50%, -50%);
+        }
+
+        .target::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        @keyframes pulse {
+            from { transform: translate(-50%, -50%) scale(0.9); opacity: 0.8; }
+            to { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+        }
+
+        .btn-start { 
+            margin-top: 30px;
+            background: var(--green); 
+            color: #000; 
+            border: none; 
+            padding: 15px 40px; 
+            border-radius: 8px; 
+            font-family: 'Orbitron'; 
+            font-weight: bold; 
+            cursor: pointer; 
+            box-shadow: 0 0 15px var(--green);
+        }
+    </style>
+</head>
+<body>
+
+    <script type="module" src="nexus-overlay.js"></script>
+
+    <div class="header">
+        <span style="color:var(--neon)">CLICK HERO // REFLEX</span>
+        <button class="btn-exit" onclick="window.location.href='minigames.html'">SAIR</button>
+    </div>
+
+    <div class="game-container">
+        <div class="stats-bar">
+            <div class="stat-box">SCORE: <span id="score">0</span></div>
+            <div class="stat-box">XP: <span id="xp-display">0</span></div>
+        </div>
+
+        <div id="click-area"></div>
+
+        <button id="start-btn" class="btn-start" onclick="startGame()">INICIAR TREINO</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", authDomain: "minharifadigital.firebaseapp.com", projectId: "minharifadigital", appId: "1:59630725905:web:396c8cfca385dc3d957ab0" };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        let user;
+        let score = 0;
+        let xpGained = 0;
+        let isPlaying = false;
+        let gameTimer;
+        let xpTimer;
+
+        onAuthStateChanged(auth, u => { if(u) user = u; else window.location.href="index.html"; });
+
+        window.startGame = () => {
+            score = 0;
+            xpGained = 0;
+            isPlaying = true;
+            document.getElementById('score').innerText = "0";
+            document.getElementById('start-btn').style.display = "none";
+            
+            // Timer de XP (1 por segundo)
+            xpTimer = setInterval(() => {
+                xpGained++;
+                document.getElementById('xp-display').innerText = xpGained;
+            }, 1000);
+
+            spawnTarget();
+
+            // O jogo dura 30 segundos por round
+            setTimeout(endGame, 30000);
+        };
+
+        function spawnTarget() {
+            if(!isPlaying) return;
+            
+            const area = document.getElementById('click-area');
+            const target = document.createElement('div');
+            target.className = 'target';
+            
+            // Posição aleatória dentro da área
+            const x = Math.random() * 80 + 10; // 10% a 90%
+            const y = Math.random() * 80 + 10;
+            
+            target.style.left = x + '%';
+            target.style.top = y + '%';
+            
+            target.onclick = (e) => {
+                e.stopPropagation();
+                score += 10;
+                document.getElementById('score').innerText = score;
+                target.remove();
+                spawnTarget();
+            };
+
+            area.appendChild(target);
+
+            // O alvo desaparece após 1.2 segundos se não clicado
+            setTimeout(() => {
+                if(target.parentElement) {
+                    target.remove();
+                    if(isPlaying) spawnTarget();
+                }
+            }, 1200);
+        }
+
+        async function endGame() {
+            isPlaying = false;
+            clearInterval(xpTimer);
+            
+            if(user) {
+                await updateDoc(doc(db, "usuarios", user.uid), { xp: increment(xpGained) });
+            }
+
+            Swal.fire({
+                title: 'TREINO FINALIZADO',
+                text: `Score: ${score} | XP: ${xpGained}`,
+                confirmButtonText: 'REPETIR',
+                background: '#0a0a0a',
+                color: '#fff'
+            }).then(() => {
+                document.getElementById('start-btn').style.display = "block";
+                document.getElementById('click-area').innerHTML = '';
+            });
+        }
+    </script>
+</body>
+</html>
