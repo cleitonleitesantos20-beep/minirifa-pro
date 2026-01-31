@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Data Match - Nexus Protocol</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --dark: #050505; }
+        body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; padding: 0; min-height: 100vh; overflow: hidden; touch-action: none; }
+        
+        .header { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; font-family: 'Orbitron'; font-size: 0.6rem; border-bottom: 1px solid #1a1a1a; background: #000; box-sizing: border-box; }
+        .btn-exit { background: none; border: 1px solid var(--pink); color: var(--pink); padding: 5px 12px; border-radius: 4px; font-family: 'Orbitron'; cursor: pointer; font-size: 0.5rem; }
+
+        .game-container { display: flex; flex-direction: column; align-items: center; padding: 10px; height: calc(100vh - 60px); justify-content: space-around; box-sizing: border-box; }
+
+        .stats-bar { display: flex; gap: 15px; font-family: 'Orbitron'; font-size: 0.7rem; color: var(--neon); }
+        .stat-box { text-align: center; background: rgba(0, 242, 255, 0.05); padding: 5px 12px; border-radius: 8px; border: 1px solid rgba(0, 242, 255, 0.2); min-width: 80px; }
+
+        #grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            width: 90vw;
+            max-width: 360px;
+            perspective: 1000px;
+        }
+
+        .card {
+            aspect-ratio: 1/1;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+
+        .card.flipped { transform: rotateY(180deg); }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            border: 2px solid #222;
+            font-size: 1.5rem;
+        }
+
+        .card-front { background: #111; color: var(--neon); }
+        .card-front::after { content: '?'; opacity: 0.3; }
+
+        .card-back {
+            background: rgba(0, 242, 255, 0.1);
+            border-color: var(--neon);
+            color: var(--neon);
+            transform: rotateY(180deg);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
+        }
+
+        .card.matched .card-back {
+            border-color: var(--green);
+            color: var(--green);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
+        }
+
+        .btn-start { background: var(--neon); color: #000; border: none; padding: 12px 30px; border-radius: 5px; font-family: 'Orbitron'; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+
+    <script type="module" src="nexus-overlay.js"></script>
+
+    <div class="header">
+        <span style="color:var(--neon)">DATA MATCH // SYNC</span>
+        <button class="btn-exit" onclick="window.location.href='minigames.html'">SAIR</button>
+    </div>
+
+    <div class="game-container">
+        <div class="stats-bar">
+            <div class="stat-box"><span style="display:block; font-size:0.5rem; color:#888">SCORE</span><span id="score">0</span></div>
+            <div class="stat-box"><span style="display:block; font-size:0.5rem; color:#888">XP</span><span id="xp-display">0</span></div>
+        </div>
+
+        <div id="grid"></div>
+
+        <button id="start-btn" class="btn-start" onclick="initGame()">INICIAR SYNC</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", authDomain: "minharifadigital.firebaseapp.com", projectId: "minharifadigital", appId: "1:59630725905:web:396c8cfca385dc3d957ab0" };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        let user;
+        let score = 0;
+        let xpGained = 0;
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let isLock = false;
+
+        const icons = ['📡', '🛡️', '🔑', '💾', '💻', '🔋', '🔌', '🛰️'];
+        const deck = [...icons, ...icons];
+
+        onAuthStateChanged(auth, u => { if(u) user = u; else window.location.href="index.html"; });
+
+        setInterval(() => {
+            if(matchedPairs < 8 && matchedPairs > 0) {
+                xpGained++;
+                document.getElementById('xp-display').innerText = xpGained;
+            }
+        }, 1000);
+
+        window.initGame = () => {
+            score = 0; matchedPairs = 0; flippedCards = []; isLock = false;
+            document.getElementById('score').innerText = "0";
+            document.getElementById('start-btn').style.display = "none";
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
+            
+            deck.sort(() => Math.random() - 0.5);
+
+            deck.forEach((icon, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.dataset.icon = icon;
+                card.innerHTML = `
+                    <div class="card-face card-front"></div>
+                    <div class="card-face card-back">${icon}</div>
+                `;
+                card.onclick = () => flipCard(card);
+                grid.appendChild(card);
+            });
+        };
+
+        function flipCard(card) {
+            if(isLock || card.classList.contains('flipped') || card.classList.contains('matched')) return;
+
+            card.classList.add('flipped');
+            flippedCards.push(card);
+
+            if(flippedCards.length === 2) {
+                isLock = true;
+                checkMatch();
+            }
+        }
+
+        function checkMatch() {
+            const [c1, c2] = flippedCards;
+            if(c1.dataset.icon === c2.dataset.icon) {
+                c1.classList.add('matched');
+                c2.classList.add('matched');
+                matchedPairs++;
+                score += 100;
+                document.getElementById('score').innerText = score;
+                flippedCards = [];
+                isLock = false;
+                if(matchedPairs === 8) endGame();
+            } else {
+                setTimeout(() => {
+                    c1.classList.remove('flipped');
+                    c2.classList.remove('flipped');
+                    flippedCards = [];
+                    isLock = false;
+                }, 1000);
+            }
+        }
+
+        async function endGame() {
+            await updateDoc(doc(db, "usuarios", user.uid), { xp: increment(xpGained) });
+            Swal.fire({
+                title: 'SYNC COMPLETO',
+                text: `Dados recuperados! Score: ${score}`,
+                confirmButtonText: 'NOVO SCAN',
+                background: '#0a0a0a',
+                color: '#fff'
+            }).then(() => {
+                document.getElementById('start-btn').style.display = "block";
+            });
+        }
+    </script>
+</body>
+</html>
