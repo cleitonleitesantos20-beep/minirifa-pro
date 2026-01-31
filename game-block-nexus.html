@@ -3,46 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Block Nexus - Central de Treinamento</title>
+    <title>Block Nexus - Module</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --dark: #050505; --card: #111; }
+        :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --dark: #050505; }
         body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; padding: 0; min-height: 100vh; overflow: hidden; touch-action: none; }
         
-        .header { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; font-family: 'Orbitron'; font-size: 0.6rem; border-bottom: 1px solid #1a1a1a; background: #000; }
+        .header { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; font-family: 'Orbitron'; font-size: 0.6rem; border-bottom: 1px solid #1a1a1a; background: #000; box-sizing: border-box; }
         .btn-exit { background: none; border: 1px solid var(--pink); color: var(--pink); padding: 5px 12px; border-radius: 4px; font-family: 'Orbitron'; cursor: pointer; font-size: 0.5rem; }
 
-        .game-container { display: flex; flex-direction: column; align-items: center; padding: 10px; height: calc(100vh - 60px); justify-content: space-around; }
+        .game-container { display: flex; flex-direction: column; align-items: center; padding: 10px; height: calc(100vh - 60px); justify-content: space-around; box-sizing: border-box; }
 
-        /* Stats */
-        .stats-bar { display: flex; gap: 20px; font-family: 'Orbitron'; font-size: 0.7rem; color: var(--neon); }
-        .stat-box { text-align: center; background: rgba(0, 242, 255, 0.05); padding: 5px 15px; border-radius: 8px; border: 1px solid rgba(0, 242, 255, 0.2); }
+        .stats-bar { display: flex; gap: 15px; font-family: 'Orbitron'; font-size: 0.7rem; color: var(--neon); }
+        .stat-box { text-align: center; background: rgba(0, 242, 255, 0.05); padding: 5px 12px; border-radius: 8px; border: 1px solid rgba(0, 242, 255, 0.2); min-width: 80px; }
 
-        /* Tabuleiro */
         #board { 
             display: grid; 
             grid-template-columns: repeat(8, 1fr); 
             grid-template-rows: repeat(8, 1fr); 
-            gap: 4px; 
+            gap: 3px; 
             background: #111; 
-            padding: 6px; 
-            border-radius: 10px; 
+            padding: 5px; 
+            border-radius: 8px; 
             border: 2px solid #222;
-            width: 90vw;
-            max-width: 340px;
+            width: 92vw;
+            max-width: 350px;
             aspect-ratio: 1/1;
         }
-        .cell { background: #0a0a0a; border-radius: 4px; transition: 0.2s; }
-        .cell.filled { background: var(--neon); box-shadow: 0 0 10px var(--neon); }
-        .cell.preview { background: rgba(0, 242, 255, 0.2); }
+        .cell { background: #0a0a0a; border-radius: 3px; transition: background 0.2s, box-shadow 0.2s; }
+        .cell.filled { background: var(--neon); box-shadow: 0 0 12px var(--neon); border: 1px solid rgba(255,255,255,0.3); }
+        .cell.highlight { background: rgba(0, 255, 136, 0.3); }
 
-        /* Peças para arrastar */
-        .pieces-container { display: flex; justify-content: space-around; width: 100%; max-width: 340px; height: 100px; }
-        .piece-slot { width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.02); border-radius: 10px; border: 1px dashed #333; }
+        .pieces-container { display: flex; justify-content: space-around; width: 100%; max-width: 350px; height: 110px; margin-top: 10px; }
+        .piece-slot { width: 90px; height: 90px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid #222; transition: 0.3s; }
+        .piece-slot.selected { border-color: var(--green); background: rgba(0, 255, 136, 0.1); transform: scale(1.05); box-shadow: 0 0 15px rgba(0,255,136,0.2); }
         
-        .piece { display: grid; gap: 2px; cursor: grab; transition: transform 0.1s; }
-        .piece-block { width: 18px; height: 18px; background: var(--neon); border-radius: 3px; box-shadow: inset 0 0 5px rgba(0,0,0,0.5); }
+        .piece { display: grid; gap: 2px; cursor: pointer; }
+        .piece-block { width: 18px; height: 18px; background: var(--neon); border-radius: 2px; box-shadow: inset 0 0 5px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
@@ -50,22 +48,22 @@
     <script type="module" src="nexus-overlay.js"></script>
 
     <div class="header">
-        <span style="color:var(--neon)">BLOCK NEXUS // MODULE</span>
+        <span style="color:var(--neon)">BLOCK NEXUS // CORE</span>
         <button class="btn-exit" onclick="window.location.href='minigames.html'">SAIR</button>
     </div>
 
     <div class="game-container">
         <div class="stats-bar">
-            <div class="stat-box">SCORE: <span id="score">0</span></div>
-            <div class="stat-box">XP: <span id="xp-display">0</span></div>
+            <div class="stat-box"><span style="display:block; font-size:0.5rem; color:#888">SCORE</span><span id="score">0</span></div>
+            <div class="stat-box"><span style="display:block; font-size:0.5rem; color:#888">XP GANHO</span><span id="xp-display">0</span></div>
         </div>
 
         <div id="board"></div>
 
         <div class="pieces-container" id="pieces-tray">
-            <div class="piece-slot" id="slot-0"></div>
-            <div class="piece-slot" id="slot-1"></div>
-            <div class="piece-slot" id="slot-2"></div>
+            <div class="piece-slot" onclick="selectPiece(0)" id="slot-0"></div>
+            <div class="piece-slot" onclick="selectPiece(1)" id="slot-1"></div>
+            <div class="piece-slot" onclick="selectPiece(2)" id="slot-2"></div>
         </div>
     </div>
 
@@ -82,26 +80,26 @@
         let user;
         let score = 0;
         let xpGained = 0;
-        let board = Array(8).fill().map(() => Array(8).fill(0));
-        let xpTimer;
+        let selectedPieceIndex = null;
+        let currentPieces = [null, null, null];
+        let boardState = Array(8).fill().map(() => Array(8).fill(0));
+
+        const PIECE_TYPES = [
+            { shape: [[1,1],[1,1]], color: '--neon' },
+            { shape: [[1,1,1,1]], color: '--neon' },
+            { shape: [[1,1,1]], color: '--neon' },
+            { shape: [[1,1,0],[0,1,1]], color: '--neon' },
+            { shape: [[1,0],[1,0],[1,1]], color: '--neon' },
+            { shape: [[1,1,1],[0,1,0]], color: '--neon' },
+            { shape: [[1]], color: '--neon' }
+        ];
 
         onAuthStateChanged(auth, u => { if(u) user = u; else window.location.href="index.html"; });
 
-        // Iniciar timer de XP (1 por segundo)
-        xpTimer = setInterval(() => {
+        setInterval(() => {
             xpGained++;
             document.getElementById('xp-display').innerText = xpGained;
         }, 1000);
-
-        // Formatos de peças (Matrizes)
-        const PIECE_TYPES = [
-            [[1,1],[1,1]], // Quadrado
-            [[1,1,1,1]],   // I
-            [[1,1,1]],     // I curta
-            [[1,1,0],[0,1,1]], // Z
-            [[1,0],[1,0],[1,1]], // L
-            [[1]] // Ponto
-        ];
 
         function createBoard() {
             const boardEl = document.getElementById('board');
@@ -110,52 +108,147 @@
                 for(let c=0; c<8; c++) {
                     const cell = document.createElement('div');
                     cell.className = 'cell';
-                    cell.dataset.r = r;
-                    cell.dataset.c = c;
+                    cell.id = `cell-${r}-${c}`;
+                    cell.onclick = () => placePiece(r, c);
                     boardEl.appendChild(cell);
                 }
             }
         }
 
-        function generatePieces() {
+        function renderPieces() {
             for(let i=0; i<3; i++) {
                 const slot = document.getElementById(`slot-${i}`);
-                if(slot.innerHTML === "") {
-                    const type = PIECE_TYPES[Math.floor(Math.random()*PIECE_TYPES.length)];
+                slot.innerHTML = '';
+                if(currentPieces[i]) {
                     const pieceEl = document.createElement('div');
                     pieceEl.className = 'piece';
-                    pieceEl.style.gridTemplateColumns = `repeat(${type[0].length}, 1fr)`;
-                    pieceEl.draggable = true;
-                    
-                    type.forEach(row => {
+                    pieceEl.style.gridTemplateColumns = `repeat(${currentPieces[i].shape[0].length}, 1fr)`;
+                    currentPieces[i].shape.forEach(row => {
                         row.forEach(val => {
                             const b = document.createElement('div');
                             if(val) b.className = 'piece-block';
                             pieceEl.appendChild(b);
                         });
                     });
-                    
-                    // Lógica simplificada de clique para mobile (já que drag&drop puro é ruim no mobile)
-                    pieceEl.onclick = () => alert("Arraste as peças para o tabuleiro! (Funcionalidade de Drag em desenvolvimento para mobile)");
-                    
                     slot.appendChild(pieceEl);
                 }
             }
+            checkGameOver();
         }
 
-        async function saveProgress() {
-            if(!user) return;
-            await updateDoc(doc(db, "usuarios", user.uid), {
-                xp: increment(xpGained),
-                bestBlocks: increment(score) // Aqui você pode ajustar para salvar apenas se for Recorde
+        window.selectPiece = (index) => {
+            if(!currentPieces[index]) return;
+            selectedPieceIndex = index;
+            document.querySelectorAll('.piece-slot').forEach(s => s.classList.remove('selected'));
+            document.getElementById(`slot-${index}`).classList.add('selected');
+        };
+
+        function placePiece(row, col) {
+            if(selectedPieceIndex === null) return;
+            const piece = currentPieces[selectedPieceIndex];
+            
+            // Verificar se cabe
+            if(!canPlace(piece.shape, row, col)) return;
+
+            // Marcar no boardState e UI
+            piece.shape.forEach((pRow, r) => {
+                pRow.forEach((val, c) => {
+                    if(val) {
+                        boardState[row + r][col + c] = 1;
+                        document.getElementById(`cell-${row+r}-${col+c}`).classList.add('filled');
+                    }
+                });
+            });
+
+            currentPieces[selectedPieceIndex] = null;
+            selectedPieceIndex = null;
+            document.querySelectorAll('.piece-slot').forEach(s => s.classList.remove('selected'));
+            
+            score += 10;
+            checkLines();
+            
+            if(currentPieces.every(p => p === null)) {
+                currentPieces = [
+                    PIECE_TYPES[Math.floor(Math.random()*PIECE_TYPES.length)],
+                    PIECE_TYPES[Math.floor(Math.random()*PIECE_TYPES.length)],
+                    PIECE_TYPES[Math.floor(Math.random()*PIECE_TYPES.length)]
+                ];
+            }
+            
+            document.getElementById('score').innerText = score;
+            renderPieces();
+        }
+
+        function canPlace(shape, row, col) {
+            for(let r=0; r<shape.length; r++) {
+                for(let c=0; c<shape[r].length; c++) {
+                    if(shape[r][c]) {
+                        if(row + r >= 8 || col + c >= 8 || boardState[row+r][col+c]) return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        function checkLines() {
+            let rowsToClear = [];
+            let colsToClear = [];
+
+            for(let i=0; i<8; i++) {
+                if(boardState[i].every(val => val === 1)) rowsToClear.push(i);
+                if(boardState.every(row => row[i] === 1)) colsToClear.push(i);
+            }
+
+            rowsToClear.forEach(r => {
+                boardState[r] = Array(8).fill(0);
+                for(let c=0; c<8; c++) document.getElementById(`cell-${r}-${c}`).classList.remove('filled');
+                score += 80;
+            });
+
+            colsToClear.forEach(c => {
+                for(let r=0; r<8; r++) {
+                    boardState[r][c] = 0;
+                    document.getElementById(`cell-${r}-${c}`).classList.remove('filled');
+                }
+                score += 80;
             });
         }
 
-        // Finalização
-        window.onbeforeunload = () => saveProgress();
+        function checkGameOver() {
+            const hasPossibleMove = currentPieces.some(p => {
+                if(!p) return false;
+                for(let r=0; r<8; r++) {
+                    for(let c=0; c<8; c++) {
+                        if(canPlace(p.shape, r, c)) return true;
+                    }
+                }
+                return false;
+            });
 
+            if(!hasPossibleMove && currentPieces.some(p => p !== null)) {
+                endGame();
+            }
+        }
+
+        async function endGame() {
+            await updateDoc(doc(db, "usuarios", user.uid), { xp: increment(xpGained) });
+            Swal.fire({
+                title: 'SISTEMA OFFLINE',
+                text: `Seu score final: ${score}`,
+                confirmButtonText: 'REINICIAR',
+                background: '#0a0a0a',
+                color: '#fff'
+            }).then(() => location.reload());
+        }
+
+        // Inicialização
         createBoard();
-        generatePieces();
+        currentPieces = [
+            PIECE_TYPES[Math.floor(Math.random()*PIECE_TYPES.length)],
+            PIECE_TYPES[Math.floor(Math.random()*PIECE_TYPES.length)],
+            PIECE_TYPES[Math.floor(Math.random()*PIECE_TYPES.length)]
+        ];
+        renderPieces();
     </script>
 </body>
 </html>
