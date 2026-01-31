@@ -151,4 +151,54 @@
         onAuthStateChanged(auth, user => {
             if (user) {
                 currentUser = user;
-                onSnapshot(doc(db, "usuarios", user.uid), snap =>
+                onSnapshot(doc(db, "usuarios", user.uid), snap => {
+                    const d = snap.data();
+                    if(!d) return;
+                    userSaldo = d.saldo || 0;
+                    document.getElementById('u-nome').innerText = (d.nome || "OPERADOR").toUpperCase();
+                    document.getElementById('u-saldo').innerText = Math.floor(userSaldo).toLocaleString('pt-br');
+                    document.getElementById('u-indicados').innerText = (d.indicadosCount || 0) * 100;
+                    if(d.pixPadrao) document.getElementById('pix-key').value = d.pixPadrao;
+                });
+            } else { window.location.href = "index.html"; }
+        });
+
+        window.solicitarSaque = async () => {
+            const chave = document.getElementById('pix-key').value;
+            if (userSaldo < 50) {
+                alert("Margem insuficiente para resgate de recompensas (Mínimo 5.000 NP).");
+                return;
+            }
+            if (!chave) { alert("Insira uma chave para resgate."); return; }
+            await updateDoc(doc(db, "usuarios", currentUser.uid), { pixPadrao: chave, saqueSolicitado: true });
+            alert("Solicitação de resgate de recompensas enviada para análise.");
+        };
+
+        window.enviarFeedback = async () => {
+            const texto = document.getElementById('user-feedback').value;
+            if (texto.length < 5) return;
+            await setDoc(doc(collection(db, "feedbacks")), {
+                uid: currentUser.uid,
+                mensagem: texto,
+                data: serverTimestamp()
+            });
+            alert("Chamado aberto com sucesso!");
+            document.getElementById('user-feedback').value = "";
+        };
+
+        window.copyLink = () => {
+            const siteURL = window.location.origin;
+            const refLink = `${siteURL}/login.html?ref=${currentUser.uid}`;
+            navigator.clipboard.writeText(refLink).then(() => {
+                alert("Link de indicação copiado!");
+            });
+        };
+
+        document.getElementById('btn-sair').addEventListener('click', () => {
+            signOut(auth).then(() => window.location.href = "index.html");
+        });
+    </script>
+
+    <script type="module" src="nexus-overlay.js"></script>
+</body>
+</html>
