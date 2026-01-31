@@ -7,88 +7,68 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        :root { --neon: #00f2ff; --green: #00ff88; --pink: #ff0055; --bg: #050505; --gray-dead: #1a1a1a; }
+        :root { --neon: #00f2ff; --green: #00ff88; --pink: #ff0055; --bg: #050505; --gray-dead: #1a1a1a; --blue-sold: #0077ff; }
         
-        body { background: var(--bg); color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; padding-bottom: 120px; }
+        body { background: var(--bg); color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; padding-bottom: 140px; }
 
-        /* Estrutura do Prédio */
+        /* Placar de Valor do Prédio mais Compacto */
+        .tower-info {
+            position: sticky; top: 85px; z-index: 90;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(12px);
+            padding: 10px; margin: 10px 15px;
+            border: 1px solid var(--neon); border-radius: 12px;
+            text-align: center; box-shadow: 0 0 15px rgba(0,242,255,0.2);
+        }
+
+        .prize-row { display: flex; justify-content: space-around; align-items: center; }
+        .prize-box { flex: 1; }
+        .prize-label { font-size: 0.5rem; font-family: 'Orbitron'; color: #888; margin-bottom: 2px; }
+        .prize-pool { font-family: 'Orbitron'; font-size: 1.1rem; color: var(--green); }
+        .prize-potential { font-family: 'Orbitron'; font-size: 1.1rem; color: var(--neon); }
+
+        /* Estrutura do Prédio Compacta */
         .tower-container { 
-            display: flex; 
-            flex-direction: column-reverse; /* Prédio sobe de baixo para cima */
-            align-items: center; 
-            padding: 20px;
-            gap: 10px;
+            display: flex; flex-direction: column-reverse; 
+            align-items: center; padding: 10px; gap: 4px;
         }
 
         .floor {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr); /* 4 aptos na frente, 4 atrás (visualizado em 2 linhas) */
-            gap: 5px;
-            background: rgba(255,255,255,0.02);
-            padding: 10px;
-            border-left: 3px solid #222;
-            border-right: 3px solid #222;
-            position: relative;
-            width: 280px;
+            display: grid; grid-template-columns: repeat(8, 1fr); 
+            gap: 2px; background: rgba(255,255,255,0.03);
+            padding: 4px; border-left: 2px solid #333; border-right: 2px solid #333;
+            position: relative; width: 92vw; max-width: 350px;
         }
 
         .floor::after {
-            content: attr(data-floor);
-            position: absolute;
-            left: -35px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-family: 'Orbitron';
-            font-size: 0.6rem;
-            color: #444;
+            content: attr(data-floor); position: absolute; left: 2px; top: -8px;
+            font-family: 'Orbitron'; font-size: 0.4rem; color: #444; pointer-events: none;
         }
 
         .apt {
-            aspect-ratio: 1.2/1;
-            background: var(--gray-dead);
-            border: 1px solid #000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Orbitron';
-            font-size: 0.5rem;
-            color: #333;
-            cursor: pointer;
-            transition: 0.3s;
+            aspect-ratio: 1/1; background: var(--gray-dead);
+            border: 1px solid #000; display: flex; align-items: center;
+            justify-content: center; font-family: 'Orbitron';
+            font-size: 0.45rem; color: #333; cursor: pointer; transition: 0.2s;
         }
 
-        /* Estados dos Apartamentos */
-        .apt.active { background: #111; color: var(--neon); border-color: var(--neon); box-shadow: inset 0 0 10px rgba(0,242,255,0.2); }
-        .apt.selected { background: var(--neon) !important; color: #000 !important; box-shadow: 0 0 15px var(--neon); }
-        .apt.sold { background: var(--pink) !important; color: #fff !important; opacity: 1; box-shadow: 0 0 5px var(--pink); border-color: #ff0055; }
+        /* Cores solicitadas */
+        .apt.selected { background: var(--green) !important; color: #000 !important; box-shadow: 0 0 10px var(--green); border-color: #fff; transform: scale(1.1); z-index: 2; }
+        .apt.sold { background: var(--blue-sold) !important; color: #fff !important; box-shadow: inset 0 0 8px rgba(255,255,255,0.3); border-color: #00f2ff; cursor: default; }
 
-        /* Placar de Valor do Prédio */
-        .tower-info {
-            position: sticky;
-            top: 85px;
-            z-index: 90;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(10px);
-            padding: 15px;
-            margin: 10px;
-            border: 1px solid var(--green);
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .prize-pool { font-family: 'Orbitron'; font-size: 1.5rem; color: var(--green); text-shadow: 0 0 10px var(--green); }
-        
+        /* Checkout */
         #checkout { 
             position: fixed; bottom: 0; width: 100%; background: #0a0a0a; 
             border-top: 2px solid var(--neon); padding: 15px; z-index: 10001; 
-            transform: translateY(100%); transition: 0.4s;
+            transform: translateY(100%); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         #checkout.active { transform: translateY(0); }
         
         .btn-action { 
             font-family: 'Orbitron'; font-weight: bold; width: 100%; 
-            padding: 12px; border-radius: 5px; border: none; cursor: pointer; 
+            padding: 14px; border-radius: 8px; border: none; cursor: pointer; 
+            text-transform: uppercase; font-size: 0.7rem;
         }
+        .btn-deposit { background: var(--pink); color: #fff; margin-top: 8px; }
     </style>
 </head>
 <body>
@@ -96,27 +76,42 @@
     <script type="module" src="nexus-overlay.js"></script>
 
     <div class="tower-info">
-        <div style="font-size: 0.6rem; font-family: 'Orbitron'; color: #888;">VALOR ACUMULADO DO PRÉDIO</div>
-        <div class="prize-pool" id="tower-prize">0 NP</div>
-        <div style="font-size: 0.5rem; color: var(--neon); margin-top: 5px;">CADA BLOCO ADICIONA +15 NP AO SORTEIO</div>
-    </div>
-
-    <div class="tower-container" id="nexus-tower">
-        </div>
-
-    <div id="checkout">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <div>
-                <div style="font-size:0.5rem; color:#444; font-family:'Orbitron';">BLOCOS SELECIONADOS: <span id="num-list" style="color:var(--neon);">-</span></div>
-                <div style="font-size:1.2rem; color:#fff; font-family:'Orbitron';"><span id="total-price">0</span> NP</div>
+        <div class="prize-row">
+            <div class="prize-box">
+                <div class="prize-label">PRÊMIO ATUAL</div>
+                <div class="prize-pool" id="tower-prize">0 NP</div>
+            </div>
+            <div style="width: 1px; height: 30px; background: #222;"></div>
+            <div class="prize-box">
+                <div class="prize-label">VALOR FINAL MÁX.</div>
+                <div class="prize-potential" id="potential-prize">1.200 NP</div>
             </div>
         </div>
-        <button id="btn-pay" class="btn-action" style="background:var(--green); color:#000;" onclick="confirmarCompra()">RESERVAR APARTAMENTOS</button>
+    </div>
+
+    <div class="tower-container" id="nexus-tower"></div>
+
+    <div id="checkout">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div>
+                <div style="font-size:0.45rem; color:#666; font-family:'Orbitron';">BLOCOS: <span id="num-list" style="color:var(--neon);">-</span></div>
+                <div style="font-size:1.3rem; color:#fff; font-family:'Orbitron';"><span id="total-price">0</span> NP</div>
+            </div>
+            <div style="text-align: right;">
+                <div style="font-size:0.45rem; color:#666; font-family:'Orbitron';">SEU SALDO</div>
+                <div id="display-user-balance" style="font-size:0.8rem; color:var(--green); font-family:'Orbitron';">0 NP</div>
+            </div>
+        </div>
+        
+        <div id="action-area">
+            <button id="btn-pay" class="btn-action" style="background:var(--green); color:#000;" onclick="confirmarCompra()">RESERVAR APARTAMENTOS</button>
+            <button id="btn-deposit" class="btn-action btn-deposit" style="display:none;" onclick="window.location.href='deposito.html'">SALDO INSUFICIENTE - RECARREGAR</button>
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, updateDoc, setDoc, increment, arrayUnion } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, setDoc, increment, arrayUnion, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -135,44 +130,55 @@
         const CUSTO_POR_BLOCO = 10;
         const PREMIO_POR_BLOCO = 15;
 
-        let user, selecionados = [], vendidosGlobal = [];
+        let userSaldo = 0;
+        let selecionados = [];
 
-        // Gerar Prédio
+        // Inicializar Potencial Máximo
+        document.getElementById('potential-prize').innerText = `${(TOTAL_FLOORS * APT_PER_FLOOR) * PREMIO_POR_BLOCO} NP`;
+
+        // Gerar Prédio mais compacto
         const tower = document.getElementById('nexus-tower');
         for (let f = 1; f <= TOTAL_FLOORS; f++) {
             const floorDiv = document.createElement('div');
             floorDiv.className = 'floor';
-            floorDiv.setAttribute('data-floor', `ANDAR ${f}`);
+            floorDiv.setAttribute('data-floor', `F${f}`);
             
             for (let a = 1; a <= APT_PER_FLOOR; a++) {
                 const id = `${f}-${a}`;
                 const apt = document.createElement('div');
                 apt.className = 'apt';
                 apt.id = `apt-${id}`;
-                apt.innerText = id;
+                apt.innerText = a; // Apenas o número do apto para ser compacto
                 apt.onclick = () => toggleApt(id);
                 floorDiv.appendChild(apt);
             }
             tower.appendChild(floorDiv);
         }
 
-        // Sincronização em Tempo Real
+        // Snapshot do Prédio (Global)
         onSnapshot(doc(db, "rifas_vendas", "global"), (snap) => {
             const data = snap.data();
-            vendidosGlobal = data ? (data.vendidos || []) : [];
+            const vendidos = data ? (data.vendidos || []) : [];
             
             document.querySelectorAll('.apt').forEach(el => el.classList.remove('sold'));
-            vendidosGlobal.forEach(id => {
+            vendidos.forEach(id => {
                 const el = document.getElementById(`apt-${id}`);
                 if (el) el.classList.add('sold');
             });
 
-            // Atualiza prêmio acumulado
-            const valorTotal = vendidosGlobal.length * PREMIO_POR_BLOCO;
-            document.getElementById('tower-prize').innerText = `${valorTotal} NP`;
+            document.getElementById('tower-prize').innerText = `${vendidos.length * PREMIO_POR_BLOCO} NP`;
         });
 
-        onAuthStateChanged(auth, u => { if (!u) window.location.href = "login.html"; else user = u; });
+        // Snapshot do Usuário (Saldo)
+        onAuthStateChanged(auth, u => {
+            if (u) {
+                onSnapshot(doc(db, "usuarios", u.uid), snap => {
+                    userSaldo = snap.data()?.saldo || 0;
+                    document.getElementById('display-user-balance').innerText = `${userSaldo.toFixed(0)} NP`;
+                    atualizarPainel();
+                });
+            } else { window.location.href = "login.html"; }
+        });
 
         window.toggleApt = (id) => {
             const el = document.getElementById(`apt-${id}`);
@@ -192,11 +198,24 @@
             const total = selecionados.length * CUSTO_POR_BLOCO;
             document.getElementById('total-price').innerText = total;
             document.getElementById('num-list').innerText = selecionados.join(', ') || '-';
-            document.getElementById('checkout').classList.toggle('active', selecionados.length > 0);
+            
+            const checkout = document.getElementById('checkout');
+            checkout.classList.toggle('active', selecionados.length > 0);
+
+            // Lógica de saldo insuficiente
+            if (total > userSaldo) {
+                document.getElementById('btn-pay').style.display = 'none';
+                document.getElementById('btn-deposit').style.display = 'block';
+            } else {
+                document.getElementById('btn-pay').style.display = 'block';
+                document.getElementById('btn-deposit').style.display = 'none';
+            }
         }
 
         window.confirmarCompra = async () => {
             const total = selecionados.length * CUSTO_POR_BLOCO;
+            if (userSaldo < total) return;
+
             try {
                 const userRef = doc(db, "usuarios", auth.currentUser.uid);
                 await updateDoc(userRef, { 
@@ -206,10 +225,10 @@
                 });
                 await setDoc(doc(db, "rifas_vendas", "global"), { vendidos: arrayUnion(...selecionados) }, { merge: true });
                 
-                alert("Blocos adquiridos! O prédio subiu!");
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.9 }, colors: ['#00f2ff', '#00ff88'] });
                 selecionados = [];
                 atualizarPainel();
-            } catch(e) { console.error(e); }
+            } catch(e) { alert("Erro na conexão Nexus."); }
         };
     </script>
 </body>
