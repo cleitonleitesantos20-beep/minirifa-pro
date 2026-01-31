@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexusVL - Créditos</title>
+    <title>NexusVL - Store</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --gold: #ffcc00; --dark: #0a0a0a; --bg-card: #080808; }
+        :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --dark: #0a0a0a; --bg-card: #080808; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; padding: 0; min-height: 100vh; display: flex; flex-direction: column; }
 
@@ -17,32 +17,34 @@
 
         .container { padding: 20px; max-width: 450px; margin: 0 auto; width: 100%; flex-grow: 1; }
 
-        .balance-card { background: var(--bg-card); border: 1px solid #1a1a1a; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 20px; box-shadow: 0 0 20px rgba(0,242,255,0.05); }
+        /* BALANÇO NP */
+        .balance-card { background: var(--bg-card); border: 1px solid #1a1a1a; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 25px; border-left: 4px solid var(--neon); }
         .balance-label { font-family: 'Orbitron'; font-size: 0.6rem; color: #555; letter-spacing: 2px; }
-        .balance-value { font-family: 'Orbitron'; font-size: 1.5rem; color: var(--neon); margin-top: 5px; }
+        .balance-value { font-family: 'Orbitron'; font-size: 1.8rem; color: #fff; margin-top: 5px; }
+        .np-symbol { color: var(--neon); font-size: 1rem; margin-left: 5px; }
 
-        .method-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab { flex: 1; padding: 15px; border-radius: 12px; border: 1px solid #1a1a1a; background: #0a0a0a; text-align: center; font-family: 'Orbitron'; font-size: 0.55rem; color: #666; }
-        .tab.active { border-color: var(--neon); color: var(--neon); background: rgba(0,242,255,0.05); }
+        /* MECÂNICA DE COMBOS */
+        .combo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .combo-card { background: #0a0a0a; border: 1px solid #1a1a1a; padding: 15px; border-radius: 15px; text-align: center; cursor: pointer; transition: 0.3s; position: relative; overflow: hidden; }
+        .combo-card.active { border-color: var(--neon); background: rgba(0,242,255,0.05); transform: scale(1.03); }
+        .combo-card .tag { position: absolute; top: 0; right: 0; background: var(--pink); color: #fff; font-size: 0.5rem; padding: 3px 8px; font-family: 'Orbitron'; border-radius: 0 0 0 10px; }
+        .combo-np { display: block; font-family: 'Orbitron'; font-size: 1.2rem; color: var(--green); }
+        .combo-price { font-size: 0.7rem; color: #444; font-family: 'Orbitron'; }
 
-        .input-group { background: var(--bg-card); border: 1px solid #1a1a1a; padding: 20px; border-radius: 20px; margin-bottom: 20px; }
-        .amount-input { width: 100%; background: #000; border: 1px solid #222; padding: 15px; border-radius: 12px; color: var(--green); font-family: 'Orbitron'; font-size: 1.5rem; text-align: center; outline: none; }
-        .amount-input:focus { border-color: var(--neon); }
-        .min-warning { color: #555; font-size: 0.6rem; font-family: 'Rajdhani'; display: block; margin-top: 12px; text-align: center; text-transform: uppercase; }
+        /* INPUT MANUAL */
+        .input-group { background: var(--bg-card); border: 1px solid #1a1a1a; padding: 20px; border-radius: 20px; margin-bottom: 25px; }
+        .input-label { font-size: 0.6rem; font-family: 'Orbitron'; color: #444; margin-bottom: 10px; display: block; text-align: center; }
+        .amount-input-container { display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .amount-input { width: 120px; background: #000; border: 1px solid #222; padding: 10px; border-radius: 8px; color: var(--green); font-family: 'Orbitron'; font-size: 1.2rem; text-align: center; }
 
-        .quick-amounts { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 25px; }
-        .btn-quick { background: #080808; border: 1px solid #1a1a1a; padding: 12px; border-radius: 12px; color: #fff; font-family: 'Orbitron'; font-size: 0.65rem; cursor: pointer; transition: 0.3s; }
-        .btn-quick:active { background: var(--neon); color: #000; }
+        .btn-generate { width: 100%; background: linear-gradient(90deg, var(--neon), var(--green)); border: none; padding: 22px; border-radius: 15px; color: #000; font-family: 'Orbitron'; font-size: 0.8rem; font-weight: bold; cursor: pointer; letter-spacing: 2px; }
 
-        .btn-generate { width: 100%; background: linear-gradient(90deg, var(--neon), var(--green)); border: none; padding: 20px; border-radius: 15px; color: #000; font-family: 'Orbitron'; font-size: 0.8rem; font-weight: bold; cursor: pointer; letter-spacing: 1px; }
-
-        .legal-notice { margin-top: 30px; font-size: 0.6rem; color: #333; text-align: center; line-height: 1.4; padding: 0 10px; }
-
-        .pix-area { display: none; margin-top: 25px; background: #fff; padding: 25px; border-radius: 25px; text-align: center; color: #000; animation: slideUp 0.4s ease; }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        
-        .copy-box { background: #f0f0f0; padding: 10px; border-radius: 10px; font-family: monospace; font-size: 0.6rem; word-break: break-all; margin: 15px 0; border: 1px dashed #ccc; }
+        /* ÁREA PIX */
+        .pix-area { display: none; margin-top: 25px; background: #fff; padding: 25px; border-radius: 25px; text-align: center; color: #000; }
+        .copy-box { background: #f0f0f0; padding: 10px; border-radius: 10px; font-family: monospace; font-size: 0.55rem; word-break: break-all; margin: 15px 0; border: 1px dashed #ccc; }
         .btn-copy { width: 100%; background: #000; color: #fff; border: none; padding: 15px; border-radius: 10px; font-family: 'Orbitron'; cursor: pointer; }
+
+        .legal-notice { margin-top: 30px; font-size: 0.55rem; color: #222; text-align: center; line-height: 1.4; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -51,42 +53,58 @@
 
     <div class="header">
         <button class="btn-back" onclick="window.location.href='dashboard.html'">VOLTAR</button>
-        <h1 class="page-title">ADQUIRIR CRÉDITOS</h1>
+        <h1 class="page-title">NEXUS STORE</h1>
         <div style="width: 40px;"></div>
     </div>
 
     <div class="container">
         
         <div class="balance-card">
-            <div class="balance-label">CRÉDITOS DISPONÍVEIS</div>
-            <div class="balance-value">R$ <span id="u-saldo">0,00</span></div>
+            <div class="balance-label">SALDO EM PROTOCOLO</div>
+            <div class="balance-value"><span id="u-saldo">0,00</span> <span class="np-symbol">NP</span></div>
         </div>
 
-        <div class="method-tabs">
-            <div class="tab active">PIX INSTANTÂNEO</div>
+        <div class="combo-grid">
+            <div class="combo-card" onclick="selectCombo(20, this)">
+                <span class="combo-np">20 NP</span>
+                <span class="combo-price">VALOR: 20,00</span>
+            </div>
+            <div class="combo-card active" onclick="selectCombo(50, this)">
+                <div class="tag">POPULAR</div>
+                <span class="combo-np">55 NP</span>
+                <span class="combo-price">VALOR: 50,00</span>
+            </div>
+            <div class="combo-card" onclick="selectCombo(100, this)">
+                <div class="tag">+15% BONUS</div>
+                <span class="combo-np">115 NP</span>
+                <span class="combo-price">VALOR: 100,00</span>
+            </div>
+            <div class="combo-card" onclick="selectCombo(200, this)">
+                <div class="tag">MAX POWER</div>
+                <span class="combo-np">250 NP</span>
+                <span class="combo-price">VALOR: 200,00</span>
+            </div>
         </div>
 
         <div class="input-group">
-            <input type="number" id="deposit-amount" class="amount-input" placeholder="0.00">
-            <span class="min-warning">Valor mínimo para aquisição: R$ 5,00</span>
+            <span class="input-label">QUANTIDADE PERSONALIZADA</span>
+            <div class="amount-input-container">
+                <input type="number" id="deposit-amount" class="amount-input" value="50">
+                <span class="np-symbol">NP</span>
+            </div>
         </div>
 
-        <div class="quick-amounts">
-            <button class="btn-quick" onclick="setAmount(20)">R$ 20</button>
-            <button class="btn-quick" onclick="setAmount(50)">R$ 50</button>
-            <button class="btn-quick" onclick="setAmount(100)">R$ 100</button>
-        </div>
-
-        <button class="btn-generate" id="main-btn" onclick="generateDeposit()">CONFIRMAR AQUISIÇÃO</button>
+        <button class="btn-generate" id="main-btn" onclick="generateDeposit()">REQUISITAR NEXUS POINTS</button>
 
         <div id="pix-area" class="pix-area">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=NEXUS-VIRTUAL-LICENSE" alt="QR Code">
-            <div class="copy-box" id="pix-string">nexus_protocol_payment_hash_v1_secure_gate_...</div>
-            <button class="btn-copy" onclick="copyPix()">COPIAR CÓDIGO PIX</button>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=NEXUS-PROTOCOL-ASSET" alt="QR Code">
+            <div class="copy-box" id="pix-string">nexus_assets_protocol_id_992837_hash_check...</div>
+            <button class="btn-copy" onclick="copyPix()">COPIAR CHAVE DE ATIVAÇÃO</button>
         </div>
 
         <div class="legal-notice">
-            Ao adquirir créditos, você concorda com os Termos de Uso do NexusVL. Os créditos adquiridos são destinados exclusivamente para interações dentro da plataforma e não possuem valor de resgate externo imediato fora das regras de licenciamento.
+            A aquisição de Nexus Points (NP) constitui uma licença de uso limitada dentro do ecossistema NexusVL. 
+            NP não possui valor monetário fora do protocolo e não é reembolsável após a ativação dos pacotes.
         </div>
 
     </div>
@@ -114,23 +132,27 @@
             } else { window.location.href = "login.html"; }
         });
 
-        window.setAmount = (val) => document.getElementById('deposit-amount').value = val;
+        window.selectCombo = (val, el) => {
+            document.querySelectorAll('.combo-card').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('deposit-amount').value = val;
+        };
 
         window.generateDeposit = async () => {
             const amount = parseFloat(document.getElementById('deposit-amount').value);
             if (isNaN(amount) || amount < 5) {
-                return Swal.fire({ icon: 'error', title: 'Valor Inválido', text: 'O valor mínimo é R$ 5,00', background: '#111', color: '#fff' });
+                return Swal.fire({ icon: 'error', title: 'Falha no Protocolo', text: 'Mínimo de 5 NP para requisição.', background: '#000', color: '#fff' });
             }
 
             const btn = document.getElementById('main-btn');
-            btn.innerText = "PROCESSANDO LICENÇA...";
+            btn.innerText = "SINCRONIZANDO NP...";
             btn.disabled = true;
 
             try {
                 if (userUID) {
                     await updateDoc(doc(db, "usuarios", userUID), { saldo: increment(amount) });
                     document.getElementById('pix-area').style.display = 'block';
-                    btn.innerText = "LICENÇA APROVADA";
+                    btn.innerText = "NP DISPONIBILIZADO";
                 }
             } catch (e) {
                 btn.disabled = false;
@@ -142,9 +164,9 @@
             navigator.clipboard.writeText(document.getElementById('pix-string').innerText);
             Swal.fire({
                 icon: 'success',
-                title: 'Copiado!',
-                text: 'Créditos liberados para uso no NexusVL.',
-                background: '#111',
+                title: 'CHAVE COPIADA',
+                text: 'Aguardando validação da rede Nexus.',
+                background: '#000',
                 color: '#fff'
             });
         };
