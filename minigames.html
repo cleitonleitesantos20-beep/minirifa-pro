@@ -6,161 +6,121 @@
     <title>Nexus - Central de Treinamento</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --dark: #0a0a0a; --card: #111; }
+        :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --dark: #0a0a0a; --card: #111; --gold: #ffcc00; }
         body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; padding: 0; min-height: 100vh; overflow-y: auto; }
         
-        .header { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; font-family: 'Orbitron'; font-size: 0.6rem; border-bottom: 1px solid #1a1a1a; margin-bottom: 10px; }
+        .header { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; font-family: 'Orbitron'; font-size: 0.6rem; border-bottom: 1px solid #1a1a1a; margin-bottom: 10px; position: sticky; top:0; background: #000; z-index: 100; }
         .btn-exit { background: none; border: 1px solid var(--pink); color: var(--pink); padding: 5px 12px; border-radius: 4px; font-family: 'Orbitron'; cursor: pointer; font-size: 0.5rem; }
 
         .container { padding: 15px; padding-bottom: 60px; max-width: 500px; margin: 0 auto; }
         
-        /* Seção Daily */
-        .daily-section { background: var(--card); padding: 15px; border-radius: 15px; border: 1px solid #1a1a1a; margin-bottom: 20px; }
-        .daily-grid { display: flex; justify-content: space-between; margin-top: 10px; }
-        .day-dot { width: 28px; height: 28px; border-radius: 50%; border: 1px solid #222; display: flex; align-items: center; justify-content: center; font-size: 0.5rem; font-family: 'Orbitron'; color: #444; }
-        .day-dot.active { border-color: var(--neon); color: var(--neon); }
-        .day-dot.done { background: var(--green); color: #000; border: none; }
-        .btn-checkin { width: 100%; margin-top: 12px; background: #000; border: 1px solid var(--green); color: var(--green); padding: 12px; border-radius: 8px; font-family: 'Orbitron'; font-size: 0.65rem; cursor: pointer; transition: 0.3s; }
-        .btn-checkin:active { transform: scale(0.98); }
+        .training-info { background: linear-gradient(45deg, #111, #050505); padding: 15px; border-radius: 12px; border: 1px solid var(--neon); margin-bottom: 20px; text-align: center; }
+        .training-info p { font-family: 'Orbitron'; font-size: 0.55rem; color: var(--neon); margin: 0; }
 
         /* Grid de Jogos */
-        .games-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
-        .game-select-card { background: var(--card); border: 1px solid #1a1a1a; border-radius: 15px; padding: 15px; text-align: center; transition: 0.3s; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
+        .games-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .game-select-card { background: var(--card); border: 1px solid #1a1a1a; border-radius: 15px; padding: 15px; text-align: center; transition: 0.3s; cursor: pointer; display: flex; flex-direction: column; align-items: center; position: relative; overflow: hidden; }
         .game-select-card:active { transform: scale(0.95); border-color: var(--neon); }
         
-        .game-icon { width: 40px; height: 40px; margin-bottom: 10px; filter: drop-shadow(0 0 5px var(--neon)); }
-        .game-title { font-family: 'Orbitron'; font-size: 0.6rem; color: #fff; margin-bottom: 5px; }
-        .game-badge { font-size: 0.45rem; color: var(--neon); background: rgba(0, 242, 255, 0.1); padding: 2px 6px; border-radius: 4px; font-family: 'Orbitron'; }
-        
-        .best-score { font-size: 0.5rem; color: #555; margin-top: 8px; font-family: 'Orbitron'; }
+        /* Efeito de brilho hover */
+        .game-select-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(0,242,255,0.1) 0%, transparent 70%); opacity: 0; transition: 0.3s; }
+        .game-select-card:hover::before { opacity: 1; }
 
-        /* Overlay Anúncio */
-        #ad-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; }
-        .ad-banner { background: #0a0a0a; border: 1px dashed #333; color: #444; text-align: center; padding: 12px; font-family: 'Orbitron'; font-size: 0.45rem; margin: 15px 0; border-radius: 8px; width: 100%; box-sizing: border-box; }
+        .game-icon { width: 45px; height: 45px; margin-bottom: 10px; z-index: 1; }
+        .game-title { font-family: 'Orbitron'; font-size: 0.65rem; color: #fff; margin-bottom: 5px; z-index: 1; letter-spacing: 1px; }
+        .game-badge { font-size: 0.45rem; color: var(--green); background: rgba(0, 255, 136, 0.1); padding: 2px 8px; border-radius: 10px; font-family: 'Orbitron'; z-index: 1; }
+        
+        .best-score { font-size: 0.5rem; color: #555; margin-top: 10px; font-family: 'Orbitron'; z-index: 1; }
+
+        .ad-banner { background: #0a0a0a; border: 1px dashed #333; color: #444; text-align: center; padding: 12px; font-family: 'Orbitron'; font-size: 0.45rem; margin: 20px 0; border-radius: 8px; width: 100%; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
-    <div id="ad-overlay">
-        <div style="font-family:'Orbitron'; color:var(--neon); margin-bottom:20px; font-size: 0.8rem;">SINCRONIZANDO RECOMPENSA...</div>
-        <div id="ad-timer" style="font-family:'Orbitron'; font-size:3rem; color:var(--pink);">30</div>
-    </div>
+    <script type="module" src="nexus-overlay.js"></script>
 
     <div class="header">
-        <span style="color:var(--neon)">SISTEMA DE TREINAMENTO</span>
+        <span style="color:var(--neon)">NEXUS TRAINING CENTER</span>
         <button class="btn-exit" onclick="window.location.href='index.html'">VOLTAR</button>
     </div>
 
     <div class="container">
         
-        <div class="daily-section">
-            <div style="font-family:'Orbitron'; font-size:0.55rem; color:var(--green); letter-spacing:1px; text-align: center;">RECOMPENSA DIÁRIA</div>
-            <div class="daily-grid" id="daily-dots">
-                <div class="day-dot" data-day="1">S</div><div class="day-dot" data-day="2">T</div><div class="day-dot" data-day="3">Q</div>
-                <div class="day-dot" data-day="4">Q</div><div class="day-dot" data-day="5">S</div><div class="day-dot" data-day="6">S</div>
-                <div class="day-dot" data-day="0">D</div>
-            </div>
-            <button class="btn-checkin" id="btn-do-checkin" onclick="processCheckIn()">RESGATAR CHECK-IN (10 NP)</button>
+        <div class="training-info">
+            <p>RECOMPENSA DE TREINAMENTO ATIVA</p>
+            <div style="font-size: 1.2rem; font-family: 'Orbitron'; color: #fff; margin-top: 5px;">1 XP <span style="color: var(--green); font-size: 0.6rem;">/ SEG JOGADO</span></div>
         </div>
-
-        <div class="ad-banner">ANÚNCIO DISPONÍVEL</div>
 
         <div class="games-grid">
-            <div class="game-select-card" onclick="window.location.href='game-runner.html'">
-                <img src="https://cdn-icons-png.flaticon.com/512/3501/3501308.png" class="game-icon" style="filter: hue-rotate(150deg);">
-                <span class="game-title">RUNNER CYBER</span>
-                <span class="game-badge">+1 XP</span>
-                <span class="best-score">BEST: <span id="best-runner" style="color:var(--green)">0</span>s</span>
+            <div class="game-select-card" onclick="window.location.href='game-neon-snake.html'">
+                <img src="https://cdn-icons-png.flaticon.com/512/528/528105.png" class="game-icon" style="filter: drop-shadow(0 0 5px var(--green));">
+                <span class="game-title">NEON SNAKE</span>
+                <span class="game-badge">LIVE XP</span>
+                <span class="best-score">BEST: <span id="score-snake" style="color:var(--green)">0</span></span>
             </div>
 
-            <div class="game-select-card" onclick="window.location.href='game-duel.html'">
-                <img src="https://cdn-icons-png.flaticon.com/512/8002/8002150.png" class="game-icon" style="filter: hue-rotate(280deg);">
-                <span class="game-title">DATA DUEL</span>
-                <span class="game-badge">+1 XP</span>
-                <span class="best-score">BEST: <span id="best-click" style="color:var(--green)">0</span>s</span>
+            <div class="game-select-card" onclick="window.location.href='game-block-nexus.html'">
+                <img src="https://cdn-icons-png.flaticon.com/512/566/566312.png" class="game-icon" style="filter: hue-rotate(180deg) drop-shadow(0 0 5px var(--neon));">
+                <span class="game-title">BLOCK NEXUS</span>
+                <span class="game-badge">LIVE XP</span>
+                <span class="best-score">BEST: <span id="score-blocks" style="color:var(--green)">0</span></span>
             </div>
 
-            <div class="game-select-card" onclick="window.location.href='game-math.html'">
-                <img src="https://cdn-icons-png.flaticon.com/512/2103/2103633.png" class="game-icon" style="filter: hue-rotate(60deg);">
-                <span class="game-title">MATH IA</span>
-                <span class="game-badge">+1 XP</span>
-                <span class="best-score">SCORE: <span id="best-math" style="color:var(--green)">0</span></span>
+            <div class="game-select-card" onclick="window.location.href='game-data-match.html'">
+                <img src="https://cdn-icons-png.flaticon.com/512/2956/2956869.png" class="game-icon" style="filter: hue-rotate(280deg) drop-shadow(0 0 5px var(--pink));">
+                <span class="game-title">DATA MATCH</span>
+                <span class="game-badge">LIVE XP</span>
+                <span class="best-score">BEST: <span id="score-match" style="color:var(--green)">0</span></span>
             </div>
 
-            <div class="game-select-card" style="opacity: 0.5; cursor: not-allowed;">
-                <img src="https://cdn-icons-png.flaticon.com/512/2618/2618475.png" class="game-icon" style="filter: grayscale(1);">
-                <span class="game-title">EM BREVE</span>
-                <span class="game-badge">LOCK</span>
-                <span class="best-score">LEVEL 10</span>
+            <div class="game-select-card" onclick="window.location.href='game-click-hero.html'">
+                <img src="https://cdn-icons-png.flaticon.com/512/1063/1063196.png" class="game-icon" style="filter: drop-shadow(0 0 5px var(--gold));">
+                <span class="game-title">CYBER CLICKER</span>
+                <span class="game-badge">LIVE XP</span>
+                <span class="best-score">CLICKS: <span id="score-click" style="color:var(--green)">0</span></span>
+            </div>
+
+            <div class="game-select-card" onclick="window.location.href='game-void-pilot.html'" style="grid-column: span 2;">
+                <img src="https://cdn-icons-png.flaticon.com/512/1356/1356479.png" class="game-icon" style="filter: drop-shadow(0 0 10px var(--neon));">
+                <span class="game-title">VOID PILOT: ASTEROIDS</span>
+                <span class="game-badge">LIVE XP</span>
+                <span class="best-score">SCORE: <span id="score-void" style="color:var(--green)">0</span></span>
             </div>
         </div>
 
-        <div class="ad-banner">ANÚNCIO DISPONÍVEL</div>
+        <div class="ad-banner">SISTEMA DE TREINAMENTO SINCRONIZADO COM O FIREBASE</div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, updateDoc, increment } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", authDomain: "minharifadigital.firebaseapp.com", projectId: "minharifadigital", appId: "1:59630725905:web:396c8cfca385dc3d957ab0" };
+        const firebaseConfig = { 
+            apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", 
+            authDomain: "minharifadigital.firebaseapp.com", 
+            projectId: "minharifadigital", 
+            appId: "1:59630725905:web:396c8cfca385dc3d957ab0" 
+        };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        let user;
-
         onAuthStateChanged(auth, u => {
             if (u) {
-                user = u;
                 onSnapshot(doc(db, "usuarios", u.uid), snap => {
-                    const d = snap.data(); if(!d) return;
+                    const d = snap.data(); 
+                    if(!d) return;
                     
-                    document.getElementById('best-runner').innerText = d.bestRunner || 0;
-                    document.getElementById('best-click').innerText = d.bestClick || 0;
-                    document.getElementById('best-math').innerText = d.bestMath || 0;
-                    
-                    updateCheckInUI(d.lastCheckIn);
+                    // Sincroniza melhores pontuações dos novos jogos
+                    document.getElementById('score-snake').innerText = d.bestSnake || 0;
+                    document.getElementById('score-blocks').innerText = d.bestBlocks || 0;
+                    document.getElementById('score-match').innerText = d.bestMatch || 0;
+                    document.getElementById('score-click').innerText = d.bestClicker || 0;
+                    document.getElementById('score-void').innerText = d.bestVoid || 0;
                 });
             } else { window.location.href = "index.html"; }
         });
-
-        window.processCheckIn = () => {
-            document.getElementById('ad-overlay').style.display='flex';
-            let t = 30;
-            let i = setInterval(() => {
-                t--; document.getElementById('ad-timer').innerText = t;
-                if(t <= 0) { clearInterval(i); finishCheckIn(); }
-            }, 1000);
-        };
-
-        async function finishCheckIn() {
-            // Agora incrementa o saldo em 10 (referente aos 10 NP)
-            await updateDoc(doc(db, "usuarios", user.uid), { 
-                lastCheckIn: new Date().toLocaleDateString(), 
-                saldo: increment(10) 
-            });
-            document.getElementById('ad-overlay').style.display='none';
-            alert("Check-in concluído! +10 NP creditados em sua conta.");
-        }
-
-        function updateCheckInUI(ld) {
-            const today = new Date().toLocaleDateString();
-            const day = new Date().getDay();
-            document.querySelectorAll('.day-dot').forEach(d => {
-                if(parseInt(d.dataset.day) === day) d.classList.add('active');
-                if(ld === today && parseInt(d.dataset.day) === day) {
-                    d.classList.add('done');
-                    const b = document.getElementById('btn-do-checkin');
-                    b.innerText = "CHECK-IN REALIZADO"; 
-                    b.disabled = true; 
-                    b.style.opacity = "0.5";
-                }
-            });
-        }
     </script>
-
-    <script type="module" src="nexus-overlay.js"></script>
 </body>
 </html>
-
