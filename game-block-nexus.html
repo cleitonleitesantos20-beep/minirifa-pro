@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Block Nexus - Central de Treinamento</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --dark: #050505; --card: #111; }
+        body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; padding: 0; min-height: 100vh; overflow: hidden; touch-action: none; }
+        
+        .header { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; font-family: 'Orbitron'; font-size: 0.6rem; border-bottom: 1px solid #1a1a1a; background: #000; }
+        .btn-exit { background: none; border: 1px solid var(--pink); color: var(--pink); padding: 5px 12px; border-radius: 4px; font-family: 'Orbitron'; cursor: pointer; font-size: 0.5rem; }
+
+        .game-container { display: flex; flex-direction: column; align-items: center; padding: 10px; height: calc(100vh - 60px); justify-content: space-around; }
+
+        /* Stats */
+        .stats-bar { display: flex; gap: 20px; font-family: 'Orbitron'; font-size: 0.7rem; color: var(--neon); }
+        .stat-box { text-align: center; background: rgba(0, 242, 255, 0.05); padding: 5px 15px; border-radius: 8px; border: 1px solid rgba(0, 242, 255, 0.2); }
+
+        /* Tabuleiro */
+        #board { 
+            display: grid; 
+            grid-template-columns: repeat(8, 1fr); 
+            grid-template-rows: repeat(8, 1fr); 
+            gap: 4px; 
+            background: #111; 
+            padding: 6px; 
+            border-radius: 10px; 
+            border: 2px solid #222;
+            width: 90vw;
+            max-width: 340px;
+            aspect-ratio: 1/1;
+        }
+        .cell { background: #0a0a0a; border-radius: 4px; transition: 0.2s; }
+        .cell.filled { background: var(--neon); box-shadow: 0 0 10px var(--neon); }
+        .cell.preview { background: rgba(0, 242, 255, 0.2); }
+
+        /* Peças para arrastar */
+        .pieces-container { display: flex; justify-content: space-around; width: 100%; max-width: 340px; height: 100px; }
+        .piece-slot { width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.02); border-radius: 10px; border: 1px dashed #333; }
+        
+        .piece { display: grid; gap: 2px; cursor: grab; transition: transform 0.1s; }
+        .piece-block { width: 18px; height: 18px; background: var(--neon); border-radius: 3px; box-shadow: inset 0 0 5px rgba(0,0,0,0.5); }
+    </style>
+</head>
+<body>
+
+    <script type="module" src="nexus-overlay.js"></script>
+
+    <div class="header">
+        <span style="color:var(--neon)">BLOCK NEXUS // MODULE</span>
+        <button class="btn-exit" onclick="window.location.href='minigames.html'">SAIR</button>
+    </div>
+
+    <div class="game-container">
+        <div class="stats-bar">
+            <div class="stat-box">SCORE: <span id="score">0</span></div>
+            <div class="stat-box">XP: <span id="xp-display">0</span></div>
+        </div>
+
+        <div id="board"></div>
+
+        <div class="pieces-container" id="pieces-tray">
+            <div class="piece-slot" id="slot-0"></div>
+            <div class="piece-slot" id="slot-1"></div>
+            <div class="piece-slot" id="slot-2"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", authDomain: "minharifadigital.firebaseapp.com", projectId: "minharifadigital", appId: "1:59630725905:web:396c8cfca385dc3d957ab0" };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        let user;
+        let score = 0;
+        let xpGained = 0;
+        let board = Array(8).fill().map(() => Array(8).fill(0));
+        let xpTimer;
+
+        onAuthStateChanged(auth, u => { if(u) user = u; else window.location.href="index.html"; });
+
+        // Iniciar timer de XP (1 por segundo)
+        xpTimer = setInterval(() => {
+            xpGained++;
+            document.getElementById('xp-display').innerText = xpGained;
+        }, 1000);
+
+        // Formatos de peças (Matrizes)
+        const PIECE_TYPES = [
+            [[1,1],[1,1]], // Quadrado
+            [[1,1,1,1]],   // I
+            [[1,1,1]],     // I curta
+            [[1,1,0],[0,1,1]], // Z
+            [[1,0],[1,0],[1,1]], // L
+            [[1]] // Ponto
+        ];
+
+        function createBoard() {
+            const boardEl = document.getElementById('board');
+            boardEl.innerHTML = '';
+            for(let r=0; r<8; r++) {
+                for(let c=0; c<8; c++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.r = r;
+                    cell.dataset.c = c;
+                    boardEl.appendChild(cell);
+                }
+            }
+        }
+
+        function generatePieces() {
+            for(let i=0; i<3; i++) {
+                const slot = document.getElementById(`slot-${i}`);
+                if(slot.innerHTML === "") {
+                    const type = PIECE_TYPES[Math.floor(Math.random()*PIECE_TYPES.length)];
+                    const pieceEl = document.createElement('div');
+                    pieceEl.className = 'piece';
+                    pieceEl.style.gridTemplateColumns = `repeat(${type[0].length}, 1fr)`;
+                    pieceEl.draggable = true;
+                    
+                    type.forEach(row => {
+                        row.forEach(val => {
+                            const b = document.createElement('div');
+                            if(val) b.className = 'piece-block';
+                            pieceEl.appendChild(b);
+                        });
+                    });
+                    
+                    // Lógica simplificada de clique para mobile (já que drag&drop puro é ruim no mobile)
+                    pieceEl.onclick = () => alert("Arraste as peças para o tabuleiro! (Funcionalidade de Drag em desenvolvimento para mobile)");
+                    
+                    slot.appendChild(pieceEl);
+                }
+            }
+        }
+
+        async function saveProgress() {
+            if(!user) return;
+            await updateDoc(doc(db, "usuarios", user.uid), {
+                xp: increment(xpGained),
+                bestBlocks: increment(score) // Aqui você pode ajustar para salvar apenas se for Recorde
+            });
+        }
+
+        // Finalização
+        window.onbeforeunload = () => saveProgress();
+
+        createBoard();
+        generatePieces();
+    </script>
+</body>
+</html>
