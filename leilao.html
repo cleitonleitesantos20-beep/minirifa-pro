@@ -3,167 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Leilões IA v5.8.1</title>
+    <title>Nexus Drop - Live Sync</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --dark: #0a0a0a; --gold: #ffcc00; --glass: rgba(255,255,255,0.03); }
-        body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; padding: 0; min-height: 100vh; overflow-y: auto; }
+        :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --dark: #0a0a0a; }
+        body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden; }
         
-        /* STATUS BAR PREMIUM */
-        .status-bar { position: sticky; top: 0; z-index: 100; background: rgba(0,0,0,0.9); padding: 12px 20px; border-bottom: 1px solid #1a1a1a; display: flex; justify-content: space-between; backdrop-filter: blur(15px); }
-        .stat-box { display: flex; align-items: center; gap: 10px; }
-        .stat-label { font-family: 'Orbitron'; font-size: 0.5rem; color: #555; text-transform: uppercase; letter-spacing: 1px; }
-        .stat-val { font-family: 'Orbitron'; font-size: 0.85rem; font-weight: bold; }
-        .val-cash { color: var(--green); text-shadow: 0 0 10px rgba(0,255,136,0.3); }
-        .val-bids { color: var(--neon); text-shadow: 0 0 10px rgba(0,242,255,0.3); }
+        .status-bar { position: sticky; top: 0; z-index: 100; background: rgba(0,0,0,0.95); padding: 10px 20px; border-bottom: 1px solid #1a1a1a; display: flex; justify-content: space-between; backdrop-filter: blur(15px); }
+        .stat-box { display: flex; flex-direction: column; }
+        .stat-label { font-family: 'Orbitron'; font-size: 0.45rem; color: #555; text-transform: uppercase; }
+        .stat-val { font-family: 'Orbitron'; font-size: 0.8rem; font-weight: bold; color: var(--neon); }
 
-        .container { padding: 20px; max-width: 500px; margin: 0 auto; }
+        .container { padding: 15px; max-width: 450px; margin: 0 auto; }
 
-        /* CARDS REESTILIZADOS */
-        .auction-card { background: linear-gradient(145deg, #0f0f0f 0%, #050505 100%); border: 1px solid #1a1a1a; border-radius: 24px; padding: 25px; margin-bottom: 35px; position: relative; transition: 0.4s; }
-        .auction-card:hover { border-color: #333; transform: translateY(-5px); }
-        
-        .header-info { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
-        .type-tag { font-family: 'Orbitron'; font-size: 0.45rem; padding: 4px 10px; border-radius: 20px; letter-spacing: 1px; }
-        
-        /* TEMAS */
-        .tag-classic { color: var(--neon); border: 1px solid var(--neon); background: rgba(0,242,255,0.05); }
-        .tag-reverse { color: var(--pink); border: 1px solid var(--pink); background: rgba(255,0,85,0.05); }
-        .tag-blind { color: var(--gold); border: 1px solid var(--gold); background: rgba(255,204,0,0.05); }
+        .drop-card { background: #080808; border: 1px solid #1a1a1a; border-radius: 20px; padding: 20px; margin-bottom: 20px; position: relative; border-top: 3px solid var(--neon); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .live-indicator { position: absolute; top: 15px; right: 20px; display: flex; align-items: center; gap: 5px; font-family: 'Orbitron'; font-size: 0.5rem; color: var(--pink); }
+        .dot { width: 6px; height: 6px; background: var(--pink); border-radius: 50%; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
-        .item-name { font-family: 'Orbitron'; font-size: 1.2rem; color: #fff; display: block; margin-top: 5px; }
-        .item-display { width: 100%; height: 140px; background: radial-gradient(#1a1a1a, #080808); border-radius: 16px; margin: 20px 0; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; border: 1px solid #111; }
-        
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .info-item { background: var(--glass); padding: 10px; border-radius: 12px; border: 1px solid #1a1a1a; }
-        .info-label { font-size: 0.55rem; color: #444; font-family: 'Orbitron'; display: block; margin-bottom: 4px; }
-        .info-data { font-family: 'Orbitron'; font-size: 0.8rem; color: #eee; }
+        .item-header { margin-bottom: 15px; }
+        .item-category { font-size: 0.6rem; color: var(--neon); font-family: 'Orbitron'; letter-spacing: 1px; }
+        .item-title { font-family: 'Orbitron'; font-size: 1.1rem; display: block; text-transform: uppercase; }
 
-        .desc-box { background: rgba(0,0,0,0.3); padding: 12px; border-radius: 10px; margin-bottom: 20px; border-left: 2px solid #222; }
-        .desc-text { font-size: 0.75rem; color: #888; line-height: 1.5; margin: 0; }
+        .display-area { width: 100%; height: 130px; background: radial-gradient(circle, #111 0%, #000 100%); border-radius: 12px; margin: 15px 0; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; border: 1px solid #1a1a1a; }
 
-        .btn-bid { width: 100%; padding: 16px; border-radius: 14px; font-family: 'Orbitron'; font-size: 0.8rem; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        .btn-bid:active { transform: scale(0.96); }
+        .main-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .data-box { background: #0d0d0d; padding: 12px; border-radius: 10px; text-align: center; border: 1px solid #1a1a1a; }
+        .data-label { font-size: 0.5rem; font-family: 'Orbitron'; color: #444; display: block; margin-bottom: 5px; }
+        .data-val { font-family: 'Orbitron'; font-size: 0.9rem; color: #fff; }
 
-        .btn-back { width: 100%; background: none; border: 1px solid #222; color: #444; padding: 15px; border-radius: 14px; font-family: 'Orbitron'; font-size: 0.7rem; cursor: pointer; margin-top: 20px; margin-bottom: 50px; }
+        .timer-bar { width: 100%; height: 6px; background: #111; border-radius: 3px; margin-bottom: 20px; overflow: hidden; border: 1px solid #1a1a1a; }
+        .timer-fill { width: 100%; height: 100%; background: var(--neon); transition: none; }
+
+        .btn-action { width: 100%; padding: 20px; border-radius: 15px; font-family: 'Orbitron'; font-size: 0.85rem; font-weight: bold; cursor: pointer; border: none; transition: 0.2s; background: var(--neon); color: #000; box-shadow: 0 5px 15px rgba(0,242,255,0.2); text-transform: uppercase; }
+        .btn-action:active { transform: scale(0.96); background: var(--green); }
+
+        .history-list { margin-top: 25px; border-top: 1px solid #1a1a1a; padding-top: 15px; max-height: 100px; overflow-y: hidden; }
+        .history-item { display: flex; justify-content: space-between; font-size: 0.65rem; color: #666; margin-bottom: 8px; font-family: 'Orbitron'; animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+        .history-user { color: var(--neon); }
+
+        .btn-exit { width: 100%; background: none; border: 1px solid #222; color: #555; padding: 12px; border-radius: 10px; font-family: 'Orbitron'; font-size: 0.6rem; margin-top: 20px; cursor: pointer; transition: 0.3s; }
+        .btn-exit:hover { color: #fff; border-color: #fff; }
     </style>
 </head>
 <body>
 
+    <script type="module" src="nexus-overlay.js"></script>
+
     <div class="status-bar">
         <div class="stat-box">
-            <div class="stat-label">Carteira</div>
-            <div class="stat-val val-cash">R$ <span id="u-saldo">0,00</span></div>
+            <span class="stat-label">SALDO DISPONÍVEL</span>
+            <span class="stat-val"><span id="u-bids">0.00</span> NP</span>
         </div>
-        <div class="stat-box">
-            <div class="stat-label">Créditos Bids</div>
-            <div class="stat-val val-bids"><span id="u-bids">0</span> BIDS</div>
+        <div class="stat-box" style="text-align: right;">
+            <span class="stat-label">STATUS SESSÃO</span>
+            <span class="stat-val" style="color:var(--green)">CONECTADO</span>
         </div>
     </div>
 
     <div class="container">
-        
-        <div class="auction-card">
-            <div class="header-info">
-                <span class="type-tag tag-classic">CLÁSSICO DE CENTAVOS</span>
-                <span style="font-family:'Orbitron'; font-size:0.6rem; color:var(--pink);">⏱ 15s</span>
-            </div>
-            <span class="item-name">IPHONE 15 PRO MAX</span>
-            <div class="item-display">📱</div>
+        <div class="drop-card">
+            <div class="live-indicator"><div class="dot"></div> LIVE SYNC</div>
             
-            <div class="info-grid">
-                <div class="info-item">
-                    <span class="info-label">PREÇO ATUAL</span>
-                    <span class="info-data" style="color:var(--green)">R$ 1,42</span>
+            <div class="item-header">
+                <span class="item-category">DISPOSITIVO PREMIUM</span>
+                <span class="item-title">IPHONE 15 PRO MAX</span>
+            </div>
+
+            <div class="display-area">📱</div>
+
+            <div class="main-stats">
+                <div class="data-box">
+                    <span class="data-label">VALOR ATUAL</span>
+                    <span class="data-val" id="current-price" style="color:var(--green)">0.00 NP</span>
                 </div>
-                <div class="info-item">
-                    <span class="info-label">ARREMATANTE</span>
-                    <span class="info-data">@CYBER_X</span>
+                <div class="data-box">
+                    <span class="data-label">LÍDER DO SYNC</span>
+                    <span class="data-val" id="last-user" style="font-size: 0.7rem; color: var(--neon);">---</span>
                 </div>
             </div>
 
-            <div class="desc-box">
-                <p class="desc-text">O tempo reinicia a cada lance. O último operador antes do cronômetro zerar arremata o item pelo preço atual.</p>
+            <div class="timer-bar">
+                <div class="timer-fill" id="timer-fill"></div>
             </div>
-            
-            <button class="btn-bid" style="background:var(--neon); color:#000;" onclick="darLance(1)">EXECUTAR LANCE (1 BID)</button>
+
+            <button class="btn-action" id="btn-bid" onclick="sendAllocation()">EFETUAR ALOCAÇÃO (1 NP)</button>
+
+            <div class="history-list" id="history-box">
+                </div>
         </div>
 
-        <div class="auction-card">
-            <div class="header-info">
-                <span class="type-tag tag-reverse">MENOR LANCE ÚNICO</span>
-                <span style="font-family:'Orbitron'; font-size:0.6rem; color:#666;">⏱ 23:45:10</span>
-            </div>
-            <span class="item-name">PLAYSTATION 5 SLIM</span>
-            <div class="item-display">🎮</div>
-
-            <div class="desc-box">
-                <p class="desc-text"><b>Regra de Ouro:</b> O vencedor é quem oferecer o menor valor (Ex: R$ 0,02) que <b>ninguém mais</b> tenha oferecido.</p>
-            </div>
-
-            <div style="display:flex; gap:10px; margin-bottom:10px;">
-                <input type="number" step="0.01" id="val-reverse" placeholder="0,00" style="flex:1; background:#000; border:1px solid #222; color:#fff; padding:15px; border-radius:12px; font-family:'Orbitron';">
-                <button class="btn-bid" style="flex:1.2; background:var(--pink); color:#fff;" onclick="darLance(5)">LANÇAR (5 BIDS)</button>
-            </div>
+        <div style="background: rgba(255,255,255,0.02); padding:15px; border-radius:15px; border:1px solid #111;">
+            <p style="font-size:0.6rem; color:#555; margin:0; line-height:1.5; text-align: center; letter-spacing: 0.5px;">
+                <b>SISTEMA DE ALOCAÇÃO:</b> Cada clique consome 1 NP e adiciona 0.01 ao valor. O cronômetro de 15s reinicia a cada ação. O último usuário ativo no encerramento sincroniza o ativo.
+            </p>
         </div>
 
-        <div class="auction-card">
-            <div class="header-info">
-                <span class="type-tag tag-blind">BLIND BIDDING</span>
-                <span style="font-family:'Orbitron'; font-size:0.6rem; color:#666;">FECHAMENTO HOJE</span>
-            </div>
-            <span class="item-name">PACK 0.1 BITCOIN</span>
-            <div class="item-display">₿</div>
-
-            <div class="desc-box">
-                <p class="desc-text">Lances ocultos de alto volume. Ao término do ciclo, o sistema revela o maior investidor de Bids como vencedor.</p>
-            </div>
-
-            <div style="display:flex; gap:10px;">
-                <input type="number" id="val-blind" placeholder="Qtd Bids" style="flex:1; background:#000; border:1px solid #222; color:#fff; padding:15px; border-radius:12px; font-family:'Orbitron';">
-                <button class="btn-bid" style="flex:1.2; background:var(--gold); color:#000;" onclick="darLance(10)">ALOCAR (10+ BIDS)</button>
-            </div>
-        </div>
-
-        <button class="btn-back" onclick="window.location.href='index.html'">SAIR E VOLTAR AO MENU</button>
+        <button class="btn-exit" onclick="window.location.href='index.html'">INTERROMPER CONEXÃO</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, updateDoc, increment } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", authDomain: "minharifadigital.firebaseapp.com", projectId: "minharifadigital", appId: "1:59630725905:web:396c8cfca385dc3d957ab0" };
+        const firebaseConfig = { 
+            apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", 
+            authDomain: "minharifadigital.firebaseapp.com", 
+            projectId: "minharifadigital", 
+            appId: "1:59630725905:web:396c8cfca385dc3d957ab0" 
+        };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        let userBids = 0;
+        let userSaldo = 0;
+        let userName = "";
+        const dropID = "iphone15";
 
         onAuthStateChanged(auth, user => {
             if (user) {
                 onSnapshot(doc(db, "usuarios", user.uid), snap => {
-                    const d = snap.data();
-                    if(!d) return;
-                    userBids = d.bids || 0;
-                    document.getElementById('u-saldo').innerText = (d.saldo || 0).toLocaleString('pt-br', {minimumFractionDigits: 2});
-                    document.getElementById('u-bids').innerText = userBids;
+                    if(snap.exists()) {
+                        userSaldo = snap.data().saldo || 0;
+                        userName = snap.data().nome || "Usuário_" + user.uid.substring(0,4);
+                        document.getElementById('u-bids').innerText = userSaldo.toFixed(2);
+                    }
                 });
-            } else { window.location.href = "index.html"; }
+            } else { window.location.href = "login.html"; }
         });
 
-        window.darLance = async (custo) => {
-            if (userBids >= custo) {
-                try {
-                    await updateDoc(doc(db, "usuarios", auth.currentUser.uid), {
-                        bids: increment(-custo)
-                    });
-                    alert("SISTEMA: Lance registrado com sucesso.");
-                } catch(e) { alert("Erro de conexão."); }
-            } else {
-                alert("ACESSO NEGADO: Saldo de Bids insuficiente.");
+        // LIVE SYNC: Monitora o drop globalmente
+        onSnapshot(doc(db, "drops", dropID), snap => {
+            if(snap.exists()) {
+                const data = snap.data();
+                document.getElementById('current-price').innerText = data.valorAtual.toFixed(2) + " NP";
+                document.getElementById('last-user').innerText = "@" + data.ultimoUsuario;
+                
+                updateHistory(data.ultimoUsuario);
+                resetTimer();
             }
+        });
+
+        window.sendAllocation = async () => {
+            if (userSaldo < 1) return alert("Saldo insuficiente!");
+            
+            const btn = document.getElementById('btn-bid');
+            btn.disabled = true;
+
+            try {
+                // Desconta do usuário e atualiza o drop central
+                await updateDoc(doc(db, "usuarios", auth.currentUser.uid), { saldo: increment(-1) });
+                await updateDoc(doc(db, "drops", dropID), {
+                    valorAtual: increment(0.01),
+                    ultimoUsuario: userName,
+                    timestamp: serverTimestamp()
+                });
+            } catch(e) { console.error(e); }
+            
+            setTimeout(() => { btn.disabled = false; }, 300);
         };
+
+        function resetTimer() {
+            const fill = document.getElementById('timer-fill');
+            fill.style.transition = 'none';
+            fill.style.width = '100%';
+            setTimeout(() => {
+                fill.style.transition = '15s linear';
+                fill.style.width = '0%';
+            }, 50);
+        }
+
+        function updateHistory(user) {
+            const box = document.getElementById('history-box');
+            const item = document.createElement('div');
+            item.className = 'history-item';
+            item.innerHTML = `<span>@${user} sincronizou</span><span>+0.01 NP</span>`;
+            box.prepend(item);
+            if(box.children.length > 3) box.removeChild(box.lastChild);
+        }
     </script>
 </body>
 </html>
