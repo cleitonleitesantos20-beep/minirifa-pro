@@ -17,7 +17,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); color: #fff; font-family: 'Rajdhani'; overflow: hidden; height: 100vh; width: 100vw; }
 
-        /* Status Online Canto Esquerdo */
+        /* Status Online */
         .online-status { position: fixed; top: 20px; left: 20px; z-index: 200; display: flex; align-items: center; gap: 8px; font-family: 'Orbitron'; font-size: 0.8rem; color: var(--neon); }
         .dot { width: 8px; height: 8px; background: #00ff00; border-radius: 50%; box-shadow: 0 0 10px #00ff00; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
@@ -25,39 +25,47 @@
         #city-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; overflow-x: scroll; overflow-y: hidden; z-index: 1; scrollbar-width: none; }
         #city-container::-webkit-scrollbar { display: none; }
 
-        #zoom-layer { transform-origin: center 850px; transition: transform 1.2s cubic-bezier(0.15, 0.85, 0.35, 1), transform-origin 1.2s ease; transform: scale(0.5); }
+        /* Ajuste de escala inicial para caber na tela */
+        #zoom-layer { transform-origin: center center; transition: transform 1.2s cubic-bezier(0.15, 0.85, 0.35, 1); transform: scale(1); }
 
-        .building-front { fill: #040406; stroke: rgba(0, 242, 255, 0.2); }
+        .building-front { fill: #040406; stroke: rgba(0, 242, 255, 0.2); stroke-width: 1; }
         .win-tag { font-size: 8px; fill: #fff; opacity: 0; pointer-events: none; text-anchor: middle; font-family: 'Orbitron'; }
+        .window-dark { cursor: pointer; transition: fill 0.3s; }
         .window-dark:hover + .win-tag, .selected + .win-tag { opacity: 1; }
-        .selected { fill: var(--win-bright) !important; filter: drop-shadow(0 0 10px var(--neon)); }
+        .selected { fill: var(--win-bright) !important; filter: drop-shadow(0 0 10px var(--neon)) !important; }
 
         /* UI Lado Direito */
         .ui-right { position: fixed; bottom: 20px; right: 20px; z-index: 100; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
-        #chat-window { width: 250px; height: 200px; display: none; flex-direction: column; pointer-events: none; }
+        #chat-window { width: 250px; height: 200px; display: none; flex-direction: column; pointer-events: none; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 5px; }
         .chat-messages { flex: 1; overflow: hidden; display: flex; flex-direction: column; gap: 5px; justify-content: flex-end; }
-        .chat-msg-item { color: var(--neon); font-size: 0.9rem; text-shadow: 1px 1px 2px #000; animation: fadeOut 10s forwards; font-weight: bold; }
-        @keyframes fadeOut { 0% { opacity: 0; transform: translateY(5px); } 5% { opacity: 1; transform: translateY(0); } 80% { opacity: 1; } 100% { opacity: 0; } }
+        .chat-msg-item { color: var(--neon); font-size: 0.9rem; text-shadow: 1px 1px 2px #000; animation: fadeInOut 10s forwards; font-weight: bold; }
         
-        .chat-input-area { pointer-events: all; border-bottom: 1px solid var(--neon); width: 100%; margin-top: 5px; }
+        @keyframes fadeInOut { 
+            0% { opacity: 0; transform: translateX(10px); } 
+            5% { opacity: 1; transform: translateX(0); } 
+            90% { opacity: 1; } 
+            100% { opacity: 0; } 
+        }
+        
+        .chat-input-area { pointer-events: all; border-bottom: 1px solid var(--neon); width: 100%; }
         input { background: transparent; border: none; color: #fff; width: 100%; outline: none; padding: 5px; font-family: 'Rajdhani'; font-size: 1rem; }
 
         .btn-group { display: flex; gap: 8px; }
-        .v-button { width: 45px; height: 45px; background: rgba(0,0,0,0.6); border: 1px solid var(--neon); color: var(--neon); display: flex; align-items: center; justify-content: center; cursor: pointer; font-family: 'Orbitron'; font-size: 0.6rem; }
+        .v-button { width: 50px; height: 45px; background: rgba(0,0,0,0.7); border: 1px solid var(--neon); color: var(--neon); display: flex; align-items: center; justify-content: center; cursor: pointer; font-family: 'Orbitron'; font-size: 0.65rem; box-shadow: 0 0 10px rgba(0,242,255,0.2); }
     </style>
 </head>
 <body onclick="resetZoom()">
 
     <div class="online-status">
         <div class="dot"></div>
-        <span id="online-count">42</span> ONLINE
+        <span id="online-count">84</span> ONLINE
     </div>
 
     <div class="ui-right">
         <div id="chat-window">
             <div class="chat-messages" id="chat-box"></div>
             <div class="chat-input-area">
-                <input type="text" id="chat-input" placeholder="Mensagem..." onkeypress="if(event.key==='Enter') sendMsg()">
+                <input type="text" id="chat-input" placeholder="Conectar..." onkeypress="if(event.key==='Enter') sendMsg()">
             </div>
         </div>
         <div class="btn-group">
@@ -67,16 +75,15 @@
     </div>
 
     <div id="city-container">
-        <svg id="city-svg" class="city-svg" onclick="event.stopPropagation()">
+        <svg id="city-svg" viewBox="0 0 5000 1000" onclick="event.stopPropagation()">
             <defs>
-                <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                <filter id="glow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
             </defs>
             <g id="zoom-layer">
                 <rect id="sky-bg" width="10000" height="1000" fill="#010103" />
                 <g id="sky-layer"></g>
                 <g id="celestial-body" filter="url(#glow)"></g>
-                <g id="far-buildings"></g>
-                <rect id="plat-bg" x="0" y="850" height="150" fill="#050508" />
+                <rect id="plat-bg" x="0" y="850" width="10000" height="150" fill="#050508" />
                 <g id="mid-buildings"></g>
                 <g id="air-traffic"></g>
             </g>
@@ -86,22 +93,22 @@
     <script type="module">
         document.addEventListener('DOMContentLoaded', () => {
             renderSky();
-            updateCelestial();
             renderCity();
+            updateCelestial();
             startAirTraffic();
-            setInterval(updateCelestial, 60000); 
+            setInterval(updateCelestial, 30000); 
             
-            const totalWidth = 10000;
-            const svg = document.getElementById('city-svg');
-            svg.setAttribute('width', totalWidth);
-            svg.setAttribute('viewBox', `0 0 ${totalWidth} 1000`);
-            document.getElementById('city-container').scrollLeft = 4500;
+            // Centraliza o scroll
+            const container = document.getElementById('city-container');
+            container.scrollLeft = 2500 - window.innerWidth/2;
         });
 
         function renderSky() {
             const sky = document.getElementById('sky-layer');
             let html = '';
-            for(let i=0; i<300; i++) html += `<circle cx="${Math.random()*10000}" cy="${Math.random()*800}" r="${Math.random()*1.5}" fill="#fff" opacity="${Math.random()}"/>`;
+            for(let i=0; i<400; i++) {
+                html += `<circle cx="${Math.random()*10000}" cy="${Math.random()*800}" r="${Math.random()*1.2}" fill="#fff" opacity="${Math.random()}"/>`;
+            }
             sky.innerHTML = html;
         }
 
@@ -109,54 +116,50 @@
             const group = document.getElementById('celestial-body');
             const now = new Date();
             const hour = now.getHours() + now.getMinutes()/60;
-            
             const angle = (hour / 24) * Math.PI * 2 + Math.PI; 
-            const radiusX = 4500;
-            const radiusY = 450;
-            const centerX = 5000;
-            const centerY = 550;
-
-            const sunX = centerX + Math.cos(angle) * radiusX;
-            const sunY = centerY + Math.sin(angle) * radiusY;
-            const moonX = centerX + Math.cos(angle + Math.PI) * radiusX;
-            const moonY = centerY + Math.sin(angle + Math.PI) * radiusY;
+            
+            const sunX = 5000 + Math.cos(angle) * 4000;
+            const sunY = 500 + Math.sin(angle) * 400;
+            const moonX = 5000 + Math.cos(angle + Math.PI) * 4000;
+            const moonY = 500 + Math.sin(angle + Math.PI) * 400;
 
             group.innerHTML = `
-                <circle cx="${sunX}" cy="${sunY}" r="80" fill="var(--gold)" opacity="0.9" />
-                <circle cx="${moonX}" cy="${moonY}" r="60" fill="var(--neon)" opacity="0.7" />
+                <circle cx="${sunX}" cy="${sunY}" r="120" fill="var(--gold)" opacity="0.9" />
+                <circle cx="${moonX}" cy="${moonY}" r="90" fill="var(--neon)" opacity="0.7" />
             `;
-            // Escurece o fundo se for noite
-            const isNight = hour < 6 || hour > 18;
-            document.getElementById('sky-bg').style.fill = isNight ? "#010103" : "#02050a";
         }
 
         function renderCity() {
             const mid = document.getElementById('mid-buildings');
-            let x = 400;
-            let bID = 1;
-            while(x < 9500) {
-                const w = 220 + Math.random()*150;
-                const h = 350 + Math.random()*450;
+            let x = 200;
+            let buildingCount = 1;
+            let html = '';
+
+            while(x < 9800) {
+                const w = 250 + Math.random()*150;
+                const h = 400 + Math.random()*400;
                 const y = 850 - h;
-                let buildingHTML = `<g class="building-group" onclick="dynamicZoom(event)">
+
+                html += `<g class="building-group" onclick="dynamicZoom(event)">
                     <rect x="${x}" y="${y}" width="${w}" height="${h}" class="building-front" />
-                    <text x="${x+w/2}" y="${y+35}" class="building-id" style="fill:var(--neon); font-family:Orbitron; font-size:14px;" text-anchor="middle">NEXUS-${bID}</text>`;
+                    <text x="${x+w/2}" y="${y+35}" fill="var(--neon)" font-family="Orbitron" font-size="14" text-anchor="middle">NEXUS-${buildingCount}</text>`;
                 
                 let winID = 1;
-                for(let r = y + 70; r < 800; r += 60) {
-                    for(let c = x + 35; c < x + w - 35; c += 45) {
+                for(let r = y + 70; r < 800; r += 65) {
+                    for(let c = x + 40; c < x + w - 40; c += 50) {
                         if(Math.random() > 0.3) {
-                            buildingHTML += `
-                                <rect x="${c}" y="${r}" width="16" height="22" class="window-dark" style="--d:${Math.random()*2}s" onclick="selectWin(event)"/>
-                                <text x="${c+8}" y="${r+14}" class="win-tag">${winID}</text>`;
+                            html += `
+                                <rect x="${c}" y="${r}" width="18" height="24" fill="#111" class="window-dark" onclick="selectWin(event)"/>
+                                <text x="${c+9}" y="${r+15}" class="win-tag">${winID}</text>`;
                         }
                         winID++;
                     }
                 }
-                buildingHTML += `</g>`;
-                mid.innerHTML += buildingHTML;
-                x += w + 200; bID++;
+                html += `</g>`;
+                x += w + 150;
+                buildingCount++;
             }
+            mid.innerHTML = html;
         }
 
         window.dynamicZoom = (e) => {
@@ -167,12 +170,12 @@
             const loc = pt.matrixTransform(svg.getScreenCTM().inverse());
             const layer = document.getElementById('zoom-layer');
             layer.style.transformOrigin = `${loc.x}px ${loc.y}px`;
-            layer.style.transform = "scale(1.6)";
+            layer.style.transform = "scale(2.2)";
         };
 
         window.resetZoom = () => {
             const layer = document.getElementById('zoom-layer');
-            layer.style.transform = "scale(0.5)";
+            layer.style.transform = "scale(1)";
             document.querySelectorAll('.selected').forEach(el => el.classList.remove('selected'));
         };
 
@@ -196,26 +199,25 @@
             msg.innerHTML = `> ${input.value}`;
             box.appendChild(msg);
             input.value = "";
-            setTimeout(() => {
-                msg.style.opacity = '0';
-                setTimeout(() => msg.remove(), 1000);
-            }, 9000);
+            setTimeout(() => msg.remove(), 10000);
         };
 
         function startAirTraffic() {
             const air = document.getElementById('air-traffic');
             setInterval(() => {
                 const car = document.createElementNS("http://www.w3.org/2000/svg", "g");
-                const y = 150 + Math.random()*500;
+                const y = 100 + Math.random()*600;
                 car.innerHTML = `
-                    <rect width="35" height="10" fill="#080808" rx="2" stroke="var(--neon)" stroke-width="0.5"/>
-                    <rect x="30" y="3" width="5" height="3" fill="#ff0000" /> <rect x="0" y="3" width="6" height="4" fill="var(--neon)" /> `;
-                car.style.transition = "transform 14s linear";
+                    <rect width="40" height="12" fill="#0a0a0a" rx="3" stroke="var(--neon)" stroke-width="0.5"/>
+                    <rect x="32" y="4" width="6" height="4" fill="#ff0000" />
+                    <rect x="2" y="4" width="8" height="4" fill="var(--neon)" />
+                `;
+                car.style.transition = "transform 12s linear";
                 car.style.transform = `translate(-100px, ${y}px)`;
                 air.appendChild(car);
-                setTimeout(() => car.style.transform = `translate(10500px, ${y}px)`, 50);
-                setTimeout(() => car.remove(), 14500);
-            }, 4000);
+                setTimeout(() => car.style.transform = `translate(10000px, ${y}px)`, 50);
+                setTimeout(() => car.remove(), 12500);
+            }, 3500);
         }
     </script>
     <script type="module" src="nexus-overlay.js"></script>
