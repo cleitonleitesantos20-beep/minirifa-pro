@@ -9,6 +9,8 @@
         :root {
             --neon: #00f2ff;
             --pink: #ff0055;
+            --yellow: #f0ff00;
+            --purple: #bc00ff;
             --bg: #000000;
         }
 
@@ -26,7 +28,14 @@
         svg { display: block; flex-shrink: 0; }
 
         .building-base { fill: #000; stroke: var(--neon); stroke-width: 2.2; }
+        .antenna { stroke: var(--neon); stroke-width: 1; opacity: 0.7; }
+        .drone { fill: var(--pink); filter: drop-shadow(0 0 5px var(--pink)); animation: float 3s ease-in-out infinite; }
         
+        @keyframes float { 
+            0%, 100% { transform: translateY(0); } 
+            50% { transform: translateY(-15px); } 
+        }
+
         .window-btn { 
             cursor: pointer;
             fill: #000; 
@@ -47,32 +56,30 @@
 
         .label { font-family: 'Orbitron'; font-size: 16px; fill: var(--neon); pointer-events: none; letter-spacing: 3px; font-weight: bold; text-transform: uppercase; }
 
-        /* Animação das Luzes Cruzando os Prédios */
+        /* Tráfego de Luzes Intenso */
         .traffic-light {
-            filter: blur(1.5px);
+            filter: blur(2px);
             animation: moveLight var(--spd) linear infinite;
         }
         @keyframes moveLight {
-            from { transform: translateX(-1500px); }
+            from { transform: translateX(-2000px); }
             to { transform: translateX(6500px); }
         }
 
         .ui-overlay { position: fixed; z-index: 9999; pointer-events: none; inset: 0; }
         .ui-element { pointer-events: all; }
 
-        /* Botão Sair Transparente e mais alto */
-        .exit-container { position: absolute; bottom: 40px; left: 30px; }
+        .exit-container { position: absolute; bottom: 45px; left: 30px; }
         .btn-exit { 
-            padding: 6px 20px; 
+            padding: 6px 22px; 
             background: transparent; 
-            border: 1px solid rgba(255, 0, 85, 0.4); 
-            color: rgba(255, 0, 85, 0.8); 
+            border: 1px solid rgba(255, 0, 85, 0.3); 
+            color: rgba(255, 0, 85, 0.7); 
             font-family: 'Orbitron'; 
             font-size: 10px; 
             cursor: pointer;
             text-transform: uppercase; 
             transition: 0.4s;
-            letter-spacing: 1px;
         }
         .btn-exit:hover { border-color: var(--pink); color: var(--pink); background: rgba(255, 0, 85, 0.1); }
 
@@ -97,24 +104,27 @@
     <div id="city-viewport">
         <svg id="main-svg" width="6000" height="1000" viewBox="0 0 6000 1000">
             <defs>
-                <filter id="glow"><feGaussianBlur stdDeviation="4" result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/></filter>
+                <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/></filter>
             </defs>
 
             <g id="stars-layer"></g>
             
-            <g id="lights-back">
-                <rect class="traffic-light" x="0" y="450" width="400" height="1.5" fill="var(--neon)" style="--spd: 30s; opacity: 0.1;"/>
-                <rect class="traffic-light" x="0" y="600" width="300" height="1" fill="var(--pink)" style="--spd: 20s; opacity: 0.1;"/>
+            <g id="lights-bg">
+                <rect class="traffic-light" x="0" y="300" width="600" height="1" fill="var(--purple)" style="--spd: 40s; opacity: 0.2;"/>
             </g>
 
             <g id="buildings-container"></g>
 
+            <g id="lights-mid">
+                <rect class="traffic-light" x="0" y="500" width="800" height="4" fill="var(--neon)" style="--spd: 15s; opacity: 0.6;" filter="url(#glow)"/>
+                <rect class="traffic-light" x="0" y="700" width="500" height="3" fill="var(--yellow)" style="--spd: 10s; opacity: 0.5;" filter="url(#glow)"/>
+            </g>
+
             <rect x="0" y="900" width="6000" height="3" fill="var(--neon)" filter="url(#glow)" />
 
             <g id="lights-front">
-                <rect class="traffic-light" x="0" y="550" width="500" height="2" fill="var(--neon)" style="--spd: 12s; opacity: 0.4;"/>
-                <rect class="traffic-light" x="0" y="750" width="350" height="3" fill="var(--pink)" style="--spd: 18s; opacity: 0.3;"/>
-                <rect class="traffic-light" x="0" y="850" width="600" height="1.5" fill="var(--neon)" style="--spd: 10s; opacity: 0.5;"/>
+                <rect class="traffic-light" x="0" y="820" width="1000" height="6" fill="var(--pink)" style="--spd: 7s; opacity: 0.4;" filter="url(#glow)"/>
+                <rect class="traffic-light" x="0" y="600" width="400" height="2" fill="var(--purple)" style="--spd: 25s; opacity: 0.7;"/>
             </g>
         </svg>
     </div>
@@ -159,14 +169,23 @@
 
             buildingNames.forEach((name) => {
                 const w = 280 + Math.random() * 40; 
-                const h = 450 + Math.random() * 200; 
+                const h = 450 + Math.random() * 250; 
                 const y = floorY - h;
                 const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
                 
+                // Desenhar Antenas no topo para realismo
+                const antennaX = xPos + w * 0.2;
+                const antennaH = 40 + Math.random() * 40;
+
                 group.innerHTML = `
+                    <line x1="${antennaX}" y1="${y}" x2="${antennaX}" y2="${y - antennaH}" class="antenna" />
+                    <circle cx="${antennaX}" cy="${y - antennaH}" r="3" fill="var(--pink)" filter="url(#glow)" />
+                    
                     <rect x="${xPos}" y="${y}" width="${w}" height="${h}" class="building-base" />
                     <text x="${xPos + w/2}" y="${y - 20}" class="label" text-anchor="middle">${name}</text>
                     <rect x="${xPos + w/2 - 30}" y="${floorY - 60}" width="60" height="60" class="door-btn" onclick="windowAction('${name}', 'PORTARIA')" />
+                    
+                    <circle cx="${xPos + w + 100}" cy="${y + 100}" r="4" class="drone" />
                 `;
 
                 const cols = 4;
