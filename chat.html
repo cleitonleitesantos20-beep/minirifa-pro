@@ -15,29 +15,28 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: var(--bg); color: #fff; font-family: 'Rajdhani'; overflow: hidden; height: 100vh; width: 100vw; }
+        body { background: var(--bg); color: #fff; font-family: 'Rajdhani'; overflow: hidden; height: 100vh; width: 100vw; position: relative; }
 
         #city-viewport {
             width: 100vw; height: 100vh;
             overflow-x: auto; overflow-y: hidden;
-            display: flex; align-items: stretch;
+            display: flex; align-items: flex-end; /* Garante que os prédios fiquem no fundo */
             scroll-behavior: smooth;
             position: relative;
             z-index: 1;
         }
         #city-viewport::-webkit-scrollbar { display: none; }
 
-        svg { display: block; flex-shrink: 0; align-self: flex-end; }
+        svg { display: block; flex-shrink: 0; }
 
-        /* AJUSTE DO ASTRO (MAIS BAIXO) */
+        /* ASTRO E RELÓGIO POSICIONADOS */
         #sky-celestial {
             position: fixed;
-            top: 100px; /* Estava 40px, agora 100px */
+            top: 100px;
             right: 40px;
-            width: 80px;
-            height: 80px;
+            width: 80px; height: 80px;
             border-radius: 50%;
-            z-index: 5;
+            z-index: 10; /* Aumentado para ficar visível */
             transition: 1s ease-in-out;
             filter: drop-shadow(0 0 20px var(--glow-color));
         }
@@ -46,71 +45,84 @@
 
         #nexus-clock {
             position: fixed;
-            top: 190px; /* Estava 130px, agora 190px para seguir o sol */
-            right: 40px;
+            top: 195px;
+            right: 45px;
             font-family: 'Orbitron';
             font-size: 14px;
             color: var(--neon);
             text-shadow: 0 0 5px var(--neon);
-            z-index: 5;
+            z-index: 10;
         }
 
+        /* ESTILO DOS PRÉDIOS */
         .building-base { fill: #000; stroke: var(--neon); stroke-width: 2.2; }
         .antenna { stroke: var(--neon); stroke-width: 1; opacity: 0.7; }
-        
-        .window-btn { 
-            cursor: pointer; fill: #000; 
-            animation: blink var(--dur) infinite alternate;
-            animation-delay: var(--delay);
-            stroke: var(--neon); stroke-width: 0.8;
-            transition: 0.2s;
-        }
+        .window-btn { cursor: pointer; fill: #000; animation: blink var(--dur) infinite alternate; animation-delay: var(--delay); stroke: var(--neon); stroke-width: 0.8; transition: 0.2s; }
         .window-btn:hover { fill: var(--neon); filter: brightness(1.5); }
         @keyframes blink { 0% { opacity: 0.3; } 100% { opacity: 1; fill: var(--neon); } }
 
-        .npc-diamond { 
-            filter: drop-shadow(0 0 8px currentColor);
-            opacity: 0.9;
-            transform-box: fill-box;
-            transform-origin: center;
+        /* CHAT STREAM - GARANTINDO VISIBILIDADE */
+        #chat-stream { 
+            position: fixed; 
+            top: 0; 
+            left: 20px; 
+            width: 400px; 
+            height: 100vh; 
+            pointer-events: none; 
+            z-index: 2000; /* Acima de tudo */
         }
-
-        @keyframes moveNPC {
-            from { transform: translateX(-500px) rotate(45deg); }
-            to { transform: translateX(6500px) rotate(45deg); }
+        .chat-msg { 
+            position: absolute; 
+            left: 0; 
+            top: -100px; 
+            color: var(--neon); 
+            font-family: 'Rajdhani'; 
+            font-weight: bold; 
+            text-shadow: 2px 2px 4px #000; 
+            font-size: 1.2rem; 
+            animation: fallDown 18s linear forwards; 
+            white-space: nowrap; 
         }
-
-        @keyframes zigzagNPC {
-            0% { transform: translateX(-500px) translateY(0) rotate(45deg); }
-            25% { transform: translateX(1250px) translateY(-60px) rotate(45deg); }
-            50% { transform: translateX(3000px) translateY(0) rotate(45deg); }
-            75% { transform: translateX(4750px) translateY(-60px) rotate(45deg); }
-            100% { transform: translateX(6500px) translateY(0) rotate(45deg); }
-        }
-
-        .anim-linear { animation: moveNPC var(--spd) linear infinite; }
-        .anim-zigzag { animation: zigzagNPC var(--spd) ease-in-out infinite; }
-
-        .ui-overlay { position: fixed; bottom: 20px; left: 0; width: 100%; display: flex; justify-content: center; align-items: center; gap: 15px; padding: 0 20px; z-index: 100000; pointer-events: none; }
-        .ui-element { pointer-events: all; display: flex; gap: 10px; align-items: center; }
-        .btn-exit { padding: 8px 15px; background: transparent; border: 1px solid rgba(255, 0, 85, 0.4); color: var(--pink); font-family: 'Orbitron'; font-size: 10px; cursor: pointer; transition: 0.3s; }
-        .chat-input-bar { background: rgba(0, 0, 0, 0.9); border: 1px solid var(--neon); padding: 5px; width: 400px; max-width: 60vw; box-shadow: 0 0 15px rgba(0, 242, 255, 0.2); }
-        #chat-input { flex: 1; background: transparent; border: none; padding: 5px 10px; color: #fff; font-family: 'Rajdhani'; outline: none; width: 100%; }
-        .btn-send { background: var(--neon); border: none; padding: 5px 15px; cursor: pointer; color: #000; font-weight: bold; font-family: 'Rajdhani'; }
-        
-        #chat-stream { position: fixed; top: 0; left: 10px; width: 350px; height: 100vh; pointer-events: none; overflow: hidden; z-index: 999999; }
-        .chat-msg { position: absolute; left: 0; top: -150px; color: var(--neon); font-family: 'Rajdhani'; font-weight: bold; text-shadow: 2px 2px 4px #000; font-size: 1.1rem; animation: fallDown 18s linear forwards; white-space: nowrap; pointer-events: none; }
-        .msg-user { color: var(--pink); margin-right: 5px; font-size: 0.9rem; opacity: 0.9; }
+        .msg-user { color: var(--pink); margin-right: 8px; font-size: 0.9rem; }
 
         @keyframes fallDown { 
             0% { transform: translateY(0); opacity: 0; } 
             5% { opacity: 1; } 
-            90% { opacity: 1; } 
-            100% { transform: translateY(120vh); opacity: 0; } 
+            95% { opacity: 1; } 
+            100% { transform: translateY(110vh); opacity: 0; } 
         }
-        
-        .door-btn { fill: none; stroke: var(--pink); stroke-width: 3; cursor: pointer; transition: 0.3s; }
-        .label-inside { font-family: 'Orbitron'; font-size: 13px; fill: var(--neon); pointer-events: none; letter-spacing: 2px; font-weight: bold; text-transform: uppercase; opacity: 0.8; }
+
+        /* UI OVERLAY - FIXO NO RODAPÉ SEM CORTAR */
+        .ui-overlay { 
+            position: fixed; 
+            bottom: 30px; 
+            left: 0; 
+            width: 100%; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 15px; 
+            z-index: 100000; 
+            pointer-events: none; 
+        }
+        .ui-element { pointer-events: all; display: flex; gap: 10px; align-items: center; }
+        .btn-exit { padding: 8px 15px; background: rgba(0,0,0,0.8); border: 1px solid var(--pink); color: var(--pink); font-family: 'Orbitron'; font-size: 10px; cursor: pointer; }
+        .chat-input-bar { background: rgba(0, 0, 0, 0.9); border: 1px solid var(--neon); padding: 5px; width: 400px; max-width: 60vw; }
+        #chat-input { flex: 1; background: transparent; border: none; padding: 5px 10px; color: #fff; font-family: 'Rajdhani'; outline: none; width: 100%; }
+        .btn-send { background: var(--neon); border: none; padding: 5px 15px; cursor: pointer; color: #000; font-weight: bold; }
+
+        .npc-diamond { filter: drop-shadow(0 0 8px currentColor); opacity: 0.9; transform-box: fill-box; transform-origin: center; }
+        @keyframes moveNPC { from { transform: translateX(-500px) rotate(45deg); } to { transform: translateX(6500px) rotate(45deg); } }
+        @keyframes zigzagNPC {
+            0% { transform: translateX(-500px) translateY(0) rotate(45deg); }
+            25% { transform: translateX(1250px) translateY(-60px) rotate(45deg); }
+            100% { transform: translateX(6500px) translateY(0) rotate(45deg); }
+        }
+        .anim-linear { animation: moveNPC var(--spd) linear infinite; }
+        .anim-zigzag { animation: zigzagNPC var(--spd) ease-in-out infinite; }
+
+        .door-btn { fill: none; stroke: var(--pink); stroke-width: 3; cursor: pointer; }
+        .label-inside { font-family: 'Orbitron'; font-size: 13px; fill: var(--neon); pointer-events: none; font-weight: bold; }
         .mystery-toast { position: fixed; top: 20%; left: 50%; transform: translateX(-50%); font-family: 'Orbitron'; font-size: 1.5rem; color: var(--neon); text-shadow: 0 0 15px var(--neon); opacity: 0; transition: 0.4s; z-index: 110000; pointer-events: none; }
     </style>
 </head>
@@ -118,8 +130,8 @@
 
     <div id="sky-celestial"></div>
     <div id="nexus-clock">00:00:00</div>
-
     <div id="mystery-text" class="mystery-toast">ACESSO CONFIRMADO</div>
+    
     <div id="chat-stream"></div>
 
     <div class="ui-overlay">
@@ -144,9 +156,7 @@
             <rect x="0" y="900" width="6000" height="3" fill="var(--neon)" filter="url(#glow)" />
             <g id="npc-layer">
                 <rect class="npc-diamond anim-zigzag" x="0" y="250" width="18" height="18" fill="var(--neon)" style="--spd: 30s; color: var(--neon);" />
-                <rect class="npc-diamond anim-zigzag" x="0" y="400" width="15" height="15" fill="var(--purple)" style="--spd: 20s; color: var(--purple); animation-delay: -5s;" />
                 <rect class="npc-diamond anim-linear" x="0" y="885" width="12" height="12" fill="var(--yellow)" style="--spd: 45s; color: var(--yellow);" />
-                <rect class="npc-diamond anim-linear" x="0" y="890" width="10" height="10" fill="var(--pink)" style="--spd: 70s; color: var(--pink); animation-delay: -8s;" />
             </g>
         </svg>
     </div>
@@ -179,9 +189,10 @@
                 const msg = document.createElement('div');
                 msg.className = 'chat-msg';
                 msg.innerHTML = `<span class="msg-user">[${user}]</span> ${text}`;
-                msg.style.left = (Math.random() * 40) + "px"; 
+                msg.style.left = (Math.random() * 50) + "px"; 
                 stream.appendChild(msg);
-                setTimeout(() => { if(msg.parentNode) msg.remove(); }, 18000);
+                // Remove após a animação terminar
+                setTimeout(() => { if(msg.parentNode) msg.remove(); }, 18500);
             }, delay);
         }
 
@@ -203,28 +214,23 @@
         document.getElementById('btn-send-msg').onclick = sendMessage;
         document.getElementById('chat-input').onkeydown = (e) => { if(e.key === 'Enter') sendMessage(); };
 
-        // CORREÇÃO DO CARREGAMENTO INICIAL (SOBREPOSIÇÃO)
         const q = query(collection(db, "chat_messages"), orderBy("createdAt", "desc"), limit(12));
         let isInitialLoad = true;
 
         onSnapshot(q, (snapshot) => {
-            const changes = snapshot.docChanges();
-            
+            const docChanges = snapshot.docChanges();
             if (isInitialLoad) {
-                // No primeiro carregamento, aplica um delay crescente para não encavalar
-                changes.reverse().forEach((change, index) => {
+                // Inverte para mostrar da mais antiga para a mais nova no fluxo
+                docChanges.reverse().forEach((change, index) => {
                     if (change.type === "added") {
-                        const data = change.doc.data();
-                        displayMessage(data.userName || "NEXUS", data.text, index * 1000);
+                        displayMessage(change.doc.data().userName || "NEXUS", change.doc.data().text, index * 1200);
                     }
                 });
                 isInitialLoad = false;
             } else {
-                // Novas mensagens em tempo real aparecem na hora
-                changes.forEach((change) => {
+                docChanges.forEach((change) => {
                     if (change.type === "added") {
-                        const data = change.doc.data();
-                        displayMessage(data.userName || "NEXUS", data.text, 0);
+                        displayMessage(change.doc.data().userName || "NEXUS", change.doc.data().text, 0);
                     }
                 });
             }
@@ -232,13 +238,7 @@
 
         window.windowAction = function(name, id) {
             const t = document.getElementById('mystery-text');
-            const now = new Date();
-            const hour = now.getHours();
-            if(hour === 3 && id === 7) { 
-                t.innerText = "SISTEMA INSTÁVEL - 03:00 AM";
-            } else {
-                t.innerText = `${name} - SETOR ${id}`;
-            }
+            t.innerText = `${name} - SETOR ${id}`;
             t.style.opacity = "1";
             setTimeout(() => t.style.opacity = "0", 1200);
         };
@@ -253,10 +253,7 @@
             const clock = document.getElementById('nexus-clock');
             const astro = document.getElementById('sky-celestial');
             const now = new Date();
-            const h = String(now.getHours()).padStart(2, '0');
-            const m = String(now.getMinutes()).padStart(2, '0');
-            const s = String(now.getSeconds()).padStart(2, '0');
-            clock.innerText = `${h}:${m}:${s}`;
+            clock.innerText = now.toLocaleTimeString('pt-BR');
 
             const hour = now.getHours();
             if(hour >= 6 && hour < 18) {
@@ -274,8 +271,8 @@
             updateNexusTime();
             setInterval(updateNexusTime, 1000);
             setTimeout(() => {
-                viewport.scrollLeft = (3000) - (window.innerWidth / 2);
-            }, 100);
+                viewport.scrollLeft = 3000 - (window.innerWidth / 2);
+            }, 200);
         }
 
         function renderStars() {
