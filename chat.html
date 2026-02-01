@@ -29,6 +29,21 @@
 
         svg { display: block; flex-shrink: 0; }
 
+        /* ESTILO DO CONTEÚDO DO EASTER EGG (MODAL) */
+        #egg-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 200000;
+            flex-direction: column;
+            border: 2px solid var(--neon);
+        }
+        #egg-content { max-width: 80%; max-height: 80%; border: 1px solid var(--neon); box-shadow: 0 0 20px var(--neon); }
+        .close-egg { position: absolute; top: 20px; right: 20px; color: var(--pink); font-family: 'Orbitron'; cursor: pointer; border: 1px solid var(--pink); padding: 5px 10px; }
+
         #sky-celestial {
             position: fixed;
             top: 100px;
@@ -59,7 +74,6 @@
         .window-btn:hover { fill: var(--neon); filter: brightness(1.5); }
         @keyframes blink { 0% { opacity: 0.3; } 100% { opacity: 1; fill: var(--neon); } }
 
-        /* CHAT MAIS À ESQUERDA */
         #chat-stream { 
             position: fixed; 
             top: 0; 
@@ -118,6 +132,11 @@
     </style>
 </head>
 <body onload="init()">
+
+    <div id="egg-overlay">
+        <div class="close-egg" onclick="closeEgg()">FECHAR [X]</div>
+        <div id="egg-content"></div>
+    </div>
 
     <div id="sky-celestial"></div>
     <div id="nexus-clock">00:00:00</div>
@@ -223,26 +242,47 @@
             }
         });
 
-        // --- SISTEMA DE EASTER EGGS ---
+        // --- SISTEMA DE EASTER EGGS AVANÇADO ---
         window.windowAction = function(name, id) {
-            const t = document.getElementById('mystery-text');
+            const toast = document.getElementById('mystery-text');
+            const overlay = document.getElementById('egg-overlay');
+            const content = document.getElementById('egg-content');
             const now = new Date();
             const hour = now.getHours();
 
-            // LÓGICA DE EASTER EGGS (FÁCIL DE EDITAR)
-            if (hour === 3 && id === 7) {
-                t.innerText = "ERRO NA MATRIX: SETOR 7";
-            } else if (name === "NEXUS" && id === 1) {
-                t.innerText = "BEM-VINDO AO TOPO";
-            } else if (id === "PORTARIA") {
-                t.innerText = `ENTRADA: ${name}`;
-            } else {
-                t.innerText = `${name} - SETOR ${id}`;
+            // 1. Exemplo de VÍDEO (Prédio TITAN, Janela 5)
+            if (name === "TITAN" && id === 5) {
+                content.innerHTML = `<iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+                overlay.style.display = 'flex';
+                return;
             }
 
-            t.style.opacity = "1";
-            setTimeout(() => t.style.opacity = "0", 1200);
+            // 2. Exemplo de FOTO (Prédio NEXUS, Janela 1)
+            if (name === "NEXUS" && id === 1) {
+                content.innerHTML = `<img src="SUA_URL_DA_FOTO_AQUI.jpg" style="max-width:100%; height:auto; border:2px solid var(--neon);">`;
+                overlay.style.display = 'flex';
+                return;
+            }
+
+            // 3. Exemplo de TEXTO ESPECIAL (Qualquer prédio às 03:00 da manhã)
+            if (hour === 3) {
+                toast.innerText = "SISTEMA INSTÁVEL - VOLTE AO AMANHECER";
+            } else if (id === "PORTARIA") {
+                toast.innerText = `ACESSO LIBERADO: ${name}`;
+            } else {
+                toast.innerText = `${name} - SETOR ${id}`;
+            }
+
+            toast.style.opacity = "1";
+            setTimeout(() => toast.style.opacity = "0", 1200);
         };
+
+        window.closeEgg = function() {
+            const overlay = document.getElementById('egg-overlay');
+            const content = document.getElementById('egg-content');
+            overlay.style.display = 'none';
+            content.innerHTML = ''; // Limpa para parar vídeos
+        }
     </script>
 
     <script>
