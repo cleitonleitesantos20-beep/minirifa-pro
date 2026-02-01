@@ -53,7 +53,7 @@
         .state {
             fill: #0a0a0a;
             stroke: var(--user-neon-color);
-            stroke-width: 1px;
+            stroke-width: 0.5px;
             transition: fill 0.3s;
             cursor: pointer;
         }
@@ -61,6 +61,18 @@
         .state:hover {
             fill: var(--user-neon-color);
             fill-opacity: 0.2;
+        }
+
+        /* Estilo das Siglas */
+        .state-sigla {
+            fill: var(--user-neon-color);
+            font-family: 'Orbitron';
+            font-size: 10px;
+            font-weight: bold;
+            pointer-events: none;
+            text-anchor: middle;
+            opacity: 0.6;
+            text-shadow: 0 0 5px var(--bg-dark);
         }
 
         #protagonist {
@@ -74,24 +86,6 @@
             opacity: 0;
             z-index: 100;
             transition: opacity 0.2s;
-        }
-
-        #state-label {
-            position: fixed;
-            /* Um pouco mais baixo do topo */
-            top: 60px; 
-            left: 0;
-            font-family: 'Orbitron';
-            font-size: 1.1rem;
-            color: var(--user-neon-color);
-            text-shadow: 0 0 10px var(--user-neon-color);
-            pointer-events: none;
-            z-index: 20;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            /* Suaviza o movimento de acompanhamento */
-            transition: transform 0.1s ease-out; 
-            white-space: nowrap;
         }
 
         .btn-exit {
@@ -112,7 +106,6 @@
 <body>
 
     <a href="index.html" class="btn-exit">VOLTAR</a>
-    <div id="state-label">NEXUS SYSTEM ACTIVE</div>
     
     <div id="map-container">
         <div id="protagonist"></div>
@@ -128,7 +121,6 @@
         const svg = d3.select("#brazil-map");
         const mapGroup = d3.select("#map-group");
         const protagonist = d3.select("#protagonist");
-        const label = document.getElementById('state-label');
 
         const projection = d3.geoMercator()
             .center([-52, -15]) 
@@ -138,40 +130,34 @@
         const pathGenerator = d3.geoPath().projection(projection);
 
         const zoom = d3.zoom()
-            .scaleExtent([1, 8])
+            .scaleExtent([1, 15])
             .on("zoom", (event) => {
                 mapGroup.attr("transform", event.transform);
+                // Esconde o losango ao dar zoom para evitar desfoque
                 protagonist.style("opacity", "0");
+                // Ajusta o tamanho da fonte da sigla baseado no zoom
+                mapGroup.selectAll(".state-sigla")
+                    .style("font-size", `${10 / Math.sqrt(event.transform.k)}px`);
             });
 
         svg.call(zoom);
 
-        // Lógica para o título acompanhar o mouse
-        window.addEventListener('mousemove', (e) => {
-            const x = e.clientX;
-            // Move o label para a posição do mouse (com offset lateral para não ficar embaixo do cursor)
-            label.style.transform = `translate(${x + 20}px, 0)`;
-        });
-
         d3.json("https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson").then(data => {
             
+            // Desenha os Estados
             mapGroup.selectAll("path")
                 .data(data.features)
                 .join("path")
                 .attr("class", "state")
                 .attr("d", pathGenerator)
                 .on("mouseenter", function(event, d) {
-                    label.innerText = `SETOR: ${d.properties.name}`;
-                    
                     const centroid = pathGenerator.centroid(d);
                     const transform = d3.zoomTransform(svg.node());
-                    const x = transform.applyX(centroid[0]);
-                    const y = transform.applyY(centroid[1]);
-
+                    
                     protagonist
                         .style("opacity", "1")
-                        .style("left", `${x - 8}px`)
-                        .style("top", `${y - 8}px`);
+                        .style("left", `${transform.applyX(centroid[0]) - 8}px`)
+                        .style("top", `${transform.applyY(centroid[1]) - 8}px`);
                 })
                 .on("mousemove", function(event, d) {
                     const centroid = pathGenerator.centroid(d);
@@ -181,18 +167,27 @@
                         .style("top", `${transform.applyY(centroid[1]) - 8}px`);
                 })
                 .on("mouseleave", () => {
-                    label.innerText = "NEXUS SYSTEM ACTIVE";
                     protagonist.style("opacity", "0");
                 })
                 .on("click", (event, d) => {
                     const stateId = d.properties.sigla;
                     window.location.href = `setor.html?id=${stateId}`;
                 });
+
+            // Adiciona as Siglas (Iniciais)
+            mapGroup.selectAll("text")
+                .data(data.features)
+                .join("text")
+                .attr("class", "state-sigla")
+                .attr("transform", d => `translate(${pathGenerator.centroid(d)})`)
+                .attr("dy", "0.35em")
+                .text(d => d.properties.sigla);
         });
 
         window.addEventListener('resize', () => {
             projection.translate([window.innerWidth / 2, window.innerHeight / 2]);
             mapGroup.selectAll("path").attr("d", pathGenerator);
+            mapGroup.selectAll(".state-sigla").attr("transform", d => `translate(${pathGenerator.centroid(d)})`);
         });
     </script>
     <script type="module" src="nexus-overlay.js"></script>
