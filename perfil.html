@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Nexus Habitat | Live Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --neon-blue: #00f2ff; --neon-pink: #ff0055; --gold: #ffcc00; }
+        body { background: #050505; color: #fff; font-family: 'Rajdhani'; margin: 0; overflow-x: hidden; }
+
+        /* HEADER DE STATUS */
+        .habitat-header { padding: 30px; text-align: center; border-bottom: 1px solid #111; }
+        .user-rank { font-family: 'Orbitron'; font-size: 0.6rem; color: var(--gold); letter-spacing: 2px; }
+        .user-name { font-family: 'Orbitron'; font-size: 1.5rem; margin: 5px 0; text-transform: uppercase; }
+
+        /* ÁREA VISUAL DO HABITAT (O MUNDO) */
+        .world-view { 
+            height: 400px; 
+            display: flex; 
+            align-items: flex-end; 
+            justify-content: center; 
+            gap: 20px; 
+            background: radial-gradient(circle at bottom, #111 0%, #000 70%);
+            perspective: 1000px;
+            padding-bottom: 50px;
+        }
+
+        /* O CUBO DE IDENTIDADE (GÊNERO) */
+        .identity-cube {
+            width: 60px; height: 60px;
+            border-radius: 10px;
+            box-shadow: 0 0 30px;
+            animation: float 3s ease-in-out infinite;
+        }
+        .gender-m { background: var(--neon-blue); box-shadow: 0 0 30px var(--neon-blue); }
+        .gender-f { background: var(--neon-pink); box-shadow: 0 0 30px var(--neon-pink); }
+
+        /* O APARTAMENTO (ATIVO EVOLUTIVO) */
+        .building-asset {
+            width: 100px;
+            background: linear-gradient(#1a1a1a, #050505);
+            border: 2px solid #333;
+            border-bottom: none;
+            position: relative;
+            transition: 0.5s;
+        }
+        /* Janelas que acendem conforme o nível */
+        .window { width: 10px; height: 10px; background: #222; margin: 5px; display: inline-block; }
+        .active-win { background: var(--neon-blue); box-shadow: 0 0 5px var(--neon-blue); }
+
+        /* ESTATÍSTICAS EM CARDS COMPACTOS */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 20px; }
+        .stat-card { background: #0a0a0a; padding: 15px; border-radius: 15px; border: 1px solid #1a1a1a; text-align: center; }
+        .stat-label { font-size: 0.5rem; font-family: 'Orbitron'; color: #444; }
+        .stat-val { display: block; font-size: 1.2rem; color: #fff; font-weight: bold; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(45deg); }
+            50% { transform: translateY(-20px) rotate(45deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="habitat-header">
+        <div class="user-rank" id="display-rank">CARREGANDO PROTOCOLO...</div>
+        <div class="user-name" id="display-name">---</div>
+    </div>
+
+    <div class="world-view">
+        <div id="user-cube" class="identity-cube"></div>
+        
+        <div id="user-building" class="building-asset">
+            <div style="padding: 10px;" id="windows-box"></div>
+        </div>
+
+        <div id="commerce-building" class="building-asset" style="display: none; border-color: var(--gold); width: 120px;">
+            <div id="commerce-logo" style="font-size: 0.5rem; text-align: center; margin-top: 10px;">LOJA</div>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span class="stat-label">PATRIMÔNIO NP</span>
+            <span class="stat-val" id="stat-np">0</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">INDICAÇÕES</span>
+            <span class="stat-val" id="stat-ref">0</span>
+        </div>
+    </div>
+
+    <script type="module">
+        // LÓGICA DE CARREGAMENTO DINÂMICO
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetUserID = urlParams.get('id'); // Pega o ID da URL
+
+        // Simulação de busca no Firebase (Aqui entrará sua lógica real de DB)
+        const mockUserData = {
+            nome: "Cyber_Alchemist",
+            nivel: 12,
+            genero: "M",
+            np: 15500,
+            indicacoes: 42,
+            temComercio: true,
+            alturaPredio: 150 // em pixels
+        };
+
+        function renderHabitat(data) {
+            document.getElementById('display-name').innerText = data.nome;
+            document.getElementById('display-rank').innerText = "LEVEL " + data.nivel;
+            document.getElementById('stat-np').innerText = data.np.toLocaleString();
+            document.getElementById('stat-ref').innerText = data.indicacoes;
+
+            // Define cor do cubo
+            const cube = document.getElementById('user-cube');
+            cube.classList.add(data.genero === "M" ? "gender-m" : "gender-f");
+
+            // Define altura do apartamento
+            const building = document.getElementById('user-building');
+            building.style.height = data.alturaPredio + "px";
+
+            // Mostra comércio se tiver
+            if(data.temComercio) {
+                document.getElementById('commerce-building').style.display = "block";
+                document.getElementById('commerce-building').style.height = (data.alturaPredio * 0.8) + "px";
+            }
+
+            // Adiciona "Janelas" (Luzes) baseado no nível
+            const winBox = document.getElementById('windows-box');
+            for(let i=0; i < data.nivel; i++) {
+                const win = document.createElement('div');
+                win.className = "window active-win";
+                winBox.appendChild(win);
+            }
+        }
+
+        renderHabitat(mockUserData);
+    </script>
+</body>
+</html>
