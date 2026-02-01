@@ -9,6 +9,7 @@
         :root { 
             --accent-color: #555; 
             --gold: #ffcc00; 
+            --identity-color: #555;
             --bg-card: rgba(10, 10, 10, 0.98);
         }
         body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; overflow-x: hidden; }
@@ -37,9 +38,17 @@
         }
         .identity-cube {
             width: 55px; height: 55px; z-index: 10; margin-bottom: 25px;
-            background: var(--accent-color); box-shadow: 0 0 35px var(--accent-color);
+            background: var(--identity-color); box-shadow: 0 0 35px var(--identity-color);
             border-radius: 10px; animation: float 4s ease-in-out infinite;
         }
+        /* Efeito Arco-íris para Gênero "Outros" */
+        .rainbow-mode {
+            background: linear-gradient(45deg, #ff0000, #ff00ff, #0000ff, #00ffff, #00ff00, #ffff00, #ff0000);
+            background-size: 400% 400%;
+            animation: float 4s ease-in-out infinite, rainbow-shift 8s linear infinite !important;
+            box-shadow: 0 0 35px rgba(255,255,255,0.3);
+        }
+
         .building-asset {
             width: 90px; background: #080808; border: 2px solid #1a1a1a; 
             border-bottom: none; display: flex; flex-wrap: wrap; padding: 8px; gap: 4px; 
@@ -55,14 +64,14 @@
         .info-label { font-size: 0.5rem; color: #555; font-family: 'Orbitron'; display: block; margin-bottom: 4px; }
         .info-val { font-size: 0.8rem; color: #eee; font-family: 'Orbitron'; }
 
-        /* MODAL / INPUTS */
+        /* MODAL */
         .niche-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.95); z-index: 200; align-items: center; justify-content: center;
         }
         .modal-content { background: #0a0a0a; border: 1px solid #222; padding: 20px; border-radius: 15px; width: 85%; max-width: 400px; max-height: 90vh; overflow-y: auto; }
-        .selector-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px; }
-        .opt-btn { background: #111; border: 1px solid #333; color: #fff; padding: 10px 4px; border-radius: 6px; cursor: pointer; font-size: 0.55rem; font-family: 'Orbitron'; }
+        .selector-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; margin-bottom: 15px; }
+        .opt-btn { background: #111; border: 1px solid #333; color: #fff; padding: 10px 4px; border-radius: 6px; cursor: pointer; font-size: 0.55rem; font-family: 'Orbitron'; text-align: center; }
         
         input, select { 
             width: 100%; background: #111; border: 1px solid #333; color: #fff; 
@@ -70,6 +79,7 @@
         }
 
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        @keyframes rainbow-shift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
     </style>
 </head>
 <body>
@@ -103,8 +113,25 @@
 
     <div id="niche-modal" class="niche-modal" onclick="closeModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <span class="info-label" style="text-align:center">CONFIGURAR PROTOCOLOS</span>
-            
+            <span class="info-label" style="text-align:center">IDENTIDADE VISUAL (SEXO)</span>
+            <div class="selector-grid">
+                <div class="opt-btn" style="border-bottom: 2px solid #00d9ff" onclick="saveGender('masc')">MASCULINO</div>
+                <div class="opt-btn" style="border-bottom: 2px solid #ff00ea" onclick="saveGender('fem')">FEMININO</div>
+                <div class="opt-btn" style="background: linear-gradient(90deg, red, yellow, blue); border:none;" onclick="saveGender('other')">OUTROS</div>
+            </div>
+
+            <span class="info-label" style="text-align:center">PROTOCOLO COMERCIAL</span>
+            <div class="selector-grid">
+                <div class="opt-btn" onclick="saveRole('citizen')">CIDADÃO</div>
+                <div class="opt-btn" onclick="saveRole('clothes')">ROUPAS</div>
+                <div class="opt-btn" onclick="saveRole('shoes')">SAPATOS</div>
+                <div class="opt-btn" onclick="saveRole('tech')">ELETRÔNICOS</div>
+                <div class="opt-btn" onclick="saveRole('appliances')">ELETRODOMÉSTICOS</div>
+                <div class="opt-btn" onclick="saveRole('auto')">VEÍCULOS</div>
+                <div class="opt-btn" onclick="saveRole('jewelry')">JOIAS</div>
+            </div>
+
+            <span class="info-label" style="text-align:center">DADOS DO HABITAT</span>
             <input type="text" id="input-city" placeholder="Sua Cidade">
             <select id="input-state">
                 <option value="">Selecione o Estado</option>
@@ -121,16 +148,7 @@
             <input type="text" id="input-bio" placeholder="Sua Bio (Breve)">
             <input type="url" id="input-link" placeholder="Link Externo (http://...)">
 
-            <div class="selector-grid">
-                <div class="opt-btn" onclick="saveRole('citizen')">CIDADÃO</div>
-                <div class="opt-btn" onclick="saveRole('clothes')">ROUPAS</div>
-                <div class="opt-btn" onclick="saveRole('shoes')">SAPATOS</div>
-                <div class="opt-btn" onclick="saveRole('tech')">ELETRÔNICOS</div>
-                <div class="opt-btn" onclick="saveRole('appliances')">DOMÉSTICOS</div>
-                <div class="opt-btn" onclick="saveRole('auto')">VEÍCULOS</div>
-                <div class="opt-btn" onclick="saveRole('jewelry')">JOIAS</div>
-            </div>
-            <button onclick="handleManualSave()" style="width:100%; margin-top:15px; background:var(--gold); border:none; color:#000; padding:12px; border-radius:5px; font-family:Orbitron; font-size:0.7rem; font-weight:bold; cursor:pointer;">CONFIRMAR E SALVAR</button>
+            <button onclick="handleManualSave()" style="width:100%; margin-top:15px; background:var(--gold); border:none; color:#000; padding:12px; border-radius:5px; font-family:Orbitron; font-size:0.7rem; font-weight:bold; cursor:pointer;">CONFIRMAR E SALVAR TUDO</button>
         </div>
     </div>
 
@@ -158,14 +176,21 @@
             clothes: { label: "MODA", color: "#00f2ff" },
             shoes: { label: "CALÇADOS", color: "#8b4513" },
             tech: { label: "ELETRÔNICOS", color: "#00ff88" },
-            appliances: { label: "ELETRODOMÉSTICOS", color: "#ffaa00" },
+            appliances: { label: "ELETRODOMÉSTICOS", color: "#ffcc00" }, // DOURADO NEON
             auto: { label: "VEÍCULOS", color: "#bd00ff" },
             jewelry: { label: "JOALHERIA", color: "#e5e5e5" }
+        };
+
+        const genders = {
+            masc: { color: "#00d9ff" },
+            fem: { color: "#ff00ea" },
+            other: { color: "rainbow" }
         };
 
         let isOwner = false;
         let storeLink = "";
         let currentRole = 'citizen';
+        let currentGender = 'masc';
 
         window.toggleNicheMenu = () => { if(isOwner) document.getElementById('niche-modal').style.display = 'flex'; };
         window.closeModal = (e) => { if(e.target.id === 'niche-modal') document.getElementById('niche-modal').style.display = 'none'; };
@@ -177,13 +202,9 @@
             onAuthStateChanged(auth, user => { if(user && user.uid === targetID) isOwner = true; });
         }
 
-        // Salva quando clica no botão do nicho
-        window.saveRole = async (roleKey) => {
-            currentRole = roleKey;
-            await executeUpdate();
-        };
+        window.saveRole = async (roleKey) => { currentRole = roleKey; await executeUpdate(); };
+        window.saveGender = async (genderKey) => { currentGender = genderKey; await executeUpdate(); };
 
-        // Salva quando clica no botão Confirmar
         window.handleManualSave = async () => {
             await executeUpdate();
             document.getElementById('niche-modal').style.display = 'none';
@@ -195,44 +216,47 @@
             try {
                 await updateDoc(userRef, {
                     role: currentRole,
+                    gender: currentGender,
                     temComercio: currentRole !== 'citizen',
                     cidade: document.getElementById('input-city').value,
                     estado: document.getElementById('input-state').value,
                     bio: document.getElementById('input-bio').value,
                     linkLoja: document.getElementById('input-link').value
                 });
-            } catch (e) { console.error("Erro ao salvar:", e); }
+            } catch (e) { console.error(e); }
         }
 
-        window.redirectStore = () => {
-            if(storeLink) window.open(storeLink, '_blank');
-        };
+        window.redirectStore = () => { if(storeLink) window.open(storeLink, '_blank'); };
 
         function updateHabitat(data) {
             currentRole = data.role || 'citizen';
-            const config = roles[currentRole];
+            currentGender = data.gender || 'masc';
             storeLink = data.linkLoja || "";
             
+            // Cor do Habitat
+            const config = roles[currentRole];
             document.documentElement.style.setProperty('--accent-color', config.color);
+            
+            // Cor do Gênero (Cubo)
+            const cube = document.getElementById('user-cube');
+            cube.classList.remove('rainbow-mode');
+            if(currentGender === 'other') {
+                cube.classList.add('rainbow-mode');
+            } else {
+                const gColor = genders[currentGender].color;
+                document.documentElement.style.setProperty('--identity-color', gColor);
+            }
+
             document.getElementById('display-role').innerText = config.label;
             document.getElementById('display-name').innerText = (data.nome || "NEXUS").toUpperCase();
             document.getElementById('display-city').innerText = (data.cidade || "CIDADE").toUpperCase();
             document.getElementById('display-state').innerText = data.estado || "ESTADO";
-            
             document.getElementById('info-id').innerText = `#${targetID.substring(0, 5).toUpperCase()}`;
             document.getElementById('info-xp').innerText = data.xp || 0;
             const level = Math.floor((data.xp || 0) / 1000) + 1;
             document.getElementById('info-lvl').innerText = level;
             document.getElementById('info-bio').innerText = data.bio || "Nenhuma bio definida.";
             document.getElementById('user-balance').innerText = `${(data.saldo || 0).toFixed(2)} NP`;
-
-            // Preencher inputs se for o dono
-            if(isOwner) {
-                document.getElementById('input-city').value = data.cidade || "";
-                document.getElementById('input-state').value = data.estado || "";
-                document.getElementById('input-bio').value = data.bio || "";
-                document.getElementById('input-link').value = data.linkLoja || "";
-            }
 
             const b = document.getElementById('user-building');
             b.style.height = (70 + (level * 18)) + "px";
