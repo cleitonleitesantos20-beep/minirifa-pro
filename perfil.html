@@ -20,18 +20,17 @@
         /* HEADER */
         .habitat-header { padding: 60px 20px 10px; text-align: center; }
         .user-name { font-family: 'Orbitron'; font-size: 1.3rem; margin: 5px 0; text-shadow: 0 0 10px var(--accent-color); }
+        .geo-tag { font-size: 0.7rem; color: #888; letter-spacing: 1px; margin-bottom: 10px; }
         
-        /* BADGE CLICÁVEL */
         .status-badge { 
             display: inline-block; padding: 4px 12px; border: 1px solid var(--accent-color);
             border-radius: 20px; font-size: 0.6rem; color: var(--accent-color); 
-            letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: 0.3s;
+            letter-spacing: 2px; text-transform: uppercase; transition: 0.3s;
         }
-        .status-badge:hover { background: rgba(255,255,255,0.1); }
 
         /* WORLD */
         .world-view {
-            position: relative; height: 300px; width: 100%;
+            position: relative; height: 320px; width: 100%;
             display: flex; align-items: flex-end; justify-content: center;
             perspective: 1000px; background: radial-gradient(circle at bottom, #0a1015 0%, #000 75%);
             gap: 12px; padding-bottom: 20px;
@@ -44,27 +43,31 @@
         .building-asset {
             width: 90px; background: #080808; border: 2px solid #1a1a1a; 
             border-bottom: none; display: flex; flex-wrap: wrap; padding: 8px; gap: 4px; 
-            box-shadow: inset 0 0 15px #000; transition: 0.8s;
+            box-shadow: inset 0 0 15px #000; transition: 0.8s; cursor: pointer;
         }
         .window { width: 9px; height: 9px; background: #111; border-radius: 1px; }
         .active-win { background: var(--accent-color); box-shadow: 0 0 5px var(--accent-color); }
 
-        /* MODAL DE NICHOS (POPUP) */
+        /* INFO BOX */
+        .info-container { padding: 20px; background: var(--bg-card); border-top: 1px solid #111; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .info-item { background: #0a0a0a; padding: 10px; border: 1px solid #1a1a1a; border-radius: 8px; }
+        .info-label { font-size: 0.5rem; color: #555; font-family: 'Orbitron'; display: block; }
+        .info-val { font-size: 0.9rem; color: #eee; }
+
+        /* MODAL / INPUTS */
         .niche-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); z-index: 200; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.95); z-index: 200; align-items: center; justify-content: center; overflow-y: auto;
         }
-        .modal-content { background: #0a0a0a; border: 1px solid #222; padding: 25px; border-radius: 15px; width: 85%; max-width: 400px; text-align: center; }
-        .selector-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        .opt-btn { 
-            background: #111; border: 1px solid #333; color: #fff; padding: 12px 5px; 
-            border-radius: 8px; cursor: pointer; font-size: 0.6rem; font-family: 'Orbitron';
+        .modal-content { background: #0a0a0a; border: 1px solid #222; padding: 20px; border-radius: 15px; width: 85%; max-width: 400px; }
+        .selector-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px; }
+        .opt-btn { background: #111; border: 1px solid #333; color: #fff; padding: 10px 4px; border-radius: 6px; cursor: pointer; font-size: 0.55rem; font-family: 'Orbitron'; }
+        
+        input, select { 
+            width: 100%; background: #111; border: 1px solid #333; color: #fff; 
+            padding: 8px; margin: 5px 0; border-radius: 5px; font-family: 'Rajdhani';
         }
-
-        /* STORE */
-        .store-section { padding: 25px; background: #050505; border-top: 1px solid #111; }
-        .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .product-card { background: #0a0a0a; border-radius: 8px; padding: 10px; border: 1px solid #1a1a1a; text-align: center; }
 
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
     </style>
@@ -79,37 +82,47 @@
     </nav>
 
     <div class="habitat-header">
+        <div class="geo-tag"><span id="display-city">Cidade</span> / <span id="display-state">Estado</span></div>
         <div class="status-badge" id="display-role" onclick="toggleNicheMenu()">CARREGANDO...</div>
         <div class="user-name" id="display-name">---</div>
     </div>
 
     <div class="world-view">
         <div id="user-cube" class="identity-cube"></div>
-        <div id="user-building" class="building-asset"></div>
+        <div id="user-building" class="building-asset" onclick="redirectStore()"></div>
+    </div>
+
+    <div class="info-container">
+        <div class="info-grid">
+            <div class="info-item"><span class="info-label">NEXUS ID</span><span class="info-val" id="info-id">#0000</span></div>
+            <div class="info-item"><span class="info-label">RANK XP</span><span class="info-val" id="info-xp">0</span></div>
+            <div class="info-item" style="grid-column: span 2;"><span class="info-label">BIO / DESCRIÇÃO</span><span class="info-val" id="info-bio">Nenhuma bio definida.</span></div>
+        </div>
     </div>
 
     <div id="niche-modal" class="niche-modal" onclick="closeModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <span class="status-badge" style="border:none; color:#555">ALTERAR PROTOCOLO</span>
-            <div class="selector-grid">
-                <div class="opt-btn" style="border-left: 4px solid #555" onclick="setRole('citizen')">CIDADÃO</div>
-                <div class="opt-btn" style="border-left: 4px solid #00f2ff" onclick="setRole('clothes')">ROUPAS</div>
-                <div class="opt-btn" style="border-left: 4px solid #8b4513" onclick="setRole('shoes')">SAPATOS</div>
-                <div class="opt-btn" style="border-left: 4px solid #00ff88" onclick="setRole('tech')">ELETRÔNICOS</div>
-                <div class="opt-btn" style="border-left: 4px solid #bd00ff" onclick="setRole('auto')">VEÍCULOS</div>
-                <div class="opt-btn" style="border-left: 4px solid #e5e5e5" onclick="setRole('jewelry')">JOALHERIA</div>
-            </div>
-            <button onclick="toggleNicheMenu()" style="margin-top:20px; background:none; border:none; color:#444; font-family:Orbitron; font-size:0.6rem; cursor:pointer;">[ FECHAR ]</button>
-        </div>
-    </div>
+            <span class="info-label" style="text-align:center">CONFIGURAR NEXUS HABITAT</span>
+            
+            <input type="text" id="input-city" placeholder="Sua Cidade">
+            <select id="input-state">
+                <option value="">Selecione o Estado</option>
+                <option value="SP">São Paulo</option><option value="RJ">Rio de Janeiro</option>
+                <option value="MG">Minas Gerais</option><option value="BA">Bahia</option>
+                <option value="PR">Paraná</option></select>
+            <input type="text" id="input-bio" placeholder="Sua Bio (Breve)">
+            <input type="url" id="input-link" placeholder="Link da Loja (http://...)">
 
-    <div id="store-area" class="store-section" style="display:none;">
-        <span class="status-badge" style="border:none; margin-bottom:15px; display:block;">ESTOQUE DISPONÍVEL</span>
-        <div class="product-grid" id="product-list">
-            <div class="product-card">
-                <div style="height:80px; background:#111; margin-bottom:10px; border-radius:5px;"></div>
-                <div style="font-size:0.6rem; font-family:Orbitron; color:#aaa;">AGUARDANDO PRODUTOS</div>
+            <div class="selector-grid">
+                <div class="opt-btn" style="border-left: 3px solid #555" onclick="saveRole('citizen')">CIDADÃO</div>
+                <div class="opt-btn" style="border-left: 3px solid #00f2ff" onclick="saveRole('clothes')">ROUPAS</div>
+                <div class="opt-btn" style="border-left: 3px solid #8b4513" onclick="saveRole('shoes')">SAPATOS</div>
+                <div class="opt-btn" style="border-left: 3px solid #00ff88" onclick="saveRole('tech')">ELETRO</div>
+                <div class="opt-btn" style="border-left: 3px solid #ffaa00" onclick="saveRole('appliances')">DOMÉSTICOS</div>
+                <div class="opt-btn" style="border-left: 3px solid #bd00ff" onclick="saveRole('auto')">VEÍCULOS</div>
+                <div class="opt-btn" style="border-left: 3px solid #e5e5e5" onclick="saveRole('jewelry')">JOIAS</div>
             </div>
+            <button onclick="toggleNicheMenu()" style="width:100%; margin-top:15px; background:#222; border:none; color:#fff; padding:10px; border-radius:5px; font-family:Orbitron; font-size:0.6rem;">FECHAR E SALVAR</button>
         </div>
     </div>
 
@@ -134,68 +147,66 @@
 
         const roles = {
             citizen: { label: "CIDADÃO", color: "#555" },
-            clothes: { label: "COMERCIANTE: ROUPAS", color: "#00f2ff" },
-            shoes: { label: "COMERCIANTE: SAPATOS", color: "#8b4513" },
-            tech: { label: "COMERCIANTE: ELETRÔNICOS", color: "#00ff88" },
-            auto: { label: "COMERCIANTE: VEÍCULOS", color: "#bd00ff" },
-            jewelry: { label: "COMERCIANTE: JOALHERIA", color: "#e5e5e5" }
+            clothes: { label: "MODA", color: "#00f2ff" },
+            shoes: { label: "CALÇADOS", color: "#8b4513" },
+            tech: { label: "ELETRÔNICOS", color: "#00ff88" },
+            appliances: { label: "ELETRODOMÉSTICOS", color: "#ffaa00" },
+            auto: { label: "VEÍCULOS", color: "#bd00ff" },
+            jewelry: { label: "JOALHERIA", color: "#e5e5e5" }
         };
 
         let isOwner = false;
+        let storeLink = "";
 
-        // Gerenciar Modal
-        window.toggleNicheMenu = () => {
-            if(!isOwner) return; // Só o dono abre
-            const m = document.getElementById('niche-modal');
-            m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
-        };
-
-        window.closeModal = (e) => {
-            if(e.target.id === 'niche-modal') toggleNicheMenu();
-        };
+        window.toggleNicheMenu = () => { if(isOwner) document.getElementById('niche-modal').style.display = 'flex'; };
+        window.closeModal = (e) => { if(e.target.id === 'niche-modal') document.getElementById('niche-modal').style.display = 'none'; };
 
         if (targetID) {
             onSnapshot(doc(db, "usuarios", targetID), (snap) => {
                 if (snap.exists()) updateHabitat(snap.data());
             });
-
-            onAuthStateChanged(auth, user => {
-                if(user && user.uid === targetID) isOwner = true;
-            });
+            onAuthStateChanged(auth, user => { if(user && user.uid === targetID) isOwner = true; });
         }
 
-        window.setRole = async (roleKey) => {
+        window.saveRole = async (roleKey) => {
             const userRef = doc(db, "usuarios", auth.currentUser.uid);
             await updateDoc(userRef, {
                 role: roleKey,
-                temComercio: roleKey !== 'citizen'
+                temComercio: roleKey !== 'citizen',
+                cidade: document.getElementById('input-city').value,
+                estado: document.getElementById('input-state').value,
+                bio: document.getElementById('input-bio').value,
+                linkLoja: document.getElementById('input-link').value
             });
-            toggleNicheMenu();
+        };
+
+        window.redirectStore = () => {
+            if(storeLink && storeLink !== "") window.open(storeLink, '_blank');
         };
 
         function updateHabitat(data) {
-            const userRole = data.role || 'citizen';
-            const config = roles[userRole];
+            const config = roles[data.role || 'citizen'];
+            storeLink = data.linkLoja || "";
             
             document.documentElement.style.setProperty('--accent-color', config.color);
             document.getElementById('display-role').innerText = config.label;
-            document.getElementById('display-role').style.color = config.color;
-            document.getElementById('display-role').style.borderColor = config.color;
             document.getElementById('display-name').innerText = (data.nome || "NEXUS").toUpperCase();
+            document.getElementById('display-city').innerText = data.cidade || "Cidade";
+            document.getElementById('display-state').innerText = data.estado || "Estado";
+            document.getElementById('info-id').innerText = `#${targetID.substring(0, 5).toUpperCase()}`;
+            document.getElementById('info-xp').innerText = data.xp || 0;
+            document.getElementById('info-bio').innerText = data.bio || "Nenhuma bio definida.";
             document.getElementById('user-balance').innerText = `${(data.saldo || 0).toFixed(2)} NP`;
 
-            const level = Math.floor((data.xp || 0) / 1000) + 1;
             const b = document.getElementById('user-building');
+            const level = Math.floor((data.xp || 0) / 1000) + 1;
             b.style.height = (70 + (level * 18)) + "px";
-            
             b.innerHTML = "";
             for(let i=0; i < (level * 3); i++){
                 const w = document.createElement('div');
                 w.className = "window active-win";
                 b.appendChild(w);
             }
-
-            document.getElementById('store-area').style.display = data.temComercio ? 'block' : 'none';
         }
     </script>
 </body>
