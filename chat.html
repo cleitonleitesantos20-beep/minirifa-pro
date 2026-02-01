@@ -20,17 +20,16 @@
         #city-viewport {
             width: 100vw; height: 100vh;
             overflow-x: auto; overflow-y: hidden;
-            display: flex; align-items: flex-end; 
+            display: flex; align-items: stretch; /* Ajustado para preencher altura */
             scroll-behavior: smooth;
         }
         #city-viewport::-webkit-scrollbar { display: none; }
 
-        svg { display: block; flex-shrink: 0; }
+        svg { display: block; flex-shrink: 0; align-self: flex-end; } /* Garante que o SVG encoste no fundo */
 
         .building-base { fill: #000; stroke: var(--neon); stroke-width: 2.2; }
         .antenna { stroke: var(--neon); stroke-width: 1; opacity: 0.7; }
         
-        /* ESTILO JANELAS */
         .window-btn { 
             cursor: pointer; fill: #000; 
             animation: blink var(--dur) infinite alternate;
@@ -41,7 +40,6 @@
         .window-btn:hover { fill: var(--neon); filter: brightness(1.5); }
         @keyframes blink { 0% { opacity: 0.3; } 100% { opacity: 1; fill: var(--neon); } }
 
-        /* NPCs LOSANGOS */
         .npc-diamond { 
             filter: drop-shadow(0 0 8px currentColor);
             opacity: 0.9;
@@ -65,7 +63,6 @@
         .anim-linear { animation: moveNPC var(--spd) linear infinite; }
         .anim-zigzag { animation: zigzagNPC var(--spd) ease-in-out infinite; }
 
-        /* UI E CHAT */
         .ui-overlay { position: fixed; bottom: 20px; left: 0; width: 100%; display: flex; justify-content: center; align-items: center; gap: 15px; padding: 0 20px; z-index: 9999; pointer-events: none; }
         .ui-element { pointer-events: all; display: flex; gap: 10px; align-items: center; }
         .btn-exit { padding: 8px 15px; background: transparent; border: 1px solid rgba(255, 0, 85, 0.4); color: var(--pink); font-family: 'Orbitron'; font-size: 10px; cursor: pointer; transition: 0.3s; }
@@ -73,7 +70,7 @@
         #chat-input { flex: 1; background: transparent; border: none; padding: 5px 10px; color: #fff; font-family: 'Rajdhani'; outline: none; width: 100%; }
         .btn-send { background: var(--neon); border: none; padding: 5px 15px; cursor: pointer; color: #000; font-weight: bold; }
         
-        #chat-stream { position: fixed; top: 0; left: 20px; width: 400px; height: calc(100vh - 80px); pointer-events: none; overflow: hidden; }
+        #chat-stream { position: fixed; top: 0; left: 20px; width: 400px; height: calc(100vh - 100px); pointer-events: none; overflow: hidden; }
         .chat-msg { position: absolute; left: 0; top: -60px; color: var(--neon); font-family: 'Rajdhani'; font-weight: bold; text-shadow: 0 0 8px #000; font-size: 1.1rem; animation: fallDown 12s linear forwards; white-space: nowrap; }
         .msg-user { color: var(--pink); margin-right: 5px; }
 
@@ -108,6 +105,7 @@
             </defs>
             <g id="stars-layer"></g>
             <g id="buildings-container"></g>
+            
             <rect x="0" y="900" width="6000" height="3" fill="var(--neon)" filter="url(#glow)" />
 
             <g id="npc-layer">
@@ -137,6 +135,7 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
+        // Função de envio definida dentro do módulo
         async function sendMessage() {
             const input = document.getElementById('chat-input');
             const text = input.value.trim();
@@ -153,13 +152,33 @@
                 });
                 input.value = "";
             } catch (e) {
-                console.error("Erro:", e);
+                console.error("Erro ao enviar:", e);
             }
         }
 
-        document.getElementById('btn-send-msg').onclick = (e) => { e.preventDefault(); sendMessage(); };
-        document.getElementById('chat-input').onkeydown = (e) => { if(e.key === 'Enter') { e.preventDefault(); sendMessage(); } };
+        // Atribuição via script (mais confiável para módulos)
+        window.addEventListener('DOMContentLoaded', () => {
+            const sendBtn = document.getElementById('btn-send-msg');
+            const chatInput = document.getElementById('chat-input');
 
+            if(sendBtn) {
+                sendBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    sendMessage();
+                });
+            }
+
+            if(chatInput) {
+                chatInput.addEventListener('keydown', (e) => {
+                    if(e.key === 'Enter') {
+                        e.preventDefault();
+                        sendMessage();
+                    }
+                });
+            }
+        });
+
+        // Escuta novas mensagens
         const q = query(collection(db, "chat_messages"), orderBy("createdAt", "desc"), limit(12));
         onSnapshot(q, (snapshot) => {
             snapshot.docChanges().forEach((change) => {
