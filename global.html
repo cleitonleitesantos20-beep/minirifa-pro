@@ -23,15 +23,15 @@
             height: 100vh; width: 100vw;
         }
 
-        /* Menu Lateral - Ajustado para evitar o topo (nexus-overlay) */
+        /* Menu Lateral */
         #sector-menu {
             position: fixed; 
-            top: 15%; /* Começa mais baixo para não bater no overlay superior */
+            top: 15%; 
             right: -330px;
             width: 300px; 
             height: 70vh; 
             background: var(--overlay-bg);
-            border: 1px solid #222;
+            border: 1px solid #333;
             z-index: 9999;
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             padding: 20px;
@@ -53,7 +53,7 @@
             padding-right: 5px;
         }
 
-        /* Estrutura do Prédio - Vista de Cima */
+        /* Prédios */
         .building-wrapper {
             display: flex; flex-direction: column; align-items: center; gap: 6px;
             padding: 10px; background: rgba(255,255,255,0.02);
@@ -64,7 +64,7 @@
         .building-structure {
             width: 45px; height: 45px; border: 2px solid;
             display: flex; align-items: center; justify-content: center;
-            position: relative; background: rgba(0,0,0,0.4);
+            background: rgba(0,0,0,0.4);
         }
 
         .resident-diamond {
@@ -80,18 +80,36 @@
 
         .niche-label { font-size: 6px; font-family: 'Orbitron'; margin-top: 2px; opacity: 0.4; color: #fff; }
 
-        /* Mapa e Elementos Visuais */
-        #map-container { position: relative; z-index: 10; width: 100vw; height: 100vh; }
+        /* Mapa e Estados */
+        #map-container { position: relative; z-index: 10; width: 100vw; height: 100vh; background: #000; }
         
         .state {
-            fill: #050505; stroke: #222;
-            stroke-width: 0.5px; transition: 0.3s; cursor: pointer;
+            fill: #111111; /* Cinza bem escuro para diferenciar do fundo preto */
+            stroke: #333333; /* Borda visível */
+            stroke-width: 0.8px; 
+            transition: all 0.3s; 
+            cursor: pointer;
         }
-        .state:hover { fill: #111; }
+        
+        .state:hover { 
+            fill: #1a1a1a; 
+            stroke: #666; 
+        }
+
+        /* Estilo para quando clicar no estado */
+        .state.selected {
+            fill: rgba(0, 242, 255, 0.1);
+            stroke: var(--user-neon-color);
+            stroke-width: 1.5px;
+        }
         
         .state-sigla {
-            fill: #444; font-family: 'Orbitron';
-            font-size: 8px; pointer-events: none; text-anchor: middle;
+            fill: #ffffff; 
+            font-family: 'Orbitron';
+            font-size: 10px; 
+            pointer-events: none; 
+            text-anchor: middle;
+            opacity: 0.3;
         }
 
         #protagonist {
@@ -120,7 +138,7 @@
             <p id="connection-count" style="font-size: 7px; opacity: 0.5; margin-top: 4px;">SCANNER ATIVO</p>
         </div>
         <div id="buildings-grid"></div>
-        <button style="margin-top:10px; font-size:10px; background:none; border:1px solid #333; color:#666; padding:5px;" onclick="closeMenu()">FECHAR</button>
+        <button style="margin-top:auto; font-size:10px; background:none; border:1px solid #444; color:#fff; padding:10px; cursor:pointer; font-family:'Orbitron';" onclick="closeMenu()">DESCONECTAR</button>
     </div>
     
     <div id="map-container">
@@ -156,14 +174,18 @@
         const buildingsGrid = document.getElementById('buildings-grid');
         const protagonist = d3.select("#protagonist");
 
-        // Cor do Protagonista
         const userColor = localStorage.getItem('userNeonColor') || '#00f2ff';
         document.documentElement.style.setProperty('--user-neon-color', userColor);
 
-        window.openSector = async (stateName, stateSigla) => {
+        window.openSector = async (stateName, stateSigla, element) => {
+            // Remove seleção anterior
+            d3.selectAll(".state").classed("selected", false);
+            // Destaca o estado clicado
+            d3.select(element).classed("selected", true);
+
             const cleanSigla = stateSigla.replace("BR_", "").toUpperCase();
             document.getElementById('sector-title').innerText = `SETOR: ${stateName}`;
-            buildingsGrid.innerHTML = '<p style="font-size:8px;">ESCANEANDO...</p>';
+            buildingsGrid.innerHTML = '<p style="font-size:8px; grid-column:1/-1;">SCAN...</p>';
             sectorMenu.classList.add('active');
 
             try {
@@ -175,7 +197,6 @@
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
                     const isCitizen = data.role === 'citizen' || !data.role;
-                    // CORREÇÃO AQUI: Se não for citizen, usa a cor do banco ou a cor do usuário logado
                     const residentColor = isCitizen ? "#555555" : (data.userNeonColor || userColor);
                     const config = nicheAssets[data.role] || nicheAssets.citizen;
 
@@ -185,7 +206,7 @@
 
                     wrapper.innerHTML = `
                         <div class="building-name" style="color: ${residentColor}">${(data.nome || 'NEXUS').toUpperCase()}</div>
-                        <div class="building-structure" style="border-color: ${residentColor}; color: ${residentColor}; ${!isCitizen ? 'box-shadow: inset 0 0 10px ' + residentColor + '33' : ''}">
+                        <div class="building-structure" style="border-color: ${residentColor}; color: ${residentColor};">
                             <div class="resident-diamond"></div>
                         </div>
                         <div class="niche-label">${config.label}</div>
@@ -193,25 +214,26 @@
                     buildingsGrid.appendChild(wrapper);
                 });
             } catch (error) {
-                console.error(error);
-                buildingsGrid.innerHTML = '<p style="font-size:8px; color:red;">ERRO DE SINAL</p>';
+                buildingsGrid.innerHTML = '<p style="font-size:8px; color:red;">FAIL</p>';
             }
         };
 
-        window.closeMenu = () => sectorMenu.classList.remove('active');
+        window.closeMenu = () => {
+            sectorMenu.classList.remove('active');
+            d3.selectAll(".state").classed("selected", false);
+        };
 
-        // Configuração do Mapa D3
         const svg = d3.select("#brazil-map");
         const mapGroup = svg.select("#map-group");
         
-        // Foco aproximado no Brasil
-        const projection = d3.geoMercator().center([-52, -15]).scale(1100)
+        const projection = d3.geoMercator().center([-52, -15]).scale(1000)
             .translate([window.innerWidth / 2, window.innerHeight / 2]);
         const pathGenerator = d3.geoPath().projection(projection);
 
         d3.json("https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson").then(data => {
             mapGroup.selectAll("path").data(data.features).join("path")
-                .attr("class", "state").attr("d", pathGenerator)
+                .attr("class", "state")
+                .attr("d", pathGenerator)
                 .on("mouseenter", (event, d) => {
                     const [x, y] = pathGenerator.centroid(d);
                     const t = d3.zoomTransform(svg.node());
@@ -220,9 +242,9 @@
                         .style("top", `${t.applyY(y) - 9}px`);
                 })
                 .on("mouseleave", () => protagonist.style("opacity", "0"))
-                .on("click", (event, d) => {
+                .on("click", function(event, d) {
                     const sigla = d.properties.sigla || d.id; 
-                    openSector(d.properties.name, sigla);
+                    openSector(d.properties.name, sigla, this);
                 });
 
             mapGroup.selectAll("text").data(data.features).join("text")
@@ -232,12 +254,10 @@
                 .text(d => (d.properties.sigla || d.id).replace("BR_", ""));
         });
 
-        // Zoom interativo
         svg.call(d3.zoom().scaleExtent([1, 15]).on("zoom", (e) => {
             mapGroup.attr("transform", e.transform);
             protagonist.style("opacity", "0");
         }));
-
     </script>
 
     <script type="module" src="nexus-overlay.js"></script>
