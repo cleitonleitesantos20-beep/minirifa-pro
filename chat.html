@@ -24,7 +24,6 @@
             display: flex;
             align-items: flex-end; 
             scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
         }
         #city-viewport::-webkit-scrollbar { display: none; }
 
@@ -49,27 +48,26 @@
 
         .label { font-family: 'Orbitron'; font-size: 14px; fill: var(--neon); pointer-events: none; letter-spacing: 2px; font-weight: bold; }
 
-        /* Luzes Passando */
+        /* Estilo das Luzes de Tráfego */
         .traffic-light {
             fill: var(--neon);
-            opacity: 0.6;
-            filter: blur(2px);
-            animation: moveLight 8s linear infinite;
+            filter: blur(1px);
+            animation: moveLight var(--spd) linear infinite;
         }
         @keyframes moveLight {
-            from { transform: translateX(-500px); }
-            to { transform: translateX(6500px); }
+            from { transform: translateX(-600px); }
+            to { transform: translateX(6000px); }
         }
 
         .ui-overlay { position: fixed; z-index: 1000; pointer-events: none; inset: 0; }
         .ui-element { pointer-events: all; }
 
-        /* Botões posicionados estrategicamente abaixo da plataforma */
-        .controls { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; }
+        /* Botões posicionados ABAIXO da linha neon, na plataforma cinza */
+        .controls { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; }
         .btn { 
-            padding: 8px 16px; background: rgba(0,0,0,0.9); border: 1px solid var(--neon); 
+            padding: 6px 12px; background: rgba(0,0,0,0.8); border: 1px solid var(--neon); 
             color: var(--neon); font-family: 'Orbitron'; font-size: 9px; cursor: pointer;
-            box-shadow: 0 0 10px rgba(0, 242, 255, 0.2);
+            box-shadow: 0 0 8px rgba(0, 242, 255, 0.2);
             text-transform: uppercase;
         }
 
@@ -95,14 +93,20 @@
         <svg id="main-svg" width="6000" height="1000" viewBox="0 0 6000 1000">
             <g id="stars-layer"></g>
             
-            <rect class="traffic-light" x="0" y="870" width="150" height="1" style="animation-delay: 0s;"/>
-            <rect class="traffic-light" x="0" y="885" width="200" height="1.5" style="animation-delay: 3s; fill: var(--pink);"/>
-            <rect class="traffic-light" x="0" y="895" width="100" height="1" style="animation-delay: 5s;"/>
+            <g id="lights-back">
+                <rect class="traffic-light" x="0" y="860" width="100" height="1" style="--spd: 12s; opacity: 0.3;"/>
+                <rect class="traffic-light" x="0" y="875" width="150" height="1" style="--spd: 15s; opacity: 0.4; fill: var(--pink);"/>
+            </g>
+
+            <g id="buildings-container"></g>
+
+            <g id="lights-front">
+                <rect class="traffic-light" x="0" y="910" width="200" height="2" style="--spd: 7s; opacity: 0.6;"/>
+                <rect class="traffic-light" x="0" y="925" width="120" height="1.5" style="--spd: 10s; opacity: 0.5; fill: var(--pink);"/>
+            </g>
 
             <rect x="0" y="900" width="6000" height="100" fill="var(--floor)" />
             <rect x="0" y="900" width="6000" height="3" fill="var(--neon)" filter="url(#glow)" />
-
-            <g id="buildings-container"></g>
 
             <defs>
                 <filter id="glow"><feGaussianBlur stdDeviation="4" result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/></filter>
@@ -150,16 +154,15 @@
             const floorY = 900; 
 
             for(let i=0; i < names.length; i++) {
-                // Prédios levemente menores como solicitado
-                const w = 280 + Math.random() * 70; 
-                const h = 450 + Math.random() * 250; 
+                const w = 260 + Math.random() * 60; 
+                const h = 400 + Math.random() * 250; 
                 const y = floorY - h;
                 const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
                 
                 g.innerHTML = `
                     <rect x="${x}" y="${y}" width="${w}" height="${h}" class="building-base" />
-                    <text x="${x + w/2}" y="${y - 20}" class="label" text-anchor="middle">${names[i]}</text>
-                    <rect x="${x + w/2 - 25}" y="${floorY - 60}" width="50" height="60" class="door-btn" onclick="showMystery()" />
+                    <text x="${x + w/2}" y="${y - 15}" class="label" text-anchor="middle">${names[i]}</text>
+                    <rect x="${x + w/2 - 25}" y="${floorY - 55}" width="50" height="55" class="door-btn" onclick="showMystery()" />
                 `;
 
                 const cols = 4;
@@ -168,10 +171,10 @@
                     for(let c=0; c<cols; c++) {
                         if(Math.random() > 0.3) {
                             const wx = x + (c + 1) * (w/(cols+1)) - 10;
-                            const wy = y + 50 + (r * (h/(rows+1)));
+                            const wy = y + 40 + (r * (h/(rows+1)));
                             const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
                             rect.setAttribute("x", wx); rect.setAttribute("y", wy);
-                            rect.setAttribute("width", "20"); rect.setAttribute("height", "20");
+                            rect.setAttribute("width", "18"); rect.setAttribute("height", "18");
                             rect.setAttribute("class", "window-btn");
                             rect.setAttribute("style", `--dur:${1.2+Math.random()*2}s; --delay:${Math.random()*3}s`);
                             rect.onclick = showMystery;
@@ -180,7 +183,7 @@
                     }
                 }
                 bContainer.appendChild(g);
-                x += w + 220; 
+                x += w + 240; 
             }
         }
     </script>
