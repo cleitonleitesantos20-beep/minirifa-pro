@@ -10,7 +10,7 @@
             --neon: #00f2ff;
             --pink: #ff0055;
             --gold: #ffcc00;
-            --bg: #020204;
+            --bg: #010103;
             --win-bright: #6ef9ff;
         }
 
@@ -36,24 +36,28 @@
         #city-container::-webkit-scrollbar { display: none; }
 
         #zoom-layer {
-            transform-origin: center bottom;
-            transition: transform 1.2s cubic-bezier(0.2, 1, 0.3, 1);
-            transform: scale(0.5);
+            transform-origin: center 900px; /* Zoom foca na base da plataforma */
+            transition: transform 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+            transform: scale(0.3); /* Começa longe para ver as estrelas */
         }
 
         .city-svg { height: 100%; display: block; }
 
-        /* Estilos do Cenário */
-        .building-front { fill: #050508; stroke: rgba(0, 242, 255, 0.2); stroke-width: 1; }
-        .window-dark { cursor: pointer; pointer-events: all; animation: flicker-bright var(--d) infinite; }
-        .platform-base { fill: #010103; stroke: var(--neon); stroke-width: 0.5; opacity: 0.5; }
+        /* Elementos do Cenário */
+        .building-front { fill: #040406; stroke: rgba(0, 242, 255, 0.15); stroke-width: 1; }
+        .window-dark { cursor: pointer; pointer-events: all; animation: flicker-bright var(--d) infinite; transition: 0.3s; }
+        .platform-base { fill: #000; stroke: var(--neon); stroke-width: 2; opacity: 0.8; }
         
+        /* Efeito de Seleção */
+        .interactable:hover { stroke: #fff !important; stroke-width: 2px; filter: drop-shadow(0 0 8px var(--neon)); }
+        .selected { fill: var(--win-bright) !important; stroke: #fff !important; filter: drop-shadow(0 0 15px var(--neon)) !important; }
+
         @keyframes flicker-bright { 
-            0%, 100% { opacity: 0.2; fill: #0a0a0a; } 
+            0%, 100% { opacity: 0.2; fill: #080808; } 
             50% { opacity: 1; fill: var(--win-bright); } 
         }
 
-        /* Chat Invisível/Transparente */
+        /* Chat */
         #chat-window {
             position: fixed;
             bottom: 110px; left: 50%;
@@ -62,73 +66,52 @@
             z-index: 90; display: none; flex-direction: column;
             pointer-events: none;
         }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+        .chat-msg-item { color: #fff; text-shadow: 0 0 5px #000; font-size: 1rem; }
+        .chat-input-area { pointer-events: all; border-bottom: 1px solid rgba(0, 242, 255, 0.3); }
+        input { background: transparent; border: none; color: var(--neon); width: 100%; outline: none; font-family: 'Rajdhani'; padding: 8px; }
 
-        .chat-messages { 
-            flex: 1; overflow-y: auto; padding: 10px;
-            display: flex; flex-direction: column; gap: 8px;
-        }
-
-        .chat-msg-item {
-            color: #fff;
-            text-shadow: 0 0 5px rgba(0,0,0,0.5);
-            font-size: 1rem;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
-        .chat-input-area { 
-            pointer-events: all; 
-            background: transparent;
-            border-bottom: 1px solid rgba(0, 242, 255, 0.3);
-            margin-top: 10px;
-        }
-
-        input { 
-            background: transparent; border: none; color: var(--neon); 
-            width: 100%; outline: none; font-family: 'Rajdhani'; 
-            padding: 5px; font-size: 1rem;
-        }
-
-        /* UI Navigation */
+        /* Nav */
         .nav-bar { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; z-index: 100; }
         .v-button {
-            width: 50px; height: 50px;
-            background: rgba(0,0,0,0.4);
+            width: 60px; height: 50px;
+            background: rgba(0,0,0,0.6);
             border: 1px solid var(--neon);
-            border-radius: 8px;
+            border-radius: 5px;
             color: var(--neon);
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; transition: 0.3s;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(10px);
+            font-weight: bold;
+            font-family: 'Orbitron';
         }
     </style>
 </head>
 <body>
 
     <div class="nav-bar">
-        <div class="v-button" style="color:var(--pink); border-color: var(--pink);" onclick="location.href='index.html'">EXIT</div>
-        <div class="v-button" onclick="toggleChat()">💬</div>
-        <div class="v-button" id="btn-zoom" onclick="toggleZoom()">Z</div>
+        <div class="v-button" style="color:var(--pink); border-color: var(--pink);" onclick="location.href='index.html'">SAIR</div>
+        <div class="v-button" onclick="toggleChat()">CHAT</div>
+        <div id="btn-zoom" class="v-button" onclick="toggleZoom()">ZOOM</div>
     </div>
 
     <div id="chat-window">
         <div class="chat-messages" id="chat-box"></div>
         <div class="chat-input-area">
-            <input type="text" id="chat-input" placeholder="Nexus Link..." onkeypress="if(event.key==='Enter') sendMsg()">
+            <input type="text" id="chat-input" placeholder="Conectar ao Nexus..." onkeypress="if(event.key==='Enter') sendMsg()">
         </div>
     </div>
 
     <div id="city-container">
         <svg id="city-svg" class="city-svg">
             <defs>
-                <filter id="glow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
             </defs>
             <g id="zoom-layer">
                 <g id="sky-layer"></g>
                 <g id="celestial-body" filter="url(#glow)"></g>
                 <g id="far-buildings"></g>
-                <rect id="plat-rect" x="0" y="900" height="5" class="platform-base" />
+                <rect id="plat-rect" x="0" y="900" height="10" class="platform-base" />
                 <g id="mid-buildings"></g>
                 <g id="air-traffic"></g>
             </g>
@@ -144,13 +127,13 @@
             const finalX = renderCity();
             
             const svg = document.getElementById('city-svg');
-            const container = document.getElementById('city-container');
-            const totalWidth = finalX + 1000; 
+            const totalWidth = finalX + 1500; 
 
             svg.setAttribute('width', totalWidth);
             svg.setAttribute('viewBox', `0 0 ${totalWidth} 1000`);
             document.getElementById('plat-rect').setAttribute('width', totalWidth);
 
+            const container = document.getElementById('city-container');
             setTimeout(() => {
                 container.scrollLeft = (totalWidth * 0.5) - (window.innerWidth / 2);
             }, 100);
@@ -161,30 +144,26 @@
         function renderSky() {
             const sky = document.getElementById('sky-layer');
             let html = '';
-            for(let i=0; i<400; i++) {
-                // Estrelas cobrindo todo o eixo Y (0 a 1000)
-                html += `<circle cx="${Math.random()*9000}" cy="${Math.random()*1000}" r="${Math.random()*1.2}" fill="#fff" opacity="${Math.random()}"/>`;
+            for(let i=0; i<500; i++) {
+                html += `<circle cx="${Math.random()*10000}" cy="${Math.random()*1000}" r="${Math.random()*1.5}" fill="#fff" opacity="${Math.random()}"/>`;
             }
             sky.innerHTML = html;
         }
 
         function renderCelestial() {
             const group = document.getElementById('celestial-body');
-            const now = new Date();
-            const hour = now.getHours() + (now.getMinutes()/60);
-            
-            // Cálculo do Arco (Parábola)
-            // X vai de 10% a 90% da tela visível, Y faz a curva
-            const progress = (hour % 24) / 24; 
-            const centerX = 500 + (progress * 4000); // Segue o caminho da cidade
-            const centerY = 300 - Math.sin(Math.PI * (hour / 24)) * 250;
-
+            const hour = new Date().getHours() + (new Date().getMinutes()/60);
             const isDay = hour >= 6 && hour < 18;
+            
+            // Arco de movimento
+            const progress = (hour % 24) / 24;
+            const centerX = 1000 + (progress * 6000);
+            const centerY = 400 - Math.sin(Math.PI * (hour / 24)) * 350;
             const color = isDay ? "var(--gold)" : "var(--neon)";
             
             group.innerHTML = `
-                <rect x="${centerX}" y="${centerY}" width="60" height="30" fill="none" stroke="${color}" stroke-width="2" />
-                <rect x="${centerX+5}" y="${centerY+5}" width="50" height="20" fill="${color}" opacity="0.2" />
+                <rect x="${centerX}" y="${centerY}" width="80" height="40" fill="none" stroke="${color}" stroke-width="3" />
+                <rect x="${centerX+10}" y="${centerY+10}" width="60" height="20" fill="${color}" opacity="0.2" />
             `;
         }
 
@@ -193,33 +172,38 @@
             const far = document.getElementById('far-buildings');
             let midHTML = ''; let farHTML = '';
             
-            for(let fx=0; fx<9000; fx+=300) {
-                farHTML += `<rect x="${fx}" y="${600+Math.random()*200}" width="${150}" height="300" fill="#030305" />`;
+            for(let fx=0; fx<10000; fx+=350) {
+                farHTML += `<rect x="${fx}" y="${650+Math.random()*150}" width="${180}" height="300" fill="#020205" />`;
             }
             far.innerHTML = farHTML;
 
-            let x = 500;
-            while(x < 8000) { 
-                const w = 240 + Math.random()*140;
-                const h = 300 + Math.random()*500;
-                const y = 900 - h; // Prédio começa exatamente no Y=900 (plataforma) e sobe
+            let x = 600;
+            while(x < 9000) { 
+                const w = 250 + Math.random()*150;
+                const h = 350 + Math.random()*450;
+                const y = 900 - h;
 
-                // Prédio
-                midHTML += `<rect x="${x}" y="${y}" width="${w}" height="${h}" class="building-front" />`;
+                // Base do Prédio
+                midHTML += `<rect x="${x}" y="${y}" width="${w}" height="${h}" class="building-front interactable" />`;
 
-                // Janelas
-                for(let r = y + 50; r < 850; r += 70) {
-                    for(let c = x + 40; c < x + w - 40; c += 50) {
-                        if(Math.random() > 0.5) {
-                            midHTML += `<rect x="${c}" y="${r}" width="15" height="20" class="window-dark" style="--d:${1+Math.random()*3}s" />`;
+                // Janelas Interativas
+                for(let r = y + 60; r < 840; r += 75) {
+                    for(let c = x + 40; c < x + w - 40; c += 55) {
+                        if(Math.random() > 0.4) {
+                            midHTML += `<rect x="${c}" y="${r}" width="20" height="25" 
+                                        class="window-dark interactable" 
+                                        style="--d:${1+Math.random()*3}s" 
+                                        onclick="this.classList.toggle('selected')"/>`;
                         }
                     }
                 }
 
-                // Porta (Requisito)
-                midHTML += `<rect x="${x + w/2 - 15}" y="870" width="30" height="30" fill="none" stroke="var(--neon)" stroke-width="1" opacity="0.6"/>`;
+                // Porta Interativa
+                midHTML += `<rect x="${x + w/2 - 20}" y="855" width="40" height="45" 
+                            fill="none" stroke="var(--neon)" stroke-width="1.5" 
+                            class="interactable" onclick="this.classList.toggle('selected')"/>`;
 
-                x += w + 150 + Math.random()*200;
+                x += w + 200 + Math.random()*100;
             }
             mid.innerHTML = midHTML;
             return x; 
@@ -229,42 +213,35 @@
             const air = document.getElementById('air-traffic');
             setInterval(() => {
                 const fCar = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-                const posY = 100 + Math.random()*500;
-                fCar.setAttribute("width", "40"); fCar.setAttribute("height", "1");
+                const posY = 150 + Math.random()*500;
+                fCar.setAttribute("width", "50"); fCar.setAttribute("height", "1");
                 fCar.setAttribute("fill", "var(--neon)");
                 fCar.style.transform = `translate(-100px, ${posY}px)`;
-                fCar.style.transition = "transform 18s linear";
+                fCar.style.transition = "transform 20s linear";
                 air.appendChild(fCar);
-                setTimeout(() => fCar.style.transform = `translate(9000px, ${posY}px)`, 50);
-                setTimeout(() => fCar.remove(), 18100);
-            }, 5000);
+                setTimeout(() => fCar.style.transform = `translate(10000px, ${posY}px)`, 50);
+                setTimeout(() => fCar.remove(), 20100);
+            }, 6000);
         }
 
         window.toggleZoom = () => {
             isZoomed = !isZoomed;
-            document.getElementById('zoom-layer').style.transform = isZoomed ? "scale(0.8)" : "scale(0.5)";
-        }
+            const layer = document.getElementById('zoom-layer');
+            // Scale 1.2 foca nas portas e janelas baixas. Scale 0.3 mostra o horizonte e estrelas.
+            layer.style.transform = isZoomed ? "scale(1.2)" : "scale(0.3)";
+            document.getElementById('btn-zoom').style.color = isZoomed ? "var(--pink)" : "var(--neon)";
+        };
 
         window.toggleChat = () => {
             const win = document.getElementById('chat-window');
             win.style.display = win.style.display === 'flex' ? 'none' : 'flex';
-            if(win.style.display === 'flex') document.getElementById('chat-input').focus();
-        }
+        };
 
         window.sendMsg = () => {
             const input = document.getElementById('chat-input');
             const box = document.getElementById('chat-box');
             if(!input.value) return;
-
-            // Nome vindo do contexto (Firebase/Nexus VL)
-            const userName = "Nexus User"; 
-            
-            box.innerHTML += `
-                <div class="chat-msg-item">
-                    <span style="color:var(--neon); font-weight:bold;">${userName}:</span> 
-                    <span>${input.value}</span>
-                </div>
-            `;
+            box.innerHTML += `<div class="chat-msg-item"><b style="color:var(--neon)">Nexus User:</b> ${input.value}</div>`;
             input.value = "";
             box.scrollTo({ top: box.scrollHeight, behavior: 'smooth' });
         }
