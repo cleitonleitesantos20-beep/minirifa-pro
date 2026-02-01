@@ -30,8 +30,10 @@
             overflow-x: scroll;
             overflow-y: hidden;
             z-index: 1;
-            scroll-behavior: auto;
+            /* Scrollbar invisível para imersão */
+            scrollbar-width: none;
         }
+        #city-container::-webkit-scrollbar { display: none; }
 
         #zoom-layer {
             transform-origin: center bottom;
@@ -47,7 +49,6 @@
             stroke-width: 2; 
         }
 
-        /* Janelas Interativas */
         .window-dark { 
             cursor: pointer;
             pointer-events: all;
@@ -78,49 +79,70 @@
         }
 
         .v-button {
-            width: 50px; height: 50px;
-            background: rgba(0,0,0,0.8);
+            width: 55px; height: 55px;
+            background: rgba(0,0,0,0.85);
             border: 1px solid var(--neon);
-            border-radius: 50%;
-            color: #ccc;
+            border-radius: 12px; /* Mais quadrado/moderno */
+            color: var(--neon);
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; cursor: pointer; transition: 0.3s;
-            backdrop-filter: blur(5px);
+            font-size: 1.1rem; cursor: pointer; transition: 0.3s;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.1);
+        }
+
+        .v-button:active { transform: scale(0.9); }
+        
+        /* Botão de Zoom Especial */
+        .zoom-btn {
+            font-family: 'Orbitron';
+            text-shadow: 0 0 8px var(--neon);
+            animation: pulse-border 2s infinite;
+        }
+
+        @keyframes pulse-border {
+            0% { border-color: var(--neon); }
+            50% { border-color: #fff; }
+            100% { border-color: var(--neon); }
         }
 
         #chat-window {
             position: fixed;
-            bottom: 100px; left: 50%;
+            bottom: 110px; left: 50%;
             transform: translateX(-50%);
-            width: 350px; height: 250px;
+            width: 350px; height: 280px;
             z-index: 90; display: none; flex-direction: column;
             pointer-events: none; 
+            background: rgba(5, 5, 8, 0.9);
+            border: 1px solid var(--neon);
         }
+
+        .chat-messages { flex: 1; overflow-y: auto; padding: 15px; font-size: 0.95rem; }
 
         .chat-input-area { 
             display: flex; 
-            background: rgba(0,0,0,0.9); 
-            border: 1px solid var(--neon); 
+            border-top: 1px solid rgba(0, 242, 255, 0.3);
             pointer-events: all; 
-            padding: 5px;
+            padding: 8px;
         }
 
-        @media (max-width: 600px) { #chat-window { width: 95vw; } }
+        input { background: transparent; border: none; color: #fff; flex: 1; outline: none; font-family: 'Rajdhani'; padding: 5px; }
+
+        @media (max-width: 600px) { #chat-window { width: 90vw; } }
     </style>
 </head>
 <body>
 
     <div class="nav-bar">
-        <div class="v-button" style="color:var(--pink); border-color: var(--pink);" onclick="location.href='index.html'">X</div>
+        <div class="v-button" style="color:var(--pink); border-color: var(--pink);" onclick="location.href='index.html'">EXIT</div>
         <div class="v-button" onclick="toggleChat()">💬</div>
-        <div class="v-button" onclick="toggleZoom()">[ + ]</div>
+        <div class="v-button zoom-btn" id="btn-zoom" onclick="toggleZoom()">Z-IN</div>
     </div>
 
     <div id="chat-window">
-        <div class="chat-messages" id="chat-box" style="flex:1; overflow-y:auto; padding:10px;"></div>
+        <div class="chat-messages" id="chat-box"></div>
         <div class="chat-input-area">
-            <input type="text" id="chat-input" style="background:transparent; border:none; color:#fff; flex:1; outline:none; padding:5px;">
-            <button onclick="sendMsg()" style="background:none; border:none; color:var(--neon); cursor:pointer; font-weight:bold;">></button>
+            <input type="text" id="chat-input" placeholder="Type to Nexus..." onkeypress="if(event.key==='Enter') sendMsg()">
+            <button onclick="sendMsg()" style="background:none; border:none; color:var(--neon); cursor:pointer; font-weight:bold; font-size: 1.2rem;">></button>
         </div>
     </div>
 
@@ -150,18 +172,18 @@
             const svg = document.getElementById('city-svg');
             const container = document.getElementById('city-container');
             
-            // Ajuste Final da Borda
-            const totalWidth = finalX + 300; 
+            // Borda precisa
+            const totalWidth = finalX + 400; 
             svg.setAttribute('width', totalWidth);
             svg.setAttribute('viewBox', `0 0 ${totalWidth} 1000`);
             document.getElementById('plat-rect').setAttribute('width', totalWidth);
 
-            // Centralização Inicial Forçada
+            // Nascimento no Centro
             setTimeout(() => {
-                const centerX = (totalWidth * 0.5) / 2 - (window.innerWidth / 2);
-                container.scrollLeft = centerX;
+                const scrollableWidth = container.scrollWidth - container.clientWidth;
+                container.scrollLeft = scrollableWidth / 2;
                 container.style.scrollBehavior = 'smooth';
-            }, 100);
+            }, 150);
 
             startAirTraffic();
         });
@@ -169,8 +191,8 @@
         function renderSky() {
             const sky = document.getElementById('sky-layer');
             let html = '';
-            for(let i=0; i<120; i++) {
-                html += `<circle cx="${Math.random()*6000}" cy="${Math.random()*800}" r="${Math.random()*1.5}" fill="#fff" opacity="${Math.random()}"/>`;
+            for(let i=0; i<150; i++) {
+                html += `<circle cx="${Math.random()*6000}" cy="${Math.random()*800}" r="${Math.random()*1.8}" fill="#fff" opacity="${Math.random()}"/>`;
             }
             sky.innerHTML = html;
         }
@@ -181,22 +203,22 @@
             let midHTML = '';
             let farHTML = '';
             
-            for(let fx=0; fx<6000; fx+=250) {
-                farHTML += `<rect x="${fx}" y="${650+Math.random()*150}" width="${150}" height="200" fill="#0a0a12" />`;
+            for(let fx=0; fx<6500; fx+=250) {
+                farHTML += `<rect x="${fx}" y="${650+Math.random()*150}" width="${180}" height="200" fill="#07070f" />`;
             }
             far.innerHTML = farHTML;
 
-            let x = 200;
-            while(x < 5500) { 
-                const w = 240 + Math.random()*160;
-                const h = 450 + Math.random()*400;
+            let x = 300;
+            while(x < 5800) { 
+                const w = 250 + Math.random()*150;
+                const h = 400 + Math.random()*450;
                 const y = 900 - h;
                 
                 midHTML += `<rect x="${x}" y="${y}" width="${w}" height="${h}" class="building-front" />`;
 
                 for(let r = y + 70; r < 840; r += 75) {
                     for(let c = x + 45; c < x + w - 45; c += 60) {
-                        if(Math.random() > 0.5) {
+                        if(Math.random() > 0.4) {
                             midHTML += `<rect x="${c}" y="${r}" width="20" height="28" class="window-dark" 
                                         style="--d:${1+Math.random()*3}s" 
                                         onclick="this.classList.toggle('window-fixed')"/>`;
@@ -206,11 +228,10 @@
 
                 if (Math.random() > 0.6) {
                     const word = bannerWords[Math.floor(Math.random() * bannerWords.length)];
-                    midHTML += `<rect x="${x+20}" y="${y+100}" width="${w-40}" height="55" fill="rgba(0,0,0,0.8)" stroke="var(--neon)" />`;
-                    midHTML += `<text x="${x + w/2}" y="${y + 138}" fill="var(--neon)" font-family="Orbitron" font-size="26" text-anchor="middle" filter="url(#glow)">${word}</text>`;
+                    midHTML += `<rect x="${x+20}" y="${y+120}" width="${w-40}" height="55" fill="rgba(0,0,0,0.85)" stroke="var(--neon)" />`;
+                    midHTML += `<text x="${x + w/2}" y="${y + 158}" fill="var(--neon)" font-family="Orbitron" font-size="26" text-anchor="middle" filter="url(#glow)">${word}</text>`;
                 }
-
-                x += w + 100 + Math.random()*100;
+                x += w + 120 + Math.random()*150;
             }
             mid.innerHTML = midHTML;
             return x; 
@@ -220,20 +241,25 @@
             const air = document.getElementById('air-traffic');
             setInterval(() => {
                 const fCar = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-                const posY = 150 + Math.random()*400;
-                fCar.setAttribute("width", "45"); fCar.setAttribute("height", "2");
+                const posY = 150 + Math.random()*450;
+                fCar.setAttribute("width", "50"); fCar.setAttribute("height", "1.5");
                 fCar.setAttribute("fill", "var(--neon)");
                 fCar.style.transform = `translate(-100px, ${posY}px)`;
-                fCar.style.transition = "transform 12s linear";
+                fCar.style.transition = "transform 14s linear";
                 air.appendChild(fCar);
-                setTimeout(() => fCar.style.transform = `translate(6000px, ${posY}px)`, 50);
-                setTimeout(() => fCar.remove(), 12100);
-            }, 5000);
+                setTimeout(() => fCar.style.transform = `translate(6500px, ${posY}px)`, 50);
+                setTimeout(() => fCar.remove(), 14100);
+            }, 4500);
         }
 
         window.toggleZoom = () => {
             isZoomed = !isZoomed;
-            document.getElementById('zoom-layer').style.transform = isZoomed ? "scale(0.8)" : "scale(0.5)";
+            const layer = document.getElementById('zoom-layer');
+            const btn = document.getElementById('btn-zoom');
+            layer.style.transform = isZoomed ? "scale(0.85)" : "scale(0.5)";
+            btn.innerHTML = isZoomed ? "Z-OUT" : "Z-IN";
+            btn.style.color = isZoomed ? "var(--pink)" : "var(--neon)";
+            btn.style.borderColor = isZoomed ? "var(--pink)" : "var(--neon)";
         }
 
         window.toggleChat = () => {
@@ -243,10 +269,10 @@
 
         window.sendMsg = () => {
             const input = document.getElementById('chat-input');
-            if(!input.value) return;
-            document.getElementById('chat-box').innerHTML += `<div><b style="color:var(--neon)">User:</b> ${input.value}</div>`;
-            input.value = "";
             const box = document.getElementById('chat-box');
+            if(!input.value) return;
+            box.innerHTML += `<div style="margin-bottom:8px;"><b style="color:var(--neon)">Nexus User:</b> <span style="color:#fff">${input.value}</span></div>`;
+            input.value = "";
             box.scrollTop = box.scrollHeight;
         }
     </script>
