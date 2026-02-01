@@ -15,101 +15,68 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        
-        body { 
-            background: var(--bg); 
-            color: #fff; 
-            font-family: 'Rajdhani'; 
-            overflow: hidden; 
-            height: 100vh; width: 100vw;
-        }
+        body { background: var(--bg); color: #fff; font-family: 'Rajdhani'; overflow: hidden; height: 100vh; width: 100vw; }
 
-        #city-container {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            overflow-x: scroll;
-            overflow-y: hidden;
-            z-index: 1;
-            scrollbar-width: none;
-        }
+        /* Status Online Canto Esquerdo */
+        .online-status { position: fixed; top: 20px; left: 20px; z-index: 200; display: flex; align-items: center; gap: 8px; font-family: 'Orbitron'; font-size: 0.8rem; color: var(--neon); }
+        .dot { width: 8px; height: 8px; background: #00ff00; border-radius: 50%; box-shadow: 0 0 10px #00ff00; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+
+        #city-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; overflow-x: scroll; overflow-y: hidden; z-index: 1; scrollbar-width: none; }
         #city-container::-webkit-scrollbar { display: none; }
 
-        #zoom-layer {
-            transform-origin: center 850px;
-            transition: transform 1.2s cubic-bezier(0.15, 0.85, 0.35, 1), transform-origin 1.2s ease;
-            transform: scale(0.5);
-        }
+        #zoom-layer { transform-origin: center 850px; transition: transform 1.2s cubic-bezier(0.15, 0.85, 0.35, 1), transform-origin 1.2s ease; transform: scale(0.5); }
 
-        .city-svg { height: 100%; display: block; }
+        .building-front { fill: #040406; stroke: rgba(0, 242, 255, 0.2); }
+        .win-tag { font-size: 8px; fill: #fff; opacity: 0; pointer-events: none; text-anchor: middle; font-family: 'Orbitron'; }
+        .window-dark:hover + .win-tag, .selected + .win-tag { opacity: 1; }
+        .selected { fill: var(--win-bright) !important; filter: drop-shadow(0 0 10px var(--neon)); }
 
-        .building-group { cursor: pointer; pointer-events: all; }
-        .building-front { fill: #040406; stroke: rgba(0, 242, 255, 0.2); stroke-width: 1; }
-        .building-id { font-family: 'Orbitron'; font-size: 12px; fill: var(--neon); opacity: 0.5; pointer-events: none; text-anchor: middle; }
-        .window-dark { cursor: pointer; pointer-events: all; animation: flicker-bright var(--d) infinite; }
+        /* UI Lado Direito */
+        .ui-right { position: fixed; bottom: 20px; right: 20px; z-index: 100; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+        #chat-window { width: 250px; height: 200px; display: none; flex-direction: column; pointer-events: none; }
+        .chat-messages { flex: 1; overflow: hidden; display: flex; flex-direction: column; gap: 5px; justify-content: flex-end; }
+        .chat-msg-item { color: var(--neon); font-size: 0.9rem; text-shadow: 1px 1px 2px #000; animation: fadeOut 10s forwards; font-weight: bold; }
+        @keyframes fadeOut { 0% { opacity: 0; transform: translateY(5px); } 5% { opacity: 1; transform: translateY(0); } 80% { opacity: 1; } 100% { opacity: 0; } }
         
-        .plat-base { fill: #050508; }
-        .plat-line { stroke: var(--neon); stroke-width: 2; opacity: 0.8; }
-        
-        .selected { fill: var(--win-bright) !important; stroke: #fff !important; filter: drop-shadow(0 0 10px var(--neon)) !important; }
+        .chat-input-area { pointer-events: all; border-bottom: 1px solid var(--neon); width: 100%; margin-top: 5px; }
+        input { background: transparent; border: none; color: #fff; width: 100%; outline: none; padding: 5px; font-family: 'Rajdhani'; font-size: 1rem; }
 
-        @keyframes flicker-bright { 
-            0%, 100% { opacity: 0.2; fill: #080808; } 
-            50% { opacity: 1; fill: var(--win-bright); } 
-        }
-
-        /* Botões Canto Esquerdo Inferior */
-        .nav-bar { position: fixed; bottom: 20px; left: 20px; display: flex; gap: 8px; z-index: 100; }
-        .v-button {
-            width: 45px; height: 45px;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--neon);
-            color: var(--neon);
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; font-size: 0.65rem; font-family: 'Orbitron';
-        }
-
-        /* Chat Transparente (Apenas Letras) */
-        #chat-window {
-            position: fixed;
-            bottom: 80px; left: 20px;
-            width: 80vw; max-width: 300px; height: 150px;
-            z-index: 90; display: none; flex-direction: column;
-            pointer-events: none;
-        }
-        .chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
-        .chat-msg-item { color: #fff; font-size: 0.9rem; text-shadow: 1px 1px 2px #000; }
-        .chat-input-area { pointer-events: all; border-bottom: 1px solid var(--neon); margin-top: 5px; }
-        input { background: transparent; border: none; color: var(--neon); width: 100%; outline: none; padding: 5px; font-family: 'Rajdhani'; font-size: 1rem; }
+        .btn-group { display: flex; gap: 8px; }
+        .v-button { width: 45px; height: 45px; background: rgba(0,0,0,0.6); border: 1px solid var(--neon); color: var(--neon); display: flex; align-items: center; justify-content: center; cursor: pointer; font-family: 'Orbitron'; font-size: 0.6rem; }
     </style>
 </head>
 <body onclick="resetZoom()">
 
-    <div class="nav-bar">
-        <div class="v-button" style="border-color:var(--pink); color:var(--pink);" onclick="location.href='index.html'">EXIT</div>
-        <div class="v-button" onclick="toggleChat(event)">MSG</div>
+    <div class="online-status">
+        <div class="dot"></div>
+        <span id="online-count">42</span> ONLINE
     </div>
 
-    <div id="chat-window">
-        <div class="chat-messages" id="chat-box"></div>
-        <div class="chat-input-area">
-            <input type="text" id="chat-input" placeholder="Conectar..." onkeypress="if(event.key==='Enter') sendMsg()">
+    <div class="ui-right">
+        <div id="chat-window">
+            <div class="chat-messages" id="chat-box"></div>
+            <div class="chat-input-area">
+                <input type="text" id="chat-input" placeholder="Mensagem..." onkeypress="if(event.key==='Enter') sendMsg()">
+            </div>
+        </div>
+        <div class="btn-group">
+            <div class="v-button" onclick="toggleChat(event)">MSG</div>
+            <div class="v-button" style="border-color:var(--pink); color:var(--pink);" onclick="location.href='index.html'">EXIT</div>
         </div>
     </div>
 
     <div id="city-container">
         <svg id="city-svg" class="city-svg" onclick="event.stopPropagation()">
             <defs>
-                <filter id="glow"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
             </defs>
             <g id="zoom-layer">
+                <rect id="sky-bg" width="10000" height="1000" fill="#010103" />
                 <g id="sky-layer"></g>
                 <g id="celestial-body" filter="url(#glow)"></g>
                 <g id="far-buildings"></g>
-                
-                <rect id="plat-bg" x="0" y="850" height="150" class="plat-base" />
-                <line id="plat-top" x1="0" y1="850" x2="10000" y2="850" class="plat-line" />
-                
+                <rect id="plat-bg" x="0" y="850" height="150" fill="#050508" />
                 <g id="mid-buildings"></g>
                 <g id="air-traffic"></g>
             </g>
@@ -117,146 +84,138 @@
     </div>
 
     <script type="module">
-        let isZoomed = false;
-
         document.addEventListener('DOMContentLoaded', () => {
             renderSky();
-            renderCelestial();
-            const finalX = renderCity();
+            updateCelestial();
+            renderCity();
+            startAirTraffic();
+            setInterval(updateCelestial, 60000); 
+            
+            const totalWidth = 10000;
             const svg = document.getElementById('city-svg');
-            const totalWidth = finalX + 1000; 
-
             svg.setAttribute('width', totalWidth);
             svg.setAttribute('viewBox', `0 0 ${totalWidth} 1000`);
-            document.getElementById('plat-bg').setAttribute('width', totalWidth);
-            document.getElementById('plat-top').setAttribute('x2', totalWidth);
-
-            const container = document.getElementById('city-container');
-            setTimeout(() => {
-                container.scrollLeft = (totalWidth * 0.5) - (window.innerWidth / 2);
-            }, 100);
-            startAirTraffic();
+            document.getElementById('city-container').scrollLeft = 4500;
         });
 
         function renderSky() {
             const sky = document.getElementById('sky-layer');
             let html = '';
-            for(let i=0; i<250; i++) {
-                html += `<circle cx="${Math.random()*10000}" cy="${Math.random()*850}" r="${Math.random()*1}" fill="#fff" opacity="${Math.random()}"/>`;
-            }
+            for(let i=0; i<300; i++) html += `<circle cx="${Math.random()*10000}" cy="${Math.random()*800}" r="${Math.random()*1.5}" fill="#fff" opacity="${Math.random()}"/>`;
             sky.innerHTML = html;
         }
 
-        function renderCelestial() {
+        function updateCelestial() {
             const group = document.getElementById('celestial-body');
-            const hour = new Date().getHours() + (new Date().getMinutes()/60);
-            const isDay = hour >= 6 && hour < 18;
-            const progress = (hour % 24) / 24;
-            const centerX = 2000 + (progress * 4000);
-            const centerY = 350 - Math.sin(Math.PI * (hour / 24)) * 200;
-            const color = isDay ? "var(--gold)" : "var(--neon)";
-            group.innerHTML = `<rect x="${centerX}" y="${centerY}" width="50" height="25" fill="none" stroke="${color}" stroke-width="1.5" />`;
+            const now = new Date();
+            const hour = now.getHours() + now.getMinutes()/60;
+            
+            const angle = (hour / 24) * Math.PI * 2 + Math.PI; 
+            const radiusX = 4500;
+            const radiusY = 450;
+            const centerX = 5000;
+            const centerY = 550;
+
+            const sunX = centerX + Math.cos(angle) * radiusX;
+            const sunY = centerY + Math.sin(angle) * radiusY;
+            const moonX = centerX + Math.cos(angle + Math.PI) * radiusX;
+            const moonY = centerY + Math.sin(angle + Math.PI) * radiusY;
+
+            group.innerHTML = `
+                <circle cx="${sunX}" cy="${sunY}" r="80" fill="var(--gold)" opacity="0.9" />
+                <circle cx="${moonX}" cy="${moonY}" r="60" fill="var(--neon)" opacity="0.7" />
+            `;
+            // Escurece o fundo se for noite
+            const isNight = hour < 6 || hour > 18;
+            document.getElementById('sky-bg').style.fill = isNight ? "#010103" : "#02050a";
         }
 
         function renderCity() {
             const mid = document.getElementById('mid-buildings');
-            const far = document.getElementById('far-buildings');
-            let midHTML = ''; let farHTML = '';
-            
-            for(let fx=0; fx<10000; fx+=600) {
-                farHTML += `<rect x="${fx}" y="${720+Math.random()*80}" width="${120}" height="130" fill="#020204" />`;
-            }
-            far.innerHTML = farHTML;
-
-            let x = 600;
-            let buildingCount = 1;
-            while(x < 9000) { 
-                const w = 200 + Math.random()*150;
-                const h = 250 + Math.random()*400;
+            let x = 400;
+            let bID = 1;
+            while(x < 9500) {
+                const w = 220 + Math.random()*150;
+                const h = 350 + Math.random()*450;
                 const y = 850 - h;
-
-                midHTML += `
-                <g class="building-group" onclick="dynamicZoom(event)">
+                let buildingHTML = `<g class="building-group" onclick="dynamicZoom(event)">
                     <rect x="${x}" y="${y}" width="${w}" height="${h}" class="building-front" />
-                    <text x="${x + w/2}" y="${y + 30}" class="building-id">NEXUS-${buildingCount}</text>
-                    ${renderWindows(x, y, w, h)}
-                    <rect x="${x + w/2 - 15}" y="815" width="30" height="35" fill="none" stroke="var(--neon)" stroke-width="1" class="interactable" onclick="selectElement(event)"/>
-                </g>`;
-                x += w + 220 + Math.random()*150;
-                buildingCount++;
-            }
-            mid.innerHTML = midHTML;
-            return x; 
-        }
-
-        function renderWindows(x, y, w, h) {
-            let winHTML = '';
-            for(let r = y + 60; r < 800; r += 65) {
-                for(let c = x + 35; c < x + w - 35; c += 45) {
-                    if(Math.random() > 0.4) {
-                        winHTML += `<rect x="${c}" y="${r}" width="14" height="18" class="window-dark" style="--d:${1+Math.random()*3}s" onclick="selectElement(event)"/>`;
+                    <text x="${x+w/2}" y="${y+35}" class="building-id" style="fill:var(--neon); font-family:Orbitron; font-size:14px;" text-anchor="middle">NEXUS-${bID}</text>`;
+                
+                let winID = 1;
+                for(let r = y + 70; r < 800; r += 60) {
+                    for(let c = x + 35; c < x + w - 35; c += 45) {
+                        if(Math.random() > 0.3) {
+                            buildingHTML += `
+                                <rect x="${c}" y="${r}" width="16" height="22" class="window-dark" style="--d:${Math.random()*2}s" onclick="selectWin(event)"/>
+                                <text x="${c+8}" y="${r+14}" class="win-tag">${winID}</text>`;
+                        }
+                        winID++;
                     }
                 }
+                buildingHTML += `</g>`;
+                mid.innerHTML += buildingHTML;
+                x += w + 200; bID++;
             }
-            return winHTML;
         }
 
-        window.dynamicZoom = (event) => {
-            event.stopPropagation();
+        window.dynamicZoom = (e) => {
+            e.stopPropagation();
             const svg = document.getElementById('city-svg');
             const pt = svg.createSVGPoint();
-            pt.x = event.clientX;
-            pt.y = event.clientY;
-            const cursorpt = pt.matrixTransform(svg.getScreenCTM().inverse());
-
+            pt.x = e.clientX; pt.y = e.clientY;
+            const loc = pt.matrixTransform(svg.getScreenCTM().inverse());
             const layer = document.getElementById('zoom-layer');
-            layer.style.transformOrigin = `${cursorpt.x}px ${cursorpt.y}px`;
-            layer.style.transform = "scale(1.2)";
-            isZoomed = true;
+            layer.style.transformOrigin = `${loc.x}px ${loc.y}px`;
+            layer.style.transform = "scale(1.6)";
         };
 
         window.resetZoom = () => {
             const layer = document.getElementById('zoom-layer');
             layer.style.transform = "scale(0.5)";
-            layer.style.transformOrigin = "center 850px";
-            isZoomed = false;
             document.querySelectorAll('.selected').forEach(el => el.classList.remove('selected'));
         };
 
-        window.selectElement = (event) => {
-            event.stopPropagation();
-            document.querySelectorAll('.selected').forEach(el => el.classList.remove('selected'));
-            event.target.classList.add('selected');
+        window.selectWin = (e) => {
+            e.stopPropagation();
+            e.target.classList.toggle('selected');
         };
 
         window.toggleChat = (e) => {
             e.stopPropagation();
-            const win = document.getElementById('chat-window');
-            win.style.display = win.style.display === 'flex' ? 'none' : 'flex';
+            const chat = document.getElementById('chat-window');
+            chat.style.display = chat.style.display === 'flex' ? 'none' : 'flex';
         };
 
         window.sendMsg = () => {
             const input = document.getElementById('chat-input');
-            const box = document.getElementById('chat-box');
             if(!input.value) return;
-            box.innerHTML += `<div class="chat-msg-item"><b style="color:var(--neon)">></b> ${input.value}</div>`;
+            const box = document.getElementById('chat-box');
+            const msg = document.createElement('div');
+            msg.className = 'chat-msg-item';
+            msg.innerHTML = `> ${input.value}`;
+            box.appendChild(msg);
             input.value = "";
-            box.scrollTo({ top: box.scrollHeight, behavior: 'smooth' });
-        }
+            setTimeout(() => {
+                msg.style.opacity = '0';
+                setTimeout(() => msg.remove(), 1000);
+            }, 9000);
+        };
 
         function startAirTraffic() {
             const air = document.getElementById('air-traffic');
             setInterval(() => {
-                const fCar = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-                const posY = 100 + Math.random()*500;
-                fCar.setAttribute("width", "25"); fCar.setAttribute("height", "0.5");
-                fCar.setAttribute("fill", "var(--neon)");
-                fCar.style.transform = `translate(-50px, ${posY}px)`;
-                fCar.style.transition = "transform 20s linear";
-                air.appendChild(fCar);
-                setTimeout(() => fCar.style.transform = `translate(10000px, ${posY}px)`, 50);
-                setTimeout(() => fCar.remove(), 20100);
-            }, 9000);
+                const car = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                const y = 150 + Math.random()*500;
+                car.innerHTML = `
+                    <rect width="35" height="10" fill="#080808" rx="2" stroke="var(--neon)" stroke-width="0.5"/>
+                    <rect x="30" y="3" width="5" height="3" fill="#ff0000" /> <rect x="0" y="3" width="6" height="4" fill="var(--neon)" /> `;
+                car.style.transition = "transform 14s linear";
+                car.style.transform = `translate(-100px, ${y}px)`;
+                air.appendChild(car);
+                setTimeout(() => car.style.transform = `translate(10500px, ${y}px)`, 50);
+                setTimeout(() => car.remove(), 14500);
+            }, 4000);
         }
     </script>
     <script type="module" src="nexus-overlay.js"></script>
