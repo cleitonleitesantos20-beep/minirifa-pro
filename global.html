@@ -11,7 +11,7 @@
             --user-neon-color: #00f2ff;
             --bg-dark: #000000;
             --grid-color: rgba(0, 242, 255, 0.05);
-            --overlay-bg: rgba(0, 0, 0, 0.95);
+            --overlay-bg: rgba(0, 0, 0, 0.98);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -23,7 +23,7 @@
             height: 100vh; width: 100vw;
         }
 
-        /* Fundo Grid */
+        /* Fundo Grid Estilizado */
         body::before {
             content: ''; position: absolute;
             width: 200%; height: 200%;
@@ -43,6 +43,7 @@
             stroke-width: 0.5px; transition: 0.3s; cursor: pointer;
         }
         .state:hover { fill: var(--user-neon-color); fill-opacity: 0.2; }
+        
         .state-sigla {
             fill: var(--user-neon-color); font-family: 'Orbitron';
             font-size: 10px; pointer-events: none; text-anchor: middle; opacity: 0.6;
@@ -54,56 +55,84 @@
             clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
             filter: drop-shadow(0 0 10px var(--user-neon-color));
             pointer-events: none; opacity: 0; z-index: 100;
-            transition: left 0.2s, top 0.2s;
+            transition: left 0.2s cubic-bezier(0.1, 0.7, 1.0, 0.1), top 0.2s cubic-bezier(0.1, 0.7, 1.0, 0.1);
         }
 
-        /* MENU DE SETOR */
+        /* MENU DE SETOR ATUALIZADO */
         #sector-menu {
-            position: fixed; top: 0; right: -500px; /* Escondido */
-            width: 400px; height: 100vh;
+            position: fixed;
+            top: 0;
+            right: -450px; /* Escondido à direita */
+            width: 400px;
+            height: 100vh;
             background: var(--overlay-bg);
-            border-left: 2px solid var(--user-neon-color);
-            z-index: 2000; transition: 0.5s ease-out;
-            padding: 30px; display: flex; flex-direction: column;
-            box-shadow: -10px 0 30px rgba(0,0,0,0.8);
+            border-left: 3px solid var(--user-neon-color);
+            z-index: 9999;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -20px 0 50px rgba(0,0,0,0.9);
         }
-        #sector-menu.active { right: 0; }
 
-        .menu-header { border-bottom: 1px solid var(--user-neon-color); margin-bottom: 25px; padding-bottom: 10px; }
-        .menu-header h2 { font-family: 'Orbitron'; color: var(--user-neon-color); font-size: 1.2rem; }
+        /* Classe que ativa o menu */
+        #sector-menu.active {
+            transform: translateX(-450px); /* Puxa o menu para dentro da tela */
+        }
+
+        .menu-header { border-bottom: 1px solid var(--user-neon-color); margin-bottom: 30px; padding-bottom: 15px; }
+        .menu-header h2 { font-family: 'Orbitron'; color: var(--user-neon-color); text-transform: uppercase; font-size: 1.3rem; letter-spacing: 2px; }
 
         #buildings-grid {
-            display: grid; grid-template-columns: repeat(2, 1fr);
-            gap: 15px; overflow-y: auto; padding: 5px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            overflow-y: auto;
+            padding-right: 10px;
         }
 
         .building-wrapper {
-            display: flex; flex-direction: column; align-items: center; gap: 8px;
-            padding: 10px; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s;
+            display: flex; flex-direction: column; align-items: center; gap: 10px;
+            padding: 15px; background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(0, 242, 255, 0.05);
+            cursor: pointer; transition: 0.4s;
         }
-        .building-wrapper:hover { background: rgba(255,255,255,0.03); }
 
-        .building-name { font-family: 'Orbitron'; font-size: 10px; color: #fff; }
-        .building-structure {
-            width: 60px; height: 60px; border: 2px solid; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            border-radius: 4px;
+        .building-wrapper:hover {
+            background: rgba(0, 242, 255, 0.1);
+            border-color: var(--user-neon-color);
+            transform: translateY(-5px);
         }
-        .niche-icon { font-size: 1.2rem; }
-        .niche-label { font-size: 7px; font-weight: bold; }
+
+        .building-name { 
+            font-family: 'Orbitron'; font-size: 9px; color: #fff; 
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: center;
+        }
+
+        .building-structure {
+            width: 70px; height: 70px; border: 2px solid;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            border-radius: 4px; position: relative;
+        }
+
+        .niche-icon { font-size: 1.5rem; margin-bottom: 4px; }
+        .niche-label { font-size: 7px; font-weight: bold; font-family: 'Orbitron'; }
 
         .btn-close {
-            margin-top: auto; background: none; border: 1px solid var(--user-neon-color);
-            color: var(--user-neon-color); padding: 10px; cursor: pointer;
-            font-family: 'Orbitron'; font-size: 0.7rem;
+            margin-top: auto; background: transparent; border: 1px solid var(--user-neon-color);
+            color: var(--user-neon-color); padding: 15px; cursor: pointer;
+            font-family: 'Orbitron'; font-size: 0.7rem; letter-spacing: 1px;
+            transition: 0.3s;
         }
+        .btn-close:hover { background: var(--user-neon-color); color: #000; }
 
         .btn-exit {
-            position: fixed; bottom: 20px; left: 20px;
-            padding: 8px 16px; border: 1px solid #ff0055;
-            color: #ff0055; text-decoration: none; font-family: 'Orbitron'; font-size: 10px;
-            background: rgba(0,0,0,0.8); z-index: 1000;
+            position: fixed; bottom: 30px; left: 30px;
+            padding: 12px 24px; border: 1px solid #ff0055;
+            color: #ff0055; text-decoration: none; font-family: 'Orbitron'; font-size: 11px;
+            background: rgba(0,0,0,0.8); z-index: 1000; transition: 0.3s;
         }
+        .btn-exit:hover { background: #ff0055; color: #fff; }
     </style>
 </head>
 <body>
@@ -113,10 +142,10 @@
     <div id="sector-menu">
         <div class="menu-header">
             <h2 id="sector-title">SETOR: --</h2>
-            <p id="connection-count" style="font-size: 10px; opacity: 0.6; letter-spacing: 1px;">SCANNEANDO...</p>
+            <p id="connection-count" style="font-size: 10px; opacity: 0.5; margin-top: 5px;">AGUARDANDO CONEXÃO...</p>
         </div>
         <div id="buildings-grid"></div>
-        <button class="btn-close" onclick="closeMenu()">FECHAR SCANNER</button>
+        <button class="btn-close" onclick="closeMenu()">DESCONECTAR SCANNER</button>
     </div>
     
     <div id="map-container">
@@ -128,6 +157,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
         import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
+        // Configuração do Firebase (Inalterada)
         const firebaseConfig = { 
             apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", 
             authDomain: "minharifadigital.firebaseapp.com", 
@@ -139,91 +169,106 @@
         const db = getFirestore(app);
 
         const nicheAssets = {
-            citizen: { label: "CITIZEN", color: "#555", icon: "👤" },
+            citizen: { label: "CITIZEN", color: "#888", icon: "👤" },
             clothes: { label: "APPAREL", color: "#00f2ff", icon: "👕" },
             shoes: { label: "FOOTWEAR", color: "#8b4513", icon: "👟" },
-            tech: { label: "TECH", color: "#00ff88", icon: "🔌" },
-            appliances: { label: "HOME", color: "#ffcc00", icon: "🏠" },
-            auto: { label: "VEHICLE", color: "#bd00ff", icon: "🚗" },
-            jewelry: { label: "JEWEL", color: "#e5e5e5", icon: "💎" }
+            tech: { label: "ELECTRONICS", color: "#00ff88", icon: "🔌" },
+            appliances: { label: "EQUIPMENT", color: "#ffcc00", icon: "🏠" },
+            auto: { label: "VEHICLES", color: "#bd00ff", icon: "🚗" },
+            jewelry: { label: "JEWELRY", color: "#e5e5e5", icon: "💎" }
         };
 
         const sectorMenu = document.getElementById('sector-menu');
         const buildingsGrid = document.getElementById('buildings-grid');
         const protagonist = d3.select("#protagonist");
 
+        // Aplicar cor do usuário
+        const userColor = localStorage.getItem('userNeonColor') || '#00f2ff';
+        document.documentElement.style.setProperty('--user-neon-color', userColor);
+
+        // FUNÇÃO PARA ABRIR O MENU E CARREGAR PRÉDIOS
         window.openSector = async (stateName, stateSigla) => {
-            console.log("Buscando estado:", stateSigla); // Debug para ver se a sigla bate com o Firebase
-            
             document.getElementById('sector-title').innerText = `SETOR: ${stateName}`;
-            buildingsGrid.innerHTML = '<p style="font-size:10px;">CONECTANDO...</p>';
-            sectorMenu.classList.add('active');
+            buildingsGrid.innerHTML = '<p style="font-size:12px; grid-column: 1/-1;">ESCANEANDO HABITATS...</p>';
+            sectorMenu.classList.add('active'); // Ativa o menu lateral
 
             try {
-                // Filtra onde o campo 'estado' do Firebase é igual à sigla clicada (Ex: 'SP', 'RJ')
+                // Busca no banco onde o campo "estado" é igual à sigla clicada (Ex: "SP")
                 const q = query(collection(db, "usuarios"), where("estado", "==", stateSigla));
-                const snap = await getDocs(q);
+                const querySnapshot = await getDocs(q);
                 
                 buildingsGrid.innerHTML = '';
-                document.getElementById('connection-count').innerText = `${snap.size} CONEXÕES ATIVAS`;
+                document.getElementById('connection-count').innerText = `${querySnapshot.size} CONEXÕES ATIVAS`;
 
-                if (snap.empty) {
-                    buildingsGrid.innerHTML = '<p style="font-size:11px; color: #ff0055; grid-column: 1/-1;">SETOR VAZIO</p>';
+                if (querySnapshot.empty) {
+                    buildingsGrid.innerHTML = '<p style="font-size:11px; grid-column: 1/-1; color: #ff0055; text-align: center; padding-top: 20px;">NENHUM HABITAT DETECTADO NESTE SETOR.</p>';
                     return;
                 }
 
-                snap.forEach((doc) => {
+                querySnapshot.forEach((doc) => {
                     const data = doc.data();
                     const config = nicheAssets[data.role] || nicheAssets.citizen;
                     
-                    const div = document.createElement('div');
-                    div.className = 'building-wrapper';
-                    div.onclick = () => window.location.href = `perfil.html?id=${doc.id}`;
-                    div.innerHTML = `
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'building-wrapper';
+                    wrapper.onclick = () => window.location.href = `perfil.html?id=${doc.id}`;
+
+                    wrapper.innerHTML = `
                         <div class="building-name">${(data.nome || 'NEXUS').toUpperCase()}</div>
-                        <div class="building-structure" style="border-color: ${config.color}; color: ${config.color}; box-shadow: 0 0 10px ${config.color}44;">
+                        <div class="building-structure" style="border-color: ${config.color}; color: ${config.color}; box-shadow: 0 0 15px ${config.color}33;">
                             <span class="niche-icon">${config.icon}</span>
                             <span class="niche-label">${config.label}</span>
                         </div>
                     `;
-                    buildingsGrid.appendChild(div);
+                    buildingsGrid.appendChild(wrapper);
                 });
-            } catch (e) {
-                console.error(e);
-                buildingsGrid.innerHTML = 'ERRO';
+            } catch (error) {
+                console.error("Erro no Scanner:", error);
+                buildingsGrid.innerHTML = '<p style="color:red; font-size:10px;">FALHA NA CONEXÃO COM A REDE.</p>';
             }
         };
 
         window.closeMenu = () => sectorMenu.classList.remove('active');
 
-        // MAPA D3
+        // LÓGICA DO MAPA (D3.JS)
         const svg = d3.select("#brazil-map");
         const mapGroup = svg.select("#map-group");
-        const projection = d3.geoMercator().center([-52, -15]).scale(700)
+        const projection = d3.geoMercator().center([-52, -15]).scale(750)
             .translate([window.innerWidth / 2, window.innerHeight / 2]);
-        const path = d3.geoPath().projection(projection);
+        const pathGenerator = d3.geoPath().projection(projection);
 
         d3.json("https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson").then(data => {
             mapGroup.selectAll("path").data(data.features).join("path")
-                .attr("class", "state").attr("d", path)
-                .on("mouseenter", (e, d) => {
-                    const [x, y] = path.centroid(d);
+                .attr("class", "state").attr("d", pathGenerator)
+                .on("mouseenter", (event, d) => {
+                    const [x, y] = pathGenerator.centroid(d);
                     const t = d3.zoomTransform(svg.node());
-                    protagonist.style("opacity", "1").style("left", `${t.applyX(x) - 10}px`).style("top", `${t.applyY(y) - 10}px`);
+                    protagonist.style("opacity", "1")
+                        .style("left", `${t.applyX(x) - 10}px`)
+                        .style("top", `${t.applyY(y) - 10}px`);
                 })
                 .on("mouseleave", () => protagonist.style("opacity", "0"))
-                .on("click", (e, d) => openSector(d.properties.name, d.properties.sigla));
+                .on("click", (event, d) => openSector(d.properties.name, d.properties.sigla));
 
             mapGroup.selectAll("text").data(data.features).join("text")
-                .attr("class", "state-sigla").attr("transform", d => `translate(${path.centroid(d)})`)
+                .attr("class", "state-sigla")
+                .attr("transform", d => `translate(${pathGenerator.centroid(d)})`)
                 .attr("dy", "0.35em").text(d => d.properties.sigla);
         });
 
-        svg.call(d3.zoom().scaleExtent([1, 12]).on("zoom", (e) => {
+        // Zoom e Pan
+        svg.call(d3.zoom().scaleExtent([1, 15]).on("zoom", (e) => {
             mapGroup.attr("transform", e.transform);
             protagonist.style("opacity", "0");
         }));
+
+        window.addEventListener('resize', () => {
+            projection.translate([window.innerWidth / 2, window.innerHeight / 2]);
+            mapGroup.selectAll("path").attr("d", pathGenerator);
+            mapGroup.selectAll("text").attr("transform", d => `translate(${pathGenerator.centroid(d)})`);
+        });
     </script>
+
     <script type="module" src="nexus-overlay.js"></script>
 </body>
 </html>
