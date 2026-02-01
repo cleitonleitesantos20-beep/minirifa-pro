@@ -17,12 +17,9 @@
         body { background: var(--bg); color: #fff; font-family: 'Rajdhani'; overflow: hidden; height: 100vh; width: 100vw; }
 
         #city-viewport {
-            width: 100vw;
-            height: 100vh;
-            overflow-x: auto;
-            overflow-y: hidden;
-            display: flex;
-            align-items: flex-end; 
+            width: 100vw; height: 100vh;
+            overflow-x: auto; overflow-y: hidden;
+            display: flex; align-items: flex-end; 
             scroll-behavior: smooth;
         }
         #city-viewport::-webkit-scrollbar { display: none; }
@@ -35,8 +32,7 @@
             fill: #000; 
             animation: blink var(--dur) infinite alternate;
             animation-delay: var(--delay);
-            stroke: var(--neon);
-            stroke-width: 0.8;
+            stroke: var(--neon); stroke-width: 0.8;
         }
         @keyframes blink {
             0% { opacity: 0.2; }
@@ -48,26 +44,25 @@
 
         .label { font-family: 'Orbitron'; font-size: 14px; fill: var(--neon); pointer-events: none; letter-spacing: 2px; font-weight: bold; }
 
-        /* Estilo das Luzes de Tráfego */
+        /* Animação das Luzes Passando */
         .traffic-light {
-            fill: var(--neon);
             filter: blur(1px);
             animation: moveLight var(--spd) linear infinite;
         }
         @keyframes moveLight {
-            from { transform: translateX(-600px); }
+            from { transform: translateX(-1000px); }
             to { transform: translateX(6000px); }
         }
 
-        .ui-overlay { position: fixed; z-index: 1000; pointer-events: none; inset: 0; }
+        .ui-overlay { position: fixed; z-index: 9999; pointer-events: none; inset: 0; }
         .ui-element { pointer-events: all; }
 
-        /* Botões posicionados ABAIXO da linha neon, na plataforma cinza */
-        .controls { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; }
+        /* Botões bem embaixo na plataforma cinza */
+        .controls { position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; }
         .btn { 
-            padding: 6px 12px; background: rgba(0,0,0,0.8); border: 1px solid var(--neon); 
-            color: var(--neon); font-family: 'Orbitron'; font-size: 9px; cursor: pointer;
-            box-shadow: 0 0 8px rgba(0, 242, 255, 0.2);
+            padding: 10px 18px; background: #000; border: 1px solid var(--neon); 
+            color: var(--neon); font-family: 'Orbitron'; font-size: 10px; cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
             text-transform: uppercase;
         }
 
@@ -80,7 +75,7 @@
 </head>
 <body onload="init()">
 
-    <div id="mystery-text" class="mystery-toast">NADA ACONTECENDO...</div>
+    <div id="mystery-text" class="mystery-toast">SISTEMA ACESSADO</div>
 
     <div class="ui-overlay">
         <div class="controls ui-element">
@@ -91,26 +86,27 @@
 
     <div id="city-viewport">
         <svg id="main-svg" width="6000" height="1000" viewBox="0 0 6000 1000">
+            <defs>
+                <filter id="glow"><feGaussianBlur stdDeviation="4" result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/></filter>
+            </defs>
+
             <g id="stars-layer"></g>
             
             <g id="lights-back">
-                <rect class="traffic-light" x="0" y="860" width="100" height="1" style="--spd: 12s; opacity: 0.3;"/>
-                <rect class="traffic-light" x="0" y="875" width="150" height="1" style="--spd: 15s; opacity: 0.4; fill: var(--pink);"/>
+                <rect class="traffic-light" x="0" y="820" width="150" height="1" fill="var(--neon)" style="--spd: 20s; opacity: 0.2;"/>
+                <rect class="traffic-light" x="0" y="850" width="100" height="1" fill="var(--pink)" style="--spd: 15s; opacity: 0.2;"/>
             </g>
 
             <g id="buildings-container"></g>
 
-            <g id="lights-front">
-                <rect class="traffic-light" x="0" y="910" width="200" height="2" style="--spd: 7s; opacity: 0.6;"/>
-                <rect class="traffic-light" x="0" y="925" width="120" height="1.5" style="--spd: 10s; opacity: 0.5; fill: var(--pink);"/>
-            </g>
-
             <rect x="0" y="900" width="6000" height="100" fill="var(--floor)" />
             <rect x="0" y="900" width="6000" height="3" fill="var(--neon)" filter="url(#glow)" />
 
-            <defs>
-                <filter id="glow"><feGaussianBlur stdDeviation="4" result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/></filter>
-            </defs>
+            <g id="lights-front">
+                <rect class="traffic-light" x="0" y="915" width="250" height="2.5" fill="var(--neon)" style="--spd: 8s; opacity: 0.7;"/>
+                <rect class="traffic-light" x="0" y="940" width="180" height="2" fill="var(--pink)" style="--spd: 12s; opacity: 0.6;"/>
+                <rect class="traffic-light" x="0" y="960" width="300" height="1.5" fill="var(--neon)" style="--spd: 6s; opacity: 0.5;"/>
+            </g>
         </svg>
     </div>
 
@@ -154,15 +150,15 @@
             const floorY = 900; 
 
             for(let i=0; i < names.length; i++) {
-                const w = 260 + Math.random() * 60; 
-                const h = 400 + Math.random() * 250; 
+                const w = 240 + Math.random() * 50; 
+                const h = 380 + Math.random() * 220; 
                 const y = floorY - h;
                 const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
                 
                 g.innerHTML = `
                     <rect x="${x}" y="${y}" width="${w}" height="${h}" class="building-base" />
                     <text x="${x + w/2}" y="${y - 15}" class="label" text-anchor="middle">${names[i]}</text>
-                    <rect x="${x + w/2 - 25}" y="${floorY - 55}" width="50" height="55" class="door-btn" onclick="showMystery()" />
+                    <rect x="${x + w/2 - 25}" y="${floorY - 50}" width="50" height="50" class="door-btn" onclick="showMystery()" />
                 `;
 
                 const cols = 4;
@@ -170,7 +166,7 @@
                 for(let r=0; r<rows; r++) {
                     for(let c=0; c<cols; c++) {
                         if(Math.random() > 0.3) {
-                            const wx = x + (c + 1) * (w/(cols+1)) - 10;
+                            const wx = x + (c + 1) * (w/(cols+1)) - 9;
                             const wy = y + 40 + (r * (h/(rows+1)));
                             const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
                             rect.setAttribute("x", wx); rect.setAttribute("y", wy);
@@ -183,7 +179,7 @@
                     }
                 }
                 bContainer.appendChild(g);
-                x += w + 240; 
+                x += w + 260; 
             }
         }
     </script>
