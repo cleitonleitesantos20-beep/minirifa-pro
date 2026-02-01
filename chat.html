@@ -20,7 +20,7 @@
         #city-viewport {
             width: 100vw; height: 100vh;
             overflow-x: auto; overflow-y: hidden;
-            display: flex; align-items: flex-end; /* Garante que os prédios fiquem no fundo */
+            display: flex; align-items: flex-end;
             scroll-behavior: smooth;
             position: relative;
             z-index: 1;
@@ -29,14 +29,13 @@
 
         svg { display: block; flex-shrink: 0; }
 
-        /* ASTRO E RELÓGIO POSICIONADOS */
         #sky-celestial {
             position: fixed;
             top: 100px;
             right: 40px;
             width: 80px; height: 80px;
             border-radius: 50%;
-            z-index: 10; /* Aumentado para ficar visível */
+            z-index: 10;
             transition: 1s ease-in-out;
             filter: drop-shadow(0 0 20px var(--glow-color));
         }
@@ -54,22 +53,21 @@
             z-index: 10;
         }
 
-        /* ESTILO DOS PRÉDIOS */
         .building-base { fill: #000; stroke: var(--neon); stroke-width: 2.2; }
         .antenna { stroke: var(--neon); stroke-width: 1; opacity: 0.7; }
         .window-btn { cursor: pointer; fill: #000; animation: blink var(--dur) infinite alternate; animation-delay: var(--delay); stroke: var(--neon); stroke-width: 0.8; transition: 0.2s; }
         .window-btn:hover { fill: var(--neon); filter: brightness(1.5); }
         @keyframes blink { 0% { opacity: 0.3; } 100% { opacity: 1; fill: var(--neon); } }
 
-        /* CHAT STREAM - GARANTINDO VISIBILIDADE */
+        /* CHAT MAIS À ESQUERDA */
         #chat-stream { 
             position: fixed; 
             top: 0; 
-            left: 20px; 
-            width: 400px; 
+            left: 10px; 
+            width: 420px; 
             height: 100vh; 
             pointer-events: none; 
-            z-index: 2000; /* Acima de tudo */
+            z-index: 2000; 
         }
         .chat-msg { 
             position: absolute; 
@@ -92,7 +90,6 @@
             100% { transform: translateY(110vh); opacity: 0; } 
         }
 
-        /* UI OVERLAY - FIXO NO RODAPÉ SEM CORTAR */
         .ui-overlay { 
             position: fixed; 
             bottom: 30px; 
@@ -113,17 +110,11 @@
 
         .npc-diamond { filter: drop-shadow(0 0 8px currentColor); opacity: 0.9; transform-box: fill-box; transform-origin: center; }
         @keyframes moveNPC { from { transform: translateX(-500px) rotate(45deg); } to { transform: translateX(6500px) rotate(45deg); } }
-        @keyframes zigzagNPC {
-            0% { transform: translateX(-500px) translateY(0) rotate(45deg); }
-            25% { transform: translateX(1250px) translateY(-60px) rotate(45deg); }
-            100% { transform: translateX(6500px) translateY(0) rotate(45deg); }
-        }
         .anim-linear { animation: moveNPC var(--spd) linear infinite; }
-        .anim-zigzag { animation: zigzagNPC var(--spd) ease-in-out infinite; }
 
         .door-btn { fill: none; stroke: var(--pink); stroke-width: 3; cursor: pointer; }
         .label-inside { font-family: 'Orbitron'; font-size: 13px; fill: var(--neon); pointer-events: none; font-weight: bold; }
-        .mystery-toast { position: fixed; top: 20%; left: 50%; transform: translateX(-50%); font-family: 'Orbitron'; font-size: 1.5rem; color: var(--neon); text-shadow: 0 0 15px var(--neon); opacity: 0; transition: 0.4s; z-index: 110000; pointer-events: none; }
+        .mystery-toast { position: fixed; top: 20%; left: 50%; transform: translateX(-50%); font-family: 'Orbitron'; font-size: 1.5rem; color: var(--neon); text-shadow: 0 0 15px var(--neon); opacity: 0; transition: 0.4s; z-index: 110000; pointer-events: none; text-align: center;}
     </style>
 </head>
 <body onload="init()">
@@ -131,7 +122,6 @@
     <div id="sky-celestial"></div>
     <div id="nexus-clock">00:00:00</div>
     <div id="mystery-text" class="mystery-toast">ACESSO CONFIRMADO</div>
-    
     <div id="chat-stream"></div>
 
     <div class="ui-overlay">
@@ -155,7 +145,6 @@
             <g id="buildings-container"></g>
             <rect x="0" y="900" width="6000" height="3" fill="var(--neon)" filter="url(#glow)" />
             <g id="npc-layer">
-                <rect class="npc-diamond anim-zigzag" x="0" y="250" width="18" height="18" fill="var(--neon)" style="--spd: 30s; color: var(--neon);" />
                 <rect class="npc-diamond anim-linear" x="0" y="885" width="12" height="12" fill="var(--yellow)" style="--spd: 45s; color: var(--yellow);" />
             </g>
         </svg>
@@ -189,9 +178,8 @@
                 const msg = document.createElement('div');
                 msg.className = 'chat-msg';
                 msg.innerHTML = `<span class="msg-user">[${user}]</span> ${text}`;
-                msg.style.left = (Math.random() * 50) + "px"; 
+                msg.style.left = "0px"; 
                 stream.appendChild(msg);
-                // Remove após a animação terminar
                 setTimeout(() => { if(msg.parentNode) msg.remove(); }, 18500);
             }, delay);
         }
@@ -220,7 +208,6 @@
         onSnapshot(q, (snapshot) => {
             const docChanges = snapshot.docChanges();
             if (isInitialLoad) {
-                // Inverte para mostrar da mais antiga para a mais nova no fluxo
                 docChanges.reverse().forEach((change, index) => {
                     if (change.type === "added") {
                         displayMessage(change.doc.data().userName || "NEXUS", change.doc.data().text, index * 1200);
@@ -236,9 +223,23 @@
             }
         });
 
+        // --- SISTEMA DE EASTER EGGS ---
         window.windowAction = function(name, id) {
             const t = document.getElementById('mystery-text');
-            t.innerText = `${name} - SETOR ${id}`;
+            const now = new Date();
+            const hour = now.getHours();
+
+            // LÓGICA DE EASTER EGGS (FÁCIL DE EDITAR)
+            if (hour === 3 && id === 7) {
+                t.innerText = "ERRO NA MATRIX: SETOR 7";
+            } else if (name === "NEXUS" && id === 1) {
+                t.innerText = "BEM-VINDO AO TOPO";
+            } else if (id === "PORTARIA") {
+                t.innerText = `ENTRADA: ${name}`;
+            } else {
+                t.innerText = `${name} - SETOR ${id}`;
+            }
+
             t.style.opacity = "1";
             setTimeout(() => t.style.opacity = "0", 1200);
         };
@@ -301,8 +302,9 @@
                     for(let c=0; c<4; c++) {
                         const winX = xPos + (c + 1) * (w / 5) - 10;
                         const winY = y + 80 + (r * (h / 7));
+                        const windowID = r * 4 + c + 1;
                         if (winY < (floorY - 80)) {
-                            windowsHtml += `<rect x="${winX}" y="${winY}" width="18" height="18" class="window-btn" style="--dur:${1+Math.random()*2}s; --delay:${Math.random()*3}s" onclick="windowAction('${name}', ${r*4+c+1})" />`;
+                            windowsHtml += `<rect x="${winX}" y="${winY}" width="18" height="18" class="window-btn" style="--dur:${1+Math.random()*2}s; --delay:${Math.random()*3}s" onclick="windowAction('${name}', ${windowID})" />`;
                         }
                     }
                 }
