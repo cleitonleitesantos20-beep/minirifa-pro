@@ -8,12 +8,13 @@
     <style>
         :root {
             --neon: #00f2ff;
+            --pink: #ff0055;
             --bg: #020205;
-            --glass: rgba(0, 0, 0, 0.4);
-            --border: rgba(0, 242, 255, 0.2);
+            --glass: rgba(0, 0, 0, 0.3);
+            --border: rgba(0, 242, 255, 0.3);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
         body { 
             background: var(--bg); 
@@ -24,208 +25,228 @@
             width: 100vw;
         }
 
-        /* --- CIDADE IMENSA E INTERATIVA --- */
+        /* --- CIDADE VIVIDA --- */
         #city-container {
             position: fixed;
             top: 0; left: 0;
             width: 100vw; height: 100vh;
-            overflow-x: scroll; /* Ativa scroll */
+            overflow-x: scroll;
             overflow-y: hidden;
             z-index: 1;
-            background: radial-gradient(circle at 50% 50%, #050a15 0%, #020205 100%);
-            -webkit-overflow-scrolling: touch;
+            background: radial-gradient(circle at 50% 50%, #080c1f 0%, #020205 100%);
         }
 
-        .city-svg { 
-            width: 5000px; /* Largura imensa */
-            height: 100%; 
-            display: block;
-        }
+        .city-svg { width: 6000px; height: 100%; display: block; }
 
         .building { 
-            stroke: rgba(0, 242, 255, 0.4); /* Mais visível */
+            stroke: rgba(0, 242, 255, 0.3); 
             stroke-width: 1.5; 
-            fill: rgba(0, 10, 20, 0.6);
+            fill: rgba(2, 5, 15, 0.9);
         }
         
+        /* Animação de Neons nos Prédios */
+        @keyframes pulse { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
+        .neon-detail { stroke: var(--neon); filter: drop-shadow(0 0 5px var(--neon)); animation: pulse 3s infinite; }
+
         .window { 
             fill: rgba(0, 242, 255, 0.1); 
             cursor: pointer; 
             pointer-events: all;
             transition: 0.3s;
         }
-        .window:hover { fill: var(--neon); filter: drop-shadow(0 0 10px var(--neon)); }
+        .window.active { fill: var(--neon); filter: drop-shadow(0 0 8px var(--neon)); }
 
-        /* --- INTERFACE TRANSPARENTE --- */
+        /* --- INTERFACE FLUTUANTE E COMPACTA --- */
         .chat-overlay {
             position: fixed;
             top: 0; left: 0;
             z-index: 10;
-            display: grid;
-            grid-template-columns: 80px 1fr;
+            display: flex;
             height: 100vh; width: 100vw;
-            padding-top: 85px;
-            pointer-events: none; /* Permite clicar na cidade através do vazio */
+            pointer-events: none; 
         }
-
-        .chat-menu, .chat-content { pointer-events: all; }
 
         .chat-menu {
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(15px);
+            width: 70px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(20px);
             border-right: 1px solid var(--border);
-            display: flex; flex-direction: column; align-items: center; gap: 25px;
-            padding: 20px 0;
+            display: flex; flex-direction: column; align-items: center; gap: 20px;
+            padding: 100px 0 20px 0;
+            pointer-events: all;
         }
-
-        .menu-item {
-            width: 55px; height: 55px; border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            background: rgba(255,255,255,0.05); cursor: pointer; transition: 0.3s;
-            font-size: 1.4rem; border: 1px solid var(--border);
-        }
-
-        .menu-item.active { border-color: var(--neon); background: rgba(0, 242, 255, 0.15); box-shadow: 0 0 15px var(--neon); }
 
         .chat-content {
-            display: flex; flex-direction: column; padding: 20px;
-            max-width: 450px;
-            background: linear-gradient(to right, rgba(0,0,0,0.5), transparent); /* Gradiente suave */
+            flex: 1;
+            display: flex; flex-direction: column;
+            padding: 100px 20px 20px 20px;
+            max-width: 400px;
+            pointer-events: all;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Esconder chat no celular para ver a cidade */
+        @media (max-width: 600px) {
+            .chat-content.hidden { transform: translateX(-120%); }
+            .chat-content { max-width: 85vw; background: linear-gradient(to right, rgba(0,0,0,0.8), transparent); }
         }
 
         .chat-messages {
-            flex: 1; overflow-y: auto; margin-bottom: 20px;
+            flex: 1; overflow-y: auto;
             background: var(--glass);
             backdrop-filter: blur(10px);
             border-radius: 15px; padding: 15px;
             border: 1px solid var(--border);
+            margin-bottom: 15px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
         }
+
+        .menu-item {
+            width: 50px; height: 50px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(0, 242, 255, 0.05); cursor: pointer; transition: 0.3s;
+            font-size: 1.2rem; border: 1px solid var(--border);
+        }
+
+        .menu-item.active { background: var(--neon); color: #000; box-shadow: 0 0 20px var(--neon); }
 
         .chat-input-area {
-            display: flex; gap: 10px; 
-            background: rgba(0,0,0,0.8);
-            padding: 15px; border-radius: 20px; 
-            border: 1px solid var(--neon);
+            display: flex; gap: 10px; background: #000;
+            padding: 12px; border-radius: 30px; border: 1px solid var(--neon);
         }
 
-        input { flex: 1; background: transparent; border: none; color: #fff; font-family: 'Rajdhani'; outline: none; }
+        input { flex: 1; background: transparent; border: none; color: #fff; outline: none; font-size: 16px; }
 
-        .footer-info {
-            position: fixed; bottom: 15px; left: 95px;
-            z-index: 100; font-family: 'Orbitron'; font-size: 0.6rem; color: var(--neon);
+        #toggle-chat {
+            position: fixed; top: 85px; left: 85px;
+            z-index: 100; background: var(--neon); color: #000;
+            border: none; padding: 5px 15px; border-radius: 5px;
+            font-family: 'Orbitron'; font-size: 0.6rem; cursor: pointer;
+            pointer-events: all;
         }
     </style>
 </head>
 <body>
 
+    <button id="toggle-chat">OCULTAR INTERFACE</button>
+
     <div id="city-container">
-        <svg id="city-svg" class="city-svg" viewBox="0 0 5000 1000" preserveAspectRatio="none">
+        <svg id="city-svg" class="city-svg" viewBox="0 0 6000 1000" preserveAspectRatio="none">
             <defs>
-                <filter id="glow"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
             </defs>
-            <g id="celestial-body"></g>
-            <g id="buildings-layer"></g>
+            <g id="traffic-layer"></g> <g id="buildings-layer"></g>
         </svg>
     </div>
 
     <div class="chat-overlay">
         <nav class="chat-menu">
-            <div class="menu-item active" id="btn-global">🌐</div>
-            <div class="menu-item" id="btn-friends">👥</div>
-            <div class="menu-item" id="btn-add">➕</div>
+            <div class="menu-item active" onclick="switchChat('global', this)">🌐</div>
+            <div class="menu-item" onclick="switchChat('friends', this)">👥</div>
+            <div class="menu-item" onclick="toggleCityView()">🏙️</div>
         </nav>
 
-        <main class="chat-content">
-            <h2 id="chat-title" style="font-family: 'Orbitron'; font-size: 0.8rem; margin-bottom: 20px; color: var(--neon);">GLOBAL_STREAM</h2>
+        <main class="chat-content" id="main-chat">
+            <h2 id="chat-title" style="font-family: 'Orbitron'; font-size: 0.7rem; color: var(--neon); margin-bottom: 10px;">SYSTEM_OVERLAY</h2>
             <div class="chat-messages" id="chat-box">
-                <div style="color: var(--neon); font-size: 0.7rem;">[SISTEMA]: CIDADE SINCRONIZADA.</div>
-                <div style="color: #888; font-size: 0.7rem;">ARRASTE O FUNDO PARA LADOS E CLIQUE NAS JANELAS.</div>
+                <div style="color: var(--neon);">[CONECTADO AO NEXUS]</div>
             </div>
 
             <div class="chat-input-area">
-                <input type="text" placeholder="TRANSMITIR..." id="chat-input">
-                <button id="send-btn" style="background:none; border:none; color:var(--neon); cursor:pointer;">SEND</button>
+                <input type="text" placeholder="COMANDO..." id="chat-input">
+                <button onclick="sendMessage()" style="background:none; border:none; color:var(--neon); font-weight:bold;">></button>
             </div>
         </main>
     </div>
 
-    <div class="footer-info">
-        <span id="online-val">128</span> NODES_ACTIVE
-    </div>
-
     <script type="module">
-        import { getFirestore, doc, onSnapshot, updateDoc, arrayUnion, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
         document.addEventListener('DOMContentLoaded', () => {
             generateCity();
-            setupEvents();
+            startTraffic();
+            
+            document.getElementById('toggle-chat').onclick = function() {
+                const chat = document.getElementById('main-chat');
+                chat.classList.toggle('hidden');
+                this.innerText = chat.classList.contains('hidden') ? 'MOSTRAR CHAT' : 'OCULTAR INTERFACE';
+            };
         });
 
         function generateCity() {
             const layer = document.getElementById('buildings-layer');
-            const celestial = document.getElementById('celestial-body');
-            
-            // Lua/Sol Estático no topo
-            celestial.innerHTML = `<circle cx="500" cy="150" r="40" fill="none" stroke="var(--neon)" stroke-width="1" filter="url(#glow)" />`;
-
-            for(let i = 0; i < 60; i++) {
-                const w = 120 + Math.random() * 100;
-                const h = 250 + Math.random() * 550;
-                const x = i * 85;
+            for(let i = 0; i < 80; i++) {
+                const w = 150 + Math.random() * 200;
+                const h = 300 + Math.random() * 600;
+                const x = i * 100;
                 const y = 1000 - h;
 
-                // Prédio
+                // Prédio Base
                 const b = document.createElementNS("http://www.w3.org/2000/svg", "rect");
                 b.setAttribute("x", x); b.setAttribute("y", y); b.setAttribute("width", w); b.setAttribute("height", h);
                 b.setAttribute("class", "building");
                 layer.appendChild(b);
 
-                // Janelas (Segredos)
-                for(let row = 1; row < h/50; row++) {
-                    for(let col = 1; col < w/35; col++) {
-                        if(Math.random() > 0.4) {
-                            const win = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-                            win.setAttribute("x", x + (col * 30));
-                            win.setAttribute("y", y + (row * 40));
-                            win.setAttribute("width", 15); win.setAttribute("height", 20);
-                            win.setAttribute("class", "window");
-                            win.onclick = (e) => {
-                                e.stopPropagation();
-                                alert("REGISTRO ENCONTRADO NO BLOCO " + Math.floor(x));
-                            };
-                            layer.appendChild(win);
-                        }
+                // Detalhe Neon Pulsante
+                if(Math.random() > 0.7) {
+                    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    line.setAttribute("x1", x); line.setAttribute("y1", y); line.setAttribute("x2", x+w); line.setAttribute("y2", y);
+                    line.setAttribute("class", "neon-detail");
+                    layer.appendChild(line);
+                }
+
+                // Janelas com vida (piscam sozinhas)
+                for(let row = 1; row < h/60; row++) {
+                    for(let col = 1; col < w/40; col++) {
+                        const win = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                        win.setAttribute("x", x + (col * 35));
+                        win.setAttribute("y", y + (row * 50));
+                        win.setAttribute("width", 12); win.setAttribute("height", 12);
+                        win.setAttribute("class", "window");
+                        if(Math.random() > 0.6) win.classList.add('active');
+                        
+                        win.onclick = (e) => {
+                            e.stopPropagation();
+                            win.classList.toggle('active');
+                            alert("SINAL ENCONTRADO NO SETOR " + Math.floor(x/100));
+                        };
+                        layer.appendChild(win);
                     }
                 }
             }
         }
 
-        function setupEvents() {
-            document.getElementById('btn-global').onclick = () => switchChat('global');
-            document.getElementById('btn-friends').onclick = () => switchChat('friends');
-            document.getElementById('btn-add').onclick = () => {
-                const id = prompt("ID DO AMIGO:");
-                if(id) alert("SOLICITAÇÃO ENVIADA.");
-            };
-            document.getElementById('send-btn').onclick = sendMessage;
+        // Animação de Carros Voadores
+        function startTraffic() {
+            const traffic = document.getElementById('traffic-layer');
+            setInterval(() => {
+                const car = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                const y = 200 + Math.random() * 600;
+                car.setAttribute("x", "0"); car.setAttribute("y", y);
+                car.setAttribute("width", "30"); car.setAttribute("height", "2");
+                car.setAttribute("fill", Math.random() > 0.5 ? "var(--neon)" : "var(--pink)");
+                car.style.transition = "transform 10s linear";
+                traffic.appendChild(car);
+                
+                setTimeout(() => car.style.transform = "translateX(6000px)", 50);
+                setTimeout(() => car.remove(), 10000);
+            }, 800);
         }
 
-        function switchChat(type) {
+        window.switchChat = (type, el) => {
             document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
-            document.getElementById('btn-' + type).classList.add('active');
+            el.classList.add('active');
             document.getElementById('chat-title').innerText = type.toUpperCase() + "_STREAM";
-        }
+        };
 
-        function sendMessage() {
+        window.sendMessage = () => {
             const input = document.getElementById('chat-input');
-            if(input.value) {
-                const box = document.getElementById('chat-box');
-                box.innerHTML += `<div><b>VOCÊ:</b> ${input.value}</div>`;
-                input.value = "";
-                box.scrollTop = box.scrollHeight;
-            }
-        }
+            if(!input.value) return;
+            const box = document.getElementById('chat-box');
+            box.innerHTML += `<div><span style="color:var(--neon)">></span> ${input.value}</div>`;
+            input.value = "";
+            box.scrollTop = box.scrollHeight;
+        };
     </script>
     <script type="module" src="nexus-overlay.js"></script>
 </body>
