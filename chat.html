@@ -10,6 +10,7 @@
             --neon: #00f2ff;
             --pink: #ff0055;
             --bg: #020205;
+            --border: rgba(0, 242, 255, 0.3);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -22,7 +23,6 @@
             height: 100vh; width: 100vw;
         }
 
-        /* --- CIDADE 2D ATIVA --- */
         #city-container {
             position: fixed;
             top: 0; left: 0;
@@ -30,69 +30,58 @@
             overflow-x: scroll;
             overflow-y: hidden;
             z-index: 1;
-            background: linear-gradient(to bottom, #050a15 0%, #020205 100%);
+            background: radial-gradient(circle at 50% 100%, #0a1025 0%, #020205 100%);
+            scroll-behavior: smooth;
         }
 
         .city-svg { 
             width: 6000px; 
-            height: 80%; /* Cidade menor na tela */
-            margin-top: 10vh;
+            height: 70%; 
+            margin-top: 15vh;
             display: block; 
         }
 
-        .skyline { fill: #0a0a1a; stroke: rgba(0, 242, 255, 0.2); stroke-width: 1; }
+        .building-body { fill: #05050a; stroke: var(--border); stroke-width: 1; }
+        .window-node { cursor: pointer; transition: 0.3s; }
+        .window-node:hover { fill: #fff; filter: drop-shadow(0 0 8px var(--neon)); }
         
-        /* Luzes das Janelas Animadas */
-        .light { fill: var(--neon); opacity: 0.3; transition: 0.5s; }
-        .light.blink { animation: blinker 2s infinite; }
-        @keyframes blinker { 50% { opacity: 0.8; filter: blur(2px); } }
-
-        /* --- BOTÕES VIRTUAIS --- */
+        /* Botões Virtuais */
         .v-button {
             position: fixed;
-            width: 60px; height: 60px;
+            width: 55px; height: 55px;
             border-radius: 50%;
-            background: rgba(0, 0, 0, 0.6);
-            border: 2px solid var(--neon);
-            box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--neon);
+            box-shadow: 0 0 10px rgba(0, 242, 255, 0.2);
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem;
-            z-index: 100;
-            cursor: pointer;
-            pointer-events: all;
-            transition: 0.3s;
+            font-size: 1.2rem; z-index: 100;
+            cursor: pointer; pointer-events: all;
         }
 
-        .v-button:active { transform: scale(0.9); box-shadow: 0 0 25px var(--neon); }
+        #btn-global { bottom: 25px; left: 25px; }
+        #btn-friends { bottom: 25px; left: 95px; }
+        #btn-toggle { top: 25px; right: 25px; font-size: 0.7rem; font-family: 'Orbitron'; width: auto; padding: 0 15px; border-radius: 8px; }
 
-        #btn-global { bottom: 30px; left: 30px; }
-        #btn-friends { bottom: 30px; left: 110px; }
-        #btn-toggle { top: 30px; right: 30px; font-size: 0.8rem; font-family: 'Orbitron'; color: var(--neon); border-radius: 10px; width: auto; padding: 0 15px; }
-
-        /* --- CHAT SOBREPOSTO (FLUTUANTE) --- */
         #chat-window {
             position: fixed;
-            bottom: 110px; left: 30px;
-            width: 320px; height: 400px;
-            background: rgba(0, 0, 0, 0.8);
+            bottom: 95px; left: 25px;
+            width: 300px; height: 350px;
+            background: rgba(0, 0, 0, 0.9);
             backdrop-filter: blur(10px);
-            border: 1px solid var(--border);
-            border-radius: 20px;
+            border: 1px solid var(--neon);
+            border-radius: 15px;
             z-index: 90;
-            display: none; /* Começa escondido */
+            display: none;
             flex-direction: column;
             padding: 15px;
             pointer-events: all;
-            border: 1px solid var(--neon);
         }
 
-        .chat-messages { flex: 1; overflow-y: auto; margin-bottom: 10px; font-size: 0.9rem; }
-        .chat-input-area { display: flex; gap: 5px; border-top: 1px solid rgba(0,242,255,0.2); padding-top: 10px; }
-        input { background: transparent; border: none; color: #fff; outline: none; flex: 1; }
+        .chat-messages { flex: 1; overflow-y: auto; font-size: 0.8rem; color: #ccc; }
+        .chat-input-area { display: flex; gap: 10px; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px; }
+        input { background: transparent; border: none; color: #fff; outline: none; flex: 1; font-family: 'Rajdhani'; }
 
-        @media (max-width: 600px) {
-            #chat-window { width: calc(100vw - 60px); }
-        }
+        @media (max-width: 600px) { #chat-window { width: 85vw; } }
     </style>
 </head>
 <body>
@@ -102,21 +91,18 @@
     <div class="v-button" id="btn-toggle" onclick="toggleCityMode()">AGITAR CIDADE</div>
 
     <div id="chat-window">
-        <div id="chat-title" style="font-family: 'Orbitron'; font-size: 0.7rem; color: var(--neon); margin-bottom: 10px;">GLOBAL_STREAM</div>
-        <div class="chat-messages" id="chat-box">
-            <div style="color: var(--neon)">[SISTEMA]: CONECTADO.</div>
-        </div>
+        <div id="chat-title" style="font-family: 'Orbitron'; font-size: 0.6rem; color: var(--neon); margin-bottom: 8px;">GLOBAL_STREAM</div>
+        <div class="chat-messages" id="chat-box"></div>
         <div class="chat-input-area">
-            <input type="text" placeholder="Transmitir..." id="chat-input">
-            <button onclick="sendMsg()" style="background:none; border:none; color:var(--neon); cursor:pointer;">></button>
+            <input type="text" placeholder="Transmita sua mensagem..." id="chat-input">
+            <button onclick="sendMsg()" style="background:none; border:none; color:var(--neon); font-weight:bold; cursor:pointer;">></button>
         </div>
     </div>
 
     <div id="city-container">
         <svg id="city-svg" class="city-svg" viewBox="0 0 6000 1000">
-            <g id="back-layer"></g>
+            <g id="main-layer"></g>
             <g id="traffic-layer"></g>
-            <g id="front-layer"></g>
         </svg>
     </div>
 
@@ -124,38 +110,66 @@
         let agilityLevel = 1;
 
         document.addEventListener('DOMContentLoaded', () => {
-            build2DCity();
+            generateRealisticCity();
             startTraffic();
+            
+            // Centralizar a visualização ao iniciar
+            const container = document.getElementById('city-container');
+            const centerX = (6000 - window.innerWidth) / 2;
+            container.scrollLeft = centerX;
         });
 
-        function build2DCity() {
-            const back = document.getElementById('back-layer');
-            const front = document.getElementById('front-layer');
-            
-            for(let i = 0; i < 100; i++) {
-                const x = i * 60;
-                const h = 200 + Math.random() * 400;
-                const w = 80 + Math.random() * 100;
-                
-                // Silhueta do prédio
-                const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-                rect.setAttribute("x", x);
-                rect.setAttribute("y", 1000 - h);
-                rect.setAttribute("width", w);
-                rect.setAttribute("height", h);
-                rect.setAttribute("class", "skyline");
-                back.appendChild(rect);
+        function generateRealisticCity() {
+            const layer = document.getElementById('main-layer');
+            let currentX = 50;
 
-                // Luzes ativas
-                for(let j = 0; j < 5; j++) {
-                    const light = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                    light.setAttribute("cx", x + (Math.random() * w));
-                    light.setAttribute("cy", (1000 - h) + (Math.random() * h));
-                    light.setAttribute("r", "1.5");
-                    light.setAttribute("class", "light blink");
-                    light.style.animationDuration = (1 + Math.random() * 3) + "s";
-                    front.appendChild(light);
+            while (currentX < 5900) {
+                const w = 180 + Math.random() * 250;
+                const h = 400 + Math.random() * 500;
+                const y = 1000 - h;
+
+                // Corpo do prédio (Frente única)
+                const building = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                building.setAttribute("x", currentX);
+                building.setAttribute("y", y);
+                building.setAttribute("width", w);
+                building.setAttribute("height", h);
+                building.setAttribute("class", "building-body");
+                layer.appendChild(building);
+
+                // Antenas e Topo
+                if(Math.random() > 0.5) {
+                    const ant = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    ant.setAttribute("x1", currentX + w/2); ant.setAttribute("y1", y);
+                    ant.setAttribute("x2", currentX + w/2); ant.setAttribute("y2", y - 50);
+                    ant.setAttribute("stroke", "var(--neon)");
+                    layer.appendChild(ant);
                 }
+
+                // Janelas Realistas
+                const rows = Math.floor(h / 60);
+                const cols = Math.floor(w / 40);
+                for(let r = 1; r < rows; r++) {
+                    for(let c = 1; c < cols; c++) {
+                        if(Math.random() > 0.4) {
+                            const win = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                            win.setAttribute("x", currentX + (c * 35));
+                            win.setAttribute("y", y + (r * 50));
+                            win.setAttribute("width", 10);
+                            win.setAttribute("height", 15);
+                            win.setAttribute("fill", Math.random() > 0.8 ? "var(--neon)" : "#1a1a25");
+                            win.setAttribute("class", "window-node");
+                            
+                            // Algumas janelas são clicáveis
+                            if(Math.random() > 0.85) {
+                                win.onclick = () => alert(`FRAGMENTO DE DADOS: Bloco ${Math.floor(currentX)}`);
+                            }
+                            layer.appendChild(win);
+                        }
+                    }
+                }
+
+                currentX += w + (50 + Math.random() * 100); // Espaçamento entre prédios
             }
         }
 
@@ -163,21 +177,18 @@
             const traffic = document.getElementById('traffic-layer');
             setInterval(() => {
                 const car = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-                const y = 850 + (Math.random() * 100);
-                car.setAttribute("x", "-50");
-                car.setAttribute("y", y);
-                car.setAttribute("width", "40");
-                car.setAttribute("height", "1");
+                const y = 920 + (Math.random() * 40);
+                car.setAttribute("x", "-50"); car.setAttribute("y", y);
+                car.setAttribute("width", "35"); car.setAttribute("height", "1.5");
                 car.setAttribute("fill", Math.random() > 0.5 ? "var(--neon)" : "var(--pink)");
                 
-                // Velocidade baseada na agitação
-                const duration = (10 / agilityLevel);
-                car.style.transition = `transform ${duration}s linear`;
+                const dur = 12 / agilityLevel;
+                car.style.transition = `transform ${dur}s linear`;
                 traffic.appendChild(car);
                 
                 setTimeout(() => car.style.transform = "translateX(6100px)", 50);
-                setTimeout(() => car.remove(), duration * 1000);
-            }, 1000 / agilityLevel);
+                setTimeout(() => car.remove(), dur * 1000);
+            }, 1200 / agilityLevel);
         }
 
         window.toggleChat = (type) => {
@@ -192,15 +203,19 @@
         };
 
         window.toggleCityMode = () => {
-            agilityLevel = agilityLevel >= 5 ? 1 : agilityLevel + 2;
-            const box = document.getElementById('chat-box');
-            box.innerHTML += `<div style="color:var(--pink)">[ALERTA]: AGITAÇÃO NÍVEL ${agilityLevel}</div>`;
+            agilityLevel = agilityLevel >= 5 ? 1 : agilityLevel + 1.5;
+            const msg = document.createElement('div');
+            msg.style.color = "var(--pink)";
+            msg.innerText = `[NEXUS]: TRÁFEGO EM ${Math.floor(agilityLevel * 100)}%`;
+            document.getElementById('chat-box').appendChild(msg);
         };
 
         window.sendMsg = () => {
             const input = document.getElementById('chat-input');
             if(!input.value) return;
-            document.getElementById('chat-box').innerHTML += `<div>> ${input.value}</div>`;
+            const div = document.createElement('div');
+            div.innerHTML = `<span style="color:var(--neon)">></span> ${input.value}`;
+            document.getElementById('chat-box').appendChild(div);
             input.value = "";
         };
     </script>
