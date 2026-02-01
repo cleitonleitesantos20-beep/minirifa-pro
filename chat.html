@@ -73,14 +73,14 @@
         #chat-input { flex: 1; background: transparent; border: none; padding: 5px 10px; color: #fff; font-family: 'Rajdhani'; outline: none; width: 100%; }
         .btn-send { background: var(--neon); border: none; padding: 5px 15px; cursor: pointer; color: #000; font-weight: bold; font-family: 'Rajdhani'; }
         
-        /* CHAT STREAM */
-        #chat-stream { position: fixed; top: 0; left: 10px; width: 400px; height: 100vh; pointer-events: none; overflow: hidden; z-index: 999999; }
-        .chat-msg { position: absolute; left: 0; top: -150px; color: var(--neon); font-family: 'Rajdhani'; font-weight: bold; text-shadow: 2px 2px 5px #000; font-size: 1.4rem; animation: fallDown 10s linear forwards; white-space: nowrap; pointer-events: none; }
-        .msg-user { color: var(--pink); margin-right: 5px; }
+        /* CHAT STREAM - AJUSTADO PARA SER MENOR E MAIS LENTO */
+        #chat-stream { position: fixed; top: 0; left: 10px; width: 350px; height: 100vh; pointer-events: none; overflow: hidden; z-index: 999999; }
+        .chat-msg { position: absolute; left: 0; top: -150px; color: var(--neon); font-family: 'Rajdhani'; font-weight: bold; text-shadow: 2px 2px 4px #000; font-size: 1.1rem; animation: fallDown 18s linear forwards; white-space: nowrap; pointer-events: none; }
+        .msg-user { color: var(--pink); margin-right: 5px; font-size: 0.9rem; opacity: 0.9; }
 
         @keyframes fallDown { 
             0% { transform: translateY(0); opacity: 0; } 
-            10% { opacity: 1; } 
+            5% { opacity: 1; } 
             90% { opacity: 1; } 
             100% { transform: translateY(120vh); opacity: 0; } 
         }
@@ -127,7 +127,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "SUA_API_KEY",
@@ -142,20 +142,29 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
+        let currentNexusName = "VISITANTE";
+
+        // Monitor de Autenticação para pegar o nome correto
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentNexusName = user.displayName || user.email.split('@')[0] || "USER_NEXUS";
+                console.log("Usuário Nexus identificado:", currentNexusName);
+            }
+        });
+
         function displayMessage(user, text) {
             const stream = document.getElementById('chat-stream');
             if(!stream) return;
             const msg = document.createElement('div');
             msg.className = 'chat-msg';
             msg.innerHTML = `<span class="msg-user">[${user}]</span> ${text}`;
-            msg.style.left = (Math.random() * 40) + "px"; 
+            msg.style.left = (Math.random() * 30) + "px"; 
             
-            // Delay aleatório para mensagens antigas não caírem todas juntas no load
-            const delay = Math.random() * 2;
+            const delay = Math.random() * 3;
             msg.style.animationDelay = `${delay}s`;
             
             stream.appendChild(msg);
-            setTimeout(() => { if(msg.parentNode) msg.remove(); }, 12000);
+            setTimeout(() => { if(msg.parentNode) msg.remove(); }, 20000);
         }
 
         async function sendMessage() {
@@ -163,14 +172,12 @@
             const text = input.value.trim();
             if (!text) return;
 
-            const user = auth.currentUser;
-            const name = user ? (user.displayName || "USER_NEXUS") : "VISITANTE";
             input.value = "";
 
             try {
                 await addDoc(collection(db, "chat_messages"), {
                     text: text.toUpperCase(),
-                    userName: name,
+                    userName: currentNexusName,
                     createdAt: serverTimestamp()
                 });
             } catch (e) {
@@ -183,14 +190,13 @@
             if(e.key === 'Enter') sendMessage();
         });
 
-        // Carrega as últimas 8 mensagens e fica ouvindo novas
         const q = query(collection(db, "chat_messages"), orderBy("createdAt", "desc"), limit(8));
         onSnapshot(q, (snapshot) => {
             snapshot.docChanges().forEach((change) => {
                 if (change.type === "added") {
                     const data = change.doc.data();
                     if(data.text) {
-                        displayMessage(data.userName, data.text);
+                        displayMessage(data.userName || "NEXUS", data.text);
                     }
                 }
             });
