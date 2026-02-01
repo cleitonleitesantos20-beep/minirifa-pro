@@ -36,7 +36,6 @@
             50% { transform: translateY(-15px); } 
         }
 
-        /* Janelas Piscantes */
         .window-btn { 
             cursor: pointer; fill: #000; 
             animation: blink var(--dur) infinite alternate;
@@ -124,7 +123,7 @@
             <div class="chat-input-bar">
                 <div style="display: flex;">
                     <input type="text" id="chat-input" placeholder="ENVIAR MENSAGEM..." maxlength="60">
-                    <button class="btn-send" onclick="sendMessage()">ENVIAR</button>
+                    <button class="btn-send" onclick="window.sendMessage()">ENVIAR</button>
                 </div>
             </div>
         </div>
@@ -137,10 +136,6 @@
             </defs>
             <g id="stars-layer"></g>
             <g id="buildings-container"></g>
-            <g id="lights-front">
-                <rect class="traffic-light" x="0" y="550" width="800" height="3" fill="var(--neon)" style="--spd: 15s; opacity: 0.6;" filter="url(#glow)"/>
-                <rect class="traffic-light" x="0" y="750" width="600" height="5" fill="var(--pink)" style="--spd: 8s; opacity: 0.5;" filter="url(#glow)"/>
-            </g>
             <rect x="0" y="900" width="6000" height="3" fill="var(--neon)" filter="url(#glow)" />
         </svg>
     </div>
@@ -150,6 +145,7 @@
         import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
+        // IMPORTANTE: Insira suas credenciais aqui para o envio funcionar
         const firebaseConfig = {
             apiKey: "SUA_API_KEY",
             authDomain: "SEU_AUTH_DOMAIN",
@@ -163,32 +159,48 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
+        // Definindo a função globalmente para o botão encontrar
         window.sendMessage = async () => {
             const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            
+            if (!text) return;
+
             const user = auth.currentUser;
-            if (!input.value.trim() || !user) return;
+            const name = user ? (user.displayName || "USER_NEXUS") : "VISITANTE";
+
             try {
                 await addDoc(collection(db, "chat_messages"), {
-                    text: input.value.toUpperCase(),
-                    userName: user.displayName || "ANÔNIMO",
+                    text: text.toUpperCase(),
+                    userName: name,
                     createdAt: serverTimestamp()
                 });
                 input.value = "";
-            } catch (e) { console.error(e); }
+            } catch (e) {
+                console.error("Erro ao enviar para Firebase:", e);
+                // Fallback visual caso o Firebase não esteja configurado
+                displayMessage(name, text.toUpperCase() + " (OFFLINE)");
+                input.value = "";
+            }
         };
 
+        // Escuta as mensagens globais
         const q = query(collection(db, "chat_messages"), orderBy("createdAt", "desc"), limit(1));
         onSnapshot(q, (snapshot) => {
             snapshot.docChanges().forEach((change) => {
                 if (change.type === "added") {
                     const data = change.doc.data();
-                    if (data.createdAt) displayMessage(data.userName, data.text);
+                    // Apenas exibe se tiver data (evita mensagens locais instantâneas duplicadas)
+                    if (data.createdAt) {
+                        displayMessage(data.userName, data.text);
+                    }
                 }
             });
         });
 
         function displayMessage(user, text) {
             const stream = document.getElementById('chat-stream');
+            if(!stream) return;
             const msg = document.createElement('div');
             msg.className = 'chat-msg';
             msg.innerHTML = `<span class="msg-user">[${user}]</span> ${text}`;
@@ -197,6 +209,7 @@
             setTimeout(() => msg.remove(), 12000);
         }
 
+        // Atalho Enter
         document.getElementById('chat-input').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') window.sendMessage();
         });
@@ -253,7 +266,7 @@
                     <circle cx="${xPos + w + 100}" cy="${y + 100}" r="4" class="drone" />
                 `;
 
-                // GERADOR DE JANELAS (RESTABELECIDO)
+                // Janelas
                 const cols = 4;
                 const rows = 6;
                 let winId = 1;
@@ -275,7 +288,6 @@
                         }
                     }
                 }
-
                 bContainer.appendChild(group);
                 xPos += w + 450; 
             });
