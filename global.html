@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NexusVL - Global Map</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght[400;700]&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --user-neon-color: #00f2ff; /* Cor padrão, será sobrescrita pela cor do perfil */
+            --bg-dark: #000000;
+            --grid-color: rgba(0, 242, 255, 0.1);
+            --text-color: #e0e0e0;
+            --highlight-color: var(--user-neon-color);
+            --glow-filter: drop-shadow(0 0 8px var(--highlight-color));
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-color);
+            font-family: 'Rajdhani', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Background com grid/padrão cyberpunk */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+                linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.1;
+            z-index: 0;
+            animation: backgroundScan 30s linear infinite;
+        }
+
+        @keyframes backgroundScan {
+            from { background-position: 0% 0%; }
+            to { background-position: 100% 100%; }
+        }
+
+        #global-container {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 90vw;
+            height: 90vh;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3em;
+            color: var(--highlight-color);
+            text-shadow: 0 0 15px var(--highlight-color);
+            margin-bottom: 20px;
+            animation: pulseText 2s infinite alternate;
+        }
+
+        @keyframes pulseText {
+            from { opacity: 0.8; text-shadow: 0 0 5px var(--highlight-color); }
+            to { opacity: 1; text-shadow: 0 0 20px var(--highlight-color); }
+        }
+
+        #map-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 900px; /* Tamanho máximo do mapa */
+            height: auto;
+            aspect-ratio: 1 / 1; /* Ajuste conforme a proporção real do seu SVG */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            border: 2px solid var(--highlight-color);
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.5);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            animation: borderGlow 4s infinite alternate;
+            transform: scale(0.95); /* Pequena escala inicial para o zoom */
+            transition: transform 0.5s ease-out;
+        }
+
+        @keyframes borderGlow {
+            0% { box-shadow: 0 0 10px var(--highlight-color); border-color: var(--highlight-color); }
+            50% { box-shadow: 0 0 25px var(--highlight-color); border-color: var(--user-neon-color); }
+            100% { box-shadow: 0 0 10px var(--highlight-color); border-color: var(--highlight-color); }
+        }
+
+        #brazil-map {
+            width: 100%;
+            height: 100%;
+            max-width: 700px;
+            fill: #222; /* Cor padrão dos estados */
+            stroke: var(--highlight-color);
+            stroke-width: 0.5;
+            filter: var(--glow-filter);
+        }
+
+        #brazil-map path {
+            transition: fill 0.3s ease, transform 0.2s ease;
+            cursor: pointer;
+            fill: rgba(30, 30, 30, 0.7); /* Cor dos estados em repouso */
+            stroke: var(--user-neon-color);
+            stroke-width: 1.5;
+            filter: drop-shadow(0 0 2px rgba(0, 242, 255, 0.3));
+        }
+
+        #brazil-map path:hover {
+            fill: rgba(0, 242, 255, 0.3); /* Cor do estado ao passar o mouse */
+            transform: scale(1.01);
+            filter: var(--glow-filter);
+        }
+
+        /* Protagonista: O losango néon */
+        #protagonist-cursor {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--highlight-color);
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+            filter: drop-shadow(0 0 10px var(--highlight-color));
+            pointer-events: none; /* Não bloqueia cliques nos estados */
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+            opacity: 0; /* Começa invisível */
+            z-index: 100;
+        }
+
+        #state-info {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--highlight-color);
+            padding: 10px 20px;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--highlight-color);
+            text-shadow: 0 0 5px var(--highlight-color);
+            opacity: 0;
+            transition: opacity 0.3s ease-out;
+            pointer-events: none;
+            z-index: 11;
+        }
+
+        /* Botão Sair */
+        .btn-exit {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            padding: 10px 20px;
+            background: rgba(0,0,0,0.8);
+            border: 1px solid var(--pink);
+            color: var(--pink);
+            font-family: 'Orbitron';
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            text-decoration: none; /* Para usar como link */
+        }
+        .btn-exit:hover {
+            background: var(--pink);
+            color: #000;
+            box-shadow: 0 0 15px var(--pink);
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="btn-exit">SAIR</a>
+
+    <div id="global-container">
+        <h1>NEXUSVL - MAPA GLOBAL</h1>
+        <div id="map-wrapper">
+            <div id="protagonist-cursor"></div>
+
+            <svg id="brazil-map" viewBox="0 0 800 800">
+                <path id="AM" d="M200 100 L250 120 L270 150 L220 180 L180 140 Z" /> <path id="PA" d="M300 150 L380 170 L400 220 L320 250 L290 200 Z" /> <path id="MA" d="M420 200 L480 210 L490 260 L430 280 L400 230 Z" /> <path id="CE" d="M500 200 L550 210 L560 250 L510 270 L480 220 Z" /> <path id="RN" d="M570 240 L600 250 L610 270 L580 290 L560 260 Z" /> <path id="PB" d="M570 300 L600 310 L610 330 L580 350 L560 320 Z" /> <path id="PE" d="M550 360 L590 370 L600 400 L560 420 L530 390 Z" /> <path id="AL" d="M540 430 L570 440 L580 460 L550 480 L520 450 Z" /> <path id="SE" d="M530 490 L560 500 L570 520 L540 540 L510 510 Z" /> <path id="BA" d="M400 350 L480 380 L500 450 L450 520 L380 480 Z" /> <path id="MG" d="M300 450 L380 470 L400 550 L320 580 L280 500 Z" /> <path id="ES" d="M420 560 L450 570 L460 600 L430 620 L400 590 Z" /> <path id="RJ" d="M350 600 L380 610 L390 640 L360 660 L330 630 Z" /> <path id="SP" d="M250 550 L300 580 L320 630 L280 660 L220 600 Z" /> <path id="PR" d="M180 620 L220 640 L240 680 L200 700 L160 660 Z" /> <path id="SC" d="M150 710 L190 720 L200 750 L160 770 L130 740 Z" /> <path id="RS" d="M100 780 L150 790 L160 820 L110 840 L80 810 Z" /> <path id="MT" d="M150 300 L250 320 L280 400 L200 450 L120 380 Z" /> <path id="MS" d="M100 450 L180 470 L200 520 L150 550 L80 500 Z" /> <path id="GO" d="M250 380 L320 400 L340 460 L280 490 L220 430 Z" /> <path id="DF" d="M330 465 L340 470 L345 480 L335 485 L325 475 Z" /> </svg>
+        </div>
+        <div id="state-info">SELECIONE UM ESTADO</div>
+    </div>
+
+    <script type="module">
+        // Importe o Firebase aqui se precisar carregar a cor do perfil
+        // import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        // import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        // import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // const firebaseConfig = { /* ... seus dados de config ... */ };
+        // const app = initializeApp(firebaseConfig);
+        // const auth = getAuth(app);
+        // const db = getFirestore(app);
+
+        // Função para carregar a cor do perfil (exemplo)
+        async function loadProfileColor() {
+            // Este é um exemplo de como você pode carregar a cor do perfil
+            // Substitua pela sua lógica real do Firebase
+            // Por enquanto, usaremos uma cor estática ou do localStorage
+
+            let profileColor = localStorage.getItem('userNeonColor') || '#00f2ff'; // Pega do localStorage ou usa neon padrão
+
+            // Exemplo com Firebase (descomente e adapte se precisar)
+            /*
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    const userDocRef = doc(db, "users", user.uid);
+                    const userDocSnap = await getDoc(userDocRef);
+                    if (userDocSnap.exists()) {
+                        profileColor = userDocSnap.data().neonColor || '#00f2ff';
+                    }
+                }
+                document.documentElement.style.setProperty('--user-neon-color', profileColor);
+            });
+            */
+            document.documentElement.style.setProperty('--user-neon-color', profileColor);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProfileColor(); // Carrega a cor do perfil ao iniciar
+
+            const mapWrapper = document.getElementById('map-wrapper');
+            const protagonist = document.getElementById('protagonist-cursor');
+            const stateInfo = document.getElementById('state-info');
+            const paths = document.querySelectorAll('#brazil-map path');
+
+            paths.forEach(path => {
+                path.addEventListener('mouseover', (e) => {
+                    const stateId = e.target.id;
+                    stateInfo.textContent = `ACESSO: ${stateId}`;
+                    stateInfo.style.opacity = 1;
+
+                    // Posiciona o losango no centro do estado
+                    const bbox = e.target.getBBox(); // Obtém as dimensões do path
+                    const mapSvg = document.getElementById('brazil-map');
+                    const svgPoint = mapSvg.createSVGPoint();
+                    svgPoint.x = bbox.x + bbox.width / 2;
+                    svgPoint.y = bbox.y + bbox.height / 2;
+
+                    // Transforma as coordenadas SVG para as coordenadas do wrapper do mapa
+                    const screenPoint = svg
