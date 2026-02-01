@@ -9,7 +9,6 @@
         :root {
             --neon: #00f2ff;
             --pink: #ff0055;
-            --gold: #ffcc00;
             --bg: #000000;
         }
 
@@ -27,16 +26,14 @@
         }
         #city-viewport::-webkit-scrollbar { display: none; }
 
-        svg { display: block; }
+        /* Camada de Zoom Suave */
+        #zoom-layer { transition: transform 0.8s ease-out; transform-origin: center bottom; }
 
-        /* Zoom Layer */
-        #zoom-layer { transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); transform-origin: center bottom; }
-
-        /* Estilos dos Prédios baseados na Imagem */
-        .building-base { fill: #000; stroke: var(--neon); stroke-width: 1.5; cursor: pointer; }
+        /* Estilo Wireframe (Igual à foto) */
+        .building-base { fill: #000; stroke: var(--neon); stroke-width: 1.2; cursor: pointer; }
         
         .window-btn { 
-            fill: #001a1d; 
+            fill: #000; 
             cursor: pointer; 
             animation: blink var(--dur) infinite alternate;
             animation-delay: var(--delay);
@@ -44,69 +41,37 @@
             stroke-width: 0.5;
         }
         @keyframes blink {
-            0% { fill: #001a1d; filter: none; opacity: 0.3; }
-            100% { fill: var(--neon); filter: drop-shadow(0 0 8px var(--neon)); opacity: 1; }
+            0% { opacity: 0.1; }
+            100% { opacity: 1; fill: var(--neon); }
         }
         
-        /* Portas dos Prédios */
-        .door-btn { 
-            fill: none; 
-            stroke: var(--pink); 
-            stroke-width: 2; 
-            cursor: pointer; 
-            transition: 0.3s; 
-        }
-        .door-btn:hover { filter: drop-shadow(0 0 12px var(--pink)); fill: rgba(255, 0, 85, 0.2); }
+        .door-btn { fill: none; stroke: var(--pink); stroke-width: 2; cursor: pointer; }
+        .door-btn:hover { fill: rgba(255, 0, 85, 0.2); }
 
-        .label { font-family: 'Orbitron'; font-size: 11px; fill: var(--neon); pointer-events: none; letter-spacing: 1px; text-transform: uppercase; }
+        .label { font-family: 'Orbitron'; font-size: 10px; fill: var(--neon); pointer-events: none; letter-spacing: 1px; }
 
         /* UI Overlay */
         .ui-overlay { position: fixed; z-index: 1000; pointer-events: none; inset: 0; }
         .ui-element { pointer-events: all; }
 
         #chat-container {
-            position: absolute;
-            bottom: 120px;
-            right: 40px;
-            width: 300px;
-            display: none;
-            flex-direction: column;
-            background: rgba(0,0,0,0.8);
-            border: 1px solid var(--neon);
-            padding: 10px;
+            position: absolute; bottom: 100px; right: 30px; width: 260px;
+            display: none; flex-direction: column; background: rgba(0,0,0,0.9);
+            border: 1px solid var(--neon); padding: 10px;
         }
-        #chat-msgs { max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
-        .msg { font-size: 0.85rem; color: #fff; border-left: 2px solid var(--neon); padding-left: 5px; }
-        .msg b { color: var(--neon); font-size: 0.7rem; display: block; }
+        #chat-msgs { max-height: 150px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; font-size: 0.8rem; }
         
-        #chat-input { 
-            background: #000; border: 1px solid var(--neon); color: var(--neon); 
-            padding: 8px; font-family: 'Orbitron'; font-size: 0.7rem; outline: none; width: 100%;
-        }
-
         .mystery-toast {
-            position: fixed;
-            top: 15%;
-            left: 50%;
-            transform: translateX(-50%);
-            font-family: 'Orbitron';
-            font-size: 2rem;
-            color: var(--neon);
-            text-shadow: 0 0 20px var(--neon);
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.5s;
-            z-index: 2000;
+            position: fixed; top: 15%; left: 50%; transform: translateX(-50%);
+            font-family: 'Orbitron'; font-size: 1.5rem; color: var(--neon);
+            text-shadow: 0 0 10px var(--neon); opacity: 0; transition: 0.4s; z-index: 2000;
         }
 
-        .controls { position: absolute; bottom: 40px; right: 40px; display: flex; gap: 10px; }
+        .controls { position: absolute; bottom: 30px; right: 30px; display: flex; gap: 8px; }
         .btn { 
-            padding: 10px 20px; background: #000; border: 1px solid var(--neon); 
-            color: var(--neon); font-family: 'Orbitron'; font-size: 10px; cursor: pointer;
-            transition: 0.3s;
+            padding: 8px 16px; background: #000; border: 1px solid var(--neon); 
+            color: var(--neon); font-family: 'Orbitron'; font-size: 9px; cursor: pointer;
         }
-        .btn:hover { background: var(--neon); color: #000; }
-
     </style>
 </head>
 <body onload="init()">
@@ -116,155 +81,116 @@
     <div class="ui-overlay">
         <div id="chat-container" class="ui-element">
             <div id="chat-msgs"></div>
-            <input type="text" id="chat-input" placeholder="COMMAND..." onkeypress="handleChat(event)">
+            <input type="text" id="chat-input" style="background:#000; border:1px solid var(--neon); color:var(--neon); width:100%; margin-top:5px; padding:5px;" placeholder="MSG..." onkeypress="handleChat(event)">
         </div>
 
         <div class="controls ui-element">
-            <button class="btn" onclick="resetView()">WIDEN VIEW</button>
-            <button class="btn" onclick="toggleChat()">DEEP CHAT</button>
-            <button class="btn" style="border-color:var(--pink); color:var(--pink)" onclick="window.location.href='index.html'">BACK</button>
+            <button class="btn" onclick="resetView()">RESET</button>
+            <button class="btn" onclick="toggleChat()">CHAT</button>
+            <button class="btn" style="border-color:var(--pink); color:var(--pink)" onclick="window.location.href='index.html'">EXIT</button>
         </div>
     </div>
 
     <div id="city-viewport">
-        <svg id="main-svg" width="6000" height="1000" viewBox="0 0 6000 1000">
-            <rect width="6000" height="1000" fill="#000" />
+        <svg id="main-svg" width="3000" height="1000" viewBox="0 0 3000 1000">
+            <rect width="3000" height="1000" fill="#000" />
             <g id="stars-layer"></g>
-            
-            <circle id="celestial-body" r="35" filter="url(#glow)" />
+            <circle id="celestial-body" r="30" fill="#fff" filter="url(#glow)" />
 
             <g id="zoom-layer">
-                <rect x="0" y="880" width="6000" height="5" fill="var(--neon)" filter="url(#glow)" />
-                
+                <rect x="0" y="880" width="3000" height="2" fill="var(--neon)" filter="url(#glow)" />
                 <g id="flash-traffic"></g>
                 <g id="buildings-container"></g>
             </g>
 
             <defs>
-                <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-                    <feGaussianBlur stdDeviation="5" result="blur"/>
-                    <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-                </filter>
+                <filter id="glow"><feGaussianBlur stdDeviation="4" result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/></filter>
             </defs>
         </svg>
     </div>
 
     <script>
         const viewport = document.getElementById('city-viewport');
-        const zoomLayer = document.getElementById('zoom-layer');
         const bContainer = document.getElementById('buildings-container');
-        const names = ["AURA", "VERTEX", "NOVA", "CIPHER", "ION", "ECHO", "ZENITH", "FLUX", "OMEGA", "TITAN", "NEON", "VOID", "GRID", "CORE"];
+        const names = ["AURA", "VERTEX", "NOVA", "CIPHER", "ION", "ECHO", "ZENITH", "FLUX", "OMEGA", "TITAN"];
 
         function init() {
             renderStars();
             renderBuildings();
-            animateCelestial();
             animateFlashTraffic();
-            
-            // Iniciar no meio do cenário
-            setTimeout(() => {
-                viewport.scrollLeft = (6000 / 2) - (window.innerWidth / 2);
-            }, 100);
+            // Centraliza no meio dos 3000px
+            setTimeout(() => { viewport.scrollLeft = (3000 / 2) - (window.innerWidth / 2); }, 50);
         }
 
         function showMystery() {
             const t = document.getElementById('mystery-text');
             t.style.opacity = "1";
-            setTimeout(() => t.style.opacity = "0", 2000);
+            setTimeout(() => t.style.opacity = "0", 1500);
         }
 
         function renderStars() {
             const layer = document.getElementById('stars-layer');
-            for(let i=0; i<400; i++) {
+            for(let i=0; i<150; i++) {
                 const s = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                s.setAttribute("cx", Math.random() * 6000);
-                s.setAttribute("cy", Math.random() * 700);
-                s.setAttribute("r", Math.random() * 1);
+                s.setAttribute("cx", Math.random() * 3000);
+                s.setAttribute("cy", Math.random() * 600);
+                s.setAttribute("r", Math.random() * 0.8);
                 s.setAttribute("fill", "#fff");
-                s.setAttribute("opacity", Math.random());
                 layer.appendChild(s);
             }
         }
 
         function renderBuildings() {
-            let x = 300;
-            for(let i=0; i<14; i++) {
-                const w = 140 + Math.random() * 80;
-                const h = 300 + Math.random() * 400;
+            let x = 100;
+            for(let i=0; i<10; i++) {
+                const w = 160 + Math.random() * 40;
+                const h = 300 + Math.random() * 300;
                 const y = 880 - h;
-                
                 const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
                 
-                // Prédio
                 g.innerHTML = `
                     <rect x="${x}" y="${y}" width="${w}" height="${h}" class="building-base" />
-                    <text x="${x + w/2}" y="${y - 15}" class="label" text-anchor="middle">${names[i]}</text>
-                    <rect x="${x + w/2 - 15}" y="840" width="30" height="40" class="door-btn" onclick="event.stopPropagation(); showMystery()" />
+                    <text x="${x + w/2}" y="${y - 12}" class="label" text-anchor="middle">${names[i] || 'NEXUS'}</text>
+                    <rect x="${x + w/2 - 12}" y="845" width="24" height="35" class="door-btn" onclick="event.stopPropagation(); showMystery()" />
                 `;
 
-                // Janelas (Grid fixas como na imagem)
-                const cols = 4;
-                const rows = 8;
-                const spacingX = w / (cols + 1);
-                const spacingY = (h - 100) / (rows + 1);
-
-                for(let r=0; r<rows; r++) {
-                    for(let c=0; c<cols; c++) {
-                        if(Math.random() > 0.3) { // Algumas janelas vazias
-                            const wx = x + (c + 1) * spacingX - 8;
-                            const wy = y + 40 + (r * spacingY);
-                            const dur = (1.5 + Math.random() * 3).toFixed(1) + "s";
-                            const delay = (Math.random() * 5).toFixed(1) + "s";
-                            
+                // Janelas Simplificadas
+                for(let r=0; r<5; r++) {
+                    for(let c=0; c<3; c++) {
+                        if(Math.random() > 0.4) {
+                            const wx = x + (c + 1) * (w/4) - 6;
+                            const wy = y + 40 + (r * (h/7));
                             const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-                            rect.setAttribute("x", wx);
-                            rect.setAttribute("y", wy);
-                            rect.setAttribute("width", "16");
-                            rect.setAttribute("height", "16");
+                            rect.setAttribute("x", wx); rect.setAttribute("y", wy);
+                            rect.setAttribute("width", "12"); rect.setAttribute("height", "12");
                             rect.setAttribute("class", "window-btn");
-                            rect.setAttribute("style", `--dur: ${dur}; --delay: ${delay}`);
+                            rect.setAttribute("style", `--dur:${1+Math.random()*2}s; --delay:${Math.random()*3}s`);
                             rect.onclick = (e) => { e.stopPropagation(); showMystery(); };
                             g.appendChild(rect);
                         }
                     }
                 }
-
                 bContainer.appendChild(g);
-                x += w + 180;
+                x += w + 120; // Espaçamento menor para aproximar
             }
         }
 
         function resetView() {
-            zoomLayer.style.transform = `scale(1)`;
-            viewport.scrollLeft = (6000 / 2) - (window.innerWidth / 2);
-        }
-
-        function animateCelestial() {
-            const body = document.getElementById('celestial-body');
-            const hour = new Date().getHours();
-            const isDay = hour >= 6 && hour < 18;
-            const progress = (hour % 12) / 12;
-            const cx = 1000 + (progress * 4000);
-            const cy = 300 - Math.sin(progress * Math.PI) * 200;
-            
-            body.setAttribute("cx", cx);
-            body.setAttribute("cy", cy);
-            body.setAttribute("fill", isDay ? "var(--gold)" : "#ffffff");
+            document.getElementById('zoom-layer').style.transform = `scale(1)`;
+            viewport.scrollLeft = (3000 / 2) - (window.innerWidth / 2);
         }
 
         function animateFlashTraffic() {
             const g = document.getElementById('flash-traffic');
             setInterval(() => {
                 const l = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-                l.setAttribute("x", "-1000");
-                l.setAttribute("y", 885 + Math.random() * 40);
-                l.setAttribute("width", "400");
-                l.setAttribute("height", "1");
-                l.setAttribute("fill", Math.random() > 0.5 ? "var(--neon)" : "var(--pink)");
-                l.innerHTML = `<animate attributeName="x" from="-1000" to="6000" dur="0.3s" fill="freeze" />`;
+                l.setAttribute("x", "-500"); l.setAttribute("y", 882 + Math.random() * 30);
+                l.setAttribute("width", "200"); l.setAttribute("height", "1");
+                l.setAttribute("fill", "var(--neon)");
+                l.innerHTML = `<animate attributeName="x" from="-500" to="3000" dur="0.3s" fill="freeze" />`;
                 g.appendChild(l);
                 setTimeout(() => l.remove(), 400);
-            }, 250);
+            }, 400);
         }
 
         function toggleChat() {
@@ -273,16 +199,11 @@
         }
 
         function handleChat(e) {
-            if(e.key === 'Enter') {
-                const input = document.getElementById('chat-input');
-                if(!input.value) return;
-                const msgs = document.getElementById('chat-msgs');
+            if(e.key === 'Enter' && e.target.value) {
                 const m = document.createElement('div');
-                m.className = 'msg';
-                m.innerHTML = `<b>ACCESS_LOG</b> ${input.value}`;
-                msgs.appendChild(m);
-                input.value = "";
-                msgs.scrollTop = msgs.scrollHeight;
+                m.innerHTML = `<b style="color:var(--neon)">USER:</b> ${e.target.value}`;
+                document.getElementById('chat-msgs').appendChild(m);
+                e.target.value = "";
             }
         }
     </script>
