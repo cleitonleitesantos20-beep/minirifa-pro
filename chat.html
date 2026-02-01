@@ -14,276 +14,237 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { 
-            background: var(--bg); 
-            color: #fff; 
-            font-family: 'Rajdhani'; 
-            overflow: hidden; 
-            height: 100vh; 
-            width: 100vw; 
-        }
+        body { background: var(--bg); color: #fff; font-family: 'Rajdhani'; overflow: hidden; height: 100vh; width: 100vw; }
 
-        /* Container da Cidade */
         #city-viewport {
             width: 100vw;
             height: 100vh;
             overflow-x: auto;
             overflow-y: hidden;
-            scroll-behavior: smooth;
             scrollbar-width: none;
         }
         #city-viewport::-webkit-scrollbar { display: none; }
 
-        svg { background: linear-gradient(to bottom, #010105 0%, #050510 100%); transition: background 1s; }
+        svg { display: block; background: #010105; }
 
-        /* Zoom Layer */
-        #zoom-layer { 
-            transition: transform 0.8s cubic-bezier(0.2, 0, 0.2, 1); 
-            transform-origin: 0 0;
-        }
+        /* Zoom Layer Suave */
+        #zoom-layer { transition: transform 0.6s ease-out; transform-origin: center center; }
 
         /* Estilos dos Prédios */
-        .building-base { fill: #08080c; stroke: rgba(0, 242, 255, 0.3); stroke-width: 2; cursor: pointer; }
-        .building-base:hover { fill: #0d0d15; }
+        .building-base { fill: #0a0a0f; stroke: rgba(0, 242, 255, 0.4); stroke-width: 2; cursor: pointer; transition: fill 0.3s; }
+        .building-base:hover { fill: #11111a; }
         
-        .window-btn { fill: #1a1a25; cursor: pointer; transition: 0.2s; }
-        .window-btn:hover { fill: var(--neon); filter: drop-shadow(0 0 5px var(--neon)); }
+        .window-btn { fill: #1a1a25; cursor: pointer; }
+        .window-btn:hover { fill: var(--neon); filter: drop-shadow(0 0 8px var(--neon)); }
         
-        .door-btn { fill: var(--pink); cursor: pointer; opacity: 0.8; }
-        .door-btn:hover { opacity: 1; filter: drop-shadow(0 0 8px var(--pink)); }
+        .door-btn { fill: var(--pink); cursor: pointer; }
+        .door-btn:hover { filter: drop-shadow(0 0 10px var(--pink)); }
 
-        .label { font-family: 'Orbitron'; font-size: 12px; fill: var(--neon); pointer-events: none; text-transform: uppercase; }
+        .label { font-family: 'Orbitron'; font-size: 14px; fill: var(--neon); pointer-events: none; }
 
-        /* Interface de UI */
-        .ui-overlay { position: fixed; z-index: 1000; pointer-events: none; width: 100%; height: 100%; top: 0; left: 0; }
+        /* UI Overlay */
+        .ui-overlay { position: fixed; z-index: 1000; pointer-events: none; inset: 0; }
         .ui-element { pointer-events: all; }
 
-        /* Chat Transparente */
+        /* Chat Ultra Transparente (Apenas Texto) */
         #chat-container {
             position: absolute;
-            bottom: 80px;
-            right: 20px;
-            width: 280px;
-            background: rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(5px);
-            border-left: 1px solid var(--neon);
-            padding: 10px;
+            bottom: 100px;
+            right: 30px;
+            width: 320px;
             display: none;
             flex-direction: column;
         }
-        #chat-msgs { height: 150px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; scrollbar-width: none; }
-        .msg { font-size: 0.85rem; color: #fff; animation: fadeIn 0.3s forwards; }
-        .msg b { color: var(--neon); }
+        #chat-msgs { 
+            height: 200px; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 8px; 
+            justify-content: flex-end;
+            padding: 10px;
+        }
+        .msg { 
+            font-size: 1rem; 
+            color: rgba(255, 255, 255, 0.9); 
+            text-shadow: 2px 2px 4px #000; 
+            animation: slideIn 0.3s ease-out;
+            line-height: 1.2;
+        }
+        .msg b { color: var(--neon); font-family: 'Orbitron'; font-size: 0.8rem; display: block; margin-bottom: 2px; }
         
         #chat-input { 
-            background: rgba(255,255,255,0.05); border: none; border-bottom: 1px solid rgba(0,242,255,0.3);
-            color: #fff; padding: 5px; font-family: 'Rajdhani'; outline: none;
+            background: transparent; border: none; border-bottom: 1px solid var(--neon);
+            color: #fff; padding: 8px; font-family: 'Rajdhani'; font-size: 1.1rem; outline: none;
+            width: 100%; margin-top: 10px;
         }
 
-        /* Botões */
-        .controls { position: absolute; bottom: 20px; right: 20px; display: flex; gap: 10px; }
+        /* Controles */
+        .controls { position: absolute; bottom: 30px; right: 30px; display: flex; gap: 15px; }
         .btn { 
-            padding: 10px 15px; background: rgba(0,0,0,0.6); border: 1px solid var(--neon); 
-            color: var(--neon); font-family: 'Orbitron'; font-size: 10px; cursor: pointer; transition: 0.3s;
+            padding: 12px 20px; background: rgba(0,0,0,0.8); border: 1px solid var(--neon); 
+            color: var(--neon); font-family: 'Orbitron'; font-size: 11px; cursor: pointer; 
         }
-        .btn:hover { background: var(--neon); color: #000; }
         .btn-exit { border-color: var(--pink); color: var(--pink); }
-        .btn-exit:hover { background: var(--pink); color: #fff; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
     </style>
 </head>
-<body>
+<body onload="init()">
 
     <div class="ui-overlay">
         <div id="chat-container" class="ui-element">
             <div id="chat-msgs"></div>
-            <input type="text" id="chat-input" placeholder="Mensagem rápida..." onkeypress="handleChat(event)">
+            <input type="text" id="chat-input" placeholder="DIGITE AQUI..." onkeypress="handleChat(event)">
         </div>
 
         <div class="controls ui-element">
-            <button class="btn" onclick="resetView()">RESET ZOOM</button>
+            <button class="btn" onclick="resetView()">RESET VIEW</button>
             <button class="btn" onclick="toggleChat()">CHAT</button>
-            <button class="btn btn-exit" onclick="window.location.href='index.html'">SAIR</button>
+            <button class="btn btn-exit" onclick="window.location.href='index.html'">VOLTAR</button>
         </div>
     </div>
 
     <div id="city-viewport" onclick="resetView()">
-        <svg id="main-svg" width="6000" height="1000" viewBox="0 0 6000 1000">
-            <rect id="sky" width="6000" height="1000" fill="#010103" />
-            <g id="stars"></g>
-            <circle id="celestial" cx="0" cy="0" r="60" filter="url(#glow)" />
+        <svg id="main-svg" width="7000" height="1000" viewBox="0 0 7000 1000">
+            <rect width="7000" height="1000" fill="#010103" />
+            <g id="stars-layer"></g>
             
             <g id="zoom-layer">
-                <rect x="0" y="850" width="6000" height="150" fill="#050508" />
-                <line x1="0" y1="850" x2="6000" y2="850" stroke="var(--neon)" stroke-width="1" opacity="0.3" />
-                
+                <rect x="0" y="850" width="7000" height="150" fill="#050508" />
                 <g id="light-streaks"></g>
-
-                <g id="buildings-group"></g>
+                <g id="buildings-container"></g>
             </g>
-
-            <defs>
-                <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-                    <feGaussianBlur stdDeviation="5" result="blur" />
-                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                </filter>
-            </defs>
         </svg>
     </div>
 
     <script>
-        const svg = document.getElementById('main-svg');
         const zoomLayer = document.getElementById('zoom-layer');
-        const bGroup = document.getElementById('buildings-group');
-        const names = ["Aura", "Vertex", "Nova", "Cipher", "Ion", "Echo", "Zenith", "Flux", "Omega", "Titan", "Neon", "Void", "Grid", "Core"];
-        const winCounts = [10, 20, 40, 50];
+        const bContainer = document.getElementById('buildings-container');
+        const names = ["AURA", "VERTEX", "NOVA", "CIPHER", "ION", "ECHO", "ZENITH", "FLUX", "OMEGA", "TITAN", "NEON", "VOID", "GRID", "CORE"];
+        const winOptions = [10, 20, 40, 50];
 
         function init() {
-            createStars();
-            createBuildings();
-            animateLights();
-            updateClock();
-            setInterval(updateClock, 60000);
+            renderStars();
+            renderBuildings();
+            animateTraffic();
         }
 
-        function createStars() {
-            const stars = document.getElementById('stars');
-            for(let i=0; i<500; i++) {
-                const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                c.setAttribute("cx", Math.random() * 6000);
-                c.setAttribute("cy", Math.random() * 700);
-                c.setAttribute("r", Math.random() * 1.5);
-                c.setAttribute("fill", "#fff");
-                c.setAttribute("opacity", Math.random());
-                stars.appendChild(c);
+        function renderStars() {
+            const layer = document.getElementById('stars-layer');
+            for(let i=0; i<400; i++) {
+                const s = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                s.setAttribute("cx", Math.random() * 7000);
+                s.setAttribute("cy", Math.random() * 800);
+                s.setAttribute("r", Math.random() * 1.2);
+                s.setAttribute("fill", "#fff");
+                s.setAttribute("opacity", Math.random());
+                layer.appendChild(s);
             }
         }
 
-        function createBuildings() {
-            let xPos = 200;
+        function renderBuildings() {
+            let x = 300;
             for(let i=0; i<14; i++) {
-                const w = 180 + Math.random() * 100;
-                const h = 300 + Math.random() * 400;
+                const w = 200 + Math.random() * 80;
+                const h = 350 + Math.random() * 400;
                 const y = 850 - h;
-                const wins = winCounts[Math.floor(Math.random() * winCounts.length)];
+                const wins = winOptions[Math.floor(Math.random() * winOptions.length)];
                 
                 const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-                g.setAttribute("class", "building");
-                g.onclick = (e) => focusBuilding(e, xPos, y, w, h);
+                g.onclick = (e) => focus(e, x, y, w, h);
 
-                // Corpo do Prédio
                 g.innerHTML = `
-                    <rect x="${xPos}" y="${y}" width="${w}" height="${h}" class="building-base" />
-                    <text x="${xPos + w/2}" y="${y - 15}" class="label" text-anchor="middle">${names[i]}</text>
-                    <rect x="${xPos + w/2 - 15}" y="820" width="30" height="30" class="door-btn" onclick="doorAction(event)" />
+                    <rect x="${x}" y="${y}" width="${w}" height="${h}" class="building-base" />
+                    <text x="${x + w/2}" y="${y - 20}" class="label" text-anchor="middle">${names[i]}</text>
+                    <rect x="${x + w/2 - 20}" y="810" width="40" height="40" class="door-btn" onclick="doorClick(event)" />
                 `;
 
-                // Gerar Janelas
-                let currentWin = 0;
+                // Janelas
                 const cols = 4;
                 const rows = Math.ceil(wins / cols);
-                const wSpace = w / (cols + 1);
-                const hSpace = (h - 100) / (rows + 1);
+                const stepX = w / (cols + 1);
+                const stepY = (h - 120) / (rows + 1);
 
-                for(let r=0; r<rows; r++) {
-                    for(let c=0; c<cols; c++) {
-                        if(currentWin < wins) {
-                            const wx = xPos + (c + 1) * wSpace - 8;
-                            const wy = y + 50 + (r * hSpace);
-                            g.innerHTML += `<rect x="${wx}" y="${wy}" width="16" height="20" class="window-btn" onclick="winAction(event, ${currentWin+1})" />`;
-                            currentWin++;
-                        }
-                    }
+                for(let k=0; k < wins; k++) {
+                    const row = Math.floor(k / cols);
+                    const col = k % cols;
+                    const wx = x + (col + 1) * stepX - 10;
+                    const wy = y + 60 + (row * stepY);
+                    g.innerHTML += `<rect x="${wx}" y="${wy}" width="20" height="25" class="window-btn" onclick="winClick(event, ${k+1})" />`;
                 }
 
-                bGroup.appendChild(g);
-                xPos += w + 200;
+                bContainer.appendChild(g);
+                x += w + 250;
             }
         }
 
-        function focusBuilding(e, x, y, w, h) {
+        function focus(e, x, y, w, h) {
             e.stopPropagation();
-            const scale = 1.8;
-            const tx = -(x - 50) * scale;
-            const ty = -(y - 100) * scale;
+            const scale = 1.5;
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            // Cálculo para centralizar o prédio no zoom
+            const tx = centerX - (x + w/2) * scale;
+            const ty = centerY - (y + h/2) * scale;
             zoomLayer.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
         }
 
         function resetView() {
-            zoomLayer.style.transform = `translate(0,0) scale(1)`;
+            zoomLayer.style.transform = `translate(0, 0) scale(1)`;
         }
 
-        function winAction(e, id) {
+        function doorClick(e) {
             e.stopPropagation();
-            alert(`Interface de Janela #${id} acessada.`);
+            alert("(nd acontece no momento)");
         }
 
-        function doorAction(e) {
+        function winClick(e, id) {
             e.stopPropagation();
-            alert("Acesso à base: nd acontece no momento.");
+            alert(`Janela ${id} selecionada.`);
         }
 
-        // Animação de Luzes (Substituindo carros complexos)
-        function animateLights() {
-            const container = document.getElementById('light-streaks');
-            setInterval(() => {
-                const line = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-                const y = 855 + Math.random() * 80;
-                line.setAttribute("x", "-200");
-                line.setAttribute("y", y);
-                line.setAttribute("width", "100");
-                line.setAttribute("height", "1");
-                line.setAttribute("fill", Math.random() > 0.5 ? "var(--neon)" : "var(--pink)");
-                line.innerHTML = `<animate attributeName="x" from="-200" to="6000" dur="${2 + Math.random()*3}s" repeatCount="indefinite" />`;
-                container.appendChild(line);
-                if(container.childNodes.length > 20) container.removeChild(container.firstChild);
-            }, 800);
-        }
-
-        // Sistema de Horário Real
-        function updateClock() {
-            const hour = new Date().getHours();
-            const sky = document.getElementById('sky');
-            const cel = document.getElementById('celestial');
-            
-            // Ciclo de cores do céu
-            if(hour >= 6 && hour < 18) {
-                sky.setAttribute("fill", "#0a1a2f");
-                cel.setAttribute("fill", "var(--gold)");
-                cel.setAttribute("cx", "500"); cel.setAttribute("cy", "200");
-            } else {
-                sky.setAttribute("fill", "#010105");
-                cel.setAttribute("fill", "#e0e0e0");
-                cel.setAttribute("cx", "800"); cel.setAttribute("cy", "150");
-            }
-        }
-
-        // Chat Funcional
         function toggleChat() {
             const chat = document.getElementById('chat-container');
-            chat.style.display = (chat.style.display === 'flex') ? 'none' : 'flex';
+            chat.style.display = chat.style.display === 'flex' ? 'none' : 'flex';
+            if(chat.style.display === 'flex') document.getElementById('chat-input').focus();
         }
 
         function handleChat(e) {
             if(e.key === 'Enter') {
                 const input = document.getElementById('chat-input');
-                const msgs = document.getElementById('chat-msgs');
                 if(!input.value) return;
 
-                const div = document.createElement('div');
-                div.className = 'msg';
-                div.innerHTML = `<b>Você:</b> ${input.value}`;
-                msgs.appendChild(div);
-                msgs.scrollTop = msgs.scrollHeight;
-                input.value = "";
+                const msgs = document.getElementById('chat-msgs');
+                const m = document.createElement('div');
+                m.className = 'msg';
+                m.innerHTML = `<b>USUÁRIO</b> ${input.value}`;
+                msgs.appendChild(m);
                 
-                // Limpeza automática após 20s
-                setTimeout(() => div.remove(), 20000);
+                input.value = "";
+                msgs.scrollTop = msgs.scrollHeight;
+
+                // Desaparecer após 15 segundos
+                setTimeout(() => m.style.opacity = "0", 14000);
+                setTimeout(() => m.remove(), 15000);
             }
         }
 
-        init();
+        function animateTraffic() {
+            const g = document.getElementById('light-streaks');
+            setInterval(() => {
+                const l = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                const y = 860 + Math.random() * 80;
+                l.setAttribute("x", "-500");
+                l.setAttribute("y", y);
+                l.setAttribute("width", "150");
+                l.setAttribute("height", "2");
+                l.setAttribute("fill", Math.random() > 0.5 ? "var(--neon)" : "var(--pink)");
+                l.innerHTML = `<animate attributeName="x" from="-500" to="7000" dur="${1.5 + Math.random() * 2}s" repeatCount="indefinite" />`;
+                g.appendChild(l);
+                if(g.childNodes.length > 15) g.removeChild(g.firstChild);
+            }, 1000);
+        }
     </script>
     <script type="module" src="nexus-overlay.js"></script>
 </body>
