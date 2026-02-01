@@ -10,8 +10,6 @@
             --neon: #00f2ff;
             --pink: #ff0055;
             --bg: #020205;
-            --glass: rgba(0, 0, 0, 0.3);
-            --border: rgba(0, 242, 255, 0.3);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -21,11 +19,10 @@
             color: #fff; 
             font-family: 'Rajdhani'; 
             overflow: hidden; 
-            height: 100vh;
-            width: 100vw;
+            height: 100vh; width: 100vw;
         }
 
-        /* --- CIDADE VIVIDA --- */
+        /* --- CIDADE 2D ATIVA --- */
         #city-container {
             position: fixed;
             top: 0; left: 0;
@@ -33,219 +30,178 @@
             overflow-x: scroll;
             overflow-y: hidden;
             z-index: 1;
-            background: radial-gradient(circle at 50% 50%, #080c1f 0%, #020205 100%);
+            background: linear-gradient(to bottom, #050a15 0%, #020205 100%);
         }
 
-        .city-svg { width: 6000px; height: 100%; display: block; }
-
-        .building { 
-            stroke: rgba(0, 242, 255, 0.3); 
-            stroke-width: 1.5; 
-            fill: rgba(2, 5, 15, 0.9);
+        .city-svg { 
+            width: 6000px; 
+            height: 80%; /* Cidade menor na tela */
+            margin-top: 10vh;
+            display: block; 
         }
+
+        .skyline { fill: #0a0a1a; stroke: rgba(0, 242, 255, 0.2); stroke-width: 1; }
         
-        /* Animação de Neons nos Prédios */
-        @keyframes pulse { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
-        .neon-detail { stroke: var(--neon); filter: drop-shadow(0 0 5px var(--neon)); animation: pulse 3s infinite; }
+        /* Luzes das Janelas Animadas */
+        .light { fill: var(--neon); opacity: 0.3; transition: 0.5s; }
+        .light.blink { animation: blinker 2s infinite; }
+        @keyframes blinker { 50% { opacity: 0.8; filter: blur(2px); } }
 
-        .window { 
-            fill: rgba(0, 242, 255, 0.1); 
-            cursor: pointer; 
+        /* --- BOTÕES VIRTUAIS --- */
+        .v-button {
+            position: fixed;
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid var(--neon);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem;
+            z-index: 100;
+            cursor: pointer;
             pointer-events: all;
             transition: 0.3s;
         }
-        .window.active { fill: var(--neon); filter: drop-shadow(0 0 8px var(--neon)); }
 
-        /* --- INTERFACE FLUTUANTE E COMPACTA --- */
-        .chat-overlay {
+        .v-button:active { transform: scale(0.9); box-shadow: 0 0 25px var(--neon); }
+
+        #btn-global { bottom: 30px; left: 30px; }
+        #btn-friends { bottom: 30px; left: 110px; }
+        #btn-toggle { top: 30px; right: 30px; font-size: 0.8rem; font-family: 'Orbitron'; color: var(--neon); border-radius: 10px; width: auto; padding: 0 15px; }
+
+        /* --- CHAT SOBREPOSTO (FLUTUANTE) --- */
+        #chat-window {
             position: fixed;
-            top: 0; left: 0;
-            z-index: 10;
-            display: flex;
-            height: 100vh; width: 100vw;
-            pointer-events: none; 
-        }
-
-        .chat-menu {
-            width: 70px;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(20px);
-            border-right: 1px solid var(--border);
-            display: flex; flex-direction: column; align-items: center; gap: 20px;
-            padding: 100px 0 20px 0;
-            pointer-events: all;
-        }
-
-        .chat-content {
-            flex: 1;
-            display: flex; flex-direction: column;
-            padding: 100px 20px 20px 20px;
-            max-width: 400px;
-            pointer-events: all;
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* Esconder chat no celular para ver a cidade */
-        @media (max-width: 600px) {
-            .chat-content.hidden { transform: translateX(-120%); }
-            .chat-content { max-width: 85vw; background: linear-gradient(to right, rgba(0,0,0,0.8), transparent); }
-        }
-
-        .chat-messages {
-            flex: 1; overflow-y: auto;
-            background: var(--glass);
+            bottom: 110px; left: 30px;
+            width: 320px; height: 400px;
+            background: rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(10px);
-            border-radius: 15px; padding: 15px;
             border: 1px solid var(--border);
-            margin-bottom: 15px;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
-        }
-
-        .menu-item {
-            width: 50px; height: 50px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            background: rgba(0, 242, 255, 0.05); cursor: pointer; transition: 0.3s;
-            font-size: 1.2rem; border: 1px solid var(--border);
-        }
-
-        .menu-item.active { background: var(--neon); color: #000; box-shadow: 0 0 20px var(--neon); }
-
-        .chat-input-area {
-            display: flex; gap: 10px; background: #000;
-            padding: 12px; border-radius: 30px; border: 1px solid var(--neon);
-        }
-
-        input { flex: 1; background: transparent; border: none; color: #fff; outline: none; font-size: 16px; }
-
-        #toggle-chat {
-            position: fixed; top: 85px; left: 85px;
-            z-index: 100; background: var(--neon); color: #000;
-            border: none; padding: 5px 15px; border-radius: 5px;
-            font-family: 'Orbitron'; font-size: 0.6rem; cursor: pointer;
+            border-radius: 20px;
+            z-index: 90;
+            display: none; /* Começa escondido */
+            flex-direction: column;
+            padding: 15px;
             pointer-events: all;
+            border: 1px solid var(--neon);
+        }
+
+        .chat-messages { flex: 1; overflow-y: auto; margin-bottom: 10px; font-size: 0.9rem; }
+        .chat-input-area { display: flex; gap: 5px; border-top: 1px solid rgba(0,242,255,0.2); padding-top: 10px; }
+        input { background: transparent; border: none; color: #fff; outline: none; flex: 1; }
+
+        @media (max-width: 600px) {
+            #chat-window { width: calc(100vw - 60px); }
         }
     </style>
 </head>
 <body>
 
-    <button id="toggle-chat">OCULTAR INTERFACE</button>
+    <div class="v-button" id="btn-global" onclick="toggleChat('GLOBAL')">🌐</div>
+    <div class="v-button" id="btn-friends" onclick="toggleChat('FRIENDS')">👥</div>
+    <div class="v-button" id="btn-toggle" onclick="toggleCityMode()">AGITAR CIDADE</div>
+
+    <div id="chat-window">
+        <div id="chat-title" style="font-family: 'Orbitron'; font-size: 0.7rem; color: var(--neon); margin-bottom: 10px;">GLOBAL_STREAM</div>
+        <div class="chat-messages" id="chat-box">
+            <div style="color: var(--neon)">[SISTEMA]: CONECTADO.</div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" placeholder="Transmitir..." id="chat-input">
+            <button onclick="sendMsg()" style="background:none; border:none; color:var(--neon); cursor:pointer;">></button>
+        </div>
+    </div>
 
     <div id="city-container">
-        <svg id="city-svg" class="city-svg" viewBox="0 0 6000 1000" preserveAspectRatio="none">
-            <defs>
-                <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-            </defs>
-            <g id="traffic-layer"></g> <g id="buildings-layer"></g>
+        <svg id="city-svg" class="city-svg" viewBox="0 0 6000 1000">
+            <g id="back-layer"></g>
+            <g id="traffic-layer"></g>
+            <g id="front-layer"></g>
         </svg>
     </div>
 
-    <div class="chat-overlay">
-        <nav class="chat-menu">
-            <div class="menu-item active" onclick="switchChat('global', this)">🌐</div>
-            <div class="menu-item" onclick="switchChat('friends', this)">👥</div>
-            <div class="menu-item" onclick="toggleCityView()">🏙️</div>
-        </nav>
-
-        <main class="chat-content" id="main-chat">
-            <h2 id="chat-title" style="font-family: 'Orbitron'; font-size: 0.7rem; color: var(--neon); margin-bottom: 10px;">SYSTEM_OVERLAY</h2>
-            <div class="chat-messages" id="chat-box">
-                <div style="color: var(--neon);">[CONECTADO AO NEXUS]</div>
-            </div>
-
-            <div class="chat-input-area">
-                <input type="text" placeholder="COMANDO..." id="chat-input">
-                <button onclick="sendMessage()" style="background:none; border:none; color:var(--neon); font-weight:bold;">></button>
-            </div>
-        </main>
-    </div>
-
     <script type="module">
-        import { getFirestore, doc, onSnapshot, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        let agilityLevel = 1;
 
         document.addEventListener('DOMContentLoaded', () => {
-            generateCity();
+            build2DCity();
             startTraffic();
-            
-            document.getElementById('toggle-chat').onclick = function() {
-                const chat = document.getElementById('main-chat');
-                chat.classList.toggle('hidden');
-                this.innerText = chat.classList.contains('hidden') ? 'MOSTRAR CHAT' : 'OCULTAR INTERFACE';
-            };
         });
 
-        function generateCity() {
-            const layer = document.getElementById('buildings-layer');
-            for(let i = 0; i < 80; i++) {
-                const w = 150 + Math.random() * 200;
-                const h = 300 + Math.random() * 600;
-                const x = i * 100;
-                const y = 1000 - h;
+        function build2DCity() {
+            const back = document.getElementById('back-layer');
+            const front = document.getElementById('front-layer');
+            
+            for(let i = 0; i < 100; i++) {
+                const x = i * 60;
+                const h = 200 + Math.random() * 400;
+                const w = 80 + Math.random() * 100;
+                
+                // Silhueta do prédio
+                const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                rect.setAttribute("x", x);
+                rect.setAttribute("y", 1000 - h);
+                rect.setAttribute("width", w);
+                rect.setAttribute("height", h);
+                rect.setAttribute("class", "skyline");
+                back.appendChild(rect);
 
-                // Prédio Base
-                const b = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-                b.setAttribute("x", x); b.setAttribute("y", y); b.setAttribute("width", w); b.setAttribute("height", h);
-                b.setAttribute("class", "building");
-                layer.appendChild(b);
-
-                // Detalhe Neon Pulsante
-                if(Math.random() > 0.7) {
-                    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                    line.setAttribute("x1", x); line.setAttribute("y1", y); line.setAttribute("x2", x+w); line.setAttribute("y2", y);
-                    line.setAttribute("class", "neon-detail");
-                    layer.appendChild(line);
-                }
-
-                // Janelas com vida (piscam sozinhas)
-                for(let row = 1; row < h/60; row++) {
-                    for(let col = 1; col < w/40; col++) {
-                        const win = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-                        win.setAttribute("x", x + (col * 35));
-                        win.setAttribute("y", y + (row * 50));
-                        win.setAttribute("width", 12); win.setAttribute("height", 12);
-                        win.setAttribute("class", "window");
-                        if(Math.random() > 0.6) win.classList.add('active');
-                        
-                        win.onclick = (e) => {
-                            e.stopPropagation();
-                            win.classList.toggle('active');
-                            alert("SINAL ENCONTRADO NO SETOR " + Math.floor(x/100));
-                        };
-                        layer.appendChild(win);
-                    }
+                // Luzes ativas
+                for(let j = 0; j < 5; j++) {
+                    const light = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                    light.setAttribute("cx", x + (Math.random() * w));
+                    light.setAttribute("cy", (1000 - h) + (Math.random() * h));
+                    light.setAttribute("r", "1.5");
+                    light.setAttribute("class", "light blink");
+                    light.style.animationDuration = (1 + Math.random() * 3) + "s";
+                    front.appendChild(light);
                 }
             }
         }
 
-        // Animação de Carros Voadores
         function startTraffic() {
             const traffic = document.getElementById('traffic-layer');
             setInterval(() => {
                 const car = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-                const y = 200 + Math.random() * 600;
-                car.setAttribute("x", "0"); car.setAttribute("y", y);
-                car.setAttribute("width", "30"); car.setAttribute("height", "2");
+                const y = 850 + (Math.random() * 100);
+                car.setAttribute("x", "-50");
+                car.setAttribute("y", y);
+                car.setAttribute("width", "40");
+                car.setAttribute("height", "1");
                 car.setAttribute("fill", Math.random() > 0.5 ? "var(--neon)" : "var(--pink)");
-                car.style.transition = "transform 10s linear";
+                
+                // Velocidade baseada na agitação
+                const duration = (10 / agilityLevel);
+                car.style.transition = `transform ${duration}s linear`;
                 traffic.appendChild(car);
                 
-                setTimeout(() => car.style.transform = "translateX(6000px)", 50);
-                setTimeout(() => car.remove(), 10000);
-            }, 800);
+                setTimeout(() => car.style.transform = "translateX(6100px)", 50);
+                setTimeout(() => car.remove(), duration * 1000);
+            }, 1000 / agilityLevel);
         }
 
-        window.switchChat = (type, el) => {
-            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
-            el.classList.add('active');
-            document.getElementById('chat-title').innerText = type.toUpperCase() + "_STREAM";
+        window.toggleChat = (type) => {
+            const win = document.getElementById('chat-window');
+            const title = document.getElementById('chat-title');
+            if(win.style.display === 'flex' && title.innerText.includes(type)) {
+                win.style.display = 'none';
+            } else {
+                win.style.display = 'flex';
+                title.innerText = type + "_STREAM";
+            }
         };
 
-        window.sendMessage = () => {
+        window.toggleCityMode = () => {
+            agilityLevel = agilityLevel >= 5 ? 1 : agilityLevel + 2;
+            const box = document.getElementById('chat-box');
+            box.innerHTML += `<div style="color:var(--pink)">[ALERTA]: AGITAÇÃO NÍVEL ${agilityLevel}</div>`;
+        };
+
+        window.sendMsg = () => {
             const input = document.getElementById('chat-input');
             if(!input.value) return;
-            const box = document.getElementById('chat-box');
-            box.innerHTML += `<div><span style="color:var(--neon)">></span> ${input.value}</div>`;
+            document.getElementById('chat-box').innerHTML += `<div>> ${input.value}</div>`;
             input.value = "";
-            box.scrollTop = box.scrollHeight;
         };
     </script>
     <script type="module" src="nexus-overlay.js"></script>
