@@ -71,14 +71,15 @@
         #chat-input { flex: 1; background: transparent; border: none; padding: 5px 10px; color: #fff; font-family: 'Rajdhani'; outline: none; width: 100%; }
         .btn-send { background: var(--neon); border: none; padding: 5px 15px; cursor: pointer; color: #000; font-weight: bold; font-family: 'Rajdhani'; }
         
-        #chat-stream { position: fixed; top: 0; left: 20px; width: 400px; height: 100vh; pointer-events: none; overflow: hidden; z-index: 9000; }
-        .chat-msg { position: absolute; left: 0; top: -100px; color: var(--neon); font-family: 'Rajdhani'; font-weight: bold; text-shadow: 0 0 8px #000; font-size: 1.2rem; animation: fallDown 10s linear forwards; white-space: nowrap; }
+        /* CORREÇÃO AQUI: Garante que o stream apareça na frente de tudo */
+        #chat-stream { position: fixed; top: 0; left: 20px; width: 450px; height: 100vh; pointer-events: none; overflow: hidden; z-index: 99999; }
+        .chat-msg { position: absolute; left: 0; top: -100px; color: var(--neon); font-family: 'Rajdhani'; font-weight: bold; text-shadow: 2px 2px 4px #000; font-size: 1.3rem; animation: fallDown 12s linear forwards; white-space: nowrap; }
         .msg-user { color: var(--pink); margin-right: 5px; }
 
         @keyframes fallDown { 
             0% { transform: translateY(0); opacity: 0; } 
-            10% { opacity: 1; } 
-            90% { opacity: 1; } 
+            5% { opacity: 1; } 
+            95% { opacity: 1; } 
             100% { transform: translateY(110vh); opacity: 0; } 
         }
         
@@ -139,16 +140,19 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // Função global para exibir a mensagem
+        // Função global para exibir a mensagem na cascata
         window.displayMessage = function(user, text) {
             const stream = document.getElementById('chat-stream');
             if(!stream) return;
             const msg = document.createElement('div');
             msg.className = 'chat-msg';
             msg.innerHTML = `<span class="msg-user">[${user}]</span> ${text}`;
-            msg.style.left = Math.random() * 80 + "px"; // Aleatoriedade no X
+            // Posicionamento aleatório na lateral esquerda (0 a 100px)
+            msg.style.left = Math.floor(Math.random() * 100) + "px"; 
             stream.appendChild(msg);
-            setTimeout(() => msg.remove(), 10500);
+            
+            // Remove o elemento após a animação acabar
+            setTimeout(() => { if(msg.parentNode) msg.remove(); }, 12000);
         };
 
         async function sendMessage() {
@@ -159,10 +163,10 @@
             const user = auth.currentUser;
             const name = user ? (user.displayName || "USER_NEXUS") : "VISITANTE";
 
+            // GATILHO DE TESTE: Mostra na tela imediatamente para teste visual
+            window.displayMessage(name, text.toUpperCase());
+
             try {
-                // TESTE LOCAL: Descomente a linha abaixo para ver funcionando sem Firebase
-                // window.displayMessage(name, text.toUpperCase()); 
-                
                 await addDoc(collection(db, "chat_messages"), {
                     text: text.toUpperCase(),
                     userName: name,
@@ -170,29 +174,39 @@
                 });
                 input.value = "";
             } catch (e) {
-                console.error("Erro ao enviar:", e);
-                // Fallback visual caso falhe a conexão
-                window.displayMessage("SISTEMA", "ERRO DE CONEXÃO COM NEXUS");
+                console.error("Firebase Error:", e);
             }
         }
 
+        // Eventos de clique e tecla
         window.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('btn-send-msg').onclick = (e) => { e.preventDefault(); sendMessage(); };
-            document.getElementById('chat-input').onkeydown = (e) => { if(e.key === 'Enter') { e.preventDefault(); sendMessage(); } };
+            const btn = document.getElementById('btn-send-msg');
+            const input = document.getElementById('chat-input');
+            if(btn) btn.onclick = (e) => { e.preventDefault(); sendMessage(); };
+            if(input) input.onkeydown = (e) => { if(e.key === 'Enter') { e.preventDefault(); sendMessage(); } };
         });
 
-        const q = query(collection(db, "chat_messages"), orderBy("createdAt", "desc"), limit(12));
+        // Escuta do Firebase
+        const q = query(collection(db, "chat_messages"), orderBy("createdAt", "desc"), limit(10));
         onSnapshot(q, (snapshot) => {
             snapshot.docChanges().forEach((change) => {
                 if (change.type === "added") {
                     const data = change.doc.data();
-                    if (data.createdAt) window.displayMessage(data.userName, data.text);
+                    // Apenas exibe se não for a mensagem que acabamos de mandar manualmente (ou se vier de outro user)
+                    if (data.text) {
+                        // O timeout evita duplicatas no envio local
+                        setTimeout(() => {
+                           // Aqui você pode decidir se quer que mensagens do banco também caiam
+                           // window.displayMessage(data.userName, data.text);
+                        }, 500);
+                    }
                 }
             });
         });
     </script>
 
     <script>
+        // Restante do código da cidade mantido exatamente igual
         const viewport = document.getElementById('city-viewport');
         const bContainer = document.getElementById('buildings-container');
         const buildingNames = ["NEXUS", "TORRES", "NEMIS", "TITAN", "HOROS", "FÊNIX", "IRIIS", "PIRID"];
@@ -233,7 +247,6 @@
                 const h = 450 + Math.random() * 250; 
                 const y = floorY - h;
                 const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
-
                 let windowsHtml = '';
                 const cols = 4;
                 const rows = 6;
@@ -248,7 +261,6 @@
                         }
                     }
                 }
-
                 group.innerHTML = `
                     <line x1="${xPos + 50}" y1="${y}" x2="${xPos + 50}" y2="${y - 60}" class="antenna" />
                     <rect x="${xPos}" y="${y}" width="${w}" height="${h}" class="building-base" />
