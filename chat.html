@@ -15,41 +15,39 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: var(--bg); color: #fff; font-family: 'Rajdhani'; overflow: hidden; height: 100vh; width: 100vw; }
 
-        /* Viewport com Scroll habilitado para deslizar para o lado */
         #city-viewport {
             width: 100vw;
             height: 100vh;
             overflow-x: auto;
             overflow-y: hidden;
+            display: flex;
+            align-items: flex-end; /* Garante que a base do SVG encoste no fundo */
             scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch; /* Melhora o deslize no mobile */
+            -webkit-overflow-scrolling: touch;
         }
-        /* Esconder barra de scroll mas manter funcionalidade */
         #city-viewport::-webkit-scrollbar { display: none; }
 
-        svg { display: block; background: #000; }
+        svg { display: block; flex-shrink: 0; }
 
-        /* Estilo Wireframe Aproximado */
-        .building-base { fill: #000; stroke: var(--neon); stroke-width: 2; }
+        .building-base { fill: #000; stroke: var(--neon); stroke-width: 2.5; }
         
         .window-btn { 
             fill: #000; 
             animation: blink var(--dur) infinite alternate;
             animation-delay: var(--delay);
             stroke: var(--neon);
-            stroke-width: 0.8;
+            stroke-width: 1;
         }
         @keyframes blink {
             0% { opacity: 0.2; }
             100% { opacity: 1; fill: var(--neon); }
         }
         
-        .door-btn { fill: none; stroke: var(--pink); stroke-width: 2.5; cursor: pointer; }
-        .door-btn:hover { fill: rgba(255, 0, 85, 0.3); }
+        .door-btn { fill: none; stroke: var(--pink); stroke-width: 3; cursor: pointer; transition: 0.3s; }
+        .door-btn:hover { stroke: #fff; filter: drop-shadow(0 0 10px var(--pink)); }
 
-        .label { font-family: 'Orbitron'; font-size: 14px; fill: var(--neon); pointer-events: none; letter-spacing: 2px; }
+        .label { font-family: 'Orbitron'; font-size: 16px; fill: var(--neon); pointer-events: none; letter-spacing: 2px; font-weight: bold; }
 
-        /* UI Overlay */
         .ui-overlay { position: fixed; z-index: 1000; pointer-events: none; inset: 0; }
         .ui-element { pointer-events: all; }
 
@@ -61,8 +59,9 @@
 
         .controls { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; }
         .btn { 
-            padding: 10px 20px; background: rgba(0,0,0,0.8); border: 1px solid var(--neon); 
+            padding: 10px 20px; background: rgba(0,0,0,0.9); border: 1px solid var(--neon); 
             color: var(--neon); font-family: 'Orbitron'; font-size: 10px; cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 242, 255, 0.2);
         }
     </style>
 </head>
@@ -72,16 +71,16 @@
 
     <div class="ui-overlay">
         <div class="controls ui-element">
-            <button class="btn" onclick="scrollToCenter()">CENTER</button>
+            <button class="btn" onclick="scrollToCenter()">CENTER VIEW</button>
             <button class="btn" style="border-color:var(--pink); color:var(--pink)" onclick="window.location.href='index.html'">EXIT</button>
         </div>
     </div>
 
     <div id="city-viewport">
-        <svg id="main-svg" width="5000" height="1000" viewBox="0 0 5000 1000">
+        <svg id="main-svg" width="6000" height="950" viewBox="0 0 6000 950">
             <g id="stars-layer"></g>
             
-            <rect x="0" y="850" width="5000" height="4" fill="var(--neon)" filter="url(#glow)" />
+            <rect x="0" y="900" width="6000" height="4" fill="var(--neon)" filter="url(#glow)" />
 
             <g id="buildings-container"></g>
 
@@ -94,17 +93,16 @@
     <script>
         const viewport = document.getElementById('city-viewport');
         const bContainer = document.getElementById('buildings-container');
-        const names = ["CORE", "AURA", "VERTEX", "NOVA", "CIPHER", "ION", "ECHO", "ZENITH", "FLUX", "TITAN", "NEON", "VOID"];
+        const names = ["CORE", "AURA", "VERTEX", "NOVA", "CIPHER", "ION", "ECHO", "ZENITH", "FLUX", "TITAN", "NEON", "VOID", "GRID", "NEXUS"];
 
         function init() {
             renderStars();
             renderBuildings();
-            scrollToCenter();
+            setTimeout(scrollToCenter, 100);
         }
 
         function scrollToCenter() {
-            // Centraliza o scroll no meio do cenário
-            const center = (5000 / 2) - (window.innerWidth / 2);
+            const center = (6000 / 2) - (window.innerWidth / 2);
             viewport.scrollLeft = center;
         }
 
@@ -116,11 +114,11 @@
 
         function renderStars() {
             const layer = document.getElementById('stars-layer');
-            for(let i=0; i<250; i++) {
+            for(let i=0; i<300; i++) {
                 const s = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                s.setAttribute("cx", Math.random() * 5000);
-                s.setAttribute("cy", Math.random() * 700);
-                s.setAttribute("r", Math.random() * 1.2);
+                s.setAttribute("cx", Math.random() * 6000);
+                s.setAttribute("cy", Math.random() * 600);
+                s.setAttribute("r", Math.random() * 1.5);
                 s.setAttribute("fill", "#fff");
                 s.setAttribute("opacity", Math.random());
                 layer.appendChild(s);
@@ -128,40 +126,40 @@
         }
 
         function renderBuildings() {
-            let x = 200;
+            let x = 100;
+            const floorY = 900; // Alinhado com a linha neon do chão
+
             for(let i=0; i < names.length; i++) {
-                // Prédios muito maiores (Largura entre 250 e 350)
-                const w = 250 + Math.random() * 100;
-                const h = 400 + Math.random() * 350;
-                const y = 850 - h;
+                const w = 300 + Math.random() * 100; // Prédios largos para proximidade
+                const h = 500 + Math.random() * 300; 
+                const y = floorY - h;
                 const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
                 
                 g.innerHTML = `
                     <rect x="${x}" y="${y}" width="${w}" height="${h}" class="building-base" />
-                    <text x="${x + w/2}" y="${y - 20}" class="label" text-anchor="middle">${names[i]}</text>
-                    <rect x="${x + w/2 - 25}" y="790" width="50" height="60" class="door-btn" onclick="showMystery()" />
+                    <text x="${x + w/2}" y="${y - 25}" class="label" text-anchor="middle">${names[i]}</text>
+                    <rect x="${x + w/2 - 30}" y="${floorY - 70}" width="60" height="70" class="door-btn" onclick="showMystery()" />
                 `;
 
-                // Janelas maiores para preencher o espaço
                 const cols = 4;
                 const rows = 6;
                 for(let r=0; r<rows; r++) {
                     for(let c=0; c<cols; c++) {
-                        if(Math.random() > 0.3) {
-                            const wx = x + (c + 1) * (w/(cols+1)) - 10;
-                            const wy = y + 50 + (r * (h/(rows+1)));
+                        if(Math.random() > 0.25) {
+                            const wx = x + (c + 1) * (w/(cols+1)) - 12;
+                            const wy = y + 60 + (r * (h/(rows+2)));
                             const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
                             rect.setAttribute("x", wx); rect.setAttribute("y", wy);
-                            rect.setAttribute("width", "20"); rect.setAttribute("height", "22");
+                            rect.setAttribute("width", "24"); rect.setAttribute("height", "24");
                             rect.setAttribute("class", "window-btn");
-                            rect.setAttribute("style", `--dur:${1.5+Math.random()*2}s; --delay:${Math.random()*4}s`);
+                            rect.setAttribute("style", `--dur:${1+Math.random()*2}s; --delay:${Math.random()*3}s`);
                             rect.onclick = showMystery;
                             g.appendChild(rect);
                         }
                     }
                 }
                 bContainer.appendChild(g);
-                x += w + 150; // Espaço para não ficar sobrecarregado, mas próximo
+                x += w + 180;
             }
         }
     </script>
