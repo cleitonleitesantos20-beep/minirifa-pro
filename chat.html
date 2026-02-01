@@ -9,7 +9,8 @@
         :root {
             --neon: #00f2ff;
             --bg: #020205;
-            --border: rgba(255, 255, 255, 0.1);
+            --glass: rgba(0, 0, 0, 0.4);
+            --border: rgba(0, 242, 255, 0.2);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -23,42 +24,39 @@
             width: 100vw;
         }
 
-        /* --- CONTAINER DA CIDADE (IMENSA) --- */
+        /* --- CIDADE IMENSA E INTERATIVA --- */
         #city-container {
             position: fixed;
             top: 0; left: 0;
             width: 100vw; height: 100vh;
-            overflow-x: auto;
+            overflow-x: scroll; /* Ativa scroll */
             overflow-y: hidden;
             z-index: 1;
-            background: radial-gradient(circle at 50% 30%, #0a0a1a 0%, #020205 100%);
+            background: radial-gradient(circle at 50% 50%, #050a15 0%, #020205 100%);
+            -webkit-overflow-scrolling: touch;
         }
 
         .city-svg { 
-            width: 5000px; /* Cidade ainda maior */
+            width: 5000px; /* Largura imensa */
             height: 100%; 
             display: block;
         }
 
         .building { 
-            stroke: rgba(0, 242, 255, 0.15); 
-            stroke-width: 1; 
-            fill: rgba(0, 5, 15, 0.8);
+            stroke: rgba(0, 242, 255, 0.4); /* Mais visível */
+            stroke-width: 1.5; 
+            fill: rgba(0, 10, 20, 0.6);
         }
         
         .window { 
-            fill: rgba(0, 242, 255, 0.05); 
+            fill: rgba(0, 242, 255, 0.1); 
             cursor: pointer; 
             pointer-events: all;
-            transition: 0.2s;
+            transition: 0.3s;
         }
-        .window:hover { fill: var(--neon); filter: drop-shadow(0 0 8px var(--neon)); }
-        
-        /* Ciclo Dia/Noite */
-        .day-mode { background: radial-gradient(circle at top, #1a1a2e, #020205) !important; }
-        .day-mode .building { stroke: rgba(255, 174, 0, 0.2); }
+        .window:hover { fill: var(--neon); filter: drop-shadow(0 0 10px var(--neon)); }
 
-        /* --- INTERFACE DE CHAT --- */
+        /* --- INTERFACE TRANSPARENTE --- */
         .chat-overlay {
             position: fixed;
             top: 0; left: 0;
@@ -66,65 +64,64 @@
             display: grid;
             grid-template-columns: 80px 1fr;
             height: 100vh; width: 100vw;
-            padding-top: 85px; /* Alinhado com seu overlay atual */
-            background: linear-gradient(to right, rgba(0,0,0,0.9) 80px, transparent);
-            pointer-events: none; 
+            padding-top: 85px;
+            pointer-events: none; /* Permite clicar na cidade através do vazio */
         }
 
         .chat-menu, .chat-content { pointer-events: all; }
 
         .chat-menu {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(15px);
             border-right: 1px solid var(--border);
             display: flex; flex-direction: column; align-items: center; gap: 25px;
-            padding: 20px 0; backdrop-filter: blur(10px);
+            padding: 20px 0;
         }
 
         .menu-item {
-            width: 55px; height: 55px; border-radius: 15px;
+            width: 55px; height: 55px; border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
-            background: rgba(255,255,255,0.03); cursor: pointer; transition: 0.3s;
+            background: rgba(255,255,255,0.05); cursor: pointer; transition: 0.3s;
             font-size: 1.4rem; border: 1px solid var(--border);
         }
 
-        .menu-item:active { transform: scale(0.9); }
-        .menu-item.active { border-color: var(--neon); box-shadow: 0 0 20px rgba(0, 242, 255, 0.3); background: rgba(0, 242, 255, 0.1); }
+        .menu-item.active { border-color: var(--neon); background: rgba(0, 242, 255, 0.15); box-shadow: 0 0 15px var(--neon); }
 
         .chat-content {
             display: flex; flex-direction: column; padding: 20px;
             max-width: 450px;
+            background: linear-gradient(to right, rgba(0,0,0,0.5), transparent); /* Gradiente suave */
         }
 
         .chat-messages {
             flex: 1; overflow-y: auto; margin-bottom: 20px;
-            background: rgba(0,0,0,0.4); border-radius: 15px; padding: 15px;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border-radius: 15px; padding: 15px;
             border: 1px solid var(--border);
-            backdrop-filter: blur(5px);
         }
 
         .chat-input-area {
-            display: flex; gap: 10px; background: rgba(0,0,0,0.9);
-            padding: 15px; border-radius: 20px; border: 1px solid var(--neon);
-            box-shadow: 0 0 15px rgba(0, 242, 255, 0.1);
+            display: flex; gap: 10px; 
+            background: rgba(0,0,0,0.8);
+            padding: 15px; border-radius: 20px; 
+            border: 1px solid var(--neon);
         }
 
-        input { flex: 1; background: transparent; border: none; color: #fff; font-family: 'Rajdhani'; font-size: 1rem; outline: none; }
+        input { flex: 1; background: transparent; border: none; color: #fff; font-family: 'Rajdhani'; outline: none; }
 
         .footer-info {
             position: fixed; bottom: 15px; left: 95px;
-            display: flex; flex-direction: column; gap: 5px;
-            z-index: 100;
+            z-index: 100; font-family: 'Orbitron'; font-size: 0.6rem; color: var(--neon);
         }
-
-        .online-counter { font-family: 'Orbitron'; font-size: 0.6rem; color: var(--neon); letter-spacing: 1px; }
-
     </style>
 </head>
-<body id="main-body">
+<body>
 
     <div id="city-container">
         <svg id="city-svg" class="city-svg" viewBox="0 0 5000 1000" preserveAspectRatio="none">
             <defs>
-                <filter id="glow"><feGaussianBlur stdDeviation="2.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                <filter id="glow"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
             </defs>
             <g id="celestial-body"></g>
             <g id="buildings-layer"></g>
@@ -139,67 +136,64 @@
         </nav>
 
         <main class="chat-content">
-            <h2 id="chat-title" style="font-family: 'Orbitron'; font-size: 0.8rem; margin-bottom: 20px; color: var(--neon); text-shadow: 0 0 10px var(--neon);">GLOBAL_STREAM</h2>
+            <h2 id="chat-title" style="font-family: 'Orbitron'; font-size: 0.8rem; margin-bottom: 20px; color: var(--neon);">GLOBAL_STREAM</h2>
             <div class="chat-messages" id="chat-box">
-                <div style="color: var(--neon); font-size: 0.7rem; margin-bottom: 10px;">[SISTEMA]: SINCRONIZANDO NODES...</div>
-                <div style="color: #666; font-size: 0.7rem;">[AVISO]: ARRASTE A CIDADE PARA EXPLORAR SEGREDOS NAS JANELAS.</div>
+                <div style="color: var(--neon); font-size: 0.7rem;">[SISTEMA]: CIDADE SINCRONIZADA.</div>
+                <div style="color: #888; font-size: 0.7rem;">ARRASTE O FUNDO PARA LADOS E CLIQUE NAS JANELAS.</div>
             </div>
 
             <div class="chat-input-area">
-                <input type="text" placeholder="ENVIAR TRANSMISSÃO..." id="chat-input">
-                <button id="send-btn" style="background:none; border:none; color:var(--neon); font-family:'Orbitron'; font-size:0.7rem; cursor:pointer; font-weight:bold;">ENVIAR</button>
+                <input type="text" placeholder="TRANSMITIR..." id="chat-input">
+                <button id="send-btn" style="background:none; border:none; color:var(--neon); cursor:pointer;">SEND</button>
             </div>
         </main>
     </div>
 
     <div class="footer-info">
-        <div class="online-counter"><span id="online-val">128</span> NODES_ACTIVE</div>
+        <span id="online-val">128</span> NODES_ACTIVE
     </div>
 
     <script type="module">
-        // Importando o necessário
         import { getFirestore, doc, onSnapshot, updateDoc, arrayUnion, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-        // Inicialização Global
         document.addEventListener('DOMContentLoaded', () => {
             generateCity();
-            setupInteractions();
+            setupEvents();
         });
 
         function generateCity() {
             const layer = document.getElementById('buildings-layer');
             const celestial = document.getElementById('celestial-body');
-            const hour = new Date().getHours();
-            const isDay = hour >= 6 && hour < 18;
-
-            if(isDay) document.getElementById('main-body').classList.add('day-mode');
             
-            celestial.innerHTML = `<circle cx="400" cy="150" r="45" fill="none" stroke="${isDay ? '#ffae00' : '#00f2ff'}" stroke-width="2" filter="url(#glow)" />`;
+            // Lua/Sol Estático no topo
+            celestial.innerHTML = `<circle cx="500" cy="150" r="40" fill="none" stroke="var(--neon)" stroke-width="1" filter="url(#glow)" />`;
 
-            for(let i = 0; i < 70; i++) {
-                const w = 100 + Math.random() * 150;
-                const h = 300 + Math.random() * 600;
-                const x = i * 80;
+            for(let i = 0; i < 60; i++) {
+                const w = 120 + Math.random() * 100;
+                const h = 250 + Math.random() * 550;
+                const x = i * 85;
                 const y = 1000 - h;
 
+                // Prédio
                 const b = document.createElementNS("http://www.w3.org/2000/svg", "rect");
                 b.setAttribute("x", x); b.setAttribute("y", y); b.setAttribute("width", w); b.setAttribute("height", h);
                 b.setAttribute("class", "building");
                 layer.appendChild(b);
 
-                for(let row = 1; row < h/45; row++) {
-                    for(let col = 1; col < w/30; col++) {
+                // Janelas (Segredos)
+                for(let row = 1; row < h/50; row++) {
+                    for(let col = 1; col < w/35; col++) {
                         if(Math.random() > 0.4) {
                             const win = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-                            win.setAttribute("x", x + (col * 25));
-                            win.setAttribute("y", y + (row * 35));
-                            win.setAttribute("width", 12); win.setAttribute("height", 16);
+                            win.setAttribute("x", x + (col * 30));
+                            win.setAttribute("y", y + (row * 40));
+                            win.setAttribute("width", 15); win.setAttribute("height", 20);
                             win.setAttribute("class", "window");
-                            win.addEventListener('click', (e) => {
+                            win.onclick = (e) => {
                                 e.stopPropagation();
-                                alert("DATA_NODE: Registro encontrado #" + Math.floor(Math.random()*9999));
-                            });
+                                alert("REGISTRO ENCONTRADO NO BLOCO " + Math.floor(x));
+                            };
                             layer.appendChild(win);
                         }
                     }
@@ -207,46 +201,32 @@
             }
         }
 
-        function setupInteractions() {
-            // Botões de navegação
+        function setupEvents() {
             document.getElementById('btn-global').onclick = () => switchChat('global');
             document.getElementById('btn-friends').onclick = () => switchChat('friends');
-            document.getElementById('btn-add').onclick = () => promptAddFriend();
-            document.getElementById('send-btn').onclick = () => sendMessage();
+            document.getElementById('btn-add').onclick = () => {
+                const id = prompt("ID DO AMIGO:");
+                if(id) alert("SOLICITAÇÃO ENVIADA.");
+            };
+            document.getElementById('send-btn').onclick = sendMessage;
         }
 
         function switchChat(type) {
             document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
-            const box = document.getElementById('chat-box');
-            box.innerHTML = "";
-
-            if(type === 'global') {
-                document.getElementById('btn-global').classList.add('active');
-                document.getElementById('chat-title').innerText = "GLOBAL_STREAM";
-                box.innerHTML = `<div style="color:var(--neon)">[SISTEMA]: CANAL GLOBAL ATIVO.</div>`;
-            } else {
-                document.getElementById('btn-friends').classList.add('active');
-                document.getElementById('chat-title').innerText = "PRIVATE_NODES";
-                box.innerHTML = `<div style="color:#666">Buscando amigos conectados...</div>`;
-            }
-        }
-
-        function promptAddFriend() {
-            const id = prompt("DIGITE O ID DO NODE:");
-            if(id) alert("SOLICITAÇÃO ENVIADA PARA: " + id);
+            document.getElementById('btn-' + type).classList.add('active');
+            document.getElementById('chat-title').innerText = type.toUpperCase() + "_STREAM";
         }
 
         function sendMessage() {
             const input = document.getElementById('chat-input');
-            if(input.value.trim() !== "") {
+            if(input.value) {
                 const box = document.getElementById('chat-box');
-                box.innerHTML += `<div><b style="color:var(--neon)">VOCÊ:</b> ${input.value}</div>`;
+                box.innerHTML += `<div><b>VOCÊ:</b> ${input.value}</div>`;
                 input.value = "";
                 box.scrollTop = box.scrollHeight;
             }
         }
     </script>
-    
     <script type="module" src="nexus-overlay.js"></script>
 </body>
 </html>
