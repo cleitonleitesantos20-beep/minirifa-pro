@@ -36,6 +36,7 @@
             50% { transform: translateY(-15px); } 
         }
 
+        /* Janelas Piscantes */
         .window-btn { 
             cursor: pointer; fill: #000; 
             animation: blink var(--dur) infinite alternate;
@@ -119,7 +120,7 @@
 
     <div class="ui-overlay">
         <div class="ui-element">
-            <button class="btn-exit" onclick="window.location.href='dashboard.html'">SAIR</button>
+            <button class="btn-exit" onclick="window.location.href='index.html'">SAIR</button>
             <div class="chat-input-bar">
                 <div style="display: flex;">
                     <input type="text" id="chat-input" placeholder="ENVIAR MENSAGEM..." maxlength="60">
@@ -139,7 +140,6 @@
             <g id="lights-front">
                 <rect class="traffic-light" x="0" y="550" width="800" height="3" fill="var(--neon)" style="--spd: 15s; opacity: 0.6;" filter="url(#glow)"/>
                 <rect class="traffic-light" x="0" y="750" width="600" height="5" fill="var(--pink)" style="--spd: 8s; opacity: 0.5;" filter="url(#glow)"/>
-                <rect class="traffic-light" x="0" y="400" width="400" height="2" fill="var(--yellow)" style="--spd: 20s; opacity: 0.4;"/>
             </g>
             <rect x="0" y="900" width="6000" height="3" fill="var(--neon)" filter="url(#glow)" />
         </svg>
@@ -150,7 +150,6 @@
         import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // Substitua pelos seus dados do projeto Firebase
         const firebaseConfig = {
             apiKey: "SUA_API_KEY",
             authDomain: "SEU_AUTH_DOMAIN",
@@ -164,13 +163,10 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // FUNÇÃO PARA ENVIAR MENSAGEM
         window.sendMessage = async () => {
             const input = document.getElementById('chat-input');
             const user = auth.currentUser;
-            
             if (!input.value.trim() || !user) return;
-
             try {
                 await addDoc(collection(db, "chat_messages"), {
                     text: input.value.toUpperCase(),
@@ -178,20 +174,15 @@
                     createdAt: serverTimestamp()
                 });
                 input.value = "";
-            } catch (e) {
-                console.error("Erro ao enviar: ", e);
-            }
+            } catch (e) { console.error(e); }
         };
 
-        // ESCUTAR MENSAGENS EM TEMPO REAL (Global)
         const q = query(collection(db, "chat_messages"), orderBy("createdAt", "desc"), limit(1));
         onSnapshot(q, (snapshot) => {
             snapshot.docChanges().forEach((change) => {
                 if (change.type === "added") {
                     const data = change.doc.data();
-                    if (data.createdAt) { // Evita duplicar localmente antes de subir
-                        displayMessage(data.userName, data.text);
-                    }
+                    if (data.createdAt) displayMessage(data.userName, data.text);
                 }
             });
         });
@@ -201,7 +192,7 @@
             const msg = document.createElement('div');
             msg.className = 'chat-msg';
             msg.innerHTML = `<span class="msg-user">[${user}]</span> ${text}`;
-            msg.style.left = Math.random() * 30 + "px";
+            msg.style.left = Math.random() * 40 + "px";
             stream.appendChild(msg);
             setTimeout(() => msg.remove(), 12000);
         }
@@ -224,6 +215,13 @@
             }, 100);
         }
 
+        function windowAction(name, id) {
+            const t = document.getElementById('mystery-text');
+            t.innerText = `${name} - SETOR ${id}`;
+            t.style.opacity = "1";
+            setTimeout(() => t.style.opacity = "0", 1200);
+        }
+
         function renderStars() {
             const layer = document.getElementById('stars-layer');
             for(let i=0; i<300; i++) {
@@ -239,19 +237,45 @@
 
         function renderBuildings() {
             let xPos = 400; 
+            const floorY = 900;
+
             buildingNames.forEach((name) => {
                 const w = 280 + Math.random() * 40; 
                 const h = 450 + Math.random() * 250; 
-                const y = 900 - h;
+                const y = floorY - h;
                 const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
                 
                 group.innerHTML = `
                     <line x1="${xPos + 50}" y1="${y}" x2="${xPos + 50}" y2="${y - 60}" class="antenna" />
                     <rect x="${xPos}" y="${y}" width="${w}" height="${h}" class="building-base" />
                     <text x="${xPos + w/2}" y="${y + 35}" class="label-inside" text-anchor="middle">${name}</text>
-                    <rect x="${xPos + w/2 - 30}" y="${900 - 60}" width="60" height="60" class="door-btn" />
+                    <rect x="${xPos + w/2 - 30}" y="${floorY - 60}" width="60" height="60" class="door-btn" onclick="windowAction('${name}', 'PORTARIA')" />
                     <circle cx="${xPos + w + 100}" cy="${y + 100}" r="4" class="drone" />
                 `;
+
+                // GERADOR DE JANELAS (RESTABELECIDO)
+                const cols = 4;
+                const rows = 6;
+                let winId = 1;
+                for(let r=0; r<rows; r++) {
+                    for(let c=0; c<cols; c++) {
+                        const winX = xPos + (c + 1) * (w / (cols + 1)) - 10;
+                        const winY = y + 80 + (r * (h / (rows + 1)));
+                        if (winY < (floorY - 80)) { 
+                            const winBtn = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                            winBtn.setAttribute("x", winX);
+                            winBtn.setAttribute("y", winY);
+                            winBtn.setAttribute("width", "18");
+                            winBtn.setAttribute("height", "18");
+                            winBtn.setAttribute("class", "window-btn");
+                            winBtn.setAttribute("style", `--dur:${1+Math.random()*2}s; --delay:${Math.random()*3}s`);
+                            const currentId = winId++;
+                            winBtn.onclick = () => windowAction(name, currentId);
+                            group.appendChild(winBtn);
+                        }
+                    }
+                }
+
                 bContainer.appendChild(group);
                 xPos += w + 450; 
             });
