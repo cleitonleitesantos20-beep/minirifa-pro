@@ -73,7 +73,8 @@
         #chat-input { flex: 1; background: transparent; border: none; padding: 5px 10px; color: #fff; font-family: 'Rajdhani'; outline: none; width: 100%; }
         .btn-send { background: var(--neon); border: none; padding: 5px 15px; cursor: pointer; color: #000; font-weight: bold; font-family: 'Rajdhani'; }
         
-        #chat-stream { position: fixed; top: 0; left: 20px; width: 450px; height: 100vh; pointer-events: none; overflow: hidden; z-index: 999999; }
+        /* CHAT STREAM AJUSTADO À ESQUERDA */
+        #chat-stream { position: fixed; top: 0; left: 10px; width: 400px; height: 100vh; pointer-events: none; overflow: hidden; z-index: 999999; }
         .chat-msg { position: absolute; left: 0; top: -100px; color: var(--neon); font-family: 'Rajdhani'; font-weight: bold; text-shadow: 2px 2px 5px #000; font-size: 1.4rem; animation: fallDown 10s linear forwards; white-space: nowrap; pointer-events: none; }
         .msg-user { color: var(--pink); margin-right: 5px; }
 
@@ -141,28 +142,29 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // Função de exibir mensagem (Agora dentro do módulo)
         function displayMessage(user, text) {
             const stream = document.getElementById('chat-stream');
             if(!stream) return;
             const msg = document.createElement('div');
             msg.className = 'chat-msg';
             msg.innerHTML = `<span class="msg-user">[${user}]</span> ${text}`;
-            msg.style.left = Math.random() * 80 + "px"; 
+            // Ajustado para ficar bem na lateral esquerda
+            msg.style.left = Math.random() * 30 + "px"; 
             stream.appendChild(msg);
             setTimeout(() => { if(msg.parentNode) msg.remove(); }, 10500);
         }
 
-        // Função de enviar
         async function sendMessage() {
             const input = document.getElementById('chat-input');
             const text = input.value.trim();
             if (!text) return;
 
-            const name = auth.currentUser ? (auth.currentUser.displayName || "USER_NEXUS") : "VISITANTE";
+            // Pega o nome do usuário logado ou "VISITANTE"
+            const user = auth.currentUser;
+            const name = user ? (user.displayName || "USER_NEXUS") : "VISITANTE";
             
-            // Força exibição local imediata para teste
-            displayMessage(name, text.toUpperCase());
+            // Limpa o input IMEDIATAMENTE
+            input.value = "";
 
             try {
                 await addDoc(collection(db, "chat_messages"), {
@@ -170,19 +172,16 @@
                     userName: name,
                     createdAt: serverTimestamp()
                 });
-                input.value = "";
             } catch (e) {
                 console.error("Erro Firebase:", e);
             }
         }
 
-        // Bind dos eventos (Necessário em type="module")
         document.getElementById('btn-send-msg').addEventListener('click', sendMessage);
         document.getElementById('chat-input').addEventListener('keydown', (e) => {
             if(e.key === 'Enter') sendMessage();
         });
 
-        // Listener do Banco
         const q = query(collection(db, "chat_messages"), orderBy("createdAt", "desc"), limit(5));
         onSnapshot(q, (snapshot) => {
             snapshot.docChanges().forEach((change) => {
@@ -193,7 +192,6 @@
             });
         });
 
-        // Tornar windowAction global para os onclicks do SVG funcionarem
         window.windowAction = function(name, id) {
             const t = document.getElementById('mystery-text');
             t.innerText = `${name} - SETOR ${id}`;
@@ -203,7 +201,6 @@
     </script>
 
     <script>
-        // Lógica de Renderização Visual
         const viewport = document.getElementById('city-viewport');
         const bContainer = document.getElementById('buildings-container');
         const buildingNames = ["NEXUS", "TORRES", "NEMIS", "TITAN", "HOROS", "FÊNIX", "IRIIS", "PIRID"];
