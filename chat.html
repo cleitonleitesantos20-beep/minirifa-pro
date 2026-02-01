@@ -23,42 +23,42 @@
             width: 100vw;
         }
 
-        /* --- VIEWPORT DA CIDADE (SCROLL HORIZONTAL) --- */
+        /* --- CONTAINER DA CIDADE (IMENSA) --- */
         #city-container {
             position: fixed;
             top: 0; left: 0;
             width: 100vw; height: 100vh;
-            overflow-x: auto; /* Permite scroll horizontal */
+            overflow-x: auto;
             overflow-y: hidden;
             z-index: 1;
-            scroll-behavior: smooth;
-            pointer-events: all;
+            background: radial-gradient(circle at 50% 30%, #0a0a1a 0%, #020205 100%);
         }
 
-        /* Custom Scrollbar Invisível mas funcional */
-        #city-container::-webkit-scrollbar { height: 2px; }
-        #city-container::-webkit-scrollbar-thumb { background: var(--neon); }
-
         .city-svg { 
-            width: 4000px; /* Cidade imensa */
+            width: 5000px; /* Cidade ainda maior */
             height: 100%; 
             display: block;
         }
 
-        .building { stroke: rgba(0, 242, 255, 0.2); stroke-width: 1; fill: rgba(0,0,0,0.3); }
+        .building { 
+            stroke: rgba(0, 242, 255, 0.15); 
+            stroke-width: 1; 
+            fill: rgba(0, 5, 15, 0.8);
+        }
         
         .window { 
-            fill: rgba(0, 242, 255, 0.1); 
+            fill: rgba(0, 242, 255, 0.05); 
             cursor: pointer; 
+            pointer-events: all;
             transition: 0.2s;
         }
         .window:hover { fill: var(--neon); filter: drop-shadow(0 0 8px var(--neon)); }
         
         /* Ciclo Dia/Noite */
-        .day-mode { background: radial-gradient(circle at top, #1a1a2e, #020205); }
-        .day-mode .building { stroke: rgba(255, 174, 0, 0.3); }
+        .day-mode { background: radial-gradient(circle at top, #1a1a2e, #020205) !important; }
+        .day-mode .building { stroke: rgba(255, 174, 0, 0.2); }
 
-        /* --- INTERFACE --- */
+        /* --- INTERFACE DE CHAT --- */
         .chat-overlay {
             position: fixed;
             top: 0; left: 0;
@@ -66,8 +66,8 @@
             display: grid;
             grid-template-columns: 80px 1fr;
             height: 100vh; width: 100vw;
-            padding-top: 80px;
-            background: linear-gradient(to right, rgba(0,0,0,0.95) 50px, transparent);
+            padding-top: 85px; /* Alinhado com seu overlay atual */
+            background: linear-gradient(to right, rgba(0,0,0,0.9) 80px, transparent);
             pointer-events: none; 
         }
 
@@ -75,48 +75,56 @@
 
         .chat-menu {
             border-right: 1px solid var(--border);
-            display: flex; flex-direction: column; align-items: center; gap: 20px;
+            display: flex; flex-direction: column; align-items: center; gap: 25px;
             padding: 20px 0; backdrop-filter: blur(10px);
         }
 
         .menu-item {
-            width: 50px; height: 50px; border-radius: 12px;
+            width: 55px; height: 55px; border-radius: 15px;
             display: flex; align-items: center; justify-content: center;
-            background: rgba(255,255,255,0.05); cursor: pointer; transition: 0.3s;
-            font-size: 1.2rem; border: 1px solid transparent;
+            background: rgba(255,255,255,0.03); cursor: pointer; transition: 0.3s;
+            font-size: 1.4rem; border: 1px solid var(--border);
         }
 
-        .menu-item.active { border-color: var(--neon); box-shadow: 0 0 15px var(--neon); background: rgba(0, 242, 255, 0.1); }
+        .menu-item:active { transform: scale(0.9); }
+        .menu-item.active { border-color: var(--neon); box-shadow: 0 0 20px rgba(0, 242, 255, 0.3); background: rgba(0, 242, 255, 0.1); }
 
         .chat-content {
             display: flex; flex-direction: column; padding: 20px;
-            max-width: 400px; /* Compacto para não cobrir a cidade */
+            max-width: 450px;
         }
 
         .chat-messages {
             flex: 1; overflow-y: auto; margin-bottom: 20px;
-            background: rgba(0,0,0,0.2); border-radius: 10px; padding: 10px;
+            background: rgba(0,0,0,0.4); border-radius: 15px; padding: 15px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(5px);
         }
 
         .chat-input-area {
-            display: flex; gap: 10px; background: rgba(0,0,0,0.8);
-            padding: 12px; border-radius: 12px; border: 1px solid var(--border);
+            display: flex; gap: 10px; background: rgba(0,0,0,0.9);
+            padding: 15px; border-radius: 20px; border: 1px solid var(--neon);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.1);
         }
 
-        input { flex: 1; background: transparent; border: none; color: #fff; font-family: 'Rajdhani'; outline: none; }
+        input { flex: 1; background: transparent; border: none; color: #fff; font-family: 'Rajdhani'; font-size: 1rem; outline: none; }
 
-        .online-counter {
-            position: fixed; bottom: 20px; left: 100px;
-            font-family: 'Orbitron'; font-size: 0.6rem; color: var(--neon); z-index: 100;
+        .footer-info {
+            position: fixed; bottom: 15px; left: 95px;
+            display: flex; flex-direction: column; gap: 5px;
+            z-index: 100;
         }
+
+        .online-counter { font-family: 'Orbitron'; font-size: 0.6rem; color: var(--neon); letter-spacing: 1px; }
+
     </style>
 </head>
 <body id="main-body">
 
     <div id="city-container">
-        <svg id="city-svg" class="city-svg" viewBox="0 0 4000 1000" preserveAspectRatio="none">
+        <svg id="city-svg" class="city-svg" viewBox="0 0 5000 1000" preserveAspectRatio="none">
             <defs>
-                <filter id="glow"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                <filter id="glow"><feGaussianBlur stdDeviation="2.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
             </defs>
             <g id="celestial-body"></g>
             <g id="buildings-layer"></g>
@@ -125,35 +133,39 @@
 
     <div class="chat-overlay">
         <nav class="chat-menu">
-            <div class="menu-item active" id="btn-global" onclick="switchChat('global')">🌐</div>
-            <div class="menu-item" id="btn-friends" onclick="switchChat('friends')">👥</div>
-            <div class="menu-item" onclick="promptAddFriend()">➕</div>
+            <div class="menu-item active" id="btn-global">🌐</div>
+            <div class="menu-item" id="btn-friends">👥</div>
+            <div class="menu-item" id="btn-add">➕</div>
         </nav>
 
         <main class="chat-content">
-            <h2 id="chat-title" style="font-family: 'Orbitron'; font-size: 0.7rem; margin-bottom: 15px; color: var(--neon); letter-spacing: 2px;">GLOBAL_STREAM</h2>
+            <h2 id="chat-title" style="font-family: 'Orbitron'; font-size: 0.8rem; margin-bottom: 20px; color: var(--neon); text-shadow: 0 0 10px var(--neon);">GLOBAL_STREAM</h2>
             <div class="chat-messages" id="chat-box">
-                <div style="color: #444; font-size: 0.8rem;">[SISTEMA]: CIDADE CARREGADA. ARRASTE PARA O LADO PARA EXPLORAR.</div>
+                <div style="color: var(--neon); font-size: 0.7rem; margin-bottom: 10px;">[SISTEMA]: SINCRONIZANDO NODES...</div>
+                <div style="color: #666; font-size: 0.7rem;">[AVISO]: ARRASTE A CIDADE PARA EXPLORAR SEGREDOS NAS JANELAS.</div>
             </div>
 
             <div class="chat-input-area">
-                <input type="text" placeholder="MENSAGEM..." id="chat-input">
-                <button onclick="sendMessage()" style="background:none; border:none; color:var(--neon); font-family:'Orbitron'; font-size:0.6rem; cursor:pointer;">ENVIAR</button>
+                <input type="text" placeholder="ENVIAR TRANSMISSÃO..." id="chat-input">
+                <button id="send-btn" style="background:none; border:none; color:var(--neon); font-family:'Orbitron'; font-size:0.7rem; cursor:pointer; font-weight:bold;">ENVIAR</button>
             </div>
         </main>
     </div>
 
-    <div class="online-counter">
-        <span id="online-val">000</span> NODES_ACTIVE
+    <div class="footer-info">
+        <div class="online-counter"><span id="online-val">128</span> NODES_ACTIVE</div>
     </div>
 
     <script type="module">
+        // Importando o necessário
         import { getFirestore, doc, onSnapshot, updateDoc, arrayUnion, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-        const db = getFirestore();
-        const auth = getAuth();
-        let currentUser = null;
+        // Inicialização Global
+        document.addEventListener('DOMContentLoaded', () => {
+            generateCity();
+            setupInteractions();
+        });
 
         function generateCity() {
             const layer = document.getElementById('buildings-layer');
@@ -163,35 +175,31 @@
 
             if(isDay) document.getElementById('main-body').classList.add('day-mode');
             
-            // Sol ou Lua seguindo o scroll
-            celestial.innerHTML = `<circle cx="300" cy="150" r="50" fill="none" stroke="${isDay ? '#ffae00' : '#00f2ff'}" stroke-width="2" filter="url(#glow)" />`;
+            celestial.innerHTML = `<circle cx="400" cy="150" r="45" fill="none" stroke="${isDay ? '#ffae00' : '#00f2ff'}" stroke-width="2" filter="url(#glow)" />`;
 
-            // Gerar 60 prédios para cobrir os 4000px
-            for(let i = 0; i < 60; i++) {
-                const w = 80 + Math.random() * 120;
-                const h = 200 + Math.random() * 600;
-                const x = i * 70;
+            for(let i = 0; i < 70; i++) {
+                const w = 100 + Math.random() * 150;
+                const h = 300 + Math.random() * 600;
+                const x = i * 80;
                 const y = 1000 - h;
 
-                // Prédio
                 const b = document.createElementNS("http://www.w3.org/2000/svg", "rect");
                 b.setAttribute("x", x); b.setAttribute("y", y); b.setAttribute("width", w); b.setAttribute("height", h);
                 b.setAttribute("class", "building");
                 layer.appendChild(b);
 
-                // Janelas
-                for(let row = 1; row < h/40; row++) {
-                    for(let col = 1; col < w/25; col++) {
-                        if(Math.random() > 0.3) {
+                for(let row = 1; row < h/45; row++) {
+                    for(let col = 1; col < w/30; col++) {
+                        if(Math.random() > 0.4) {
                             const win = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-                            win.setAttribute("x", x + (col * 20));
-                            win.setAttribute("y", y + (row * 30));
-                            win.setAttribute("width", 10); win.setAttribute("height", 14);
+                            win.setAttribute("x", x + (col * 25));
+                            win.setAttribute("y", y + (row * 35));
+                            win.setAttribute("width", 12); win.setAttribute("height", 16);
                             win.setAttribute("class", "window");
-                            win.onclick = (e) => {
+                            win.addEventListener('click', (e) => {
                                 e.stopPropagation();
-                                alert("CONEXÃO ESTABELECIDA: NODE " + Math.floor(Math.random()*9999));
-                            };
+                                alert("DATA_NODE: Registro encontrado #" + Math.floor(Math.random()*9999));
+                            });
                             layer.appendChild(win);
                         }
                     }
@@ -199,36 +207,44 @@
             }
         }
 
-        window.switchChat = (type) => {
+        function setupInteractions() {
+            // Botões de navegação
+            document.getElementById('btn-global').onclick = () => switchChat('global');
+            document.getElementById('btn-friends').onclick = () => switchChat('friends');
+            document.getElementById('btn-add').onclick = () => promptAddFriend();
+            document.getElementById('send-btn').onclick = () => sendMessage();
+        }
+
+        function switchChat(type) {
             document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            const box = document.getElementById('chat-box');
+            box.innerHTML = "";
+
             if(type === 'global') {
                 document.getElementById('btn-global').classList.add('active');
                 document.getElementById('chat-title').innerText = "GLOBAL_STREAM";
+                box.innerHTML = `<div style="color:var(--neon)">[SISTEMA]: CANAL GLOBAL ATIVO.</div>`;
             } else {
                 document.getElementById('btn-friends').classList.add('active');
                 document.getElementById('chat-title').innerText = "PRIVATE_NODES";
-                loadFriends();
+                box.innerHTML = `<div style="color:#666">Buscando amigos conectados...</div>`;
             }
-        };
+        }
 
-        window.promptAddFriend = async () => {
-            const id = prompt("ID DO AMIGO:");
-            if(id && currentUser) {
-                const ref = doc(db, "usuarios", currentUser.uid);
-                await updateDoc(ref, { amigos: arrayUnion(id) });
-                alert("PEDIDO ENVIADO.");
+        function promptAddFriend() {
+            const id = prompt("DIGITE O ID DO NODE:");
+            if(id) alert("SOLICITAÇÃO ENVIADA PARA: " + id);
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            if(input.value.trim() !== "") {
+                const box = document.getElementById('chat-box');
+                box.innerHTML += `<div><b style="color:var(--neon)">VOCÊ:</b> ${input.value}</div>`;
+                input.value = "";
+                box.scrollTop = box.scrollHeight;
             }
-        };
-
-        // Iniciar cidade imediatamente para teste visual
-        generateCity();
-
-        onAuthStateChanged(auth, user => {
-            if(user) { 
-                currentUser = user; 
-                document.getElementById('online-val').innerText = Math.floor(Math.random() * 500);
-            }
-        });
+        }
     </script>
     
     <script type="module" src="nexus-overlay.js"></script>
