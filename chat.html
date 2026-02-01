@@ -29,8 +29,20 @@
 
         .building-base { fill: #000; stroke: var(--neon); stroke-width: 2.2; }
         .antenna { stroke: var(--neon); stroke-width: 1; opacity: 0.7; }
-        .drone { fill: var(--pink); filter: drop-shadow(0 0 5px var(--pink)); animation: float 3s ease-in-out infinite; }
         
+        /* ESTILO DOS NPCS LOSANGOS */
+        .npc-diamond { 
+            filter: drop-shadow(0 0 8px currentColor);
+            animation: moveNPC var(--spd) linear infinite;
+            opacity: 0.8;
+        }
+        
+        @keyframes moveNPC {
+            from { transform: translateX(-200px) rotate(45deg); }
+            to { transform: translateX(6200px) rotate(45deg); }
+        }
+
+        .drone { fill: var(--pink); filter: drop-shadow(0 0 5px var(--pink)); animation: float 3s ease-in-out infinite; }
         @keyframes float { 
             0%, 100% { transform: translateY(0); } 
             50% { transform: translateY(-15px); } 
@@ -52,17 +64,6 @@
         
         .door-btn { fill: none; stroke: var(--pink); stroke-width: 3; cursor: pointer; transition: 0.3s; }
         .label-inside { font-family: 'Orbitron'; font-size: 13px; fill: var(--neon); pointer-events: none; letter-spacing: 2px; font-weight: bold; text-transform: uppercase; opacity: 0.8; }
-
-        /* LOSANGOS NEON EM PATRULHA */
-        .data-diamond { 
-            filter: drop-shadow(0 0 8px currentColor);
-            animation: moveDiamond var(--spd) linear infinite;
-            opacity: 0.7;
-        }
-        @keyframes moveDiamond {
-            from { transform: translateX(-500px) rotate(45deg); }
-            to { transform: translateX(6500px) rotate(45deg); }
-        }
 
         .ui-overlay { 
             position: fixed; bottom: 20px; left: 0; width: 100%;
@@ -125,7 +126,7 @@
             <div class="chat-input-bar">
                 <div style="display: flex;">
                     <input type="text" id="chat-input" placeholder="ENVIAR MENSAGEM..." maxlength="60">
-                    <button class="btn-send" onclick="window.sendMessage()">ENVIAR</button>
+                    <button class="btn-send" id="btn-send-msg">ENVIAR</button>
                 </div>
             </div>
         </div>
@@ -138,11 +139,12 @@
             </defs>
             <g id="stars-layer"></g>
 
-            <g id="diamonds-layer">
-                <rect class="data-diamond" x="0" y="350" width="25" height="25" fill="var(--neon)" style="--spd: 30s; color: var(--neon);" />
-                <rect class="data-diamond" x="0" y="600" width="18" height="18" fill="var(--pink)" style="--spd: 20s; color: var(--pink);" />
-                <rect class="data-diamond" x="0" y="820" width="30" height="30" fill="var(--neon)" style="--spd: 45s; color: var(--neon);" />
-                <rect class="data-diamond" x="0" y="450" width="15" height="15" fill="var(--pink)" style="--spd: 15s; color: var(--pink);" />
+            <g id="npc-layer">
+                <rect class="npc-diamond" x="0" y="200" width="15" height="15" fill="var(--neon)" style="--spd: 45s; color: var(--neon);" />
+                <rect class="npc-diamond" x="0" y="400" width="20" height="20" fill="var(--pink)" style="--spd: 30s; color: var(--pink);" />
+                
+                <rect class="npc-diamond" x="0" y="885" width="10" height="10" fill="var(--yellow)" style="--spd: 60s; color: var(--yellow);" />
+                <rect class="npc-diamond" x="0" y="890" width="12" height="12" fill="var(--neon)" style="--spd: 40s; color: var(--neon);" />
             </g>
 
             <g id="buildings-container"></g>
@@ -168,7 +170,8 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        window.sendMessage = async () => {
+        // Função de envio corrigida para escopo de módulo
+        const sendMessage = async () => {
             const input = document.getElementById('chat-input');
             const text = input.value.trim();
             if (!text) return;
@@ -177,6 +180,7 @@
             const name = user ? (user.displayName || "USER_NEXUS") : "VISITANTE";
 
             try {
+                // Certifique-se que o nome da coleção aqui é o mesmo das Rules (chat_messages)
                 await addDoc(collection(db, "chat_messages"), {
                     text: text.toUpperCase(),
                     userName: name,
@@ -184,19 +188,24 @@
                 });
                 input.value = "";
             } catch (e) {
-                console.error("Erro ao enviar:", e);
-                displayMessage("SISTEMA", "FALHA NA CONEXÃO");
+                console.error("Erro Firebase:", e);
+                displayMessage("ERRO", "VERIFIQUE REGRAS OU LOGIN");
             }
         };
 
+        // Atribuição de eventos dentro do módulo (mais seguro que onclick no HTML)
+        document.getElementById('btn-send-msg').addEventListener('click', sendMessage);
+        document.getElementById('chat-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // Listener de mensagens
         const q = query(collection(db, "chat_messages"), orderBy("createdAt", "desc"), limit(12));
         onSnapshot(q, (snapshot) => {
             snapshot.docChanges().forEach((change) => {
                 if (change.type === "added") {
                     const data = change.doc.data();
-                    if (data.createdAt) {
-                        displayMessage(data.userName, data.text);
-                    }
+                    if (data.createdAt) displayMessage(data.userName, data.text);
                 }
             });
         });
@@ -211,10 +220,6 @@
             stream.appendChild(msg);
             setTimeout(() => msg.remove(), 12000);
         }
-
-        document.getElementById('chat-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') window.sendMessage();
-        });
     </script>
 
     <script>
