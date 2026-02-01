@@ -21,7 +21,7 @@
             overflow-x: auto;
             overflow-y: hidden;
             display: flex;
-            align-items: flex-end; /* Garante que a base do SVG encoste no fundo */
+            align-items: flex-end; 
             scroll-behavior: smooth;
             -webkit-overflow-scrolling: touch;
         }
@@ -57,11 +57,12 @@
             text-shadow: 0 0 15px var(--neon); opacity: 0; transition: 0.4s; z-index: 2000;
         }
 
-        .controls { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; }
+        .controls { position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; }
         .btn { 
             padding: 10px 20px; background: rgba(0,0,0,0.9); border: 1px solid var(--neon); 
             color: var(--neon); font-family: 'Orbitron'; font-size: 10px; cursor: pointer;
-            box-shadow: 0 0 10px rgba(0, 242, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
+            text-transform: uppercase;
         }
     </style>
 </head>
@@ -77,8 +78,10 @@
     </div>
 
     <div id="city-viewport">
-        <svg id="main-svg" width="6000" height="950" viewBox="0 0 6000 950">
+        <svg id="main-svg" width="6000" height="1000" viewBox="0 0 6000 1000">
             <g id="stars-layer"></g>
+            
+            <rect x="0" y="900" width="6000" height="100" fill="#050505" />
             
             <rect x="0" y="900" width="6000" height="4" fill="var(--neon)" filter="url(#glow)" />
 
@@ -127,11 +130,11 @@
 
         function renderBuildings() {
             let x = 100;
-            const floorY = 900; // Alinhado com a linha neon do chão
+            const floorY = 900; 
 
             for(let i=0; i < names.length; i++) {
-                const w = 300 + Math.random() * 100; // Prédios largos para proximidade
-                const h = 500 + Math.random() * 300; 
+                const w = 320 + Math.random() * 80; 
+                const h = 550 + Math.random() * 250; 
                 const y = floorY - h;
                 const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
                 
@@ -159,7 +162,7 @@
                     }
                 }
                 bContainer.appendChild(g);
-                x += w + 180;
+                x += w + 200;
             }
         }
     </script>
