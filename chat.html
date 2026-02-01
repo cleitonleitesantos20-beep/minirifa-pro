@@ -29,6 +29,32 @@
 
         svg { display: block; flex-shrink: 0; align-self: flex-end; }
 
+        /* ASTRO (SOL/LUA) */
+        #sky-celestial {
+            position: fixed;
+            top: 40px;
+            right: 40px;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            z-index: 5;
+            transition: 1s ease-in-out;
+            filter: drop-shadow(0 0 20px var(--glow-color));
+        }
+        .sun { background: var(--yellow); --glow-color: var(--yellow); box-shadow: 0 0 40px var(--yellow); }
+        .moon { background: #e0e0e0; --glow-color: #fff; box-shadow: inset -15px -5px 0 0 #bdbdbd, 0 0 20px #fff; }
+
+        #nexus-clock {
+            position: fixed;
+            top: 130px;
+            right: 40px;
+            font-family: 'Orbitron';
+            font-size: 14px;
+            color: var(--neon);
+            text-shadow: 0 0 5px var(--neon);
+            z-index: 5;
+        }
+
         .building-base { fill: #000; stroke: var(--neon); stroke-width: 2.2; }
         .antenna { stroke: var(--neon); stroke-width: 1; opacity: 0.7; }
         
@@ -90,6 +116,9 @@
 </head>
 <body onload="init()">
 
+    <div id="sky-celestial"></div>
+    <div id="nexus-clock">00:00:00</div>
+
     <div id="mystery-text" class="mystery-toast">ACESSO CONFIRMADO</div>
     <div id="chat-stream"></div>
 
@@ -127,14 +156,13 @@
         import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // Configuração preenchida com o seu Project ID
         const firebaseConfig = {
-            apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", // Obtenha esta chave nas configurações do Projeto no Console do Firebase (Configurações do Projeto > Geral > Seus Aplicativos)
+            apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8",
             authDomain: "minharifadigital.firebaseapp.com",
             projectId: "minharifadigital",
             storageBucket: "minharifadigital.appspot.com",
             messagingSenderId: "1057099562075",
-            appId: "1:59630725905:web:396c8cfca385dc3d957ab0" // Também fica nas configurações do projeto
+            appId: "1:59630725905:web:396c8cfca385dc3d957ab0"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -142,20 +170,15 @@
         const auth = getAuth(app);
 
         let userLabel = "VISITANTE";
-
-        onAuthStateChanged(auth, (user) => {
-            userLabel = user ? "MORADOR" : "VISITANTE";
-        });
+        onAuthStateChanged(auth, (user) => { userLabel = user ? "MORADOR" : "VISITANTE"; });
 
         function displayMessage(user, text) {
             const stream = document.getElementById('chat-stream');
             if(!stream) return;
-            
             const msg = document.createElement('div');
             msg.className = 'chat-msg';
             msg.innerHTML = `<span class="msg-user">[${user}]</span> ${text}`;
             msg.style.left = (Math.random() * 40) + "px"; 
-            
             stream.appendChild(msg);
             setTimeout(() => { if(msg.parentNode) msg.remove(); }, 18000);
         }
@@ -164,26 +187,21 @@
             const input = document.getElementById('chat-input');
             const text = input.value.trim();
             if (!text) return;
-
             const msgContent = text.toUpperCase();
             input.value = "";
-
             try {
                 await addDoc(collection(db, "chat_messages"), {
                     text: msgContent,
                     userName: userLabel,
                     createdAt: serverTimestamp()
                 });
-            } catch (e) {
-                console.error("Erro ao enviar:", e);
-            }
+            } catch (e) { console.error(e); }
         }
 
         document.getElementById('btn-send-msg').onclick = sendMessage;
         document.getElementById('chat-input').onkeydown = (e) => { if(e.key === 'Enter') sendMessage(); };
 
         const q = query(collection(db, "chat_messages"), orderBy("createdAt", "desc"), limit(12));
-
         onSnapshot(q, (snapshot) => {
             snapshot.docChanges().forEach((change) => {
                 if (change.type === "added") {
@@ -193,9 +211,19 @@
             });
         });
 
+        // ACTION GLOBAL PARA JANELAS
         window.windowAction = function(name, id) {
             const t = document.getElementById('mystery-text');
-            t.innerText = `${name} - SETOR ${id}`;
+            const now = new Date();
+            const hour = now.getHours();
+
+            // Exemplo de lógica para Easter Egg futuro baseado em hora
+            if(hour === 3 && id === 7) { 
+                t.innerText = "SISTEMA INSTÁVEL - 03:00 AM";
+            } else {
+                t.innerText = `${name} - SETOR ${id}`;
+            }
+
             t.style.opacity = "1";
             setTimeout(() => t.style.opacity = "0", 1200);
         };
@@ -206,9 +234,33 @@
         const bContainer = document.getElementById('buildings-container');
         const buildingNames = ["NEXUS", "TORRES", "NEMIS", "TITAN", "HOROS", "FÊNIX", "IRIIS", "PIRID"];
 
+        function updateNexusTime() {
+            const clock = document.getElementById('nexus-clock');
+            const astro = document.getElementById('sky-celestial');
+            const now = new Date();
+            
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            const s = String(now.getSeconds()).padStart(2, '0');
+            clock.innerText = `${h}:${m}:${s}`;
+
+            // Ciclo Dia/Noite (Sol das 06h às 18h)
+            const hour = now.getHours();
+            if(hour >= 6 && hour < 18) {
+                astro.className = 'sun';
+                document.getElementById('stars-layer').style.opacity = "0.2";
+            } else {
+                astro.className = 'moon';
+                document.getElementById('stars-layer').style.opacity = "1";
+            }
+        }
+
         function init() {
             renderStars();
             renderBuildings();
+            updateNexusTime();
+            setInterval(updateNexusTime, 1000);
+            
             setTimeout(() => {
                 viewport.scrollLeft = (3000) - (window.innerWidth / 2);
             }, 100);
