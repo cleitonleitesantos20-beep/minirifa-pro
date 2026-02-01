@@ -23,7 +23,6 @@
             height: 100vh; width: 100vw;
         }
 
-        /* Fundo Grid Estilizado */
         body::before {
             content: ''; position: absolute;
             width: 200%; height: 200%;
@@ -46,7 +45,7 @@
         
         .state-sigla {
             fill: var(--user-neon-color); font-family: 'Orbitron';
-            font-size: 10px; pointer-events: none; text-anchor: middle; opacity: 0.6;
+            font-size: 8px; pointer-events: none; text-anchor: middle; opacity: 0.6;
         }
 
         #protagonist {
@@ -55,84 +54,71 @@
             clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
             filter: drop-shadow(0 0 10px var(--user-neon-color));
             pointer-events: none; opacity: 0; z-index: 100;
-            transition: left 0.2s cubic-bezier(0.1, 0.7, 1.0, 0.1), top 0.2s cubic-bezier(0.1, 0.7, 1.0, 0.1);
+            transition: left 0.2s ease, top 0.2s ease;
         }
 
-        /* MENU DE SETOR ATUALIZADO */
         #sector-menu {
-            position: fixed;
-            top: 0;
-            right: -450px; /* Escondido à direita */
-            width: 400px;
-            height: 100vh;
+            position: fixed; top: 0; right: -450px;
+            width: 400px; height: 100vh;
             background: var(--overlay-bg);
             border-left: 3px solid var(--user-neon-color);
             z-index: 9999;
-            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
             padding: 40px 30px;
-            display: flex;
-            flex-direction: column;
+            display: flex; flex-direction: column;
             box-shadow: -20px 0 50px rgba(0,0,0,0.9);
         }
 
-        /* Classe que ativa o menu */
-        #sector-menu.active {
-            transform: translateX(-450px); /* Puxa o menu para dentro da tela */
-        }
+        #sector-menu.active { transform: translateX(-450px); }
 
         .menu-header { border-bottom: 1px solid var(--user-neon-color); margin-bottom: 30px; padding-bottom: 15px; }
         .menu-header h2 { font-family: 'Orbitron'; color: var(--user-neon-color); text-transform: uppercase; font-size: 1.3rem; letter-spacing: 2px; }
 
         #buildings-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            overflow-y: auto;
-            padding-right: 10px;
+            display: grid; grid-template-columns: repeat(2, 1fr);
+            gap: 15px; overflow-y: auto; padding-right: 10px;
         }
 
         .building-wrapper {
-            display: flex; flex-direction: column; align-items: center; gap: 10px;
-            padding: 15px; background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(0, 242, 255, 0.05);
-            cursor: pointer; transition: 0.4s;
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            padding: 12px; background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(0, 242, 255, 0.1);
+            cursor: pointer; transition: 0.3s; border-radius: 4px;
         }
 
         .building-wrapper:hover {
             background: rgba(0, 242, 255, 0.1);
             border-color: var(--user-neon-color);
-            transform: translateY(-5px);
+            transform: scale(1.05);
         }
 
         .building-name { 
-            font-family: 'Orbitron'; font-size: 9px; color: #fff; 
+            font-family: 'Orbitron'; font-size: 8px; color: #fff; 
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: center;
         }
 
         .building-structure {
-            width: 70px; height: 70px; border: 2px solid;
+            width: 60px; height: 60px; border: 1px solid;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            border-radius: 4px; position: relative;
+            position: relative;
         }
 
-        .niche-icon { font-size: 1.5rem; margin-bottom: 4px; }
-        .niche-label { font-size: 7px; font-weight: bold; font-family: 'Orbitron'; }
+        .niche-icon { font-size: 1.2rem; }
+        .niche-label { font-size: 6px; font-weight: bold; font-family: 'Orbitron'; margin-top: 2px; }
 
         .btn-close {
-            margin-top: auto; background: transparent; border: 1px solid var(--user-neon-color);
-            color: var(--user-neon-color); padding: 15px; cursor: pointer;
-            font-family: 'Orbitron'; font-size: 0.7rem; letter-spacing: 1px;
-            transition: 0.3s;
+            margin-top: 20px; background: transparent; border: 1px solid var(--user-neon-color);
+            color: var(--user-neon-color); padding: 12px; cursor: pointer;
+            font-family: 'Orbitron'; font-size: 0.6rem; transition: 0.3s;
         }
         .btn-close:hover { background: var(--user-neon-color); color: #000; }
 
         .btn-exit {
-            position: fixed; bottom: 30px; left: 30px;
-            padding: 12px 24px; border: 1px solid #ff0055;
-            color: #ff0055; text-decoration: none; font-family: 'Orbitron'; font-size: 11px;
-            background: rgba(0,0,0,0.8); z-index: 1000; transition: 0.3s;
+            position: fixed; bottom: 20px; left: 20px;
+            padding: 10px 20px; border: 1px solid #ff0055;
+            color: #ff0055; text-decoration: none; font-family: 'Orbitron'; font-size: 10px;
+            background: rgba(0,0,0,0.8); z-index: 1000;
         }
-        .btn-exit:hover { background: #ff0055; color: #fff; }
     </style>
 </head>
 <body>
@@ -157,7 +143,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
         import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-        // Configuração do Firebase (Inalterada)
         const firebaseConfig = { 
             apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", 
             authDomain: "minharifadigital.firebaseapp.com", 
@@ -182,26 +167,26 @@
         const buildingsGrid = document.getElementById('buildings-grid');
         const protagonist = d3.select("#protagonist");
 
-        // Aplicar cor do usuário
         const userColor = localStorage.getItem('userNeonColor') || '#00f2ff';
         document.documentElement.style.setProperty('--user-neon-color', userColor);
 
-        // FUNÇÃO PARA ABRIR O MENU E CARREGAR PRÉDIOS
+        // FUNÇÃO DE BUSCA CORRIGIDA
         window.openSector = async (stateName, stateSigla) => {
+            console.log("Buscando Setor:", stateSigla);
             document.getElementById('sector-title').innerText = `SETOR: ${stateName}`;
-            buildingsGrid.innerHTML = '<p style="font-size:12px; grid-column: 1/-1;">ESCANEANDO HABITATS...</p>';
-            sectorMenu.classList.add('active'); // Ativa o menu lateral
+            buildingsGrid.innerHTML = '<p style="font-size:10px; grid-column: 1/-1;">ESCANEANDO REDE NEXUS...</p>';
+            sectorMenu.classList.add('active');
 
             try {
-                // Busca no banco onde o campo "estado" é igual à sigla clicada (Ex: "SP")
+                // Buscando no banco. IMPORTANTE: O campo no Firebase deve se chamar "estado" e conter a sigla (ex: "SP")
                 const q = query(collection(db, "usuarios"), where("estado", "==", stateSigla));
                 const querySnapshot = await getDocs(q);
                 
                 buildingsGrid.innerHTML = '';
-                document.getElementById('connection-count').innerText = `${querySnapshot.size} CONEXÕES ATIVAS`;
+                document.getElementById('connection-count').innerText = `${querySnapshot.size} HABITATS ENCONTRADOS`;
 
                 if (querySnapshot.empty) {
-                    buildingsGrid.innerHTML = '<p style="font-size:11px; grid-column: 1/-1; color: #ff0055; text-align: center; padding-top: 20px;">NENHUM HABITAT DETECTADO NESTE SETOR.</p>';
+                    buildingsGrid.innerHTML = '<p style="font-size:10px; grid-column: 1/-1; color: #555; text-align: center; margin-top: 20px;">SEM SINAL NESTE SETOR.</p>';
                     return;
                 }
 
@@ -211,11 +196,12 @@
                     
                     const wrapper = document.createElement('div');
                     wrapper.className = 'building-wrapper';
+                    // Redireciona para o arquivo de perfil (ajuste o nome se necessário)
                     wrapper.onclick = () => window.location.href = `perfil.html?id=${doc.id}`;
 
                     wrapper.innerHTML = `
                         <div class="building-name">${(data.nome || 'NEXUS').toUpperCase()}</div>
-                        <div class="building-structure" style="border-color: ${config.color}; color: ${config.color}; box-shadow: 0 0 15px ${config.color}33;">
+                        <div class="building-structure" style="border-color: ${config.color}; color: ${config.color};">
                             <span class="niche-icon">${config.icon}</span>
                             <span class="niche-label">${config.label}</span>
                         </div>
@@ -224,19 +210,20 @@
                 });
             } catch (error) {
                 console.error("Erro no Scanner:", error);
-                buildingsGrid.innerHTML = '<p style="color:red; font-size:10px;">FALHA NA CONEXÃO COM A REDE.</p>';
+                buildingsGrid.innerHTML = '<p style="color:red; font-size:10px;">ERRO DE PROTOCOLO.</p>';
             }
         };
 
         window.closeMenu = () => sectorMenu.classList.remove('active');
 
-        // LÓGICA DO MAPA (D3.JS)
+        // MAPA D3
         const svg = d3.select("#brazil-map");
         const mapGroup = svg.select("#map-group");
-        const projection = d3.geoMercator().center([-52, -15]).scale(750)
+        const projection = d3.geoMercator().center([-52, -15]).scale(700)
             .translate([window.innerWidth / 2, window.innerHeight / 2]);
         const pathGenerator = d3.geoPath().projection(projection);
 
+        // Mapa GeoJSON robusto
         d3.json("https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson").then(data => {
             mapGroup.selectAll("path").data(data.features).join("path")
                 .attr("class", "state").attr("d", pathGenerator)
@@ -248,16 +235,20 @@
                         .style("top", `${t.applyY(y) - 10}px`);
                 })
                 .on("mouseleave", () => protagonist.style("opacity", "0"))
-                .on("click", (event, d) => openSector(d.properties.name, d.properties.sigla));
+                .on("click", (event, d) => {
+                    // Mapeamento manual de siglas caso o JSON não as tenha corretamente
+                    const sigla = d.properties.sigla || d.id; 
+                    openSector(d.properties.name, sigla);
+                });
 
             mapGroup.selectAll("text").data(data.features).join("text")
                 .attr("class", "state-sigla")
                 .attr("transform", d => `translate(${pathGenerator.centroid(d)})`)
-                .attr("dy", "0.35em").text(d => d.properties.sigla);
+                .attr("dy", "0.35em").text(d => d.properties.sigla || d.id);
         });
 
-        // Zoom e Pan
-        svg.call(d3.zoom().scaleExtent([1, 15]).on("zoom", (e) => {
+        // Zoom
+        svg.call(d3.zoom().scaleExtent([1, 10]).on("zoom", (e) => {
             mapGroup.attr("transform", e.transform);
             protagonist.style("opacity", "0");
         }));
@@ -265,7 +256,6 @@
         window.addEventListener('resize', () => {
             projection.translate([window.innerWidth / 2, window.innerHeight / 2]);
             mapGroup.selectAll("path").attr("d", pathGenerator);
-            mapGroup.selectAll("text").attr("transform", d => `translate(${pathGenerator.centroid(d)})`);
         });
     </script>
 
