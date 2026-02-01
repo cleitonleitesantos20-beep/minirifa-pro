@@ -11,7 +11,7 @@
             --user-neon-color: #00f2ff;
             --bg-dark: #000000;
             --grid-color: rgba(0, 242, 255, 0.05);
-            --overlay-bg: rgba(0, 0, 0, 0.98);
+            --overlay-bg: rgba(0, 0, 0, 0.95);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -49,74 +49,59 @@
         }
 
         #protagonist {
-            position: absolute; width: 16px; height: 16px;
+            position: absolute; width: 20px; height: 20px;
             background: var(--user-neon-color);
             clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
             filter: drop-shadow(0 0 10px var(--user-neon-color));
             pointer-events: none; opacity: 0; z-index: 100;
+            transition: left 0.2s, top 0.2s;
         }
 
         /* MENU DE SETOR */
         #sector-menu {
-            position: fixed; top: 0; right: -100%;
-            width: 450px; height: 100vh;
+            position: fixed; top: 0; right: -500px; /* Escondido */
+            width: 400px; height: 100vh;
             background: var(--overlay-bg);
             border-left: 2px solid var(--user-neon-color);
-            z-index: 2000; transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 2000; transition: 0.5s ease-out;
             padding: 30px; display: flex; flex-direction: column;
-            box-shadow: -20px 0 50px rgba(0,0,0,0.9);
+            box-shadow: -10px 0 30px rgba(0,0,0,0.8);
         }
         #sector-menu.active { right: 0; }
 
         .menu-header { border-bottom: 1px solid var(--user-neon-color); margin-bottom: 25px; padding-bottom: 10px; }
-        .menu-header h2 { font-family: 'Orbitron'; color: var(--user-neon-color); text-transform: uppercase; }
+        .menu-header h2 { font-family: 'Orbitron'; color: var(--user-neon-color); font-size: 1.2rem; }
 
-        /* GRID DE PRÉDIOS */
         #buildings-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr);
-            gap: 20px; overflow-y: auto; padding: 10px;
+            display: grid; grid-template-columns: repeat(2, 1fr);
+            gap: 15px; overflow-y: auto; padding: 5px;
         }
 
         .building-wrapper {
             display: flex; flex-direction: column; align-items: center; gap: 8px;
-            text-align: center; cursor: pointer; transition: 0.3s;
+            padding: 10px; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s;
         }
+        .building-wrapper:hover { background: rgba(255,255,255,0.03); }
 
-        .building-name {
-            font-family: 'Orbitron'; font-size: 9px; 
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            width: 100%; color: #eee; text-transform: uppercase;
-            text-shadow: 0 0 5px rgba(255,255,255,0.3);
-        }
-
+        .building-name { font-family: 'Orbitron'; font-size: 10px; color: #fff; }
         .building-structure {
-            width: 80px; height: 80px; background: #050505;
-            border: 2px solid; position: relative;
+            width: 60px; height: 60px; border: 2px solid; 
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
             border-radius: 4px;
         }
-
-        .building-wrapper:hover .building-structure {
-            transform: translateY(-5px);
-            filter: brightness(1.2) drop-shadow(0 5px 15px currentColor);
-        }
-
-        .niche-icon { font-size: 1.5rem; filter: drop-shadow(0 0 5px currentColor); margin-bottom: 2px; }
-        .niche-label { font-size: 7px; font-weight: bold; font-family: 'Orbitron'; letter-spacing: 1px; }
+        .niche-icon { font-size: 1.2rem; }
+        .niche-label { font-size: 7px; font-weight: bold; }
 
         .btn-close {
-            margin-top: 20px; background: none; border: 1px solid var(--user-neon-color);
-            color: var(--user-neon-color); padding: 12px; cursor: pointer;
-            font-family: 'Orbitron'; text-transform: uppercase; font-size: 0.7rem;
+            margin-top: auto; background: none; border: 1px solid var(--user-neon-color);
+            color: var(--user-neon-color); padding: 10px; cursor: pointer;
+            font-family: 'Orbitron'; font-size: 0.7rem;
         }
-        .btn-close:hover { background: var(--user-neon-color); color: #000; }
 
         .btn-exit {
-            position: fixed; bottom: 30px; left: 30px;
-            padding: 10px 20px; border: 1px solid #ff0055;
-            color: #ff0055; text-decoration: none;
-            font-family: 'Orbitron'; font-size: 12px;
+            position: fixed; bottom: 20px; left: 20px;
+            padding: 8px 16px; border: 1px solid #ff0055;
+            color: #ff0055; text-decoration: none; font-family: 'Orbitron'; font-size: 10px;
             background: rgba(0,0,0,0.8); z-index: 1000;
         }
     </style>
@@ -128,10 +113,10 @@
     <div id="sector-menu">
         <div class="menu-header">
             <h2 id="sector-title">SETOR: --</h2>
-            <p id="connection-count" style="font-size: 11px; opacity: 0.5;">0 CONEXÕES ATIVAS</p>
+            <p id="connection-count" style="font-size: 10px; opacity: 0.6; letter-spacing: 1px;">SCANNEANDO...</p>
         </div>
         <div id="buildings-grid"></div>
-        <button class="btn-close" onclick="closeMenu()">DESCONECTAR SCANNER</button>
+        <button class="btn-close" onclick="closeMenu()">FECHAR SCANNER</button>
     </div>
     
     <div id="map-container">
@@ -153,98 +138,91 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // CONFIGURAÇÃO DE NICHOS (Sincronizado com Perfil)
         const nicheAssets = {
             citizen: { label: "CITIZEN", color: "#555", icon: "👤" },
             clothes: { label: "APPAREL", color: "#00f2ff", icon: "👕" },
             shoes: { label: "FOOTWEAR", color: "#8b4513", icon: "👟" },
-            tech: { label: "ELECTRONICS", color: "#00ff88", icon: "🔌" },
-            appliances: { label: "EQUIPMENT", color: "#ffcc00", icon: "🏠" },
-            auto: { label: "VEHICLES", color: "#bd00ff", icon: "🚗" },
-            jewelry: { label: "JEWELRY", color: "#e5e5e5", icon: "💎" }
+            tech: { label: "TECH", color: "#00ff88", icon: "🔌" },
+            appliances: { label: "HOME", color: "#ffcc00", icon: "🏠" },
+            auto: { label: "VEHICLE", color: "#bd00ff", icon: "🚗" },
+            jewelry: { label: "JEWEL", color: "#e5e5e5", icon: "💎" }
         };
 
-        const svg = d3.select("#brazil-map");
-        const mapGroup = d3.select("#map-group");
-        const protagonist = d3.select("#protagonist");
         const sectorMenu = document.getElementById('sector-menu');
         const buildingsGrid = document.getElementById('buildings-grid');
+        const protagonist = d3.select("#protagonist");
 
-        const userColor = localStorage.getItem('userNeonColor') || '#00f2ff';
-        document.documentElement.style.setProperty('--user-neon-color', userColor);
-
-        const projection = d3.geoMercator().center([-52, -15]).scale(700)
-            .translate([window.innerWidth / 2, window.innerHeight / 2]);
-        const pathGenerator = d3.geoPath().projection(projection);
-
-        window.openSector = async (stateName, stateId) => {
+        window.openSector = async (stateName, stateSigla) => {
+            console.log("Buscando estado:", stateSigla); // Debug para ver se a sigla bate com o Firebase
+            
             document.getElementById('sector-title').innerText = `SETOR: ${stateName}`;
-            buildingsGrid.innerHTML = '<p style="font-size:12px; grid-column: 1/-1;">ESCANEANDO BANCO DE DADOS...</p>';
+            buildingsGrid.innerHTML = '<p style="font-size:10px;">CONECTANDO...</p>';
             sectorMenu.classList.add('active');
 
             try {
-                // BUSCA NA COLEÇÃO "usuarios" (Conforme seu código de perfil)
-                const q = query(collection(db, "usuarios"), where("estado", "==", stateId));
-                const querySnapshot = await getDocs(q);
+                // Filtra onde o campo 'estado' do Firebase é igual à sigla clicada (Ex: 'SP', 'RJ')
+                const q = query(collection(db, "usuarios"), where("estado", "==", stateSigla));
+                const snap = await getDocs(q);
                 
                 buildingsGrid.innerHTML = '';
-                document.getElementById('connection-count').innerText = `${querySnapshot.size} CONEXÕES ATIVAS`;
+                document.getElementById('connection-count').innerText = `${snap.size} CONEXÕES ATIVAS`;
 
-                if (querySnapshot.empty) {
-                    buildingsGrid.innerHTML = '<p style="font-size:12px; grid-column: 1/-1; color: #ff0055;">NENHUM HABITAT DETECTADO.</p>';
+                if (snap.empty) {
+                    buildingsGrid.innerHTML = '<p style="font-size:11px; color: #ff0055; grid-column: 1/-1;">SETOR VAZIO</p>';
                     return;
                 }
 
-                querySnapshot.forEach((doc) => {
+                snap.forEach((doc) => {
                     const data = doc.data();
                     const config = nicheAssets[data.role] || nicheAssets.citizen;
                     
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'building-wrapper';
-                    wrapper.onclick = () => window.location.href = `perfil.html?id=${doc.id}`;
-
-                    wrapper.innerHTML = `
-                        <div class="building-name">${(data.nome || 'NEXUS').substring(0, 12)}</div>
-                        <div class="building-structure" style="border-color: ${config.color}; color: ${config.color};">
+                    const div = document.createElement('div');
+                    div.className = 'building-wrapper';
+                    div.onclick = () => window.location.href = `perfil.html?id=${doc.id}`;
+                    div.innerHTML = `
+                        <div class="building-name">${(data.nome || 'NEXUS').toUpperCase()}</div>
+                        <div class="building-structure" style="border-color: ${config.color}; color: ${config.color}; box-shadow: 0 0 10px ${config.color}44;">
                             <span class="niche-icon">${config.icon}</span>
                             <span class="niche-label">${config.label}</span>
                         </div>
                     `;
-                    buildingsGrid.appendChild(wrapper);
+                    buildingsGrid.appendChild(div);
                 });
-            } catch (error) {
-                console.error(error);
-                buildingsGrid.innerHTML = '<p style="color:red">ERRO NO SCANNER</p>';
+            } catch (e) {
+                console.error(e);
+                buildingsGrid.innerHTML = 'ERRO';
             }
         };
 
         window.closeMenu = () => sectorMenu.classList.remove('active');
 
+        // MAPA D3
+        const svg = d3.select("#brazil-map");
+        const mapGroup = svg.select("#map-group");
+        const projection = d3.geoMercator().center([-52, -15]).scale(700)
+            .translate([window.innerWidth / 2, window.innerHeight / 2]);
+        const path = d3.geoPath().projection(projection);
+
         d3.json("https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson").then(data => {
             mapGroup.selectAll("path").data(data.features).join("path")
-                .attr("class", "state").attr("d", pathGenerator)
-                .on("mouseenter", (event, d) => {
-                    const [x, y] = pathGenerator.centroid(d);
+                .attr("class", "state").attr("d", path)
+                .on("mouseenter", (e, d) => {
+                    const [x, y] = path.centroid(d);
                     const t = d3.zoomTransform(svg.node());
-                    protagonist.style("opacity", "1").style("left", `${t.applyX(x) - 8}px`).style("top", `${t.applyY(y) - 8}px`);
+                    protagonist.style("opacity", "1").style("left", `${t.applyX(x) - 10}px`).style("top", `${t.applyY(y) - 10}px`);
                 })
                 .on("mouseleave", () => protagonist.style("opacity", "0"))
-                .on("click", (event, d) => openSector(d.properties.name, d.properties.sigla));
+                .on("click", (e, d) => openSector(d.properties.name, d.properties.sigla));
 
             mapGroup.selectAll("text").data(data.features).join("text")
-                .attr("class", "state-sigla").attr("transform", d => `translate(${pathGenerator.centroid(d)})`)
+                .attr("class", "state-sigla").attr("transform", d => `translate(${path.centroid(d)})`)
                 .attr("dy", "0.35em").text(d => d.properties.sigla);
         });
 
-        svg.call(d3.zoom().scaleExtent([1, 15]).on("zoom", (e) => {
+        svg.call(d3.zoom().scaleExtent([1, 12]).on("zoom", (e) => {
             mapGroup.attr("transform", e.transform);
             protagonist.style("opacity", "0");
         }));
-
-        window.addEventListener('resize', () => {
-            projection.translate([window.innerWidth / 2, window.innerHeight / 2]);
-            mapGroup.selectAll("path").attr("d", pathGenerator);
-        });
     </script>
     <script type="module" src="nexus-overlay.js"></script>
 </body>
