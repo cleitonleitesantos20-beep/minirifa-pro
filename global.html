@@ -79,32 +79,41 @@
             gap: 15px; overflow-y: auto; padding-right: 10px;
         }
 
+        /* Estrutura do Prédio - Vista de Cima */
         .building-wrapper {
             display: flex; flex-direction: column; align-items: center; gap: 8px;
-            padding: 12px; background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(0, 242, 255, 0.1);
-            cursor: pointer; transition: 0.3s; border-radius: 4px;
-        }
-
-        .building-wrapper:hover {
-            background: rgba(0, 242, 255, 0.1);
-            border-color: var(--user-neon-color);
-            transform: scale(1.05);
-        }
-
-        .building-name { 
-            font-family: 'Orbitron'; font-size: 8px; color: #fff; 
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: center;
-        }
-
-        .building-structure {
-            width: 60px; height: 60px; border: 1px solid;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 15px; background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer; transition: 0.3s; border-radius: 2px;
             position: relative;
         }
 
-        .niche-icon { font-size: 1.2rem; }
-        .niche-label { font-size: 6px; font-weight: bold; font-family: 'Orbitron'; margin-top: 2px; }
+        .building-wrapper:hover {
+            background: rgba(255,255,255,0.05);
+            transform: translateY(-2px);
+        }
+
+        .building-name { 
+            font-family: 'Orbitron'; font-size: 9px; 
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+            width: 100%; text-align: center; font-weight: bold;
+        }
+
+        .building-structure {
+            width: 70px; height: 70px; border: 2px solid;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            position: relative; background: rgba(0,0,0,0.3);
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+        }
+        
+        /* Detalhe visual de telhado tecnológico */
+        .building-structure::before {
+            content: ''; position: absolute; inset: 5px;
+            border: 1px solid rgba(255,255,255,0.1); pointer-events: none;
+        }
+
+        .niche-icon { font-size: 1.5rem; filter: drop-shadow(0 0 5px currentColor); }
+        .niche-label { font-size: 7px; font-weight: bold; font-family: 'Orbitron'; margin-top: 4px; opacity: 0.8; }
 
         .btn-close {
             margin-top: 20px; background: transparent; border: 1px solid var(--user-neon-color);
@@ -154,13 +163,13 @@
         const db = getFirestore(app);
 
         const nicheAssets = {
-            citizen: { label: "CITIZEN", color: "#888", icon: "👤" },
-            clothes: { label: "APPAREL", color: "#00f2ff", icon: "👕" },
-            shoes: { label: "FOOTWEAR", color: "#8b4513", icon: "👟" },
-            tech: { label: "ELECTRONICS", color: "#00ff88", icon: "🔌" },
-            appliances: { label: "EQUIPMENT", color: "#ffcc00", icon: "🏠" },
-            auto: { label: "VEHICLES", color: "#bd00ff", icon: "🚗" },
-            jewelry: { label: "JEWELRY", color: "#e5e5e5", icon: "💎" }
+            citizen: { label: "CITIZEN", icon: "👤" },
+            clothes: { label: "APPAREL", icon: "👕" },
+            shoes: { label: "FOOTWEAR", icon: "👟" },
+            tech: { label: "ELECTRONICS", icon: "🔌" },
+            appliances: { label: "EQUIPMENT", icon: "🏠" },
+            auto: { label: "VEHICLES", icon: "🚗" },
+            jewelry: { label: "JEWELRY", icon: "💎" }
         };
 
         const sectorMenu = document.getElementById('sector-menu');
@@ -170,16 +179,14 @@
         const userColor = localStorage.getItem('userNeonColor') || '#00f2ff';
         document.documentElement.style.setProperty('--user-neon-color', userColor);
 
-        // FUNÇÃO DE BUSCA CORRIGIDA
         window.openSector = async (stateName, stateSigla) => {
-            console.log("Buscando Setor:", stateSigla);
+            const cleanSigla = stateSigla.replace("BR_", "").toUpperCase();
             document.getElementById('sector-title').innerText = `SETOR: ${stateName}`;
             buildingsGrid.innerHTML = '<p style="font-size:10px; grid-column: 1/-1;">ESCANEANDO REDE NEXUS...</p>';
             sectorMenu.classList.add('active');
 
             try {
-                // Buscando no banco. IMPORTANTE: O campo no Firebase deve se chamar "estado" e conter a sigla (ex: "SP")
-                const q = query(collection(db, "usuarios"), where("estado", "==", stateSigla));
+                const q = query(collection(db, "usuarios"), where("estado", "==", cleanSigla));
                 const querySnapshot = await getDocs(q);
                 
                 buildingsGrid.innerHTML = '';
@@ -193,15 +200,16 @@
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
                     const config = nicheAssets[data.role] || nicheAssets.citizen;
+                    // PRIORIDADE: Cor salva no perfil do usuário, senão usa a cor padrão
+                    const residentColor = data.userNeonColor || '#ffffff';
                     
                     const wrapper = document.createElement('div');
                     wrapper.className = 'building-wrapper';
-                    // Redireciona para o arquivo de perfil (ajuste o nome se necessário)
                     wrapper.onclick = () => window.location.href = `perfil.html?id=${doc.id}`;
 
                     wrapper.innerHTML = `
-                        <div class="building-name">${(data.nome || 'NEXUS').toUpperCase()}</div>
-                        <div class="building-structure" style="border-color: ${config.color}; color: ${config.color};">
+                        <div class="building-name" style="color: ${residentColor}">${(data.nome || 'NEXUS').toUpperCase()}</div>
+                        <div class="building-structure" style="border-color: ${residentColor}; color: ${residentColor}; box-shadow: 0 0 15px ${residentColor}33;">
                             <span class="niche-icon">${config.icon}</span>
                             <span class="niche-label">${config.label}</span>
                         </div>
@@ -216,14 +224,15 @@
 
         window.closeMenu = () => sectorMenu.classList.remove('active');
 
-        // MAPA D3
+        // MAPA D3 - ZOOM AMPLIADO
         const svg = d3.select("#brazil-map");
         const mapGroup = svg.select("#map-group");
-        const projection = d3.geoMercator().center([-52, -15]).scale(700)
+        
+        // Scale aumentado para 900 para o Brasil ficar maior
+        const projection = d3.geoMercator().center([-52, -15]).scale(900)
             .translate([window.innerWidth / 2, window.innerHeight / 2]);
         const pathGenerator = d3.geoPath().projection(projection);
 
-        // Mapa GeoJSON robusto
         d3.json("https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson").then(data => {
             mapGroup.selectAll("path").data(data.features).join("path")
                 .attr("class", "state").attr("d", pathGenerator)
@@ -236,7 +245,6 @@
                 })
                 .on("mouseleave", () => protagonist.style("opacity", "0"))
                 .on("click", (event, d) => {
-                    // Mapeamento manual de siglas caso o JSON não as tenha corretamente
                     const sigla = d.properties.sigla || d.id; 
                     openSector(d.properties.name, sigla);
                 });
@@ -244,11 +252,11 @@
             mapGroup.selectAll("text").data(data.features).join("text")
                 .attr("class", "state-sigla")
                 .attr("transform", d => `translate(${pathGenerator.centroid(d)})`)
-                .attr("dy", "0.35em").text(d => d.properties.sigla || d.id);
+                .attr("dy", "0.35em")
+                .text(d => (d.properties.sigla || d.id).replace("BR_", ""));
         });
 
-        // Zoom
-        svg.call(d3.zoom().scaleExtent([1, 10]).on("zoom", (e) => {
+        svg.call(d3.zoom().scaleExtent([1, 12]).on("zoom", (e) => {
             mapGroup.attr("transform", e.transform);
             protagonist.style("opacity", "0");
         }));
