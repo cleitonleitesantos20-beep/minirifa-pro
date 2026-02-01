@@ -47,28 +47,34 @@
 
         .label { font-family: 'Orbitron'; font-size: 16px; fill: var(--neon); pointer-events: none; letter-spacing: 3px; font-weight: bold; text-transform: uppercase; }
 
-        /* Feixes de Luz */
+        /* Animação das Luzes Cruzando os Prédios */
         .traffic-light {
             filter: blur(1.5px);
             animation: moveLight var(--spd) linear infinite;
         }
         @keyframes moveLight {
-            from { transform: translateX(-1200px); }
+            from { transform: translateX(-1500px); }
             to { transform: translateX(6500px); }
         }
 
         .ui-overlay { position: fixed; z-index: 9999; pointer-events: none; inset: 0; }
         .ui-element { pointer-events: all; }
 
-        /* Botão Sair no canto inferior esquerdo */
-        .exit-container { position: absolute; bottom: 20px; left: 20px; }
+        /* Botão Sair Transparente e mais alto */
+        .exit-container { position: absolute; bottom: 40px; left: 30px; }
         .btn-exit { 
-            padding: 8px 25px; background: transparent; border: 1px solid var(--pink); 
-            color: var(--pink); font-family: 'Orbitron'; font-size: 11px; cursor: pointer;
-            box-shadow: 0 0 10px rgba(255, 0, 85, 0.2);
-            text-transform: uppercase; transition: 0.3s;
+            padding: 6px 20px; 
+            background: transparent; 
+            border: 1px solid rgba(255, 0, 85, 0.4); 
+            color: rgba(255, 0, 85, 0.8); 
+            font-family: 'Orbitron'; 
+            font-size: 10px; 
+            cursor: pointer;
+            text-transform: uppercase; 
+            transition: 0.4s;
+            letter-spacing: 1px;
         }
-        .btn-exit:hover { background: var(--pink); color: #000; }
+        .btn-exit:hover { border-color: var(--pink); color: var(--pink); background: rgba(255, 0, 85, 0.1); }
 
         .mystery-toast {
             position: fixed; top: 20%; left: 50%; transform: translateX(-50%);
@@ -97,8 +103,8 @@
             <g id="stars-layer"></g>
             
             <g id="lights-back">
-                <rect class="traffic-light" x="0" y="780" width="300" height="1" fill="var(--neon)" style="--spd: 22s; opacity: 0.2;"/>
-                <rect class="traffic-light" x="0" y="830" width="200" height="1" fill="var(--pink)" style="--spd: 16s; opacity: 0.15;"/>
+                <rect class="traffic-light" x="0" y="450" width="400" height="1.5" fill="var(--neon)" style="--spd: 30s; opacity: 0.1;"/>
+                <rect class="traffic-light" x="0" y="600" width="300" height="1" fill="var(--pink)" style="--spd: 20s; opacity: 0.1;"/>
             </g>
 
             <g id="buildings-container"></g>
@@ -106,8 +112,9 @@
             <rect x="0" y="900" width="6000" height="3" fill="var(--neon)" filter="url(#glow)" />
 
             <g id="lights-front">
-                <rect class="traffic-light" x="0" y="915" width="400" height="3" fill="var(--neon)" style="--spd: 8s; opacity: 0.6;"/>
-                <rect class="traffic-light" x="0" y="945" width="250" height="2" fill="var(--pink)" style="--spd: 11s; opacity: 0.5;"/>
+                <rect class="traffic-light" x="0" y="550" width="500" height="2" fill="var(--neon)" style="--spd: 12s; opacity: 0.4;"/>
+                <rect class="traffic-light" x="0" y="750" width="350" height="3" fill="var(--pink)" style="--spd: 18s; opacity: 0.3;"/>
+                <rect class="traffic-light" x="0" y="850" width="600" height="1.5" fill="var(--neon)" style="--spd: 10s; opacity: 0.5;"/>
             </g>
         </svg>
     </div>
@@ -152,7 +159,7 @@
 
             buildingNames.forEach((name) => {
                 const w = 280 + Math.random() * 40; 
-                const h = 400 + Math.random() * 250; 
+                const h = 450 + Math.random() * 200; 
                 const y = floorY - h;
                 const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
                 
@@ -171,7 +178,6 @@
                         const winX = xPos + (c + 1) * (w / (cols + 1)) - 10;
                         const winY = y + 50 + (r * (h / (rows + 1)));
                         
-                        // CORREÇÃO: Não desenha a janela se estiver na área da porta (base do prédio)
                         if (winY < (floorY - 80)) { 
                             if(Math.random() > 0.2) {
                                 const winBtn = document.createElementNS("http://www.w3.org/2000/svg", "rect");
