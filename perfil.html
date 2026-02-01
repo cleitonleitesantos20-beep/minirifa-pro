@@ -41,7 +41,6 @@
             background: var(--identity-color); box-shadow: 0 0 35px var(--identity-color);
             border-radius: 10px; animation: float 4s ease-in-out infinite;
         }
-        /* Efeito Arco-íris para Gênero "Outros" */
         .rainbow-mode {
             background: linear-gradient(45deg, #ff0000, #ff00ff, #0000ff, #00ffff, #00ff00, #ffff00, #ff0000);
             background-size: 400% 400%;
@@ -50,10 +49,20 @@
         }
 
         .building-asset {
-            width: 90px; background: #080808; border: 2px solid #1a1a1a; 
+            width: 90px; background: #080808; 
+            border: 2px solid var(--accent-color); /* Contorno da cor do nicho */
             border-bottom: none; display: flex; flex-wrap: wrap; padding: 8px; gap: 4px; 
-            box-shadow: inset 0 0 15px #000; transition: 0.8s; cursor: pointer;
+            box-shadow: inset 0 0 15px #000, 0 0 15px var(--accent-color); 
+            transition: 0.8s; cursor: pointer; position: relative;
         }
+        /* Portinha do Prédio */
+        .building-door {
+            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 20px; height: 25px; background: #111;
+            border: 1px solid var(--accent-color); border-bottom: none;
+            box-shadow: 0 0 10px var(--accent-color);
+        }
+
         .window { width: 9px; height: 9px; background: #111; border-radius: 1px; }
         .active-win { background: var(--accent-color); box-shadow: 0 0 5px var(--accent-color); }
 
@@ -176,7 +185,7 @@
             clothes: { label: "MODA", color: "#00f2ff" },
             shoes: { label: "CALÇADOS", color: "#8b4513" },
             tech: { label: "ELETRÔNICOS", color: "#00ff88" },
-            appliances: { label: "ELETRODOMÉSTICOS", color: "#ffcc00" }, // DOURADO NEON
+            appliances: { label: "ELETRODOMÉSTICOS", color: "#ffcc00" },
             auto: { label: "VEÍCULOS", color: "#bd00ff" },
             jewelry: { label: "JOALHERIA", color: "#e5e5e5" }
         };
@@ -233,11 +242,9 @@
             currentGender = data.gender || 'masc';
             storeLink = data.linkLoja || "";
             
-            // Cor do Habitat
             const config = roles[currentRole];
             document.documentElement.style.setProperty('--accent-color', config.color);
             
-            // Cor do Gênero (Cubo)
             const cube = document.getElementById('user-cube');
             cube.classList.remove('rainbow-mode');
             if(currentGender === 'other') {
@@ -260,7 +267,7 @@
 
             const b = document.getElementById('user-building');
             b.style.height = (70 + (level * 18)) + "px";
-            b.innerHTML = "";
+            b.innerHTML = '<div class="building-door"></div>'; // Recria a portinha
             for(let i=0; i < (level * 3); i++){
                 const w = document.createElement('div');
                 w.className = "window active-win";
