@@ -7,60 +7,66 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --accent-color: #555; /* Cinza Neon Padrão */
+            --accent-color: #555; 
             --gold: #ffcc00; 
-            --bg-card: rgba(15, 15, 15, 0.95);
+            --bg-card: rgba(10, 10, 10, 0.98);
         }
         body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; overflow-x: hidden; }
 
-        /* NAVEGAÇÃO GERAL */
+        /* NAV */
         .top-nav { display: flex; justify-content: space-between; padding: 15px; position: absolute; width: 100%; box-sizing: border-box; z-index: 100; }
-        .btn-back { background: var(--glass); border: 1px solid #333; color: #fff; padding: 5px 15px; border-radius: 5px; cursor: pointer; text-decoration: none; font-size: 0.8rem; font-family: 'Orbitron'; }
+        .btn-back { background: rgba(255,255,255,0.05); border: 1px solid #222; color: #fff; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 0.7rem; font-family: 'Orbitron'; }
 
-        /* HEADER COMPACTO */
-        .habitat-header { padding: 50px 20px 10px; text-align: center; }
-        .user-name { font-family: 'Orbitron'; font-size: 1.4rem; margin: 5px 0; text-shadow: 0 0 10px var(--accent-color); }
-        .status-badge { font-size: 0.6rem; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; }
+        /* HEADER */
+        .habitat-header { padding: 60px 20px 10px; text-align: center; }
+        .user-name { font-family: 'Orbitron'; font-size: 1.3rem; margin: 5px 0; text-shadow: 0 0 10px var(--accent-color); }
+        
+        /* BADGE CLICÁVEL */
+        .status-badge { 
+            display: inline-block; padding: 4px 12px; border: 1px solid var(--accent-color);
+            border-radius: 20px; font-size: 0.6rem; color: var(--accent-color); 
+            letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: 0.3s;
+        }
+        .status-badge:hover { background: rgba(255,255,255,0.1); }
 
-        /* MUNDO VISUAL COMPACTO */
+        /* WORLD */
         .world-view {
-            position: relative; height: 320px; width: 100%;
+            position: relative; height: 300px; width: 100%;
             display: flex; align-items: flex-end; justify-content: center;
-            perspective: 1000px; background: radial-gradient(circle at bottom, #0a1015 0%, #000 70%);
-            gap: 10px; padding-bottom: 20px;
+            perspective: 1000px; background: radial-gradient(circle at bottom, #0a1015 0%, #000 75%);
+            gap: 12px; padding-bottom: 20px;
         }
-
         .identity-cube {
-            width: 60px; height: 60px; z-index: 10; margin-bottom: 30px;
-            background: var(--accent-color); box-shadow: 0 0 40px var(--accent-color);
-            border-radius: 12px; animation: float 4s ease-in-out infinite;
+            width: 55px; height: 55px; z-index: 10; margin-bottom: 25px;
+            background: var(--accent-color); box-shadow: 0 0 35px var(--accent-color);
+            border-radius: 10px; animation: float 4s ease-in-out infinite;
         }
-
         .building-asset {
-            width: 100px; background: #0a0a0a;
-            border: 2px solid #222; border-bottom: none; display: flex; flex-wrap: wrap;
-            padding: 8px; gap: 4px; transition: 0.5s; box-shadow: inset 0 0 15px #000;
+            width: 90px; background: #080808; border: 2px solid #1a1a1a; 
+            border-bottom: none; display: flex; flex-wrap: wrap; padding: 8px; gap: 4px; 
+            box-shadow: inset 0 0 15px #000; transition: 0.8s;
         }
-
-        .window { width: 10px; height: 10px; background: #111; border-radius: 1px; }
+        .window { width: 9px; height: 9px; background: #111; border-radius: 1px; }
         .active-win { background: var(--accent-color); box-shadow: 0 0 5px var(--accent-color); }
 
-        /* PAINEL DE CONTROLE (SÓ DONO) */
-        .control-panel { background: var(--bg-card); padding: 20px; border-top: 1px solid #222; }
-        .selector-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
-        .opt-btn { 
-            background: #111; border: 1px solid #333; color: #aaa; padding: 10px 5px; 
-            border-radius: 8px; cursor: pointer; font-size: 0.6rem; font-family: 'Orbitron'; text-align: center;
+        /* MODAL DE NICHOS (POPUP) */
+        .niche-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 200; align-items: center; justify-content: center;
         }
-        .opt-btn.active { border-color: var(--gold); color: #fff; background: #1a1a1a; }
+        .modal-content { background: #0a0a0a; border: 1px solid #222; padding: 25px; border-radius: 15px; width: 85%; max-width: 400px; text-align: center; }
+        .selector-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .opt-btn { 
+            background: #111; border: 1px solid #333; color: #fff; padding: 12px 5px; 
+            border-radius: 8px; cursor: pointer; font-size: 0.6rem; font-family: 'Orbitron';
+        }
 
-        /* VITRINE DE PRODUTOS */
-        .store-section { padding: 20px; background: #050505; min-height: 200px; }
-        .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
-        .product-card { background: #111; border-radius: 10px; padding: 10px; border: 1px solid #222; }
-        .product-img { width: 100%; height: 80px; background: #1a1a1a; border-radius: 5px; margin-bottom: 8px; }
+        /* STORE */
+        .store-section { padding: 25px; background: #050505; border-top: 1px solid #111; }
+        .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .product-card { background: #0a0a0a; border-radius: 8px; padding: 10px; border: 1px solid #1a1a1a; text-align: center; }
 
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
     </style>
 </head>
 <body>
@@ -68,12 +74,12 @@
     <script type="module" src="nexus-overlay.js"></script>
 
     <nav class="top-nav">
-        <a href="index.html" class="btn-back"> < VOLTAR</a>
+        <a href="index.html" class="btn-back"> VOLTAR</a>
         <div id="user-balance" style="color:var(--gold); font-family:Orbitron; font-size:0.7rem;">0.00 NP</div>
     </nav>
 
     <div class="habitat-header">
-        <div class="status-badge" id="display-role">CIDADÃO</div>
+        <div class="status-badge" id="display-role" onclick="toggleNicheMenu()">CARREGANDO...</div>
         <div class="user-name" id="display-name">---</div>
     </div>
 
@@ -82,25 +88,27 @@
         <div id="user-building" class="building-asset"></div>
     </div>
 
-    <div id="owner-controls" class="control-panel" style="display:none;">
-        <span class="status-badge">Configurar Identidade</span>
-        <div class="selector-grid">
-            <div class="opt-btn active" onclick="setRole('citizen')">CIDADÃO</div>
-            <div class="opt-btn" onclick="setRole('clothes')">ROUPAS</div>
-            <div class="opt-btn" onclick="setRole('shoes')">SAPATOS</div>
-            <div class="opt-btn" onclick="setRole('tech')">ELETRO</div>
-            <div class="opt-btn" onclick="setRole('auto')">MOTOS/CARROS</div>
-            <div class="opt-btn" onclick="setRole('jewelry')">JOIAS</div>
+    <div id="niche-modal" class="niche-modal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="status-badge" style="border:none; color:#555">ALTERAR PROTOCOLO</span>
+            <div class="selector-grid">
+                <div class="opt-btn" style="border-left: 4px solid #555" onclick="setRole('citizen')">CIDADÃO</div>
+                <div class="opt-btn" style="border-left: 4px solid #00f2ff" onclick="setRole('clothes')">ROUPAS</div>
+                <div class="opt-btn" style="border-left: 4px solid #8b4513" onclick="setRole('shoes')">SAPATOS</div>
+                <div class="opt-btn" style="border-left: 4px solid #00ff88" onclick="setRole('tech')">ELETRÔNICOS</div>
+                <div class="opt-btn" style="border-left: 4px solid #bd00ff" onclick="setRole('auto')">VEÍCULOS</div>
+                <div class="opt-btn" style="border-left: 4px solid #e5e5e5" onclick="setRole('jewelry')">JOALHERIA</div>
+            </div>
+            <button onclick="toggleNicheMenu()" style="margin-top:20px; background:none; border:none; color:#444; font-family:Orbitron; font-size:0.6rem; cursor:pointer;">[ FECHAR ]</button>
         </div>
     </div>
 
     <div id="store-area" class="store-section" style="display:none;">
-        <span class="status-badge" style="color:#555">VITRINE DO COMERCIANTE</span>
+        <span class="status-badge" style="border:none; margin-bottom:15px; display:block;">ESTOQUE DISPONÍVEL</span>
         <div class="product-grid" id="product-list">
             <div class="product-card">
-                <div class="product-img"></div>
-                <div style="font-size:0.7rem; font-family:Orbitron;">ITEM EXEMPLO</div>
-                <div style="color:var(--gold); font-size:0.8rem;">100.00 NP</div>
+                <div style="height:80px; background:#111; margin-bottom:10px; border-radius:5px;"></div>
+                <div style="font-size:0.6rem; font-family:Orbitron; color:#aaa;">AGUARDANDO PRODUTOS</div>
             </div>
         </div>
     </div>
@@ -126,25 +134,33 @@
 
         const roles = {
             citizen: { label: "CIDADÃO", color: "#555" },
-            clothes: { label: "MODA NEON", color: "#00f2ff" }, // Azul
-            shoes: { label: "CALÇADOS", color: "#8b4513" }, // Marrom
-            tech: { label: "TECH HUB", color: "#00ff88" }, // Verde
-            auto: { label: "MOTORS", color: "#bd00ff" }, // Roxo
-            jewelry: { label: "JOALHERIA", color: "#e5e5e5" } // Prata
+            clothes: { label: "COMERCIANTE: ROUPAS", color: "#00f2ff" },
+            shoes: { label: "COMERCIANTE: SAPATOS", color: "#8b4513" },
+            tech: { label: "COMERCIANTE: ELETRÔNICOS", color: "#00ff88" },
+            auto: { label: "COMERCIANTE: VEÍCULOS", color: "#bd00ff" },
+            jewelry: { label: "COMERCIANTE: JOALHERIA", color: "#e5e5e5" }
+        };
+
+        let isOwner = false;
+
+        // Gerenciar Modal
+        window.toggleNicheMenu = () => {
+            if(!isOwner) return; // Só o dono abre
+            const m = document.getElementById('niche-modal');
+            m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
+        };
+
+        window.closeModal = (e) => {
+            if(e.target.id === 'niche-modal') toggleNicheMenu();
         };
 
         if (targetID) {
             onSnapshot(doc(db, "usuarios", targetID), (snap) => {
-                if (snap.exists()) {
-                    const data = snap.data();
-                    updateHabitat(data);
-                }
+                if (snap.exists()) updateHabitat(snap.data());
             });
 
             onAuthStateChanged(auth, user => {
-                if(user && user.uid === targetID) {
-                    document.getElementById('owner-controls').style.display = 'block';
-                }
+                if(user && user.uid === targetID) isOwner = true;
             });
         }
 
@@ -154,26 +170,24 @@
                 role: roleKey,
                 temComercio: roleKey !== 'citizen'
             });
-            // Feedback visual imediato nos botões
-            document.querySelectorAll('.opt-btn').forEach(btn => btn.classList.remove('active'));
+            toggleNicheMenu();
         };
 
         function updateHabitat(data) {
             const userRole = data.role || 'citizen';
             const config = roles[userRole];
             
-            // Aplica Cores
             document.documentElement.style.setProperty('--accent-color', config.color);
             document.getElementById('display-role').innerText = config.label;
-            document.getElementById('display-name').innerText = (data.nome || "USER").toUpperCase();
+            document.getElementById('display-role').style.color = config.color;
+            document.getElementById('display-role').style.borderColor = config.color;
+            document.getElementById('display-name').innerText = (data.nome || "NEXUS").toUpperCase();
             document.getElementById('user-balance').innerText = `${(data.saldo || 0).toFixed(2)} NP`;
 
-            // Altura do Prédio
             const level = Math.floor((data.xp || 0) / 1000) + 1;
             const b = document.getElementById('user-building');
-            b.style.height = (80 + (level * 15)) + "px";
+            b.style.height = (70 + (level * 18)) + "px";
             
-            // Janelas
             b.innerHTML = "";
             for(let i=0; i < (level * 3); i++){
                 const w = document.createElement('div');
@@ -181,7 +195,6 @@
                 b.appendChild(w);
             }
 
-            // Mostra/Esconde Vitrine
             document.getElementById('store-area').style.display = data.temComercio ? 'block' : 'none';
         }
     </script>
