@@ -54,9 +54,9 @@
         .door-btn { fill: none; stroke: var(--pink); stroke-width: 3; cursor: pointer; transition: 0.3s; }
         .door-btn:hover { stroke: #fff; filter: drop-shadow(0 0 10px var(--pink)); }
 
-        .label { font-family: 'Orbitron'; font-size: 16px; fill: var(--neon); pointer-events: none; letter-spacing: 3px; font-weight: bold; text-transform: uppercase; }
+        .label-inside { font-family: 'Orbitron'; font-size: 13px; fill: var(--neon); pointer-events: none; letter-spacing: 2px; font-weight: bold; text-transform: uppercase; opacity: 0.8; }
 
-        /* Tráfego de Luzes Intenso */
+        /* Tráfego de Luzes */
         .traffic-light {
             filter: blur(2px);
             animation: moveLight var(--spd) linear infinite;
@@ -66,12 +66,13 @@
             to { transform: translateX(6500px); }
         }
 
+        /* UI de Interação */
         .ui-overlay { position: fixed; z-index: 9999; pointer-events: none; inset: 0; }
         .ui-element { pointer-events: all; }
 
-        .exit-container { position: absolute; bottom: 45px; left: 30px; }
+        .exit-container { position: absolute; bottom: 45px; right: 30px; } /* Movi para a direita para não bater no chat */
         .btn-exit { 
-            padding: 6px 22px; 
+            padding: 6px 20px; 
             background: transparent; 
             border: 1px solid rgba(255, 0, 85, 0.3); 
             color: rgba(255, 0, 85, 0.7); 
@@ -82,6 +83,45 @@
             transition: 0.4s;
         }
         .btn-exit:hover { border-color: var(--pink); color: var(--pink); background: rgba(255, 0, 85, 0.1); }
+
+        /* Sistema de Chat Vertical */
+        #chat-stream {
+            position: fixed; top: 20px; left: 20px;
+            width: 300px; height: calc(100vh - 120px);
+            pointer-events: none; overflow: hidden;
+        }
+
+        .chat-msg {
+            position: absolute; left: 0; top: -50px;
+            color: var(--neon); font-family: 'Rajdhani'; font-weight: bold;
+            text-shadow: 0 0 5px #000; font-size: 1.1rem;
+            animation: fallDown 10s linear forwards;
+            white-space: nowrap;
+        }
+
+        @keyframes fallDown {
+            0% { transform: translateY(0); opacity: 0; }
+            5% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(100vh); opacity: 0; }
+        }
+
+        .chat-input-bar {
+            position: fixed; bottom: 30px; left: 50%;
+            transform: translateX(-50%);
+            display: flex; gap: 10px; width: 350px;
+        }
+
+        #chat-input {
+            flex: 1; background: rgba(0,0,0,0.7); border: 1px solid var(--neon);
+            padding: 8px 15px; color: #fff; font-family: 'Rajdhani';
+            outline: none; box-shadow: 0 0 10px rgba(0, 242, 255, 0.2);
+        }
+
+        .btn-send {
+            background: var(--neon); border: none; padding: 0 15px;
+            cursor: pointer; font-weight: bold; color: #000;
+        }
 
         .mystery-toast {
             position: fixed; top: 20%; left: 50%; transform: translateX(-50%);
@@ -95,7 +135,14 @@
 
     <div id="mystery-text" class="mystery-toast">ACESSO CONFIRMADO</div>
 
+    <div id="chat-stream"></div>
+
     <div class="ui-overlay">
+        <div class="chat-input-bar ui-element">
+            <input type="text" id="chat-input" placeholder="DIGITE SUA MENSAGEM..." maxlength="50">
+            <button class="btn-send" onclick="sendMessage()">></button>
+        </div>
+
         <div class="exit-container ui-element">
             <button class="btn-exit" onclick="window.location.href='index.html'">SAIR</button>
         </div>
@@ -141,6 +188,30 @@
                 const center = (6000 / 2) - (window.innerWidth / 2);
                 viewport.scrollLeft = center;
             }, 100);
+
+            // Escutar tecla Enter no chat
+            document.getElementById('chat-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendMessage();
+            });
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const stream = document.getElementById('chat-stream');
+            if (input.value.trim() === "") return;
+
+            const msg = document.createElement('div');
+            msg.className = 'chat-msg';
+            msg.innerText = `> ${input.value.toUpperCase()}`;
+            
+            // Randomizar levemente a posição X para não sobrepor tudo no mesmo pixel
+            msg.style.left = Math.random() * 20 + "px";
+            
+            stream.appendChild(msg);
+            input.value = "";
+
+            // Remover do DOM após a animação acabar (10s)
+            setTimeout(() => msg.remove(), 10000);
         }
 
         function windowAction(name, id) {
@@ -173,7 +244,6 @@
                 const y = floorY - h;
                 const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
                 
-                // Desenhar Antenas no topo para realismo
                 const antennaX = xPos + w * 0.2;
                 const antennaH = 40 + Math.random() * 40;
 
@@ -182,9 +252,9 @@
                     <circle cx="${antennaX}" cy="${y - antennaH}" r="3" fill="var(--pink)" filter="url(#glow)" />
                     
                     <rect x="${xPos}" y="${y}" width="${w}" height="${h}" class="building-base" />
-                    <text x="${xPos + w/2}" y="${y - 20}" class="label" text-anchor="middle">${name}</text>
-                    <rect x="${xPos + w/2 - 30}" y="${floorY - 60}" width="60" height="60" class="door-btn" onclick="windowAction('${name}', 'PORTARIA')" />
+                    <text x="${xPos + w/2}" y="${y + 30}" class="label-inside" text-anchor="middle">${name}</text>
                     
+                    <rect x="${xPos + w/2 - 30}" y="${floorY - 60}" width="60" height="60" class="door-btn" onclick="windowAction('${name}', 'PORTARIA')" />
                     <circle cx="${xPos + w + 100}" cy="${y + 100}" r="4" class="drone" />
                 `;
 
@@ -195,7 +265,7 @@
                 for(let r=0; r<rows; r++) {
                     for(let c=0; c<cols; c++) {
                         const winX = xPos + (c + 1) * (w / (cols + 1)) - 10;
-                        const winY = y + 50 + (r * (h / (rows + 1)));
+                        const winY = y + 70 + (r * (h / (rows + 1))); // Desci as janelas um pouco para o nome brilhar livre no topo
                         
                         if (winY < (floorY - 80)) { 
                             if(Math.random() > 0.2) {
