@@ -29,7 +29,7 @@
             overflow-x: scroll;
             overflow-y: hidden;
             z-index: 1;
-            scroll-behavior: smooth;
+            scroll-behavior: auto; /* Melhor para o pulo inicial para o centro */
         }
 
         #zoom-layer {
@@ -40,18 +40,16 @@
 
         .city-svg { height: 100%; display: block; }
 
-        /* Nuvens mais leves */
         .square-cloud {
             fill: #1a1a2e;
-            opacity: 0.3;
-            animation: cloudPass 90s linear infinite;
+            opacity: 0.2;
+            animation: cloudPass 120s linear infinite;
         }
         @keyframes cloudPass {
-            from { transform: translateX(-400px); }
-            to { transform: translateX(100%); } /* Usa % para ser mais performático */
+            from { transform: translateX(-500px); }
+            to { transform: translateX(6000px); }
         }
 
-        /* Estruturas */
         .platform-base { fill: #020205; stroke: #1f1f3d; stroke-width: 2; }
         
         .building-front { 
@@ -60,20 +58,17 @@
             stroke-width: 2; 
         }
 
-        /* Janelas Otimizadas */
         .window-dark { 
             animation: flicker-dark var(--d) infinite; 
             opacity: 0.6;
         }
         .window-clickable { cursor: pointer; pointer-events: all; }
-        .window-clickable:hover { fill: #fff !important; opacity: 1; }
 
         @keyframes flicker-dark { 
             0%, 100% { opacity: 0.1; fill: #0a0a12; } 
             50% { opacity: 0.8; fill: var(--win-color); } 
         }
 
-        /* Banners e Textos */
         .ad-banner-bg { fill: rgba(0,0,0,0.6); stroke: var(--neon); stroke-width: 1; }
         .ad-text { 
             font-family: 'Orbitron'; 
@@ -83,38 +78,30 @@
             font-size: 24px;
         }
 
-        /* Detalhes Leves */
         .roof-antenna { stroke: #444; stroke-width: 2; }
         .warning-light { fill: #ff0000; animation: blinkRed 2s infinite alternate; }
-        @keyframes blinkRed { from { opacity: 0.3; } to { opacity: 1; } }
+        @keyframes blinkRed { from { opacity: 0.2; } to { opacity: 1; } }
 
-        /* Interface Transparente */
         .nav-bar {
             position: fixed;
             bottom: 30px; left: 50%;
             transform: translateX(-50%);
             display: flex; gap: 20px;
             z-index: 100;
-            background: transparent; /* Totalmente transparente */
-            padding: 10px 25px;
         }
 
         .v-button {
             width: 50px; height: 50px;
-            background: rgba(0,0,0,0.2); /* Quase invisível */
+            background: rgba(0,0,0,0.4);
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 50%;
             color: #ccc;
             display: flex; align-items: center; justify-content: center;
             font-size: 1.2rem; cursor: pointer; transition: 0.3s;
-            backdrop-filter: blur(2px);
+            backdrop-filter: blur(4px);
         }
-        .v-button:hover { border-color: var(--neon); color: var(--neon); background: rgba(0, 242, 255, 0.1); }
-        .btn-exit { color: var(--pink); border-color: rgba(255, 0, 85, 0.2); font-size: 0.6rem; font-family: 'Orbitron'; }
+        .v-button:hover { border-color: var(--neon); color: var(--neon); }
         
-        .zoom-icon { font-weight: bold; letter-spacing: -2px; }
-
-        /* Chat Minimalista (Sem caixa) */
         #chat-window {
             position: fixed;
             bottom: 100px; left: 50%;
@@ -128,12 +115,9 @@
             flex: 1; 
             overflow-y: auto; 
             padding: 10px;
-            background: transparent; /* Sem fundo */
-            border: none; /* Sem borda */
             font-size: 0.9rem;
             color: #ddd;
-            text-shadow: 1px 1px 2px #000, 0 0 5px #000; /* Sombra para ler em cima da cidade */
-            /* Esconder barra de rolagem mas permitir rolar */
+            text-shadow: 1px 1px 2px #000;
             scrollbar-width: none; 
         }
         .chat-messages::-webkit-scrollbar { display: none; }
@@ -143,14 +127,12 @@
         
         .chat-input-area { 
             display: flex; 
-            background: rgba(0,0,0,0.3); /* Leve fundo só no input */
+            background: rgba(0,0,0,0.5); 
             border-bottom: 1px solid var(--neon); 
-            border-radius: 0;
             pointer-events: all; 
             padding: 5px;
-            margin-top: 10px;
         }
-        input { background: transparent; border: none; color: #fff; flex: 1; padding: 5px; outline: none; font-family: 'Rajdhani'; text-shadow: 1px 1px 1px #000; }
+        input { background: transparent; border: none; color: #fff; flex: 1; padding: 5px; outline: none; font-family: 'Rajdhani'; }
 
         @media (max-width: 600px) { #chat-window { width: 95vw; } }
     </style>
@@ -158,15 +140,15 @@
 <body>
 
     <div class="nav-bar">
-        <div class="v-button btn-exit" onclick="location.href='index.html'">EXIT</div>
+        <div class="v-button" style="color:var(--pink)" onclick="location.href='index.html'">EXIT</div>
         <div class="v-button" onclick="toggleChat()">💬</div>
-        <div class="v-button zoom-icon" onclick="toggleZoom()">[ + ]</div>
+        <div class="v-button" onclick="toggleZoom()">[ + ]</div>
     </div>
 
     <div id="chat-window">
         <div class="chat-messages" id="chat-box"></div>
         <div class="chat-input-area">
-            <input type="text" placeholder="Escreva..." id="chat-input">
+            <input type="text" placeholder="Global Link..." id="chat-input">
             <button onclick="sendMsg()" style="background:none; border:none; color:var(--neon); padding:0 10px; cursor:pointer; font-weight:bold;">></button>
         </div>
     </div>
@@ -176,16 +158,12 @@
             <defs>
                 <filter id="glow"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
             </defs>
-
             <g id="zoom-layer">
                 <g id="sky-layer"></g>
                 <g id="clouds-layer"></g>
-                
                 <g id="far-buildings"></g>
-
-                <rect id="plat-rect" x="-100" y="900" width="1000" height="200" class="platform-base" />
-                <line id="plat-line" x1="-100" y1="900" x2="1000" y2="900" stroke="#333" stroke-width="4" />
-
+                <rect id="plat-rect" x="0" y="900" width="1000" height="200" class="platform-base" />
+                <line id="plat-line" x1="0" y1="900" x2="1000" y2="900" stroke="#333" stroke-width="4" />
                 <g id="mid-buildings"></g>
                 <g id="air-traffic"></g>
             </g>
@@ -194,51 +172,40 @@
 
     <script type="module">
         let isZoomed = false;
-        const darkColors = ['#1a0b2e', '#0f0f3d', '#2d004d', '#000033']; // Cores reduzidas para otimizar
-        const bannerWords = ["NEXUS", "SYSTEM", "DATA", "VOID", "LINK", "CYBER"];
+        const darkColors = ['#1a0b2e', '#0f0f3d', '#000033'];
+        const bannerWords = ["NEXUS", "DATA", "VOID", "LINK", "CORE"];
 
         document.addEventListener('DOMContentLoaded', () => {
-            renderSky(); // Menos estrelas
-            renderClouds(); // Menos nuvens
+            renderSky();
+            renderClouds();
+            const finalX = renderCity();
             
-            const finalX = renderCity(); // Renderiza e pega o final exato
-            
-            // Ajustar Limites do Mapa EXATAMENTE onde acaba o prédio
             const svg = document.getElementById('city-svg');
-            const totalWidth = finalX + 100; // Margem pequena
+            const container = document.getElementById('city-container');
             
+            // Ajuste estrito da largura para fechar a borda no último prédio
+            const totalWidth = finalX + 150; 
             svg.setAttribute('width', totalWidth);
             svg.setAttribute('viewBox', `0 0 ${totalWidth} 1000`);
             
-            // Ajusta o chão para acabar junto
-            document.getElementById('plat-rect').setAttribute('width', totalWidth + 100);
+            document.getElementById('plat-rect').setAttribute('width', totalWidth);
             document.getElementById('plat-line').setAttribute('x2', totalWidth);
 
             startAirTraffic();
-            
-            const container = document.getElementById('city-container');
-            container.scrollLeft = 100;
 
-            // Paralaxe Otimizado
-            let ticking = false;
-            container.addEventListener('scroll', () => {
-                if (!ticking) {
-                    window.requestAnimationFrame(() => {
-                        const scrollPos = container.scrollLeft;
-                        document.getElementById('far-buildings').style.transform = `translateX(${scrollPos * 0.9}px)`;
-                        ticking = false;
-                    });
-                    ticking = true;
-                }
-            });
+            // Centralizar a cidade ao entrar
+            setTimeout(() => {
+                const centerX = (totalWidth * 0.7) / 2 - (window.innerWidth / 2);
+                container.scrollLeft = centerX;
+                container.style.scrollBehavior = 'smooth'; // Ativa scroll suave após o pulo inicial
+            }, 100);
         });
 
         function renderSky() {
             const sky = document.getElementById('sky-layer');
             let html = '';
-            // Reduzido para 80 estrelas (Performance)
-            for(let i=0; i<80; i++) {
-                html += `<circle cx="${Math.random()*6000}" cy="${Math.random()*800}" r="${Math.random()*1.5}" fill="#fff" opacity="${Math.random()*0.6}"/>`;
+            for(let i=0; i<60; i++) {
+                html += `<circle cx="${Math.random()*6000}" cy="${Math.random()*800}" r="${Math.random()*1.2}" fill="#fff" opacity="${Math.random()*0.5}"/>`;
             }
             sky.innerHTML = html;
         }
@@ -246,13 +213,9 @@
         function renderClouds() {
             const clouds = document.getElementById('clouds-layer');
             let html = '';
-            // Reduzido para 15 nuvens (Performance)
-            for(let i=0; i<15; i++) {
+            for(let i=0; i<10; i++) {
                 const w = 200 + Math.random()*300;
-                const h = 40 + Math.random()*40;
-                const y = Math.random()*800; 
-                const d = 80 + Math.random()*100; 
-                html += `<rect x="${Math.random()*4000}" y="${y}" width="${w}" height="${h}" class="square-cloud" style="animation-duration:${d}s" />`;
+                html += `<rect x="${Math.random()*5000}" y="${Math.random()*700}" width="${w}" height="40" class="square-cloud" />`;
             }
             clouds.innerHTML = html;
         }
@@ -263,95 +226,59 @@
             let farHTML = '';
             let midHTML = '';
             
-            // --- Prédios de Fundo (Quantidade Reduzida) ---
-            let farX = -100;
-            while (farX < 6000) {
-                const w = 100 + Math.random()*150;
-                const h = 150 + Math.random()*350;
-                farHTML += `<rect x="${farX}" y="${900-h}" width="${w}" height="${h}" fill="#0a0a14" opacity="0.8" />`;
-                farX += w + 20; // Menos gaps
+            // Fundo estático (Paralaxe removido)
+            for(let fx=0; fx < 6000; fx += 250) {
+                const h = 200 + Math.random()*300;
+                farHTML += `<rect x="${fx}" y="${900-h}" width="${150+Math.random()*100}" height="${h}" fill="#080810" />`;
             }
             far.innerHTML = farHTML;
 
-            // --- Prédios da Frente ---
-            let x = 50;
-            // Loop controlado para não estourar memória
-            while(x < 5500) { 
-                const w = 180 + Math.random()*200;
-                const h = 300 + Math.random()*500;
+            let x = 100;
+            while(x < 5000) { 
+                const w = 200 + Math.random()*200;
+                const h = 350 + Math.random()*450;
                 const y = 900 - h;
                 
-                // Prédio
                 let b = `<rect x="${x}" y="${y}" width="${w}" height="${h}" class="building-front" />`;
 
-                // Detalhe topo (Simples)
-                if(Math.random() > 0.4) {
-                    b += `<line x1="${x+w-20}" y1="${y}" x2="${x+w-20}" y2="${y-40}" class="roof-antenna" />`;
-                    b += `<circle cx="${x+w-20}" cy="${y-40}" r="2" class="warning-light" />`;
-                }
-
-                // Banner
-                let hasBanner = Math.random() > 0.6; // Menos banners
-                let bannerY = 0, bannerH = 0;
-
-                if (hasBanner) {
-                    bannerH = 40 + Math.random()*30;
-                    bannerY = y + 50 + Math.random()*(h - 200);
-                }
-
-                // Porta
-                b += `<rect x="${x + w/2 - 25}" y="${900-60}" width="50" height="60" fill="#000" stroke="#222" />`;
-
-                // Janelas (Geração Otimizada - Menos loops)
-                const rows = Math.floor(h/50); // Menos linhas (grade maior)
-                const cols = Math.floor(w/40); // Menos colunas
-
-                for(let r=1; r < rows-1; r++) {
-                    for(let c=1; c < cols; c++) {
-                        const winY = y + r*50;
-                        if (hasBanner && winY >= bannerY - 10 && winY <= bannerY + bannerH + 10) continue;
-
-                        // Probabilidade menor de janela (0.3 em vez de 0.8) -> MUITO mais leve
-                        if(Math.random() > 0.6) {
+                // Janelas (Ultra otimizadas)
+                const step = 60;
+                for(let r = y + 50; r < 850; r += step) {
+                    for(let c = x + 30; c < x + w - 30; c += 50) {
+                        if(Math.random() > 0.7) {
                             const color = darkColors[Math.floor(Math.random() * darkColors.length)];
-                            const delay = Math.random() * 5;
-                            b += `<rect x="${x + c*40}" y="${winY}" width="12" height="18" 
-                                   class="window-dark window-clickable" 
-                                   style="--d:${2+delay}s; --win-color:${color}" 
-                                   onclick="console.log('Building ${x}')" />`;
+                            b += `<rect x="${c}" y="${r}" width="15" height="20" class="window-dark" style="--d:${2+Math.random()*4}s; --win-color:${color}" />`;
                         }
                     }
                 }
 
-                if (hasBanner) {
+                if (Math.random() > 0.7) {
                     const word = bannerWords[Math.floor(Math.random() * bannerWords.length)];
-                    b += `<rect x="${x+5}" y="${bannerY}" width="${w-10}" height="${bannerH}" class="ad-banner-bg" />`;
-                    b += `<text x="${x + w/2}" y="${bannerY + bannerH/2 + 8}" class="ad-text">${word}</text>`;
+                    const bY = y + 100;
+                    b += `<rect x="${x+10}" y="${bY}" width="${w-20}" height="50" class="ad-banner-bg" />`;
+                    b += `<text x="${x + w/2}" y="${bY + 32}" class="ad-text">${word}</text>`;
                 }
 
                 midHTML += b;
-                x += w + 50 + Math.random()*80; // Espaço
+                x += w + 100 + Math.random()*150;
             }
             mid.innerHTML = midHTML;
-            return x; // Retorna o X final
+            return x; 
         }
 
         function startAirTraffic() {
             const air = document.getElementById('air-traffic');
             setInterval(() => {
                 const fCar = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                const posY = 100 + Math.random()*400;
-                fCar.setAttribute("d", "M0 0 L40 0 L50 6 L-10 6 Z"); 
-                fCar.setAttribute("fill", "#00f2ff");
-                fCar.setAttribute("filter", "url(#glow)");
+                const posY = 150 + Math.random()*400;
+                fCar.setAttribute("d", "M0 0 L30 0 L35 5 L-5 5 Z"); 
+                fCar.setAttribute("fill", "var(--neon)");
                 fCar.style.transform = `translate(-100px, ${posY}px)`;
-                fCar.style.transition = "transform 6s linear";
+                fCar.style.transition = "transform 8s linear";
                 air.appendChild(fCar);
-                
-                // Limpa o DOM logo depois
                 setTimeout(() => fCar.style.transform = `translate(6000px, ${posY}px)`, 50);
-                setTimeout(() => fCar.remove(), 6100);
-            }, 3500); // Menos tráfego
+                setTimeout(() => fCar.remove(), 8100);
+            }, 5000);
         }
 
         window.toggleChat = () => {
@@ -362,28 +289,14 @@
         window.toggleZoom = () => {
             isZoomed = !isZoomed;
             const layer = document.getElementById('zoom-layer');
-            const btn = document.querySelector('.zoom-icon');
-            
-            if(isZoomed) {
-                layer.style.transform = "scale(1.0)";
-                btn.innerHTML = "[ - ]";
-            } else {
-                layer.style.transform = "scale(0.7)";
-                btn.innerHTML = "[ + ]";
-            }
+            layer.style.transform = isZoomed ? "scale(1.0)" : "scale(0.7)";
+            document.querySelectorAll('.v-button')[2].innerHTML = isZoomed ? "[ - ]" : "[ + ]";
         }
 
         window.sendMsg = () => {
             const input = document.getElementById('chat-input');
             if(!input.value) return;
-            const fakeUser = "User" + Math.floor(Math.random()*99);
-            
-            document.getElementById('chat-box').innerHTML += `
-                <div class="chat-entry">
-                    <span class="user-name">${fakeUser}:</span>
-                    <span style="color:#fff;">${input.value}</span>
-                </div>`;
-            
+            document.getElementById('chat-box').innerHTML += `<div class="chat-entry"><span class="user-name">User:</span><span>${input.value}</span></div>`;
             input.value = "";
             const box = document.getElementById('chat-box');
             box.scrollTop = box.scrollHeight;
