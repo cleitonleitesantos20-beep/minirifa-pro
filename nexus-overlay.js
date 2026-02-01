@@ -1,5 +1,5 @@
 import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getFirestore, doc, onSnapshot, collection, addDoc, query, orderBy, limit, serverTimestamp, updateDoc, increment, getDocs, where, arrayUnion, setDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getFirestore, doc, onSnapshot, updateDoc, increment } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
 const firebaseConfig = {
@@ -53,29 +53,15 @@ function initOverlay() {
         .emoji-item:hover:not(.locked) { border-color: #00f2ff; }
         .emoji-item.locked { opacity: 0.3; cursor: not-allowed; filter: grayscale(1); }
 
-        .ctrl-group { display: flex; align-items: center; gap: 10px; }
-        .btn-recarga { background: linear-gradient(135deg, #00ff88, #009955); color: #000; border: none; padding: 5px 10px; border-radius: 5px; font-family: 'Orbitron'; font-size: 0.55rem; font-weight: 900; cursor: pointer; }
+        .ctrl-group { display: flex; align-items: center; gap: 8px; }
+        .btn-header { border: none; padding: 5px 8px; border-radius: 5px; font-family: 'Orbitron'; font-size: 0.5rem; font-weight: 900; cursor: pointer; text-transform: uppercase; }
+        .btn-recarga { background: linear-gradient(135deg, #00ff88, #009955); color: #000; }
+        .btn-perfil { background: #222; color: #fff; border: 1px solid #333; }
+        .btn-perfil:hover { background: #00f2ff; color: #000; border-color: #00f2ff; }
+
         .mode-toggle { width: 32px; height: 16px; background: #333; border-radius: 10px; position: relative; cursor: pointer; border: 1px solid #444; }
         .mode-toggle::after { content: '🌙'; position: absolute; left: 2px; top: 1px; font-size: 8px; transition: 0.3s; }
         body.light-mode .mode-toggle::after { content: '☀️'; left: 18px; }
-
-        .nexus-mission-fab { position: fixed; bottom: 15px; left: 15px; width: 45px; height: 45px; background: #00f2ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; z-index: 9999; cursor: pointer; box-shadow: 0 0 10px #00f2ff; color: #000; }
-
-        .mission-panel { position: fixed; bottom: 70px; left: 15px; width: 280px; height: 400px; background: #0a0a0ae6; backdrop-filter: blur(10px); border: 1px solid #00f2ff66; border-radius: 12px; display: none; flex-direction: column; z-index: 10000; color: #fff; }
-        .mission-panel.active { display: flex; }
-        .chat-tabs { display: flex; background: rgba(0,0,0,0.5); border-bottom: 1px solid #333; }
-        .chat-tab { flex: 1; padding: 8px; text-align: center; font-family: 'Orbitron'; font-size: 0.55rem; cursor: pointer; color: #666; }
-        .chat-tab.active-tab { color: #fff; border-bottom: 2px solid #00f2ff; }
-        
-        .nexus-week-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #333; }
-        .week-day { width: 25px; height: 25px; border-radius: 50%; border: 1px solid #444; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; color: #666; }
-        .week-day.today { border-color: #00f2ff; color: #fff; }
-        .week-day.checked { background: #00ff88; color: #000; }
-
-        .mission-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #222; font-size: 0.8rem; }
-        .mission-check { font-size: 0.65rem; color: #00ff88; border: 1px solid #00ff88; padding: 3px 8px; border-radius: 4px; cursor: pointer; transition: 0.3s; }
-        .mission-check.done { border: none; font-size: 1rem; }
-        .mission-check.disabled { border-color: #444; color: #444; cursor: not-allowed; opacity: 0.5; }
     `;
     document.head.appendChild(style);
 
@@ -101,58 +87,20 @@ function initOverlay() {
                 </div>
             </div>
             <div class="ctrl-group">
-                <button class="btn-recarga" onclick="window.location.href='deposito.html'">RECARGA</button>
+                <button class="btn-header btn-perfil" id="btn-goto-perfil">HABITAT</button>
+                <button class="btn-header btn-recarga" onclick="window.location.href='deposito.html'">RECARGA</button>
                 <div class="mode-toggle" id="theme-btn"></div>
             </div>
-        </div>
-        
-        <div class="nexus-mission-fab" id="mission-fab">🎯</div>
-
-        <div class="mission-panel" id="mission-panel">
-            <div style="background:#00f2ff; color:#000; padding:8px; font-family:Orbitron; font-size:0.55rem; display:flex; justify-content:space-between; align-items:center;">
-                <span>CENTRAL DE MISSÕES</span>
-                <span style="cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('mission-panel').classList.remove('active')">×</span>
-            </div>
-            <div class="chat-tabs">
-                <div class="chat-tab active-tab" id="mtab-daily" onclick="switchMissionTab('daily')">DIÁRIAS</div>
-                <div class="chat-tab" id="mtab-monthly" onclick="switchMissionTab('monthly')">MENSAIS</div>
-            </div>
-            <div class="nexus-week-row" id="week-row"></div>
-            <div id="mission-content" style="flex:1; overflow-y:auto;"></div>
         </div>
     `;
     document.body.prepend(ui);
 
-    let userData = {};
-    let currentLvl = 0;
-    let currentMissionTab = 'daily';
     const emojisDisponiveis = ["👤", "🔥", "🐱", "🐶", "🦊", "💎", "⚡", "👑", "🚀", "🎮"];
     const emojisIniciais = ["👤", "🔥", "🐱", "🐶", "🦊"];
-
-    // Lógica de monitoramento de missões em tempo real (Local)
-    let sessionTimer = 0;
-    setInterval(() => {
-        sessionTimer++;
-        // Se ficar 1 minuto (60s) logado, marca internamente que pode resgatar a missão de tempo
-        if(sessionTimer >= 60 && !localStorage.getItem('m_time_ready')) {
-            localStorage.setItem('m_time_ready', 'true');
-            if(document.getElementById('mission-panel').classList.contains('active')) renderMissions(currentMissionTab);
-        }
-    }, 1000);
-
-    // Monitorar se ele está em páginas específicas
-    if(window.location.href.includes('noticias.html')) localStorage.setItem('m_news_ready', 'true');
-    if(window.location.href.includes('games.html')) localStorage.setItem('m_game_ready', 'true');
 
     document.getElementById('theme-btn').onclick = () => {
         document.body.classList.toggle('light-mode');
         localStorage.setItem('nexusTheme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
-    };
-
-    document.getElementById('mission-fab').onclick = () => {
-        const p = document.getElementById('mission-panel');
-        p.classList.toggle('active');
-        if(p.classList.contains('active')) renderMissions(currentMissionTab);
     };
 
     const navAv = document.getElementById('nav-av');
@@ -160,106 +108,20 @@ function initOverlay() {
     navAv.onclick = (e) => { e.stopPropagation(); picker.classList.toggle('active'); };
     document.addEventListener('click', () => picker.classList.remove('active'));
 
-    window.switchMissionTab = (type) => {
-        currentMissionTab = type;
-        document.getElementById('mtab-daily').className = `chat-tab ${type === 'daily' ? 'active-tab' : ''}`;
-        document.getElementById('mtab-monthly').className = `chat-tab ${type === 'monthly' ? 'active-tab' : ''}`;
-        renderMissions(type);
-    };
-
-    window.renderMissions = (type) => {
-        const content = document.getElementById('mission-content');
-        const weekRow = document.getElementById('week-row');
-        content.innerHTML = "";
-        weekRow.innerHTML = "";
-        weekRow.style.display = type === 'daily' ? 'flex' : 'none';
-
-        const now = new Date();
-        const hour = now.getHours();
-        const completedDaily = userData.daily_missions || [];
-        const completedMonthly = userData.monthly_missions || [];
-        
-        if(type === 'daily') {
-            ['D','S','T','Q','Q','S','S'].forEach((d, i) => {
-                const el = document.createElement('div');
-                el.className = `week-day ${i === now.getDay() ? 'today' : ''} ${i === now.getDay() && completedDaily.length > 0 ? 'checked' : ''}`;
-                el.innerText = d;
-                weekRow.appendChild(el);
-            });
-        }
-
-        // Definição das Missões com Gatilhos
-        let missions = type === 'daily' ? [
-            { txt: "Check-in Manhã (07h-18h)", id: 'chk_day', ready: (hour >= 7 && hour < 19) },
-            { txt: "Check-in Noite (19h-06h)", id: 'chk_night', ready: (hour >= 19 || hour < 7) },
-            { txt: "Ficar Online (1 min)", id: 'm_time', ready: localStorage.getItem('m_time_ready') === 'true', xp: 5 },
-            { txt: "Ler Notícias", id: 'm_news', ready: localStorage.getItem('m_news_ready') === 'true', xp: 5 },
-            { txt: "Entrar nos Games", id: 'm_game', ready: localStorage.getItem('m_game_ready') === 'true', xp: 5 }
-        ] : [
-            { txt: "Participar de Drops", id: 'mm_drop', ready: true, xp: 50 },
-            { txt: "Apoiar Campanha Nexus", id: 'mm_camp', ready: true, xp: 100 }
-        ];
-
-        const completedList = type === 'daily' ? completedDaily : completedMonthly;
-
-        missions.forEach((m) => {
-            const isDone = completedList.includes(m.id);
-            const div = document.createElement('div');
-            div.className = "mission-item";
-            
-            let btn;
-            if (isDone) {
-                btn = `<span class="mission-check done">✅</span>`;
-            } else if (m.ready) {
-                btn = `<span class="mission-check" onclick="claimMission('${m.id}', '${type}', ${m.xp || 2})">RESGATAR</span>`;
-            } else {
-                btn = `<span class="mission-check disabled">BLOQUEADO</span>`;
-            }
-
-            div.innerHTML = `<span>${m.txt}</span>${btn}`;
-            content.appendChild(div);
-        });
-    };
-
-    window.claimMission = async (id, type, xpVal) => {
-        try {
-            const field = type === 'daily' ? 'daily_missions' : 'monthly_missions';
-            await updateDoc(doc(db, "usuarios", auth.currentUser.uid), { 
-                xp: increment(xpVal),
-                [field]: arrayUnion(id)
-            });
-            // Limpa o gatilho local após resgatar (opcional, o reset diário do firebase já resolve)
-            localStorage.removeItem(`${id}_ready`);
-        } catch (e) { console.error(e); }
-    };
-
     onAuthStateChanged(auth, user => {
         if (user) {
+            // Configura o link do perfil com o ID do usuário logado
+            document.getElementById('btn-goto-perfil').onclick = () => {
+                window.location.href = `perfil.html?id=${user.uid}`;
+            };
+
             onSnapshot(doc(db, "usuarios", user.uid), async snap => {
                 if(snap.exists()){
                     const d = snap.data();
-                    userData = d;
                     
-                    const now = new Date();
-                    const todayStr = now.toLocaleDateString('pt-BR');
-                    if (d.last_daily_reset !== todayStr) {
-                        await updateDoc(doc(db, "usuarios", user.uid), { last_daily_reset: todayStr, daily_missions: [] });
-                        // Limpa gatilhos locais no novo dia
-                        localStorage.removeItem('m_time_ready');
-                        localStorage.removeItem('m_news_ready');
-                        localStorage.removeItem('m_game_ready');
-                        return;
-                    }
-
                     const xpTotal = d.xp || 0;
                     const level = Math.floor(xpTotal / 1000) + 1;
                     const xpNoNivel = xpTotal % 1000;
-
-                    if(currentLvl !== 0 && level > currentLvl) {
-                        await updateDoc(doc(db, "usuarios", user.uid), { saldo: increment(10) });
-                        alert(`LEVEL UP! Nível ${level} (+10 NP)`);
-                    }
-                    currentLvl = level;
 
                     document.getElementById('nav-name').innerText = (d.nome || "PLAYER").toUpperCase().split(' ')[0];
                     document.getElementById('nav-av').innerText = d.avatarEmoji || "👤";
