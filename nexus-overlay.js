@@ -47,6 +47,7 @@ function initOverlay() {
             position: absolute; top: 80px; left: 10px; background: #0a0a0a; border: 1px solid #333;
             border-radius: 12px; padding: 12px; display: none; grid-template-columns: repeat(5, 1fr);
             gap: 8px; z-index: 10001; box-shadow: 0 10px 30px rgba(0,0,0,0.9); width: 230px;
+            max-height: 300px; overflow-y: auto;
         }
         .emoji-picker.active { display: grid; }
         .emoji-item { width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; background: #151515; border-radius: 8px; cursor: pointer; font-size: 1.2rem; transition: 0.2s; border: 1px solid transparent; }
@@ -87,7 +88,7 @@ function initOverlay() {
                 </div>
             </div>
             <div class="ctrl-group">
-                <button class="btn-header btn-perfil" id="btn-goto-perfil">HABITAT</button>
+                <button class="btn-header btn-perfil" id="btn-goto-perfil">PERFIL</button>
                 <button class="btn-header btn-recarga" onclick="window.location.href='deposito.html'">RECARGA</button>
                 <div class="mode-toggle" id="theme-btn"></div>
             </div>
@@ -95,8 +96,16 @@ function initOverlay() {
     `;
     document.body.prepend(ui);
 
-    const emojisDisponiveis = ["👤", "🔥", "🐱", "🐶", "🦊", "💎", "⚡", "👑", "🚀", "🎮"];
-    const emojisIniciais = ["👤", "🔥", "🐱", "🐶", "🦊"];
+    // Lista ampliada de emojis
+    const emojisDisponiveis = [
+        "👤", "🔥", "🐱", "🐶", "🦊", 
+        "💎", "⚡", "👑", "🚀", "🎮",
+        "🌈", "🌑", "👾", "🤖", "⭐",
+        "🍀", "🐯", "🦁", "🐉", "👻",
+        "🦾", "🕶️", "🎩", "🧿", "🧬"
+    ];
+    // Emojis liberados inicialmente
+    const emojisIniciais = ["👤", "🔥", "🐱", "🐶", "🦊", "💎", "⚡", "🚀"];
 
     document.getElementById('theme-btn').onclick = () => {
         document.body.classList.toggle('light-mode');
@@ -110,7 +119,6 @@ function initOverlay() {
 
     onAuthStateChanged(auth, user => {
         if (user) {
-            // Configura o link do perfil com o ID do usuário logado
             document.getElementById('btn-goto-perfil').onclick = () => {
                 window.location.href = `perfil.html?id=${user.uid}`;
             };
