@@ -29,10 +29,10 @@
 
         svg { display: block; flex-shrink: 0; align-self: flex-end; }
 
-        /* ASTRO (SOL/LUA) */
+        /* AJUSTE DO ASTRO (MAIS BAIXO) */
         #sky-celestial {
             position: fixed;
-            top: 40px;
+            top: 100px; /* Estava 40px, agora 100px */
             right: 40px;
             width: 80px;
             height: 80px;
@@ -46,7 +46,7 @@
 
         #nexus-clock {
             position: fixed;
-            top: 130px;
+            top: 190px; /* Estava 130px, agora 190px para seguir o sol */
             right: 40px;
             font-family: 'Orbitron';
             font-size: 14px;
@@ -172,15 +172,17 @@
         let userLabel = "VISITANTE";
         onAuthStateChanged(auth, (user) => { userLabel = user ? "MORADOR" : "VISITANTE"; });
 
-        function displayMessage(user, text) {
-            const stream = document.getElementById('chat-stream');
-            if(!stream) return;
-            const msg = document.createElement('div');
-            msg.className = 'chat-msg';
-            msg.innerHTML = `<span class="msg-user">[${user}]</span> ${text}`;
-            msg.style.left = (Math.random() * 40) + "px"; 
-            stream.appendChild(msg);
-            setTimeout(() => { if(msg.parentNode) msg.remove(); }, 18000);
+        function displayMessage(user, text, delay = 0) {
+            setTimeout(() => {
+                const stream = document.getElementById('chat-stream');
+                if(!stream) return;
+                const msg = document.createElement('div');
+                msg.className = 'chat-msg';
+                msg.innerHTML = `<span class="msg-user">[${user}]</span> ${text}`;
+                msg.style.left = (Math.random() * 40) + "px"; 
+                stream.appendChild(msg);
+                setTimeout(() => { if(msg.parentNode) msg.remove(); }, 18000);
+            }, delay);
         }
 
         async function sendMessage() {
@@ -201,29 +203,42 @@
         document.getElementById('btn-send-msg').onclick = sendMessage;
         document.getElementById('chat-input').onkeydown = (e) => { if(e.key === 'Enter') sendMessage(); };
 
+        // CORREÇÃO DO CARREGAMENTO INICIAL (SOBREPOSIÇÃO)
         const q = query(collection(db, "chat_messages"), orderBy("createdAt", "desc"), limit(12));
+        let isInitialLoad = true;
+
         onSnapshot(q, (snapshot) => {
-            snapshot.docChanges().forEach((change) => {
-                if (change.type === "added") {
-                    const data = change.doc.data();
-                    displayMessage(data.userName || "NEXUS", data.text);
-                }
-            });
+            const changes = snapshot.docChanges();
+            
+            if (isInitialLoad) {
+                // No primeiro carregamento, aplica um delay crescente para não encavalar
+                changes.reverse().forEach((change, index) => {
+                    if (change.type === "added") {
+                        const data = change.doc.data();
+                        displayMessage(data.userName || "NEXUS", data.text, index * 1000);
+                    }
+                });
+                isInitialLoad = false;
+            } else {
+                // Novas mensagens em tempo real aparecem na hora
+                changes.forEach((change) => {
+                    if (change.type === "added") {
+                        const data = change.doc.data();
+                        displayMessage(data.userName || "NEXUS", data.text, 0);
+                    }
+                });
+            }
         });
 
-        // ACTION GLOBAL PARA JANELAS
         window.windowAction = function(name, id) {
             const t = document.getElementById('mystery-text');
             const now = new Date();
             const hour = now.getHours();
-
-            // Exemplo de lógica para Easter Egg futuro baseado em hora
             if(hour === 3 && id === 7) { 
                 t.innerText = "SISTEMA INSTÁVEL - 03:00 AM";
             } else {
                 t.innerText = `${name} - SETOR ${id}`;
             }
-
             t.style.opacity = "1";
             setTimeout(() => t.style.opacity = "0", 1200);
         };
@@ -238,13 +253,11 @@
             const clock = document.getElementById('nexus-clock');
             const astro = document.getElementById('sky-celestial');
             const now = new Date();
-            
             const h = String(now.getHours()).padStart(2, '0');
             const m = String(now.getMinutes()).padStart(2, '0');
             const s = String(now.getSeconds()).padStart(2, '0');
             clock.innerText = `${h}:${m}:${s}`;
 
-            // Ciclo Dia/Noite (Sol das 06h às 18h)
             const hour = now.getHours();
             if(hour >= 6 && hour < 18) {
                 astro.className = 'sun';
@@ -260,7 +273,6 @@
             renderBuildings();
             updateNexusTime();
             setInterval(updateNexusTime, 1000);
-            
             setTimeout(() => {
                 viewport.scrollLeft = (3000) - (window.innerWidth / 2);
             }, 100);
