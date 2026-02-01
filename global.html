@@ -23,51 +23,20 @@
             height: 100vh; width: 100vw;
         }
 
-        body::before {
-            content: ''; position: absolute;
-            width: 200%; height: 200%;
-            background-image: linear-gradient(var(--grid-color) 1px, transparent 1px), 
-                              linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-            background-size: 50px 50px;
-            z-index: 0; transform: perspective(1000px) rotateX(60deg);
-            bottom: -50%; opacity: 0.15; pointer-events: none;
-        }
-
-        #map-container { position: relative; z-index: 10; width: 100vw; height: 100vh; cursor: grab; }
-        #map-container:active { cursor: grabbing; }
-        svg { width: 100%; height: 100%; }
-
-        /* Linhas do Brasil - Neutras/Escuras como solicitado */
-        .state {
-            fill: #050505; stroke: #222;
-            stroke-width: 0.4px; transition: 0.3s; cursor: pointer;
-        }
-        .state:hover { fill: #111; stroke: #444; }
-        
-        .state-sigla {
-            fill: #444; font-family: 'Orbitron';
-            font-size: 8px; pointer-events: none; text-anchor: middle;
-        }
-
-        #protagonist {
-            position: absolute; width: 18px; height: 18px;
-            background: var(--user-neon-color);
-            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-            filter: drop-shadow(0 0 10px var(--user-neon-color));
-            pointer-events: none; opacity: 0; z-index: 100;
-            transition: left 0.15s ease, top 0.15s ease;
-        }
-
-        /* Menu Lateral - Posicionado para não bater no topo do Overlay */
+        /* Menu Lateral - Ajustado para evitar o topo (nexus-overlay) */
         #sector-menu {
-            position: fixed; top: 80px; right: -330px;
-            width: 300px; height: calc(100vh - 160px); 
+            position: fixed; 
+            top: 15%; /* Começa mais baixo para não bater no overlay superior */
+            right: -330px;
+            width: 300px; 
+            height: 70vh; 
             background: var(--overlay-bg);
             border: 1px solid #222;
             z-index: 9999;
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             padding: 20px;
-            display: flex; flex-direction: column;
+            display: flex; 
+            flex-direction: column;
             box-shadow: -10px 0 30px rgba(0,0,0,0.8);
         }
 
@@ -77,22 +46,19 @@
         .menu-header h2 { font-family: 'Orbitron'; color: #fff; font-size: 0.9rem; letter-spacing: 1px; }
 
         #buildings-grid {
-            display: grid; grid-template-columns: 1fr 1fr;
-            gap: 10px; overflow-y: auto; padding-right: 5px;
+            display: grid; 
+            grid-template-columns: 1fr 1fr;
+            gap: 10px; 
+            overflow-y: auto; 
+            padding-right: 5px;
         }
 
+        /* Estrutura do Prédio - Vista de Cima */
         .building-wrapper {
             display: flex; flex-direction: column; align-items: center; gap: 6px;
             padding: 10px; background: rgba(255,255,255,0.02);
             border: 1px solid rgba(255,255,255,0.05);
             cursor: pointer; transition: 0.2s;
-        }
-
-        .building-wrapper:hover { background: rgba(255,255,255,0.06); }
-
-        .building-name { 
-            font-family: 'Orbitron'; font-size: 7px; color: #fff; 
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: center;
         }
 
         .building-structure {
@@ -107,21 +73,41 @@
             clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
         }
 
+        .building-name { 
+            font-family: 'Orbitron'; font-size: 7px; color: #fff; 
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: center;
+        }
+
         .niche-label { font-size: 6px; font-family: 'Orbitron'; margin-top: 2px; opacity: 0.4; color: #fff; }
 
-        .btn-close {
-            margin-top: 15px; background: transparent; border: 1px solid #333;
-            color: #666; padding: 8px; cursor: pointer;
-            font-family: 'Orbitron'; font-size: 0.5rem;
+        /* Mapa e Elementos Visuais */
+        #map-container { position: relative; z-index: 10; width: 100vw; height: 100vh; }
+        
+        .state {
+            fill: #050505; stroke: #222;
+            stroke-width: 0.5px; transition: 0.3s; cursor: pointer;
+        }
+        .state:hover { fill: #111; }
+        
+        .state-sigla {
+            fill: #444; font-family: 'Orbitron';
+            font-size: 8px; pointer-events: none; text-anchor: middle;
+        }
+
+        #protagonist {
+            position: absolute; width: 18px; height: 18px;
+            background: var(--user-neon-color);
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+            filter: drop-shadow(0 0 10px var(--user-neon-color));
+            pointer-events: none; opacity: 0; z-index: 100;
         }
 
         .btn-exit {
             position: fixed; top: 20px; left: 20px;
             padding: 8px 15px; border: 1px solid #444;
             color: #fff; text-decoration: none; font-family: 'Orbitron'; font-size: 9px;
-            background: rgba(0,0,0,0.8); z-index: 1000; transition: 0.3s;
+            background: rgba(0,0,0,0.8); z-index: 1000;
         }
-        .btn-exit:hover { border-color: var(--user-neon-color); color: var(--user-neon-color); }
     </style>
 </head>
 <body>
@@ -134,7 +120,7 @@
             <p id="connection-count" style="font-size: 7px; opacity: 0.5; margin-top: 4px;">SCANNER ATIVO</p>
         </div>
         <div id="buildings-grid"></div>
-        <button class="btn-close" onclick="closeMenu()">FECHAR SCANNER</button>
+        <button style="margin-top:10px; font-size:10px; background:none; border:1px solid #333; color:#666; padding:5px;" onclick="closeMenu()">FECHAR</button>
     </div>
     
     <div id="map-container">
@@ -157,7 +143,7 @@
         const db = getFirestore(app);
 
         const nicheAssets = {
-            citizen: { label: "CITIZEN", defaultColor: "#555555" },
+            citizen: { label: "CITIZEN" },
             clothes: { label: "APPAREL" },
             shoes: { label: "FOOTWEAR" },
             tech: { label: "ELECTRONICS" },
@@ -170,13 +156,14 @@
         const buildingsGrid = document.getElementById('buildings-grid');
         const protagonist = d3.select("#protagonist");
 
+        // Cor do Protagonista
         const userColor = localStorage.getItem('userNeonColor') || '#00f2ff';
         document.documentElement.style.setProperty('--user-neon-color', userColor);
 
         window.openSector = async (stateName, stateSigla) => {
             const cleanSigla = stateSigla.replace("BR_", "").toUpperCase();
             document.getElementById('sector-title').innerText = `SETOR: ${stateName}`;
-            buildingsGrid.innerHTML = '<p style="font-size:8px;">SCAN...</p>';
+            buildingsGrid.innerHTML = '<p style="font-size:8px;">ESCANEANDO...</p>';
             sectorMenu.classList.add('active');
 
             try {
@@ -188,8 +175,8 @@
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
                     const isCitizen = data.role === 'citizen' || !data.role;
-                    // Lógica de Cor: Se for citizen, cinza. Se for loja, usa a neon dele ou a sua.
-                    const residentColor = isCitizen ? "#555555" : (data.userNeonColor || var(--user-neon-color));
+                    // CORREÇÃO AQUI: Se não for citizen, usa a cor do banco ou a cor do usuário logado
+                    const residentColor = isCitizen ? "#555555" : (data.userNeonColor || userColor);
                     const config = nicheAssets[data.role] || nicheAssets.citizen;
 
                     const wrapper = document.createElement('div');
@@ -198,7 +185,7 @@
 
                     wrapper.innerHTML = `
                         <div class="building-name" style="color: ${residentColor}">${(data.nome || 'NEXUS').toUpperCase()}</div>
-                        <div class="building-structure" style="border-color: ${residentColor}; color: ${residentColor}; ${!isCitizen ? 'box-shadow: 0 0 10px ' + residentColor + '44' : ''}">
+                        <div class="building-structure" style="border-color: ${residentColor}; color: ${residentColor}; ${!isCitizen ? 'box-shadow: inset 0 0 10px ' + residentColor + '33' : ''}">
                             <div class="resident-diamond"></div>
                         </div>
                         <div class="niche-label">${config.label}</div>
@@ -206,17 +193,19 @@
                     buildingsGrid.appendChild(wrapper);
                 });
             } catch (error) {
-                buildingsGrid.innerHTML = '<p style="font-size:8px; color:red;">FAIL</p>';
+                console.error(error);
+                buildingsGrid.innerHTML = '<p style="font-size:8px; color:red;">ERRO DE SINAL</p>';
             }
         };
 
         window.closeMenu = () => sectorMenu.classList.remove('active');
 
+        // Configuração do Mapa D3
         const svg = d3.select("#brazil-map");
         const mapGroup = svg.select("#map-group");
         
-        // Mantendo o zoom próximo (1100)
-        const projection = d3.geoMercator().center([-52, -18]).scale(1100)
+        // Foco aproximado no Brasil
+        const projection = d3.geoMercator().center([-52, -15]).scale(1100)
             .translate([window.innerWidth / 2, window.innerHeight / 2]);
         const pathGenerator = d3.geoPath().projection(projection);
 
@@ -243,15 +232,12 @@
                 .text(d => (d.properties.sigla || d.id).replace("BR_", ""));
         });
 
+        // Zoom interativo
         svg.call(d3.zoom().scaleExtent([1, 15]).on("zoom", (e) => {
             mapGroup.attr("transform", e.transform);
             protagonist.style("opacity", "0");
         }));
 
-        window.addEventListener('resize', () => {
-            projection.translate([window.innerWidth / 2, window.innerHeight / 2]);
-            mapGroup.selectAll("path").attr("d", pathGenerator);
-        });
     </script>
 
     <script type="module" src="nexus-overlay.js"></script>
