@@ -73,22 +73,25 @@
             pointer-events: none;
             opacity: 0;
             z-index: 100;
-            /* Transição suave para seguir o zoom/pan */
             transition: opacity 0.2s;
         }
 
         #state-label {
             position: fixed;
-            top: 30px;
-            left: 50%;
-            transform: translateX(-50%);
+            /* Um pouco mais baixo do topo */
+            top: 60px; 
+            left: 0;
             font-family: 'Orbitron';
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: var(--user-neon-color);
             text-shadow: 0 0 10px var(--user-neon-color);
             pointer-events: none;
             z-index: 20;
             letter-spacing: 3px;
+            text-transform: uppercase;
+            /* Suaviza o movimento de acompanhamento */
+            transition: transform 0.1s ease-out; 
+            white-space: nowrap;
         }
 
         .btn-exit {
@@ -125,9 +128,8 @@
         const svg = d3.select("#brazil-map");
         const mapGroup = d3.select("#map-group");
         const protagonist = d3.select("#protagonist");
-        const label = d3.select("#state-label");
+        const label = document.getElementById('state-label');
 
-        // Configuração da Projeção
         const projection = d3.geoMercator()
             .center([-52, -15]) 
             .scale(700)
@@ -135,15 +137,21 @@
 
         const pathGenerator = d3.geoPath().projection(projection);
 
-        // Função de Zoom e Pan
         const zoom = d3.zoom()
-            .scaleExtent([1, 8]) // Zoom mínimo 1x, máximo 8x
+            .scaleExtent([1, 8])
             .on("zoom", (event) => {
                 mapGroup.attr("transform", event.transform);
-                protagonist.style("opacity", "0"); // Esconde o losango ao mover para evitar delay visual
+                protagonist.style("opacity", "0");
             });
 
         svg.call(zoom);
+
+        // Lógica para o título acompanhar o mouse
+        window.addEventListener('mousemove', (e) => {
+            const x = e.clientX;
+            // Move o label para a posição do mouse (com offset lateral para não ficar embaixo do cursor)
+            label.style.transform = `translate(${x + 20}px, 0)`;
+        });
 
         d3.json("https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson").then(data => {
             
@@ -153,9 +161,8 @@
                 .attr("class", "state")
                 .attr("d", pathGenerator)
                 .on("mouseenter", function(event, d) {
-                    label.text(`SETOR: ${d.properties.name.toUpperCase()}`);
+                    label.innerText = `SETOR: ${d.properties.name}`;
                     
-                    // Cálculo da posição considerando o Zoom atual
                     const centroid = pathGenerator.centroid(d);
                     const transform = d3.zoomTransform(svg.node());
                     const x = transform.applyX(centroid[0]);
@@ -167,7 +174,6 @@
                         .style("top", `${y - 8}px`);
                 })
                 .on("mousemove", function(event, d) {
-                    // Mantém o losango no lugar durante o mousemove
                     const centroid = pathGenerator.centroid(d);
                     const transform = d3.zoomTransform(svg.node());
                     protagonist
@@ -175,7 +181,7 @@
                         .style("top", `${transform.applyY(centroid[1]) - 8}px`);
                 })
                 .on("mouseleave", () => {
-                    label.text("NEXUS SYSTEM ACTIVE");
+                    label.innerText = "NEXUS SYSTEM ACTIVE";
                     protagonist.style("opacity", "0");
                 })
                 .on("click", (event, d) => {
