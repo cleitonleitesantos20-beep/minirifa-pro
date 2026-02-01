@@ -23,7 +23,6 @@
             height: 100vh; width: 100vw;
         }
 
-        /* Grid de fundo */
         body::before {
             content: ''; position: absolute;
             width: 200%; height: 200%;
@@ -38,18 +37,18 @@
         #map-container:active { cursor: grabbing; }
         svg { width: 100%; height: 100%; }
 
+        /* Linhas do Brasil - Neutras/Escuras como solicitado */
         .state {
-            fill: #0a0a0a; stroke: var(--user-neon-color);
-            stroke-width: 0.6px; transition: 0.3s; cursor: pointer;
+            fill: #050505; stroke: #222;
+            stroke-width: 0.4px; transition: 0.3s; cursor: pointer;
         }
-        .state:hover { fill: var(--user-neon-color); fill-opacity: 0.25; }
+        .state:hover { fill: #111; stroke: #444; }
         
         .state-sigla {
-            fill: var(--user-neon-color); font-family: 'Orbitron';
-            font-size: 9px; pointer-events: none; text-anchor: middle; opacity: 0.7;
+            fill: #444; font-family: 'Orbitron';
+            font-size: 8px; pointer-events: none; text-anchor: middle;
         }
 
-        /* Protagonista Losango */
         #protagonist {
             position: absolute; width: 18px; height: 18px;
             background: var(--user-neon-color);
@@ -59,90 +58,83 @@
             transition: left 0.15s ease, top 0.15s ease;
         }
 
-        /* Menu Lateral Compacto para não conflitar com Overlay */
+        /* Menu Lateral - Posicionado para não bater no topo do Overlay */
         #sector-menu {
-            position: fixed; top: 10px; right: -330px;
-            width: 300px; height: calc(100vh - 80px); /* Deixa espaço para o overlay embaixo */
+            position: fixed; top: 80px; right: -330px;
+            width: 300px; height: calc(100vh - 160px); 
             background: var(--overlay-bg);
-            border: 1px solid var(--user-neon-color);
+            border: 1px solid #222;
             z-index: 9999;
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             padding: 20px;
             display: flex; flex-direction: column;
             box-shadow: -10px 0 30px rgba(0,0,0,0.8);
-            border-radius: 4px 0 0 4px;
         }
 
-        #sector-menu.active { transform: translateX(-330px); }
+        #sector-menu.active { transform: translateX(-330px); border-color: var(--user-neon-color); }
 
-        .menu-header { border-bottom: 1px solid rgba(0, 242, 255, 0.3); margin-bottom: 15px; padding-bottom: 10px; }
-        .menu-header h2 { font-family: 'Orbitron'; color: var(--user-neon-color); font-size: 1rem; letter-spacing: 1px; }
+        .menu-header { border-bottom: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 15px; padding-bottom: 10px; }
+        .menu-header h2 { font-family: 'Orbitron'; color: #fff; font-size: 0.9rem; letter-spacing: 1px; }
 
         #buildings-grid {
             display: grid; grid-template-columns: 1fr 1fr;
             gap: 10px; overflow-y: auto; padding-right: 5px;
         }
 
-        /* Estrutura do Prédio - Vista Superior Compacta */
         .building-wrapper {
             display: flex; flex-direction: column; align-items: center; gap: 6px;
-            padding: 10px; background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
+            padding: 10px; background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
             cursor: pointer; transition: 0.2s;
         }
 
-        .building-wrapper:hover {
-            background: rgba(255,255,255,0.08);
-            transform: scale(1.02);
-        }
+        .building-wrapper:hover { background: rgba(255,255,255,0.06); }
 
         .building-name { 
-            font-family: 'Orbitron'; font-size: 8px; color: #fff; 
+            font-family: 'Orbitron'; font-size: 7px; color: #fff; 
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: center;
         }
 
         .building-structure {
-            width: 50px; height: 50px; border: 2px solid;
+            width: 45px; height: 45px; border: 2px solid;
             display: flex; align-items: center; justify-content: center;
             position: relative; background: rgba(0,0,0,0.4);
         }
 
-        /* O Habitante dentro do prédio (Losango miniatura) */
         .resident-diamond {
-            width: 14px; height: 14px;
+            width: 12px; height: 12px;
             background: currentColor;
             clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-            filter: drop-shadow(0 0 5px currentColor);
         }
 
-        .niche-label { font-size: 6px; font-family: 'Orbitron'; margin-top: 2px; opacity: 0.6; }
+        .niche-label { font-size: 6px; font-family: 'Orbitron'; margin-top: 2px; opacity: 0.4; color: #fff; }
 
         .btn-close {
-            margin-top: 15px; background: transparent; border: 1px solid #444;
-            color: #888; padding: 10px; cursor: pointer;
-            font-family: 'Orbitron'; font-size: 0.55rem; transition: 0.3s;
+            margin-top: 15px; background: transparent; border: 1px solid #333;
+            color: #666; padding: 8px; cursor: pointer;
+            font-family: 'Orbitron'; font-size: 0.5rem;
         }
-        .btn-close:hover { border-color: var(--user-neon-color); color: var(--user-neon-color); }
 
         .btn-exit {
-            position: fixed; bottom: 20px; left: 20px;
-            padding: 8px 15px; border: 1px solid #ff0055;
-            color: #ff0055; text-decoration: none; font-family: 'Orbitron'; font-size: 9px;
-            background: rgba(0,0,0,0.8); z-index: 1000;
+            position: fixed; top: 20px; left: 20px;
+            padding: 8px 15px; border: 1px solid #444;
+            color: #fff; text-decoration: none; font-family: 'Orbitron'; font-size: 9px;
+            background: rgba(0,0,0,0.8); z-index: 1000; transition: 0.3s;
         }
+        .btn-exit:hover { border-color: var(--user-neon-color); color: var(--user-neon-color); }
     </style>
 </head>
 <body>
 
-    <a href="dashboard.html" class="btn-exit">VOLTAR</a>
+    <a href="index.html" class="btn-exit">VOLTAR</a>
 
     <div id="sector-menu">
         <div class="menu-header">
             <h2 id="sector-title">SETOR: --</h2>
-            <p id="connection-count" style="font-size: 8px; opacity: 0.5; margin-top: 4px;">SCANNER ATIVO</p>
+            <p id="connection-count" style="font-size: 7px; opacity: 0.5; margin-top: 4px;">SCANNER ATIVO</p>
         </div>
         <div id="buildings-grid"></div>
-        <button class="btn-close" onclick="closeMenu()">DESCONECTAR</button>
+        <button class="btn-close" onclick="closeMenu()">FECHAR SCANNER</button>
     </div>
     
     <div id="map-container">
@@ -165,7 +157,7 @@
         const db = getFirestore(app);
 
         const nicheAssets = {
-            citizen: { label: "CITIZEN" },
+            citizen: { label: "CITIZEN", defaultColor: "#555555" },
             clothes: { label: "APPAREL" },
             shoes: { label: "FOOTWEAR" },
             tech: { label: "ELECTRONICS" },
@@ -184,29 +176,29 @@
         window.openSector = async (stateName, stateSigla) => {
             const cleanSigla = stateSigla.replace("BR_", "").toUpperCase();
             document.getElementById('sector-title').innerText = `SETOR: ${stateName}`;
-            buildingsGrid.innerHTML = '<p style="font-size:8px; grid-column: 1/-1;">ESCANEANDO...</p>';
+            buildingsGrid.innerHTML = '<p style="font-size:8px;">SCAN...</p>';
             sectorMenu.classList.add('active');
 
             try {
                 const q = query(collection(db, "usuarios"), where("estado", "==", cleanSigla));
                 const querySnapshot = await getDocs(q);
-                
                 buildingsGrid.innerHTML = '';
-                document.getElementById('connection-count').innerText = `${querySnapshot.size} HABITATS DETECTADOS`;
+                document.getElementById('connection-count').innerText = `${querySnapshot.size} HABITATS`;
 
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
+                    const isCitizen = data.role === 'citizen' || !data.role;
+                    // Lógica de Cor: Se for citizen, cinza. Se for loja, usa a neon dele ou a sua.
+                    const residentColor = isCitizen ? "#555555" : (data.userNeonColor || var(--user-neon-color));
                     const config = nicheAssets[data.role] || nicheAssets.citizen;
-                    // Cor do nicho/perfil define a borda e o losango interno
-                    const residentColor = data.userNeonColor || '#ffffff';
-                    
+
                     const wrapper = document.createElement('div');
                     wrapper.className = 'building-wrapper';
                     wrapper.onclick = () => window.location.href = `perfil.html?id=${doc.id}`;
 
                     wrapper.innerHTML = `
                         <div class="building-name" style="color: ${residentColor}">${(data.nome || 'NEXUS').toUpperCase()}</div>
-                        <div class="building-structure" style="border-color: ${residentColor}; color: ${residentColor};">
+                        <div class="building-structure" style="border-color: ${residentColor}; color: ${residentColor}; ${!isCitizen ? 'box-shadow: 0 0 10px ' + residentColor + '44' : ''}">
                             <div class="resident-diamond"></div>
                         </div>
                         <div class="niche-label">${config.label}</div>
@@ -214,7 +206,7 @@
                     buildingsGrid.appendChild(wrapper);
                 });
             } catch (error) {
-                buildingsGrid.innerHTML = '<p style="color:red; font-size:8px;">ERRO</p>';
+                buildingsGrid.innerHTML = '<p style="font-size:8px; color:red;">FAIL</p>';
             }
         };
 
@@ -223,8 +215,8 @@
         const svg = d3.select("#brazil-map");
         const mapGroup = svg.select("#map-group");
         
-        // ZOOM APROXIMADO: Scale em 1100 para o Brasil ficar bem grande e próximo
-        const projection = d3.geoMercator().center([-52, -15]).scale(1100)
+        // Mantendo o zoom próximo (1100)
+        const projection = d3.geoMercator().center([-52, -18]).scale(1100)
             .translate([window.innerWidth / 2, window.innerHeight / 2]);
         const pathGenerator = d3.geoPath().projection(projection);
 
