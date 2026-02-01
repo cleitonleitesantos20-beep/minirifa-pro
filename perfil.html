@@ -40,6 +40,7 @@
             width: 55px; height: 55px; z-index: 10; margin-bottom: 25px;
             background: var(--identity-color); box-shadow: 0 0 35px var(--identity-color);
             border-radius: 10px; animation: float 4s ease-in-out infinite;
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); /* Protagonista Losango */
         }
         .rainbow-mode {
             background: linear-gradient(45deg, #ff0000, #ff00ff, #0000ff, #00ffff, #00ff00, #ffff00, #ff0000);
@@ -50,12 +51,12 @@
 
         .building-asset {
             width: 90px; background: #080808; 
-            border: 2px solid var(--accent-color); /* Contorno da cor do nicho */
+            border: 2px solid var(--accent-color); 
             border-bottom: none; display: flex; flex-wrap: wrap; padding: 8px; gap: 4px; 
             box-shadow: inset 0 0 15px #000, 0 0 15px var(--accent-color); 
             transition: 0.8s; cursor: pointer; position: relative;
         }
-        /* Portinha do Prédio */
+        
         .building-door {
             position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
             width: 20px; height: 25px; background: #111;
@@ -96,7 +97,7 @@
     <script type="module" src="nexus-overlay.js"></script>
 
     <nav class="top-nav">
-        <a href="index.html" class="btn-back"> VOLTAR</a>
+        <a href="dashboard.html" class="btn-back"> VOLTAR</a>
         <div id="user-balance" style="color:var(--gold); font-family:Orbitron; font-size:0.7rem;">0.00 NP</div>
     </nav>
 
@@ -222,16 +223,24 @@
         async function executeUpdate() {
             if(!auth.currentUser) return;
             const userRef = doc(db, "usuarios", auth.currentUser.uid);
+            
+            // Define a cor de néon para o Global Map baseada no gênero escolhido
+            let neonColor = genders[currentGender].color;
+            if(neonColor === 'rainbow') neonColor = '#ffffff'; // Cor padrão para o mapa se for arco-íris
+            
             try {
                 await updateDoc(userRef, {
                     role: currentRole,
                     gender: currentGender,
+                    userNeonColor: neonColor, // Salva para o Global Map usar
                     temComercio: currentRole !== 'citizen',
                     cidade: document.getElementById('input-city').value,
-                    estado: document.getElementById('input-state').value,
+                    estado: document.getElementById('input-state').value, // Salva a sigla (ex: SP)
                     bio: document.getElementById('input-bio').value,
                     linkLoja: document.getElementById('input-link').value
                 });
+                // Sincroniza localmente para o mapa carregar rápido
+                localStorage.setItem('userNeonColor', neonColor);
             } catch (e) { console.error(e); }
         }
 
@@ -260,14 +269,23 @@
             document.getElementById('display-state').innerText = data.estado || "ESTADO";
             document.getElementById('info-id').innerText = `#${targetID.substring(0, 5).toUpperCase()}`;
             document.getElementById('info-xp').innerText = data.xp || 0;
+            
             const level = Math.floor((data.xp || 0) / 1000) + 1;
             document.getElementById('info-lvl').innerText = level;
             document.getElementById('info-bio').innerText = data.bio || "Nenhuma bio definida.";
             document.getElementById('user-balance').innerText = `${(data.saldo || 0).toFixed(2)} NP`;
 
+            // Preenche inputs do modal se for o dono
+            if(isOwner) {
+                document.getElementById('input-city').value = data.cidade || "";
+                document.getElementById('input-state').value = data.estado || "";
+                document.getElementById('input-bio').value = data.bio || "";
+                document.getElementById('input-link').value = data.linkLoja || "";
+            }
+
             const b = document.getElementById('user-building');
             b.style.height = (70 + (level * 18)) + "px";
-            b.innerHTML = '<div class="building-door"></div>'; // Recria a portinha
+            b.innerHTML = '<div class="building-door"></div>'; 
             for(let i=0; i < (level * 3); i++){
                 const w = document.createElement('div');
                 w.className = "window active-win";
