@@ -30,7 +30,18 @@
         .building-base { fill: #000; stroke: var(--neon); stroke-width: 2.2; }
         .antenna { stroke: var(--neon); stroke-width: 1; opacity: 0.7; }
         
-        /* ANIMAÇÕES DOS NPCS */
+        /* ESTILO JANELAS */
+        .window-btn { 
+            cursor: pointer; fill: #000; 
+            animation: blink var(--dur) infinite alternate;
+            animation-delay: var(--delay);
+            stroke: var(--neon); stroke-width: 0.8;
+            transition: 0.2s;
+        }
+        .window-btn:hover { fill: var(--neon); filter: brightness(1.5); }
+        @keyframes blink { 0% { opacity: 0.3; } 100% { opacity: 1; fill: var(--neon); } }
+
+        /* NPCs LOSANGOS */
         .npc-diamond { 
             filter: drop-shadow(0 0 8px currentColor);
             opacity: 0.9;
@@ -38,36 +49,38 @@
             transform-origin: center;
         }
 
-        /* Movimento Linear Padrão */
         @keyframes moveNPC {
             from { transform: translateX(-500px) rotate(45deg); }
             to { transform: translateX(6500px) rotate(45deg); }
         }
 
-        /* Movimento em ZigZag (Ondulado) */
         @keyframes zigzagNPC {
             0% { transform: translateX(-500px) translateY(0) rotate(45deg); }
-            25% { transform: translateX(1250px) translateY(-50px) rotate(45deg); }
+            25% { transform: translateX(1250px) translateY(-60px) rotate(45deg); }
             50% { transform: translateX(3000px) translateY(0) rotate(45deg); }
-            75% { transform: translateX(4750px) translateY(-50px) rotate(45deg); }
+            75% { transform: translateX(4750px) translateY(-60px) rotate(45deg); }
             100% { transform: translateX(6500px) translateY(0) rotate(45deg); }
         }
 
         .anim-linear { animation: moveNPC var(--spd) linear infinite; }
         .anim-zigzag { animation: zigzagNPC var(--spd) ease-in-out infinite; }
 
-        /* Estilos UI e Chat */
+        /* UI E CHAT */
         .ui-overlay { position: fixed; bottom: 20px; left: 0; width: 100%; display: flex; justify-content: center; align-items: center; gap: 15px; padding: 0 20px; z-index: 9999; pointer-events: none; }
         .ui-element { pointer-events: all; display: flex; gap: 10px; align-items: center; }
         .btn-exit { padding: 8px 15px; background: transparent; border: 1px solid rgba(255, 0, 85, 0.4); color: var(--pink); font-family: 'Orbitron'; font-size: 10px; cursor: pointer; transition: 0.3s; }
         .chat-input-bar { background: rgba(0, 0, 0, 0.8); border: 1px solid var(--neon); padding: 5px; width: 400px; max-width: 60vw; }
         #chat-input { flex: 1; background: transparent; border: none; padding: 5px 10px; color: #fff; font-family: 'Rajdhani'; outline: none; width: 100%; }
         .btn-send { background: var(--neon); border: none; padding: 5px 15px; cursor: pointer; color: #000; font-weight: bold; }
+        
         #chat-stream { position: fixed; top: 0; left: 20px; width: 400px; height: calc(100vh - 80px); pointer-events: none; overflow: hidden; }
         .chat-msg { position: absolute; left: 0; top: -60px; color: var(--neon); font-family: 'Rajdhani'; font-weight: bold; text-shadow: 0 0 8px #000; font-size: 1.1rem; animation: fallDown 12s linear forwards; white-space: nowrap; }
         .msg-user { color: var(--pink); margin-right: 5px; }
 
         @keyframes fallDown { 0% { transform: translateY(0); opacity: 0; } 5% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(100vh); opacity: 0; } }
+        
+        .door-btn { fill: none; stroke: var(--pink); stroke-width: 3; cursor: pointer; transition: 0.3s; }
+        .label-inside { font-family: 'Orbitron'; font-size: 13px; fill: var(--neon); pointer-events: none; letter-spacing: 2px; font-weight: bold; text-transform: uppercase; opacity: 0.8; }
         .mystery-toast { position: fixed; top: 20%; left: 50%; transform: translateX(-50%); font-family: 'Orbitron'; font-size: 1.5rem; color: var(--neon); text-shadow: 0 0 15px var(--neon); opacity: 0; transition: 0.4s; z-index: 2000; pointer-events: none; }
     </style>
 </head>
@@ -93,17 +106,15 @@
             <defs>
                 <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/></filter>
             </defs>
-            
             <g id="stars-layer"></g>
             <g id="buildings-container"></g>
             <rect x="0" y="900" width="6000" height="3" fill="var(--neon)" filter="url(#glow)" />
 
             <g id="npc-layer">
-                <rect class="npc-diamond anim-zigzag" x="0" y="250" width="18" height="18" fill="var(--neon)" style="--spd: 35s; color: var(--neon);" />
-                <rect class="npc-diamond anim-zigzag" x="0" y="450" width="15" height="15" fill="var(--purple)" style="--spd: 25s; color: var(--purple); animation-delay: -5s;" />
-                
-                <rect class="npc-diamond anim-linear" x="0" y="885" width="12" height="12" fill="var(--yellow)" style="--spd: 50s; color: var(--yellow);" />
-                <rect class="npc-diamond anim-linear" x="0" y="890" width="10" height="10" fill="var(--pink)" style="--spd: 80s; color: var(--pink); animation-delay: -10s;" />
+                <rect class="npc-diamond anim-zigzag" x="0" y="250" width="18" height="18" fill="var(--neon)" style="--spd: 30s; color: var(--neon);" />
+                <rect class="npc-diamond anim-zigzag" x="0" y="400" width="15" height="15" fill="var(--purple)" style="--spd: 20s; color: var(--purple); animation-delay: -5s;" />
+                <rect class="npc-diamond anim-linear" x="0" y="885" width="12" height="12" fill="var(--yellow)" style="--spd: 45s; color: var(--yellow);" />
+                <rect class="npc-diamond anim-linear" x="0" y="890" width="10" height="10" fill="var(--pink)" style="--spd: 70s; color: var(--pink); animation-delay: -8s;" />
             </g>
         </svg>
     </div>
@@ -126,7 +137,7 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        const sendMessage = async () => {
+        async function sendMessage() {
             const input = document.getElementById('chat-input');
             const text = input.value.trim();
             if (!text) return;
@@ -142,24 +153,12 @@
                 });
                 input.value = "";
             } catch (e) {
-                console.error("Erro Firebase:", e);
-                alert("ERRO AO ENVIAR. VERIFIQUE CONEXÃO.");
+                console.error("Erro:", e);
             }
-        };
+        }
 
-        // Vincula a função ao clique do botão
-        document.getElementById('btn-send-msg').addEventListener('click', (e) => {
-            e.preventDefault();
-            sendMessage();
-        });
-
-        // Vincula ao Enter
-        document.getElementById('chat-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                sendMessage();
-            }
-        });
+        document.getElementById('btn-send-msg').onclick = (e) => { e.preventDefault(); sendMessage(); };
+        document.getElementById('chat-input').onkeydown = (e) => { if(e.key === 'Enter') { e.preventDefault(); sendMessage(); } };
 
         const q = query(collection(db, "chat_messages"), orderBy("createdAt", "desc"), limit(12));
         onSnapshot(q, (snapshot) => {
@@ -184,7 +183,6 @@
     </script>
 
     <script>
-        // Funções de Renderização da Cidade
         const viewport = document.getElementById('city-viewport');
         const bContainer = document.getElementById('buildings-container');
         const buildingNames = ["NEXUS", "TORRES", "NEMIS", "TITAN", "HOROS", "FÊNIX", "IRIIS", "PIRID"];
@@ -225,10 +223,27 @@
                 const h = 450 + Math.random() * 250; 
                 const y = floorY - h;
                 const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+
+                let windowsHtml = '';
+                const cols = 4;
+                const rows = 6;
+                let winId = 1;
+                for(let r=0; r<rows; r++) {
+                    for(let c=0; c<cols; c++) {
+                        const winX = xPos + (c + 1) * (w / (cols + 1)) - 10;
+                        const winY = y + 80 + (r * (h / (rows + 1)));
+                        if (winY < (floorY - 80)) {
+                            const currentId = winId++;
+                            windowsHtml += `<rect x="${winX}" y="${winY}" width="18" height="18" class="window-btn" style="--dur:${1+Math.random()*2}s; --delay:${Math.random()*3}s" onclick="windowAction('${name}', ${currentId})" />`;
+                        }
+                    }
+                }
+
                 group.innerHTML = `
                     <line x1="${xPos + 50}" y1="${y}" x2="${xPos + 50}" y2="${y - 60}" class="antenna" />
                     <rect x="${xPos}" y="${y}" width="${w}" height="${h}" class="building-base" />
                     <text x="${xPos + w/2}" y="${y + 35}" class="label-inside" text-anchor="middle">${name}</text>
+                    ${windowsHtml}
                     <rect x="${xPos + w/2 - 30}" y="${floorY - 60}" width="60" height="60" class="door-btn" onclick="windowAction('${name}', 'PORTARIA')" />
                 `;
                 bContainer.appendChild(group);
