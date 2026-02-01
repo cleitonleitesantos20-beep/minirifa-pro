@@ -5,13 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>NexusVL - Global Map</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --user-neon-color: #00f2ff;
             --bg-dark: #000000;
             --grid-color: rgba(0, 242, 255, 0.05);
-            --overlay-bg: rgba(0, 0, 0, 0.95);
+            --overlay-bg: rgba(0, 0, 0, 0.98);
+            
+            /* Cores por Nicho */
+            --color-calcados: #ff00ff;
+            --color-roupas: #00ff41;
+            --color-joias: #ffd700;
+            --color-cidadao: #00f2ff;
+            --color-geral: #ffffff;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -21,21 +28,17 @@
             font-family: 'Rajdhani', sans-serif;
             overflow: hidden;
             height: 100vh; width: 100vw;
-            display: flex; align-items: center; justify-content: center;
         }
 
-        /* Grid de Fundo */
+        /* Fundo Grid */
         body::before {
-            content: '';
-            position: absolute;
+            content: ''; position: absolute;
             width: 200%; height: 200%;
             background-image: linear-gradient(var(--grid-color) 1px, transparent 1px), 
                               linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
             background-size: 50px 50px;
-            z-index: 0;
-            transform: perspective(1000px) rotateX(60deg);
-            bottom: -50%;
-            opacity: 0.2;
+            z-index: 0; transform: perspective(1000px) rotateX(60deg);
+            bottom: -50%; opacity: 0.2; pointer-events: none;
         }
 
         #map-container { position: relative; z-index: 10; width: 100vw; height: 100vh; cursor: grab; }
@@ -43,94 +46,76 @@
         svg { width: 100%; height: 100%; }
 
         .state {
-            fill: #0a0a0a;
-            stroke: var(--user-neon-color);
-            stroke-width: 0.5px;
-            transition: fill 0.3s;
-            cursor: pointer;
+            fill: #0a0a0a; stroke: var(--user-neon-color);
+            stroke-width: 0.5px; transition: 0.3s; cursor: pointer;
         }
         .state:hover { fill: var(--user-neon-color); fill-opacity: 0.2; }
-
         .state-sigla {
-            fill: var(--user-neon-color);
-            font-family: 'Orbitron';
-            font-size: 10px;
-            pointer-events: none;
-            text-anchor: middle;
-            opacity: 0.6;
+            fill: var(--user-neon-color); font-family: 'Orbitron';
+            font-size: 10px; pointer-events: none; text-anchor: middle; opacity: 0.6;
         }
 
         #protagonist {
-            position: absolute;
-            width: 16px; height: 16px;
+            position: absolute; width: 16px; height: 16px;
             background: var(--user-neon-color);
             clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
             filter: drop-shadow(0 0 10px var(--user-neon-color));
-            pointer-events: none;
-            opacity: 0;
-            z-index: 100;
+            pointer-events: none; opacity: 0; z-index: 100;
         }
 
-        /* MENU DE SETOR (PRÉDIOS) */
+        /* MENU DE SETOR */
         #sector-menu {
-            position: fixed;
-            top: 0; right: -100%;
-            width: 400px; height: 100vh;
+            position: fixed; top: 0; right: -100%;
+            width: 450px; height: 100vh;
             background: var(--overlay-bg);
             border-left: 2px solid var(--user-neon-color);
-            z-index: 2000;
-            transition: 0.5s cubic-bezier(0.19, 1, 0.22, 1);
-            padding: 40px;
-            display: flex; flex-direction: column;
-            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+            z-index: 2000; transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            padding: 30px; display: flex; flex-direction: column;
+            box-shadow: -20px 0 50px rgba(0,0,0,0.9);
         }
         #sector-menu.active { right: 0; }
 
-        .menu-header {
-            border-bottom: 1px solid var(--user-neon-color);
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-        }
-        .menu-header h2 { font-family: 'Orbitron'; color: var(--user-neon-color); font-size: 1.5rem; }
+        .menu-header { border-bottom: 1px solid var(--user-neon-color); margin-bottom: 25px; padding-bottom: 10px; }
+        .menu-header h2 { font-family: 'Orbitron'; color: var(--user-neon-color); text-transform: uppercase; }
 
-        /* Grid de Prédios (Vista Superior) */
+        /* GRID DE PRÉDIOS */
         #buildings-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-            gap: 15px;
-            overflow-y: auto;
-            padding: 10px;
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 20px; overflow-y: auto; padding: 10px;
         }
 
-        .building {
-            width: 60px; height: 60px;
-            background: #111;
-            border: 2px solid;
-            position: relative;
-            cursor: pointer;
-            transition: 0.3s;
-            display: flex; align-items: center; justify-content: center;
-            font-family: 'Orbitron'; font-size: 10px;
+        .building-wrapper {
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            text-align: center; cursor: pointer; transition: 0.3s;
         }
-        .building:hover {
-            transform: scale(1.1);
-            filter: brightness(1.3) drop-shadow(0 0 10px currentColor);
+
+        .building-name {
+            font-family: 'Orbitron'; font-size: 9px; 
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            width: 100%; color: #aaa; text-transform: uppercase;
         }
-        /* Efeito de profundidade vista de cima */
-        .building::after {
-            content: '';
-            position: absolute;
-            width: 70%; height: 70%;
-            border: 1px solid rgba(255,255,255,0.1);
+
+        .building-structure {
+            width: 80px; height: 80px; background: #050505;
+            border: 2px solid; position: relative;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
         }
+
+        .building-wrapper:hover .building-structure {
+            transform: translateY(-5px);
+            filter: brightness(1.2) drop-shadow(0 5px 15px currentColor);
+        }
+
+        .niche-icon { font-size: 1.5rem; filter: drop-shadow(0 0 5px currentColor); }
+        .niche-label { font-size: 8px; font-weight: bold; margin-top: 4px; }
 
         .btn-close {
-            margin-top: auto;
-            background: none; border: 1px solid #fff;
-            color: #fff; padding: 10px; cursor: pointer;
-            font-family: 'Orbitron'; transition: 0.3s;
+            margin-top: 20px; background: none; border: 1px solid var(--user-neon-color);
+            color: var(--user-neon-color); padding: 12px; cursor: pointer;
+            font-family: 'Orbitron'; text-transform: uppercase;
         }
-        .btn-close:hover { background: #fff; color: #000; }
+        .btn-close:hover { background: var(--user-neon-color); color: #000; }
 
         .btn-exit {
             position: fixed; bottom: 30px; left: 30px;
@@ -148,23 +133,33 @@
     <div id="sector-menu">
         <div class="menu-header">
             <h2 id="sector-title">SETOR: --</h2>
-            <p style="font-size: 12px; opacity: 0.6;">CONEXÕES DETECTADAS NO MAPA</p>
+            <p id="connection-count" style="font-size: 11px; opacity: 0.5;">0 CONEXÕES ATIVAS</p>
         </div>
-        <div id="buildings-grid">
-            </div>
-        <button class="btn-close" onclick="closeMenu()">FECHAR SCANNER</button>
+        <div id="buildings-grid"></div>
+        <button class="btn-close" onclick="closeMenu()">DESCONECTAR SCANNER</button>
     </div>
     
     <div id="map-container">
         <div id="protagonist"></div>
-        <svg id="brazil-map">
-            <g id="map-group"></g>
-        </svg>
+        <svg id="brazil-map"><g id="map-group"></g></svg>
     </div>
 
     <script type="module">
-        const userColor = localStorage.getItem('userNeonColor') || '#00f2ff';
-        document.documentElement.style.setProperty('--user-neon-color', userColor);
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // CONFIGURAÇÃO DO SEU FIREBASE (Preencher com seus dados)
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY",
+            authDomain: "SEU_PROJETO.firebaseapp.com",
+            projectId: "SEU_PROJETO",
+            storageBucket: "SEU_PROJETO.appspot.com",
+            messagingSenderId: "ID",
+            appId: "APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
         const svg = d3.select("#brazil-map");
         const mapGroup = d3.select("#map-group");
@@ -172,98 +167,96 @@
         const sectorMenu = document.getElementById('sector-menu');
         const buildingsGrid = document.getElementById('buildings-grid');
 
+        const userColor = localStorage.getItem('userNeonColor') || '#00f2ff';
+        document.documentElement.style.setProperty('--user-neon-color', userColor);
+
+        // Lógica de Cores e Ícones por Nicho
+        const nicheConfig = {
+            "Calcados": { color: "#ff00ff", icon: "👟", label: "FOOTWEAR" },
+            "Roupas": { color: "#00ff41", icon: "👕", label: "APPAREL" },
+            "Joias": { color: "#ffd700", icon: "💎", label: "JEWELRY" },
+            "Cidadao": { color: "#00f2ff", icon: "👤", label: "CITIZEN" }
+        };
+
         const projection = d3.geoMercator()
-            .center([-52, -15]) 
-            .scale(700)
+            .center([-52, -15]).scale(700)
             .translate([window.innerWidth / 2, window.innerHeight / 2]);
 
         const pathGenerator = d3.geoPath().projection(projection);
 
-        const zoom = d3.zoom()
-            .scaleExtent([1, 15])
-            .on("zoom", (event) => {
-                mapGroup.attr("transform", event.transform);
-                protagonist.style("opacity", "0");
-                mapGroup.selectAll(".state-sigla")
-                    .style("font-size", `${10 / Math.sqrt(event.transform.k)}px`);
-            });
-
-        svg.call(zoom);
-
-        // Simulação de dados de usuários integrados
-        const mockUsers = [
-            { name: "Alpha", type: "comerciante", color: "#ff0055", state: "SP" },
-            { name: "Beta", type: "cidadao", color: "#00f2ff", state: "SP" },
-            { name: "Nexus", type: "comerciante", color: "#ccff00", state: "RJ" },
-            { name: "Zero", type: "cidadao", color: "#7000ff", state: "SP" },
-            { name: "Oasis", type: "comerciante", color: "#00ff41", state: "MG" }
-        ];
-
-        window.openSector = (stateName, stateId) => {
+        window.openSector = async (stateName, stateId) => {
             document.getElementById('sector-title').innerText = `SETOR: ${stateName}`;
-            buildingsGrid.innerHTML = ''; // Limpa grid
-            
-            // Filtra usuários do estado ou gera aleatórios para demonstração
-            const stateUsers = mockUsers.filter(u => u.state === stateId);
-            
-            // Se não houver usuários, gera alguns aleatórios para ver o efeito
-            const displayList = stateUsers.length > 0 ? stateUsers : Array.from({length: 12}, (_, i) => ({
-                name: `ID-${i}`,
-                color: i % 3 === 0 ? "#ff0055" : userColor,
-                type: i % 3 === 0 ? "comerciante" : "cidadao"
-            }));
-
-            displayList.forEach(user => {
-                const b = document.createElement('div');
-                b.className = 'building';
-                b.style.borderColor = user.color;
-                b.style.color = user.color;
-                b.innerText = user.type === 'comerciante' ? 'COM' : 'CID';
-                b.onclick = () => window.location.href = `perfil.html?user=${user.name}&view=visitor`;
-                buildingsGrid.appendChild(b);
-            });
-
+            buildingsGrid.innerHTML = '<p style="font-size:12px; grid-column: 1/-1;">ESCANEANDO BANCO DE DADOS...</p>';
             sectorMenu.classList.add('active');
+
+            try {
+                // BUSCA REAL NO FIREBASE
+                const q = query(collection(db, "users"), where("estado", "==", stateId));
+                const querySnapshot = await getDocs(q);
+                
+                buildingsGrid.innerHTML = '';
+                document.getElementById('connection-count').innerText = `${querySnapshot.size} CONEXÕES ATIVAS`;
+
+                if (querySnapshot.empty) {
+                    buildingsGrid.innerHTML = '<p style="font-size:12px; grid-column: 1/-1; color: #ff0055;">NENHUMA CONEXÃO NESTE SETOR.</p>';
+                    return;
+                }
+
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const config = nicheConfig[data.nicho] || { color: data.userNeonColor || "#fff", icon: "🏢", label: "NEXUS" };
+                    
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'building-wrapper';
+                    wrapper.onclick = () => window.location.href = `perfil.html?uid=${doc.id}&view=visitor`;
+
+                    wrapper.innerHTML = `
+                        <div class="building-name">${data.username || 'ANONIMO'}</div>
+                        <div class="building-structure" style="border-color: ${config.color}; color: ${config.color};">
+                            <span class="niche-icon">${config.icon}</span>
+                            <span class="niche-label">${config.label}</span>
+                        </div>
+                    `;
+                    buildingsGrid.appendChild(wrapper);
+                });
+            } catch (error) {
+                console.error("Erro no scanner:", error);
+                buildingsGrid.innerHTML = '<p style="color:red">ERRO NA CONEXÃO FIREBASE</p>';
+            }
         };
 
         window.closeMenu = () => sectorMenu.classList.remove('active');
 
+        // Carregar Mapa
         d3.json("https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson").then(data => {
             mapGroup.selectAll("path")
-                .data(data.features)
-                .join("path")
-                .attr("class", "state")
-                .attr("d", pathGenerator)
-                .on("mouseenter", function(event, d) {
-                    const centroid = pathGenerator.centroid(d);
-                    const transform = d3.zoomTransform(svg.node());
+                .data(data.features).join("path")
+                .attr("class", "state").attr("d", pathGenerator)
+                .on("mouseenter", (event, d) => {
+                    const [x, y] = pathGenerator.centroid(d);
+                    const t = d3.zoomTransform(svg.node());
                     protagonist.style("opacity", "1")
-                        .style("left", `${transform.applyX(centroid[0]) - 8}px`)
-                        .style("top", `${transform.applyY(centroid[1]) - 8}px`);
-                })
-                .on("mousemove", function(event, d) {
-                    const centroid = pathGenerator.centroid(d);
-                    const transform = d3.zoomTransform(svg.node());
-                    protagonist.style("left", `${transform.applyX(centroid[0]) - 8}px`)
-                        .style("top", `${transform.applyY(centroid[1]) - 8}px`);
+                        .style("left", `${t.applyX(x) - 8}px`).style("top", `${t.applyY(y) - 8}px`);
                 })
                 .on("mouseleave", () => protagonist.style("opacity", "0"))
-                .on("click", (event, d) => {
-                    openSector(d.properties.name, d.properties.sigla);
-                });
+                .on("click", (event, d) => openSector(d.properties.name, d.properties.sigla));
 
-            mapGroup.selectAll("text")
-                .data(data.features)
-                .join("text")
+            mapGroup.selectAll("text").data(data.features).join("text")
                 .attr("class", "state-sigla")
                 .attr("transform", d => `translate(${pathGenerator.centroid(d)})`)
-                .attr("dy", "0.35em")
-                .text(d => d.properties.sigla);
+                .attr("dy", "0.35em").text(d => d.properties.sigla);
         });
+
+        // Zoom
+        svg.call(d3.zoom().scaleExtent([1, 15]).on("zoom", (e) => {
+            mapGroup.attr("transform", e.transform);
+            protagonist.style("opacity", "0");
+        }));
 
         window.addEventListener('resize', () => {
             projection.translate([window.innerWidth / 2, window.innerHeight / 2]);
             mapGroup.selectAll("path").attr("d", pathGenerator);
+            mapGroup.selectAll("text").attr("transform", d => `translate(${pathGenerator.centroid(d)})`);
         });
     </script>
     <script type="module" src="nexus-overlay.js"></script>
