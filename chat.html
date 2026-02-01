@@ -10,7 +10,6 @@
             --neon: #00f2ff;
             --pink: #ff0055;
             --bg: #000000;
-            --floor: #1a1a1a;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -61,13 +60,15 @@
         .ui-overlay { position: fixed; z-index: 9999; pointer-events: none; inset: 0; }
         .ui-element { pointer-events: all; }
 
-        .controls { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; }
-        .btn { 
-            padding: 10px 20px; background: #000; border: 1px solid var(--neon); 
-            color: var(--neon); font-family: 'Orbitron'; font-size: 10px; cursor: pointer;
-            box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
-            text-transform: uppercase;
+        /* Botão Sair no canto inferior esquerdo */
+        .exit-container { position: absolute; bottom: 20px; left: 20px; }
+        .btn-exit { 
+            padding: 8px 25px; background: transparent; border: 1px solid var(--pink); 
+            color: var(--pink); font-family: 'Orbitron'; font-size: 11px; cursor: pointer;
+            box-shadow: 0 0 10px rgba(255, 0, 85, 0.2);
+            text-transform: uppercase; transition: 0.3s;
         }
+        .btn-exit:hover { background: var(--pink); color: #000; }
 
         .mystery-toast {
             position: fixed; top: 20%; left: 50%; transform: translateX(-50%);
@@ -82,9 +83,8 @@
     <div id="mystery-text" class="mystery-toast">ACESSO CONFIRMADO</div>
 
     <div class="ui-overlay">
-        <div class="controls ui-element">
-            <button class="btn" onclick="scrollToCenter()">CENTER VIEW</button>
-            <button class="btn" style="border-color:var(--pink); color:var(--pink)" onclick="window.location.href='index.html'">EXIT</button>
+        <div class="exit-container ui-element">
+            <button class="btn-exit" onclick="window.location.href='index.html'">SAIR</button>
         </div>
     </div>
 
@@ -97,19 +97,17 @@
             <g id="stars-layer"></g>
             
             <g id="lights-back">
-                <rect class="traffic-light" x="0" y="750" width="300" height="1" fill="var(--neon)" style="--spd: 25s; opacity: 0.2;"/>
-                <rect class="traffic-light" x="0" y="820" width="200" height="1" fill="var(--pink)" style="--spd: 18s; opacity: 0.15;"/>
+                <rect class="traffic-light" x="0" y="780" width="300" height="1" fill="var(--neon)" style="--spd: 22s; opacity: 0.2;"/>
+                <rect class="traffic-light" x="0" y="830" width="200" height="1" fill="var(--pink)" style="--spd: 16s; opacity: 0.15;"/>
             </g>
 
             <g id="buildings-container"></g>
 
-            <rect x="0" y="900" width="6000" height="100" fill="var(--floor)" />
             <rect x="0" y="900" width="6000" height="3" fill="var(--neon)" filter="url(#glow)" />
 
             <g id="lights-front">
-                <rect class="traffic-light" x="0" y="910" width="400" height="3" fill="var(--neon)" style="--spd: 7s; opacity: 0.8;"/>
-                <rect class="traffic-light" x="0" y="940" width="250" height="2" fill="var(--pink)" style="--spd: 10s; opacity: 0.6;"/>
-                <rect class="traffic-light" x="0" y="970" width="500" height="1.5" fill="var(--neon)" style="--spd: 5s; opacity: 0.4;"/>
+                <rect class="traffic-light" x="0" y="915" width="400" height="3" fill="var(--neon)" style="--spd: 8s; opacity: 0.6;"/>
+                <rect class="traffic-light" x="0" y="945" width="250" height="2" fill="var(--pink)" style="--spd: 11s; opacity: 0.5;"/>
             </g>
         </svg>
     </div>
@@ -117,21 +115,17 @@
     <script>
         const viewport = document.getElementById('city-viewport');
         const bContainer = document.getElementById('buildings-container');
-        // Lista restrita aos 8 prédios solicitados
         const buildingNames = ["NEXUS", "TORRES", "NEMIS", "TITAN", "HOROS", "FÊNIX", "IRIIS", "PIRID"];
 
         function init() {
             renderStars();
             renderBuildings();
-            setTimeout(scrollToCenter, 100);
+            setTimeout(() => {
+                const center = (6000 / 2) - (window.innerWidth / 2);
+                viewport.scrollLeft = center;
+            }, 100);
         }
 
-        function scrollToCenter() {
-            const center = (6000 / 2) - (window.innerWidth / 2);
-            viewport.scrollLeft = center;
-        }
-
-        // Função para cliques nas janelas
         function windowAction(name, id) {
             const t = document.getElementById('mystery-text');
             t.innerText = `${name} - SETOR ${id}`;
@@ -153,54 +147,50 @@
         }
 
         function renderBuildings() {
-            let xPos = 400; // Início do primeiro prédio
+            let xPos = 400; 
             const floorY = 900; 
 
-            buildingNames.forEach((name, index) => {
+            buildingNames.forEach((name) => {
                 const w = 280 + Math.random() * 40; 
                 const h = 400 + Math.random() * 250; 
                 const y = floorY - h;
-                
                 const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
                 
-                // Estrutura Base e Nome
                 group.innerHTML = `
                     <rect x="${xPos}" y="${y}" width="${w}" height="${h}" class="building-base" />
                     <text x="${xPos + w/2}" y="${y - 20}" class="label" text-anchor="middle">${name}</text>
                     <rect x="${xPos + w/2 - 30}" y="${floorY - 60}" width="60" height="60" class="door-btn" onclick="windowAction('${name}', 'PORTARIA')" />
                 `;
 
-                // Geração de Janelas como Botões
                 const cols = 4;
                 const rows = 6;
                 let winId = 1;
 
                 for(let r=0; r<rows; r++) {
                     for(let c=0; c<cols; c++) {
-                        // Variabilidade de janelas (nem todas aparecem)
-                        if(Math.random() > 0.2) {
-                            const winX = xPos + (c + 1) * (w / (cols + 1)) - 10;
-                            const winY = y + 50 + (r * (h / (rows + 1)));
-                            
-                            const winBtn = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-                            winBtn.setAttribute("x", winX);
-                            winBtn.setAttribute("y", winY);
-                            winBtn.setAttribute("width", "20");
-                            winBtn.setAttribute("height", "20");
-                            winBtn.setAttribute("class", "window-btn");
-                            winBtn.setAttribute("style", `--dur:${1+Math.random()*2}s; --delay:${Math.random()*3}s`);
-                            
-                            // Atribui a função de clique
-                            const currentId = winId++;
-                            winBtn.onclick = () => windowAction(name, currentId);
-                            
-                            group.appendChild(winBtn);
+                        const winX = xPos + (c + 1) * (w / (cols + 1)) - 10;
+                        const winY = y + 50 + (r * (h / (rows + 1)));
+                        
+                        // CORREÇÃO: Não desenha a janela se estiver na área da porta (base do prédio)
+                        if (winY < (floorY - 80)) { 
+                            if(Math.random() > 0.2) {
+                                const winBtn = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                                winBtn.setAttribute("x", winX);
+                                winBtn.setAttribute("y", winY);
+                                winBtn.setAttribute("width", "20");
+                                winBtn.setAttribute("height", "20");
+                                winBtn.setAttribute("class", "window-btn");
+                                winBtn.setAttribute("style", `--dur:${1+Math.random()*2}s; --delay:${Math.random()*3}s`);
+                                
+                                const currentId = winId++;
+                                winBtn.onclick = () => windowAction(name, currentId);
+                                group.appendChild(winBtn);
+                            }
                         }
                     }
                 }
-
                 bContainer.appendChild(group);
-                xPos += w + 450; // Espaçamento entre os 8 prédios
+                xPos += w + 450; 
             });
         }
     </script>
