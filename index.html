@@ -20,14 +20,13 @@
             color: #fff; 
             font-family: 'Rajdhani'; 
             margin: 0; 
-            padding: 85px 0 60px 0 !important; /* Espaço para o Overlay fixo */
+            padding: 85px 0 80px 0 !important;
             min-height: 100vh; 
             display: flex; 
             flex-direction: column; 
             overflow-x: hidden;
         }
 
-        /* --- GRID DE APLICATIVOS (Design Celular) --- */
         .app-drawer {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -37,6 +36,17 @@
             margin: 0 auto;
             width: 100%;
         }
+
+        .dev-divider {
+            grid-column: span 3;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .dev-line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); }
+        .dev-text { font-family: 'Orbitron'; font-size: 0.5rem; color: #444; letter-spacing: 2px; text-transform: uppercase; white-space: nowrap; }
 
         .app-icon-container {
             display: flex;
@@ -67,10 +77,15 @@
         .icon-news { background: linear-gradient(135deg, #ff4b1f, #ff9068); }
         .icon-games { background: linear-gradient(135deg, #11998e, #38ef7d); }
         .icon-market { background: linear-gradient(135deg, #FDC830, #F37335); }
-        .icon-rifas { background: linear-gradient(135deg, #fc00ff, #00dbde); }
-        .icon-drops { background: linear-gradient(135deg, #8E2DE2, #4A00E0); }
+        .icon-global { background: linear-gradient(135deg, #00d2ff, #3a7bd5); }
+        .icon-chat { background: linear-gradient(135deg, #12c2e9, #c471ed, #f64f59); }
         .icon-quests { background: linear-gradient(135deg, #00c6ff, #0072ff); }
         .icon-config { background: linear-gradient(135deg, #bdc3c7, #2c3e50); }
+        
+        /* Ícones em Desenvolvimento */
+        .icon-rifas { background: linear-gradient(135deg, #444, #222); opacity: 0.6; }
+        .icon-drops { background: linear-gradient(135deg, #444, #222); opacity: 0.6; }
+        .icon-multi { background: linear-gradient(135deg, #444, #222); opacity: 0.6; }
 
         .app-label {
             font-family: 'Orbitron';
@@ -120,14 +135,14 @@
             <span class="app-label">Market</span>
         </a>
 
-        <a href="rifas.html" class="app-icon-container">
-            <div class="app-box icon-rifas">🎟️</div>
-            <span class="app-label">Campanhas</span>
+        <a href="global.html" class="app-icon-container">
+            <div class="app-box icon-global">🌍</div>
+            <span class="app-label">Global</span>
         </a>
 
-        <a href="leilao.html" class="app-icon-container">
-            <div class="app-box icon-drops">🔨</div>
-            <span class="app-label">Drops</span>
+        <a href="chat.html" class="app-icon-container">
+            <div class="app-box icon-chat">💬</div>
+            <span class="app-label">Chat</span>
         </a>
 
         <a href="quests.html" class="app-icon-container">
@@ -138,6 +153,27 @@
         <a href="config.html" class="app-icon-container">
             <div class="app-box icon-config">⚙️</div>
             <span class="app-label">Ajustes</span>
+        </a>
+
+        <div class="dev-divider">
+            <div class="dev-line"></div>
+            <div class="dev-text">Em Desenvolvimento</div>
+            <div class="dev-line"></div>
+        </div>
+
+        <a href="#" class="app-icon-container">
+            <div class="app-box icon-rifas">🎟️</div>
+            <span class="app-label">Campanhas</span>
+        </a>
+
+        <a href="#" class="app-icon-container">
+            <div class="app-box icon-drops">🔨</div>
+            <span class="app-label">Drops</span>
+        </a>
+
+        <a href="#" class="app-icon-container">
+            <div class="app-box icon-multi">👥</div>
+            <span class="app-label">Multiplayer</span>
         </a>
     </div>
 
