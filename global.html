@@ -11,6 +11,7 @@
             --user-neon-color: #00f2ff;
             --bg-dark: #000000;
             --grid-color: rgba(0, 242, 255, 0.05);
+            --overlay-bg: rgba(0, 0, 0, 0.95);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -19,13 +20,11 @@
             color: #fff;
             font-family: 'Rajdhani', sans-serif;
             overflow: hidden;
-            height: 100vh;
-            width: 100vw;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            height: 100vh; width: 100vw;
+            display: flex; align-items: center; justify-content: center;
         }
 
+        /* Grid de Fundo */
         body::before {
             content: '';
             position: absolute;
@@ -39,15 +38,8 @@
             opacity: 0.2;
         }
 
-        #map-container {
-            position: relative;
-            z-index: 10;
-            width: 100vw;
-            height: 100vh;
-            cursor: grab;
-        }
+        #map-container { position: relative; z-index: 10; width: 100vw; height: 100vh; cursor: grab; }
         #map-container:active { cursor: grabbing; }
-
         svg { width: 100%; height: 100%; }
 
         .state {
@@ -57,55 +49,111 @@
             transition: fill 0.3s;
             cursor: pointer;
         }
+        .state:hover { fill: var(--user-neon-color); fill-opacity: 0.2; }
 
-        .state:hover {
-            fill: var(--user-neon-color);
-            fill-opacity: 0.2;
-        }
-
-        /* Estilo das Siglas */
         .state-sigla {
             fill: var(--user-neon-color);
             font-family: 'Orbitron';
             font-size: 10px;
-            font-weight: bold;
             pointer-events: none;
             text-anchor: middle;
             opacity: 0.6;
-            text-shadow: 0 0 5px var(--bg-dark);
         }
 
         #protagonist {
             position: absolute;
-            width: 16px;
-            height: 16px;
+            width: 16px; height: 16px;
             background: var(--user-neon-color);
             clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
             filter: drop-shadow(0 0 10px var(--user-neon-color));
             pointer-events: none;
             opacity: 0;
             z-index: 100;
-            transition: opacity 0.2s;
         }
 
-        .btn-exit {
+        /* MENU DE SETOR (PRÉDIOS) */
+        #sector-menu {
             position: fixed;
-            bottom: 30px;
-            left: 30px;
-            padding: 10px 20px;
-            border: 1px solid #ff0055;
-            color: #ff0055;
-            text-decoration: none;
-            font-family: 'Orbitron';
-            font-size: 12px;
-            background: rgba(0,0,0,0.8);
-            z-index: 1000;
+            top: 0; right: -100%;
+            width: 400px; height: 100vh;
+            background: var(--overlay-bg);
+            border-left: 2px solid var(--user-neon-color);
+            z-index: 2000;
+            transition: 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            padding: 40px;
+            display: flex; flex-direction: column;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+        }
+        #sector-menu.active { right: 0; }
+
+        .menu-header {
+            border-bottom: 1px solid var(--user-neon-color);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .menu-header h2 { font-family: 'Orbitron'; color: var(--user-neon-color); font-size: 1.5rem; }
+
+        /* Grid de Prédios (Vista Superior) */
+        #buildings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 15px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .building {
+            width: 60px; height: 60px;
+            background: #111;
+            border: 2px solid;
+            position: relative;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Orbitron'; font-size: 10px;
+        }
+        .building:hover {
+            transform: scale(1.1);
+            filter: brightness(1.3) drop-shadow(0 0 10px currentColor);
+        }
+        /* Efeito de profundidade vista de cima */
+        .building::after {
+            content: '';
+            position: absolute;
+            width: 70%; height: 70%;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .btn-close {
+            margin-top: auto;
+            background: none; border: 1px solid #fff;
+            color: #fff; padding: 10px; cursor: pointer;
+            font-family: 'Orbitron'; transition: 0.3s;
+        }
+        .btn-close:hover { background: #fff; color: #000; }
+
+        .btn-exit {
+            position: fixed; bottom: 30px; left: 30px;
+            padding: 10px 20px; border: 1px solid #ff0055;
+            color: #ff0055; text-decoration: none;
+            font-family: 'Orbitron'; font-size: 12px;
+            background: rgba(0,0,0,0.8); z-index: 1000;
         }
     </style>
 </head>
 <body>
 
     <a href="index.html" class="btn-exit">VOLTAR</a>
+
+    <div id="sector-menu">
+        <div class="menu-header">
+            <h2 id="sector-title">SETOR: --</h2>
+            <p style="font-size: 12px; opacity: 0.6;">CONEXÕES DETECTADAS NO MAPA</p>
+        </div>
+        <div id="buildings-grid">
+            </div>
+        <button class="btn-close" onclick="closeMenu()">FECHAR SCANNER</button>
+    </div>
     
     <div id="map-container">
         <div id="protagonist"></div>
@@ -121,6 +169,8 @@
         const svg = d3.select("#brazil-map");
         const mapGroup = d3.select("#map-group");
         const protagonist = d3.select("#protagonist");
+        const sectorMenu = document.getElementById('sector-menu');
+        const buildingsGrid = document.getElementById('buildings-grid');
 
         const projection = d3.geoMercator()
             .center([-52, -15]) 
@@ -133,18 +183,52 @@
             .scaleExtent([1, 15])
             .on("zoom", (event) => {
                 mapGroup.attr("transform", event.transform);
-                // Esconde o losango ao dar zoom para evitar desfoque
                 protagonist.style("opacity", "0");
-                // Ajusta o tamanho da fonte da sigla baseado no zoom
                 mapGroup.selectAll(".state-sigla")
                     .style("font-size", `${10 / Math.sqrt(event.transform.k)}px`);
             });
 
         svg.call(zoom);
 
-        d3.json("https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson").then(data => {
+        // Simulação de dados de usuários integrados
+        const mockUsers = [
+            { name: "Alpha", type: "comerciante", color: "#ff0055", state: "SP" },
+            { name: "Beta", type: "cidadao", color: "#00f2ff", state: "SP" },
+            { name: "Nexus", type: "comerciante", color: "#ccff00", state: "RJ" },
+            { name: "Zero", type: "cidadao", color: "#7000ff", state: "SP" },
+            { name: "Oasis", type: "comerciante", color: "#00ff41", state: "MG" }
+        ];
+
+        window.openSector = (stateName, stateId) => {
+            document.getElementById('sector-title').innerText = `SETOR: ${stateName}`;
+            buildingsGrid.innerHTML = ''; // Limpa grid
             
-            // Desenha os Estados
+            // Filtra usuários do estado ou gera aleatórios para demonstração
+            const stateUsers = mockUsers.filter(u => u.state === stateId);
+            
+            // Se não houver usuários, gera alguns aleatórios para ver o efeito
+            const displayList = stateUsers.length > 0 ? stateUsers : Array.from({length: 12}, (_, i) => ({
+                name: `ID-${i}`,
+                color: i % 3 === 0 ? "#ff0055" : userColor,
+                type: i % 3 === 0 ? "comerciante" : "cidadao"
+            }));
+
+            displayList.forEach(user => {
+                const b = document.createElement('div');
+                b.className = 'building';
+                b.style.borderColor = user.color;
+                b.style.color = user.color;
+                b.innerText = user.type === 'comerciante' ? 'COM' : 'CID';
+                b.onclick = () => window.location.href = `perfil.html?user=${user.name}&view=visitor`;
+                buildingsGrid.appendChild(b);
+            });
+
+            sectorMenu.classList.add('active');
+        };
+
+        window.closeMenu = () => sectorMenu.classList.remove('active');
+
+        d3.json("https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson").then(data => {
             mapGroup.selectAll("path")
                 .data(data.features)
                 .join("path")
@@ -153,28 +237,21 @@
                 .on("mouseenter", function(event, d) {
                     const centroid = pathGenerator.centroid(d);
                     const transform = d3.zoomTransform(svg.node());
-                    
-                    protagonist
-                        .style("opacity", "1")
+                    protagonist.style("opacity", "1")
                         .style("left", `${transform.applyX(centroid[0]) - 8}px`)
                         .style("top", `${transform.applyY(centroid[1]) - 8}px`);
                 })
                 .on("mousemove", function(event, d) {
                     const centroid = pathGenerator.centroid(d);
                     const transform = d3.zoomTransform(svg.node());
-                    protagonist
-                        .style("left", `${transform.applyX(centroid[0]) - 8}px`)
+                    protagonist.style("left", `${transform.applyX(centroid[0]) - 8}px`)
                         .style("top", `${transform.applyY(centroid[1]) - 8}px`);
                 })
-                .on("mouseleave", () => {
-                    protagonist.style("opacity", "0");
-                })
+                .on("mouseleave", () => protagonist.style("opacity", "0"))
                 .on("click", (event, d) => {
-                    const stateId = d.properties.sigla;
-                    window.location.href = `setor.html?id=${stateId}`;
+                    openSector(d.properties.name, d.properties.sigla);
                 });
 
-            // Adiciona as Siglas (Iniciais)
             mapGroup.selectAll("text")
                 .data(data.features)
                 .join("text")
@@ -187,7 +264,6 @@
         window.addEventListener('resize', () => {
             projection.translate([window.innerWidth / 2, window.innerHeight / 2]);
             mapGroup.selectAll("path").attr("d", pathGenerator);
-            mapGroup.selectAll(".state-sigla").attr("transform", d => `translate(${pathGenerator.centroid(d)})`);
         });
     </script>
     <script type="module" src="nexus-overlay.js"></script>
