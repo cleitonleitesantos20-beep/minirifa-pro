@@ -12,13 +12,6 @@
             --bg-dark: #000000;
             --grid-color: rgba(0, 242, 255, 0.05);
             --overlay-bg: rgba(0, 0, 0, 0.98);
-            
-            /* Cores por Nicho */
-            --color-calcados: #ff00ff;
-            --color-roupas: #00ff41;
-            --color-joias: #ffd700;
-            --color-cidadao: #00f2ff;
-            --color-geral: #ffffff;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -92,7 +85,8 @@
         .building-name {
             font-family: 'Orbitron'; font-size: 9px; 
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            width: 100%; color: #aaa; text-transform: uppercase;
+            width: 100%; color: #eee; text-transform: uppercase;
+            text-shadow: 0 0 5px rgba(255,255,255,0.3);
         }
 
         .building-structure {
@@ -100,6 +94,7 @@
             border: 2px solid; position: relative;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+            border-radius: 4px;
         }
 
         .building-wrapper:hover .building-structure {
@@ -107,13 +102,13 @@
             filter: brightness(1.2) drop-shadow(0 5px 15px currentColor);
         }
 
-        .niche-icon { font-size: 1.5rem; filter: drop-shadow(0 0 5px currentColor); }
-        .niche-label { font-size: 8px; font-weight: bold; margin-top: 4px; }
+        .niche-icon { font-size: 1.5rem; filter: drop-shadow(0 0 5px currentColor); margin-bottom: 2px; }
+        .niche-label { font-size: 7px; font-weight: bold; font-family: 'Orbitron'; letter-spacing: 1px; }
 
         .btn-close {
             margin-top: 20px; background: none; border: 1px solid var(--user-neon-color);
             color: var(--user-neon-color); padding: 12px; cursor: pointer;
-            font-family: 'Orbitron'; text-transform: uppercase;
+            font-family: 'Orbitron'; text-transform: uppercase; font-size: 0.7rem;
         }
         .btn-close:hover { background: var(--user-neon-color); color: #000; }
 
@@ -128,7 +123,7 @@
 </head>
 <body>
 
-    <a href="index.html" class="btn-exit">VOLTAR</a>
+    <a href="dashboard.html" class="btn-exit">VOLTAR</a>
 
     <div id="sector-menu">
         <div class="menu-header">
@@ -145,21 +140,29 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-        // CONFIGURAÇÃO DO SEU FIREBASE (Preencher com seus dados)
-        const firebaseConfig = {
-            apiKey: "SUA_API_KEY",
-            authDomain: "SEU_PROJETO.firebaseapp.com",
-            projectId: "SEU_PROJETO",
-            storageBucket: "SEU_PROJETO.appspot.com",
-            messagingSenderId: "ID",
-            appId: "APP_ID"
+        const firebaseConfig = { 
+            apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", 
+            authDomain: "minharifadigital.firebaseapp.com", 
+            projectId: "minharifadigital", 
+            appId: "1:59630725905:web:396c8cfca385dc3d957ab0" 
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+
+        // CONFIGURAÇÃO DE NICHOS (Sincronizado com Perfil)
+        const nicheAssets = {
+            citizen: { label: "CITIZEN", color: "#555", icon: "👤" },
+            clothes: { label: "APPAREL", color: "#00f2ff", icon: "👕" },
+            shoes: { label: "FOOTWEAR", color: "#8b4513", icon: "👟" },
+            tech: { label: "ELECTRONICS", color: "#00ff88", icon: "🔌" },
+            appliances: { label: "EQUIPMENT", color: "#ffcc00", icon: "🏠" },
+            auto: { label: "VEHICLES", color: "#bd00ff", icon: "🚗" },
+            jewelry: { label: "JEWELRY", color: "#e5e5e5", icon: "💎" }
+        };
 
         const svg = d3.select("#brazil-map");
         const mapGroup = d3.select("#map-group");
@@ -170,18 +173,8 @@
         const userColor = localStorage.getItem('userNeonColor') || '#00f2ff';
         document.documentElement.style.setProperty('--user-neon-color', userColor);
 
-        // Lógica de Cores e Ícones por Nicho
-        const nicheConfig = {
-            "Calcados": { color: "#ff00ff", icon: "👟", label: "FOOTWEAR" },
-            "Roupas": { color: "#00ff41", icon: "👕", label: "APPAREL" },
-            "Joias": { color: "#ffd700", icon: "💎", label: "JEWELRY" },
-            "Cidadao": { color: "#00f2ff", icon: "👤", label: "CITIZEN" }
-        };
-
-        const projection = d3.geoMercator()
-            .center([-52, -15]).scale(700)
+        const projection = d3.geoMercator().center([-52, -15]).scale(700)
             .translate([window.innerWidth / 2, window.innerHeight / 2]);
-
         const pathGenerator = d3.geoPath().projection(projection);
 
         window.openSector = async (stateName, stateId) => {
@@ -190,28 +183,28 @@
             sectorMenu.classList.add('active');
 
             try {
-                // BUSCA REAL NO FIREBASE
-                const q = query(collection(db, "users"), where("estado", "==", stateId));
+                // BUSCA NA COLEÇÃO "usuarios" (Conforme seu código de perfil)
+                const q = query(collection(db, "usuarios"), where("estado", "==", stateId));
                 const querySnapshot = await getDocs(q);
                 
                 buildingsGrid.innerHTML = '';
                 document.getElementById('connection-count').innerText = `${querySnapshot.size} CONEXÕES ATIVAS`;
 
                 if (querySnapshot.empty) {
-                    buildingsGrid.innerHTML = '<p style="font-size:12px; grid-column: 1/-1; color: #ff0055;">NENHUMA CONEXÃO NESTE SETOR.</p>';
+                    buildingsGrid.innerHTML = '<p style="font-size:12px; grid-column: 1/-1; color: #ff0055;">NENHUM HABITAT DETECTADO.</p>';
                     return;
                 }
 
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
-                    const config = nicheConfig[data.nicho] || { color: data.userNeonColor || "#fff", icon: "🏢", label: "NEXUS" };
+                    const config = nicheAssets[data.role] || nicheAssets.citizen;
                     
                     const wrapper = document.createElement('div');
                     wrapper.className = 'building-wrapper';
-                    wrapper.onclick = () => window.location.href = `perfil.html?uid=${doc.id}&view=visitor`;
+                    wrapper.onclick = () => window.location.href = `perfil.html?id=${doc.id}`;
 
                     wrapper.innerHTML = `
-                        <div class="building-name">${data.username || 'ANONIMO'}</div>
+                        <div class="building-name">${(data.nome || 'NEXUS').substring(0, 12)}</div>
                         <div class="building-structure" style="border-color: ${config.color}; color: ${config.color};">
                             <span class="niche-icon">${config.icon}</span>
                             <span class="niche-label">${config.label}</span>
@@ -220,34 +213,29 @@
                     buildingsGrid.appendChild(wrapper);
                 });
             } catch (error) {
-                console.error("Erro no scanner:", error);
-                buildingsGrid.innerHTML = '<p style="color:red">ERRO NA CONEXÃO FIREBASE</p>';
+                console.error(error);
+                buildingsGrid.innerHTML = '<p style="color:red">ERRO NO SCANNER</p>';
             }
         };
 
         window.closeMenu = () => sectorMenu.classList.remove('active');
 
-        // Carregar Mapa
         d3.json("https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson").then(data => {
-            mapGroup.selectAll("path")
-                .data(data.features).join("path")
+            mapGroup.selectAll("path").data(data.features).join("path")
                 .attr("class", "state").attr("d", pathGenerator)
                 .on("mouseenter", (event, d) => {
                     const [x, y] = pathGenerator.centroid(d);
                     const t = d3.zoomTransform(svg.node());
-                    protagonist.style("opacity", "1")
-                        .style("left", `${t.applyX(x) - 8}px`).style("top", `${t.applyY(y) - 8}px`);
+                    protagonist.style("opacity", "1").style("left", `${t.applyX(x) - 8}px`).style("top", `${t.applyY(y) - 8}px`);
                 })
                 .on("mouseleave", () => protagonist.style("opacity", "0"))
                 .on("click", (event, d) => openSector(d.properties.name, d.properties.sigla));
 
             mapGroup.selectAll("text").data(data.features).join("text")
-                .attr("class", "state-sigla")
-                .attr("transform", d => `translate(${pathGenerator.centroid(d)})`)
+                .attr("class", "state-sigla").attr("transform", d => `translate(${pathGenerator.centroid(d)})`)
                 .attr("dy", "0.35em").text(d => d.properties.sigla);
         });
 
-        // Zoom
         svg.call(d3.zoom().scaleExtent([1, 15]).on("zoom", (e) => {
             mapGroup.attr("transform", e.transform);
             protagonist.style("opacity", "0");
@@ -256,7 +244,6 @@
         window.addEventListener('resize', () => {
             projection.translate([window.innerWidth / 2, window.innerHeight / 2]);
             mapGroup.selectAll("path").attr("d", pathGenerator);
-            mapGroup.selectAll("text").attr("transform", d => `translate(${pathGenerator.centroid(d)})`);
         });
     </script>
     <script type="module" src="nexus-overlay.js"></script>
