@@ -9,8 +9,8 @@
         :root {
             --neon: #00f2ff;
             --pink: #ff0055;
-            --bg: #020205;
-            --border: rgba(0, 242, 255, 0.3);
+            --bg: #000000;
+            --border: rgba(0, 242, 255, 0.2);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -31,65 +31,81 @@
             overflow-y: hidden;
             z-index: 1;
             scroll-behavior: smooth;
+            background: var(--bg);
         }
 
-        .city-svg { width: 6000px; height: 80%; margin-top: 10vh; display: block; }
+        .city-svg { width: 6000px; height: 100%; display: block; }
 
-        /* Estilos de Elementos */
-        .building-back { fill: rgba(10, 15, 30, 0.4); }
-        .building-front { fill: #05050a; stroke: var(--border); stroke-width: 0.5; }
+        /* Elementos da Cidade */
+        .building-back { fill: rgba(20, 20, 30, 0.3); }
+        .building-front { fill: #050508; stroke: var(--border); stroke-width: 0.8; }
         .window-node { transition: 0.3s; }
         .window-blink { animation: windowFlicker var(--d, 3s) infinite; }
+        .road-base { fill: #08080a; }
+        .road-line { fill: var(--neon); opacity: 0.1; }
         
         @keyframes windowFlicker {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 1; fill: var(--neon); }
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; fill: var(--neon); filter: blur(1px); }
         }
 
-        /* Botões Virtuais Inferiores */
+        /* Interface Futurista */
         .nav-bar {
             position: fixed;
-            bottom: 20px; left: 50%;
+            bottom: 30px; left: 50%;
             transform: translateX(-50%);
-            display: flex; gap: 15px;
+            display: flex; gap: 20px;
             z-index: 100;
-            background: rgba(0,0,0,0.5);
-            padding: 10px 20px;
-            border-radius: 40px;
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border);
+            padding: 10px;
         }
 
         .v-button {
             width: 50px; height: 50px;
-            border-radius: 50%;
-            background: #000;
+            background: transparent;
             border: 1px solid var(--neon);
+            color: var(--neon);
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; cursor: pointer; transition: 0.2s;
+            font-size: 1.1rem; cursor: pointer; transition: 0.3s;
+            clip-path: polygon(15% 0%, 100% 0%, 85% 100%, 0% 100%); /* Corte futurista */
         }
-        .v-button:active { transform: scale(0.9); box-shadow: 0 0 15px var(--neon); }
+        
+        .v-button:hover { background: rgba(0, 242, 255, 0.1); box-shadow: 0 0 15px var(--neon); }
+        .btn-exit { border-color: var(--pink); color: var(--pink); font-family: 'Orbitron'; font-size: 0.8rem; }
 
+        /* Chat Invisível (Apenas Letras) */
         #chat-window {
             position: fixed;
-            bottom: 90px; left: 50%;
+            bottom: 100px; left: 50%;
             transform: translateX(-50%);
-            width: 320px; height: 380px;
-            background: rgba(0, 0, 0, 0.9);
-            border: 1px solid var(--neon);
-            border-radius: 15px;
-            z-index: 90; display: none; flex-direction: column; padding: 15px;
+            width: 350px; height: 300px;
+            z-index: 90; display: none; flex-direction: column; 
+            padding: 10px;
+            pointer-events: none; /* Permite clicar através do fundo */
         }
 
-        .chat-messages { flex: 1; overflow-y: auto; font-size: 0.85rem; }
-        .chat-input-area { display: flex; gap: 8px; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px; }
-        input { background: transparent; border: none; color: #fff; outline: none; flex: 1; }
+        .chat-messages { 
+            flex: 1; overflow-y: auto; 
+            font-size: 0.9rem; 
+            text-shadow: 0 0 5px #000, 0 0 10px #000;
+            mask-image: linear-gradient(to top, black 80%, transparent 100%);
+        }
+
+        .chat-input-area { 
+            display: flex; gap: 10px; 
+            margin-top: 10px; 
+            border-bottom: 1px solid var(--neon); 
+            padding-bottom: 5px;
+            pointer-events: all; /* Habilita clique apenas no input */
+        }
+
+        input { background: transparent; border: none; color: var(--neon); outline: none; flex: 1; font-family: 'Rajdhani'; font-size: 1rem; }
+        input::placeholder { color: rgba(0, 242, 255, 0.3); }
 
         /* Pássaros/Drones */
-        .bird { fill: #fff; animation: fly 15s linear infinite; }
+        .bird { fill: var(--neon); opacity: 0.4; animation: fly 20s linear infinite; filter: blur(1px); }
         @keyframes fly {
-            from { transform: translateX(-100px) translateY(0); }
-            to { transform: translateX(6100px) translateY(-50px); }
+            from { transform: translateX(-100px) translateY(100px); }
+            to { transform: translateX(6100px) translateY(50px); }
         }
 
         @media (max-width: 600px) { #chat-window { width: 90vw; } }
@@ -98,26 +114,30 @@
 <body>
 
     <div class="nav-bar">
-        <div class="v-button" title="Voltar" onclick="location.href='index.html'">🔙</div>
-        <div class="v-button" title="Global" onclick="toggleChat('GLOBAL')">🌐</div>
-        <div class="v-button" title="Amigos" onclick="toggleChat('FRIENDS')">👥</div>
-        <div class="v-button" title="Agitar" onclick="toggleCityMode()">⚡</div>
+        <div class="v-button btn-exit" title="Sair" onclick="location.href='index.html'">_EXIT</div>
+        <div class="v-button" onclick="toggleChat('GLOBAL')">🌐</div>
+        <div class="v-button" onclick="toggleChat('FRIENDS')">👥</div>
+        <div class="v-button" onclick="toggleCityMode()">⚡</div>
     </div>
 
     <div id="chat-window">
-        <div id="chat-title" style="font-family: 'Orbitron'; font-size: 0.6rem; color: var(--neon); margin-bottom: 8px;">STREAM_ACTIVE</div>
+        <div id="chat-title" style="font-family: 'Orbitron'; font-size: 0.6rem; color: var(--neon); opacity: 0.6; letter-spacing: 2px;">SYS_LOG // ONLINE</div>
         <div class="chat-messages" id="chat-box"></div>
         <div class="chat-input-area">
-            <input type="text" placeholder="Escreva aqui..." id="chat-input">
-            <button onclick="sendMsg()" style="background:none; border:none; color:var(--neon); font-weight:bold;">></button>
+            <input type="text" placeholder="COMANDO_INPUT..." id="chat-input">
+            <button onclick="sendMsg()" style="background:none; border:none; color:var(--neon); font-family:'Orbitron'; cursor:pointer;">EXE</button>
         </div>
     </div>
 
     <div id="city-container">
         <svg id="city-svg" class="city-svg" viewBox="0 0 6000 1000">
             <defs>
-                <filter id="glow"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
             </defs>
+            
+            <rect x="0" y="900" width="6000" height="100" class="road-base" />
+            <g id="road-marks"></g>
+
             <g id="sky-elements"></g>
             <g id="back-layer"></g>
             <g id="main-layer"></g>
@@ -129,111 +149,101 @@
         let agilityLevel = 1;
 
         document.addEventListener('DOMContentLoaded', () => {
-            setAtmosphere();
-            generateCityLayers();
-            startTraffic();
-            
+            initCity();
             const container = document.getElementById('city-container');
             container.scrollLeft = (6000 - window.innerWidth) / 2;
         });
 
-        function setAtmosphere() {
-            const hour = new Date().getHours();
+        function initCity() {
             const sky = document.getElementById('sky-elements');
-            const container = document.getElementById('city-container');
-            
-            // Ciclo Dia/Noite
-            if (hour >= 6 && hour < 19) {
-                container.style.background = "linear-gradient(to bottom, #1a2a6c, #b21f1f, #fdbb2d)";
-                sky.innerHTML += `<circle cx="3000" cy="150" r="60" fill="#fff7e6" filter="url(#glow)" />`; // Sol
-            } else {
-                container.style.background = "radial-gradient(circle at 50% 100%, #0a1025 0%, #020205 100%)";
-                sky.innerHTML += `<circle cx="3000" cy="150" r="45" fill="#e1e1e1" filter="url(#glow)" />`; // Lua
-                // Estrelas aleatórias
-                for(let i=0; i<100; i++) {
-                    sky.innerHTML += `<circle cx="${Math.random()*6000}" cy="${Math.random()*400}" r="1" fill="#fff" opacity="${Math.random()}"/>`;
-                }
+            const road = document.getElementById('road-marks');
+            const back = document.getElementById('back-layer');
+            const main = document.getElementById('main-layer');
+
+            // Marcas da Estrada
+            for(let i=0; i<150; i++) {
+                road.innerHTML += `<rect x="${i*80}" y="945" width="30" height="2" class="road-line" />`;
             }
 
-            // Pássaros/Drones
-            for(let i=0; i<5; i++) {
-                sky.innerHTML += `<path d="M0,0 L5,-2 L10,0" class="bird" style="animation-delay: ${i*3}s; transform: translateY(${100+i*50}px)"/>`;
-            }
-        }
-
-        function generateCityLayers() {
-            const backLayer = document.getElementById('back-layer');
-            const mainLayer = document.getElementById('main-layer');
-            
-            // Prédios de fundo (Invisíveis/Distantes)
-            for(let i=0; i<40; i++) {
-                const x = i * 150;
-                const h = 500 + Math.random()*300;
-                backLayer.innerHTML += `<rect x="${x}" y="${1000-h}" width="${120}" height="${h}" class="building-back" />`;
+            // Elementos do Céu (Lua Neon)
+            sky.innerHTML += `<circle cx="3000" cy="150" r="40" fill="none" stroke="var(--neon)" stroke-width="0.5" filter="url(#glow)" opacity="0.3"/>`;
+            for(let i=0; i<80; i++) {
+                sky.innerHTML += `<circle cx="${Math.random()*6000}" cy="${Math.random()*400}" r="0.8" fill="#fff" opacity="${Math.random()*0.5}"/>`;
             }
 
-            // Prédios da frente (Ativos)
-            let curX = 100;
-            while(curX < 5800) {
-                const w = 200 + Math.random()*150;
-                const h = 300 + Math.random()*500;
-                const y = 1000 - h;
+            // Prédios Fundo
+            for(let i=0; i<50; i++) {
+                const h = 400 + Math.random()*300;
+                back.innerHTML += `<rect x="${i*130}" y="${900-h}" width="100" height="${h}" class="building-back" />`;
+            }
+
+            // Prédios Frente
+            let curX = 50;
+            while(curX < 5900) {
+                const w = 150 + Math.random()*200;
+                const h = 300 + Math.random()*550;
+                const y = 900 - h;
                 
                 let bGroup = `<rect x="${curX}" y="${y}" width="${w}" height="${h}" class="building-front" />`;
                 
-                // Janelas que piscam
-                for(let r=1; r < h/50; r++) {
-                    for(let c=1; c < w/40; c++) {
-                        if(Math.random() > 0.5) {
-                            const isBlink = Math.random() > 0.8 ? "window-blink" : "";
+                // Janelas
+                for(let r=1; r < h/45; r++) {
+                    for(let c=1; c < w/35; c++) {
+                        if(Math.random() > 0.6) {
+                            const isBlink = Math.random() > 0.85 ? "window-blink" : "";
                             const delay = Math.random() * 5;
-                            bGroup += `<rect class="window-node ${isBlink}" x="${curX + c*35}" y="${y + r*45}" width="8" height="12" fill="#1a1a25" style="--d:${2+delay}s" />`;
+                            bGroup += `<rect class="window-node ${isBlink}" x="${curX + c*30}" y="${y + r*40}" width="6" height="10" fill="#0a0a0f" style="--d:${2+delay}s" />`;
                         }
                     }
                 }
-                mainLayer.innerHTML += bGroup;
-                curX += w + 80 + Math.random()*100;
+                main.innerHTML += bGroup;
+                curX += w + 120 + Math.random()*150;
+            }
+
+            // Drones
+            for(let i=0; i<3; i++) {
+                sky.innerHTML += `<rect width="15" height="2" class="bird" style="animation-delay: ${i*6}s" />`;
             }
         }
+
+        window.toggleChat = (type) => {
+            const win = document.getElementById('chat-window');
+            win.style.display = win.style.display === 'flex' ? 'none' : 'flex';
+        };
+
+        window.toggleCityMode = () => {
+            agilityLevel = agilityLevel >= 5 ? 1 : agilityLevel + 1.5;
+            document.getElementById('chat-box').innerHTML += `<div style="color:var(--pink); font-size:0.7rem">[!] OVERDRIVE_MODE: ${agilityLevel}x</div>`;
+        };
+
+        window.sendMsg = () => {
+            const input = document.getElementById('chat-input');
+            if(!input.value) return;
+            const msg = document.createElement('div');
+            msg.style.marginBottom = "5px";
+            msg.innerHTML = `<span style="color:var(--neon); opacity:0.5;">USR_</span> ${input.value}`;
+            document.getElementById('chat-box').appendChild(msg);
+            input.value = "";
+            const box = document.getElementById('chat-box');
+            box.scrollTop = box.scrollHeight;
+        };
 
         function startTraffic() {
             const traffic = document.getElementById('traffic-layer');
             setInterval(() => {
                 const car = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-                const y = 940 + (Math.random() * 30);
+                const y = 910 + (Math.random() * 80);
                 car.setAttribute("x", "-50"); car.setAttribute("y", y);
-                car.setAttribute("width", "30"); car.setAttribute("height", "1");
+                car.setAttribute("width", "40"); car.setAttribute("height", "0.5");
                 car.setAttribute("fill", Math.random() > 0.5 ? "var(--neon)" : "var(--pink)");
-                const dur = 10 / agilityLevel;
+                const dur = 8 / agilityLevel;
                 car.style.transition = `transform ${dur}s linear`;
                 traffic.appendChild(car);
                 setTimeout(() => car.style.transform = "translateX(6100px)", 50);
                 setTimeout(() => car.remove(), dur * 1000);
             }, 1000 / agilityLevel);
         }
-
-        window.toggleChat = (type) => {
-            const win = document.getElementById('chat-window');
-            const title = document.getElementById('chat-title');
-            if(win.style.display === 'flex' && title.innerText.includes(type)) {
-                win.style.display = 'none';
-            } else {
-                win.style.display = 'flex';
-                title.innerText = type + "_STREAM";
-            }
-        };
-
-        window.toggleCityMode = () => {
-            agilityLevel = agilityLevel >= 5 ? 1 : agilityLevel + 1;
-            document.getElementById('chat-box').innerHTML += `<div style="color:var(--neon)">[SISTEMA]: Agitação setada em ${agilityLevel}x</div>`;
-        };
-
-        window.sendMsg = () => {
-            const input = document.getElementById('chat-input');
-            if(!input.value) return;
-            document.getElementById('chat-box').innerHTML += `<div><span style="color:var(--neon)">></span> ${input.value}</div>`;
-            input.value = "";
-        };
+        startTraffic();
     </script>
     <script type="module" src="nexus-overlay.js"></script>
 </body>
