@@ -37,8 +37,7 @@
         }
 
         .window-btn { 
-            cursor: pointer;
-            fill: #000; 
+            cursor: pointer; fill: #000; 
             animation: blink var(--dur) infinite alternate;
             animation-delay: var(--delay);
             stroke: var(--neon); stroke-width: 0.8;
@@ -52,52 +51,51 @@
         }
         
         .door-btn { fill: none; stroke: var(--pink); stroke-width: 3; cursor: pointer; transition: 0.3s; }
-        .door-btn:hover { stroke: #fff; filter: drop-shadow(0 0 10px var(--pink)); }
-
         .label-inside { font-family: 'Orbitron'; font-size: 13px; fill: var(--neon); pointer-events: none; letter-spacing: 2px; font-weight: bold; text-transform: uppercase; opacity: 0.8; }
 
-        /* Tráfego de Luzes */
-        .traffic-light {
-            filter: blur(2px);
-            animation: moveLight var(--spd) linear infinite;
-        }
+        /* Tráfego */
+        .traffic-light { filter: blur(2px); animation: moveLight var(--spd) linear infinite; }
         @keyframes moveLight {
             from { transform: translateX(-2000px); }
             to { transform: translateX(6500px); }
         }
 
-        /* UI de Interação */
-        .ui-overlay { position: fixed; z-index: 9999; pointer-events: none; inset: 0; }
-        .ui-element { pointer-events: all; }
+        /* UI OVERLAY COMPACTA */
+        .ui-overlay { 
+            position: fixed; bottom: 20px; left: 0; width: 100%;
+            display: flex; justify-content: center; align-items: center;
+            gap: 15px; padding: 0 20px; z-index: 9999; pointer-events: none;
+        }
+        .ui-element { pointer-events: all; display: flex; gap: 10px; align-items: center; }
 
-        .exit-container { position: absolute; bottom: 45px; right: 30px; } /* Movi para a direita para não bater no chat */
         .btn-exit { 
-            padding: 6px 20px; 
-            background: transparent; 
-            border: 1px solid rgba(255, 0, 85, 0.3); 
-            color: rgba(255, 0, 85, 0.7); 
-            font-family: 'Orbitron'; 
-            font-size: 10px; 
-            cursor: pointer;
-            text-transform: uppercase; 
-            transition: 0.4s;
+            padding: 8px 15px; background: transparent; 
+            border: 1px solid rgba(255, 0, 85, 0.4); 
+            color: var(--pink); font-family: 'Orbitron'; font-size: 10px; 
+            cursor: pointer; transition: 0.3s;
         }
-        .btn-exit:hover { border-color: var(--pink); color: var(--pink); background: rgba(255, 0, 85, 0.1); }
+        .btn-exit:hover { background: rgba(255, 0, 85, 0.1); box-shadow: 0 0 10px var(--pink); }
 
-        /* Sistema de Chat Vertical */
+        .chat-input-bar { background: rgba(0, 0, 0, 0.8); border: 1px solid var(--neon); padding: 5px; width: 400px; max-width: 60vw; }
+        #chat-input {
+            flex: 1; background: transparent; border: none; padding: 5px 10px;
+            color: #fff; font-family: 'Rajdhani'; outline: none; width: 100%;
+        }
+        .btn-send { background: var(--neon); border: none; padding: 5px 15px; cursor: pointer; color: #000; font-weight: bold; }
+
+        /* CHAT STREAM */
         #chat-stream {
-            position: fixed; top: 20px; left: 20px;
-            width: 300px; height: calc(100vh - 120px);
-            pointer-events: none; overflow: hidden;
+            position: fixed; top: 0; left: 20px; width: 400px; 
+            height: calc(100vh - 80px); pointer-events: none; overflow: hidden;
         }
-
         .chat-msg {
-            position: absolute; left: 0; top: -50px;
+            position: absolute; left: 0; top: -60px;
             color: var(--neon); font-family: 'Rajdhani'; font-weight: bold;
-            text-shadow: 0 0 5px #000; font-size: 1.1rem;
-            animation: fallDown 10s linear forwards;
+            text-shadow: 0 0 8px #000; font-size: 1.1rem;
+            animation: fallDown 12s linear forwards;
             white-space: nowrap;
         }
+        .msg-user { color: var(--pink); margin-right: 5px; }
 
         @keyframes fallDown {
             0% { transform: translateY(0); opacity: 0; }
@@ -106,45 +104,28 @@
             100% { transform: translateY(100vh); opacity: 0; }
         }
 
-        .chat-input-bar {
-            position: fixed; bottom: 30px; left: 50%;
-            transform: translateX(-50%);
-            display: flex; gap: 10px; width: 350px;
-        }
-
-        #chat-input {
-            flex: 1; background: rgba(0,0,0,0.7); border: 1px solid var(--neon);
-            padding: 8px 15px; color: #fff; font-family: 'Rajdhani';
-            outline: none; box-shadow: 0 0 10px rgba(0, 242, 255, 0.2);
-        }
-
-        .btn-send {
-            background: var(--neon); border: none; padding: 0 15px;
-            cursor: pointer; font-weight: bold; color: #000;
-        }
-
         .mystery-toast {
             position: fixed; top: 20%; left: 50%; transform: translateX(-50%);
             font-family: 'Orbitron'; font-size: 1.5rem; color: var(--neon);
             text-shadow: 0 0 15px var(--neon); opacity: 0; transition: 0.4s; z-index: 2000;
-            pointer-events: none; text-align: center;
+            pointer-events: none;
         }
     </style>
 </head>
 <body onload="init()">
 
     <div id="mystery-text" class="mystery-toast">ACESSO CONFIRMADO</div>
-
     <div id="chat-stream"></div>
 
     <div class="ui-overlay">
-        <div class="chat-input-bar ui-element">
-            <input type="text" id="chat-input" placeholder="DIGITE SUA MENSAGEM..." maxlength="50">
-            <button class="btn-send" onclick="sendMessage()">></button>
-        </div>
-
-        <div class="exit-container ui-element">
-            <button class="btn-exit" onclick="window.location.href='index.html'">SAIR</button>
+        <div class="ui-element">
+            <button class="btn-exit" onclick="window.location.href='dashboard.html'">SAIR</button>
+            <div class="chat-input-bar">
+                <div style="display: flex;">
+                    <input type="text" id="chat-input" placeholder="ENVIAR MENSAGEM..." maxlength="60">
+                    <button class="btn-send" onclick="sendMessage()">ENVIAR</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -153,28 +134,82 @@
             <defs>
                 <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/></filter>
             </defs>
-
             <g id="stars-layer"></g>
-            
-            <g id="lights-bg">
-                <rect class="traffic-light" x="0" y="300" width="600" height="1" fill="var(--purple)" style="--spd: 40s; opacity: 0.2;"/>
-            </g>
-
             <g id="buildings-container"></g>
-
-            <g id="lights-mid">
-                <rect class="traffic-light" x="0" y="500" width="800" height="4" fill="var(--neon)" style="--spd: 15s; opacity: 0.6;" filter="url(#glow)"/>
-                <rect class="traffic-light" x="0" y="700" width="500" height="3" fill="var(--yellow)" style="--spd: 10s; opacity: 0.5;" filter="url(#glow)"/>
-            </g>
-
-            <rect x="0" y="900" width="6000" height="3" fill="var(--neon)" filter="url(#glow)" />
-
             <g id="lights-front">
-                <rect class="traffic-light" x="0" y="820" width="1000" height="6" fill="var(--pink)" style="--spd: 7s; opacity: 0.4;" filter="url(#glow)"/>
-                <rect class="traffic-light" x="0" y="600" width="400" height="2" fill="var(--purple)" style="--spd: 25s; opacity: 0.7;"/>
+                <rect class="traffic-light" x="0" y="550" width="800" height="3" fill="var(--neon)" style="--spd: 15s; opacity: 0.6;" filter="url(#glow)"/>
+                <rect class="traffic-light" x="0" y="750" width="600" height="5" fill="var(--pink)" style="--spd: 8s; opacity: 0.5;" filter="url(#glow)"/>
+                <rect class="traffic-light" x="0" y="400" width="400" height="2" fill="var(--yellow)" style="--spd: 20s; opacity: 0.4;"/>
             </g>
+            <rect x="0" y="900" width="6000" height="3" fill="var(--neon)" filter="url(#glow)" />
         </svg>
     </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        // Substitua pelos seus dados do projeto Firebase
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY",
+            authDomain: "SEU_AUTH_DOMAIN",
+            projectId: "SEU_PROJECT_ID",
+            storageBucket: "SEU_STORAGE_BUCKET",
+            messagingSenderId: "ID",
+            appId: "APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // FUNÇÃO PARA ENVIAR MENSAGEM
+        window.sendMessage = async () => {
+            const input = document.getElementById('chat-input');
+            const user = auth.currentUser;
+            
+            if (!input.value.trim() || !user) return;
+
+            try {
+                await addDoc(collection(db, "chat_messages"), {
+                    text: input.value.toUpperCase(),
+                    userName: user.displayName || "ANÔNIMO",
+                    createdAt: serverTimestamp()
+                });
+                input.value = "";
+            } catch (e) {
+                console.error("Erro ao enviar: ", e);
+            }
+        };
+
+        // ESCUTAR MENSAGENS EM TEMPO REAL (Global)
+        const q = query(collection(db, "chat_messages"), orderBy("createdAt", "desc"), limit(1));
+        onSnapshot(q, (snapshot) => {
+            snapshot.docChanges().forEach((change) => {
+                if (change.type === "added") {
+                    const data = change.doc.data();
+                    if (data.createdAt) { // Evita duplicar localmente antes de subir
+                        displayMessage(data.userName, data.text);
+                    }
+                }
+            });
+        });
+
+        function displayMessage(user, text) {
+            const stream = document.getElementById('chat-stream');
+            const msg = document.createElement('div');
+            msg.className = 'chat-msg';
+            msg.innerHTML = `<span class="msg-user">[${user}]</span> ${text}`;
+            msg.style.left = Math.random() * 30 + "px";
+            stream.appendChild(msg);
+            setTimeout(() => msg.remove(), 12000);
+        }
+
+        document.getElementById('chat-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') window.sendMessage();
+        });
+    </script>
 
     <script>
         const viewport = document.getElementById('city-viewport');
@@ -185,40 +220,8 @@
             renderStars();
             renderBuildings();
             setTimeout(() => {
-                const center = (6000 / 2) - (window.innerWidth / 2);
-                viewport.scrollLeft = center;
+                viewport.scrollLeft = (6000 / 2) - (window.innerWidth / 2);
             }, 100);
-
-            // Escutar tecla Enter no chat
-            document.getElementById('chat-input').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') sendMessage();
-            });
-        }
-
-        function sendMessage() {
-            const input = document.getElementById('chat-input');
-            const stream = document.getElementById('chat-stream');
-            if (input.value.trim() === "") return;
-
-            const msg = document.createElement('div');
-            msg.className = 'chat-msg';
-            msg.innerText = `> ${input.value.toUpperCase()}`;
-            
-            // Randomizar levemente a posição X para não sobrepor tudo no mesmo pixel
-            msg.style.left = Math.random() * 20 + "px";
-            
-            stream.appendChild(msg);
-            input.value = "";
-
-            // Remover do DOM após a animação acabar (10s)
-            setTimeout(() => msg.remove(), 10000);
-        }
-
-        function windowAction(name, id) {
-            const t = document.getElementById('mystery-text');
-            t.innerText = `${name} - SETOR ${id}`;
-            t.style.opacity = "1";
-            setTimeout(() => t.style.opacity = "0", 1200);
         }
 
         function renderStars() {
@@ -236,54 +239,19 @@
 
         function renderBuildings() {
             let xPos = 400; 
-            const floorY = 900; 
-
             buildingNames.forEach((name) => {
                 const w = 280 + Math.random() * 40; 
                 const h = 450 + Math.random() * 250; 
-                const y = floorY - h;
+                const y = 900 - h;
                 const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
                 
-                const antennaX = xPos + w * 0.2;
-                const antennaH = 40 + Math.random() * 40;
-
                 group.innerHTML = `
-                    <line x1="${antennaX}" y1="${y}" x2="${antennaX}" y2="${y - antennaH}" class="antenna" />
-                    <circle cx="${antennaX}" cy="${y - antennaH}" r="3" fill="var(--pink)" filter="url(#glow)" />
-                    
+                    <line x1="${xPos + 50}" y1="${y}" x2="${xPos + 50}" y2="${y - 60}" class="antenna" />
                     <rect x="${xPos}" y="${y}" width="${w}" height="${h}" class="building-base" />
-                    <text x="${xPos + w/2}" y="${y + 30}" class="label-inside" text-anchor="middle">${name}</text>
-                    
-                    <rect x="${xPos + w/2 - 30}" y="${floorY - 60}" width="60" height="60" class="door-btn" onclick="windowAction('${name}', 'PORTARIA')" />
+                    <text x="${xPos + w/2}" y="${y + 35}" class="label-inside" text-anchor="middle">${name}</text>
+                    <rect x="${xPos + w/2 - 30}" y="${900 - 60}" width="60" height="60" class="door-btn" />
                     <circle cx="${xPos + w + 100}" cy="${y + 100}" r="4" class="drone" />
                 `;
-
-                const cols = 4;
-                const rows = 6;
-                let winId = 1;
-
-                for(let r=0; r<rows; r++) {
-                    for(let c=0; c<cols; c++) {
-                        const winX = xPos + (c + 1) * (w / (cols + 1)) - 10;
-                        const winY = y + 70 + (r * (h / (rows + 1))); // Desci as janelas um pouco para o nome brilhar livre no topo
-                        
-                        if (winY < (floorY - 80)) { 
-                            if(Math.random() > 0.2) {
-                                const winBtn = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-                                winBtn.setAttribute("x", winX);
-                                winBtn.setAttribute("y", winY);
-                                winBtn.setAttribute("width", "20");
-                                winBtn.setAttribute("height", "20");
-                                winBtn.setAttribute("class", "window-btn");
-                                winBtn.setAttribute("style", `--dur:${1+Math.random()*2}s; --delay:${Math.random()*3}s`);
-                                
-                                const currentId = winId++;
-                                winBtn.onclick = () => windowAction(name, currentId);
-                                group.appendChild(winBtn);
-                            }
-                        }
-                    }
-                }
                 bContainer.appendChild(group);
                 xPos += w + 450; 
             });
