@@ -15,62 +15,54 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: var(--bg); color: #fff; font-family: 'Rajdhani'; overflow: hidden; height: 100vh; width: 100vw; }
 
+        /* Viewport com Scroll habilitado para deslizar para o lado */
         #city-viewport {
             width: 100vw;
             height: 100vh;
             overflow-x: auto;
             overflow-y: hidden;
-            scrollbar-width: none;
-            display: flex;
-            align-items: center;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch; /* Melhora o deslize no mobile */
         }
+        /* Esconder barra de scroll mas manter funcionalidade */
         #city-viewport::-webkit-scrollbar { display: none; }
 
-        /* Camada de Zoom Suave */
-        #zoom-layer { transition: transform 0.8s ease-out; transform-origin: center bottom; }
+        svg { display: block; background: #000; }
 
-        /* Estilo Wireframe (Igual à foto) */
-        .building-base { fill: #000; stroke: var(--neon); stroke-width: 1.2; cursor: pointer; }
+        /* Estilo Wireframe Aproximado */
+        .building-base { fill: #000; stroke: var(--neon); stroke-width: 2; }
         
         .window-btn { 
             fill: #000; 
-            cursor: pointer; 
             animation: blink var(--dur) infinite alternate;
             animation-delay: var(--delay);
             stroke: var(--neon);
-            stroke-width: 0.5;
+            stroke-width: 0.8;
         }
         @keyframes blink {
-            0% { opacity: 0.1; }
+            0% { opacity: 0.2; }
             100% { opacity: 1; fill: var(--neon); }
         }
         
-        .door-btn { fill: none; stroke: var(--pink); stroke-width: 2; cursor: pointer; }
-        .door-btn:hover { fill: rgba(255, 0, 85, 0.2); }
+        .door-btn { fill: none; stroke: var(--pink); stroke-width: 2.5; cursor: pointer; }
+        .door-btn:hover { fill: rgba(255, 0, 85, 0.3); }
 
-        .label { font-family: 'Orbitron'; font-size: 10px; fill: var(--neon); pointer-events: none; letter-spacing: 1px; }
+        .label { font-family: 'Orbitron'; font-size: 14px; fill: var(--neon); pointer-events: none; letter-spacing: 2px; }
 
         /* UI Overlay */
         .ui-overlay { position: fixed; z-index: 1000; pointer-events: none; inset: 0; }
         .ui-element { pointer-events: all; }
 
-        #chat-container {
-            position: absolute; bottom: 100px; right: 30px; width: 260px;
-            display: none; flex-direction: column; background: rgba(0,0,0,0.9);
-            border: 1px solid var(--neon); padding: 10px;
-        }
-        #chat-msgs { max-height: 150px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; font-size: 0.8rem; }
-        
         .mystery-toast {
-            position: fixed; top: 15%; left: 50%; transform: translateX(-50%);
-            font-family: 'Orbitron'; font-size: 1.5rem; color: var(--neon);
-            text-shadow: 0 0 10px var(--neon); opacity: 0; transition: 0.4s; z-index: 2000;
+            position: fixed; top: 20%; left: 50%; transform: translateX(-50%);
+            font-family: 'Orbitron'; font-size: 1.8rem; color: var(--neon);
+            text-shadow: 0 0 15px var(--neon); opacity: 0; transition: 0.4s; z-index: 2000;
         }
 
-        .controls { position: absolute; bottom: 30px; right: 30px; display: flex; gap: 8px; }
+        .controls { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; }
         .btn { 
-            padding: 8px 16px; background: #000; border: 1px solid var(--neon); 
-            color: var(--neon); font-family: 'Orbitron'; font-size: 9px; cursor: pointer;
+            padding: 10px 20px; background: rgba(0,0,0,0.8); border: 1px solid var(--neon); 
+            color: var(--neon); font-family: 'Orbitron'; font-size: 10px; cursor: pointer;
         }
     </style>
 </head>
@@ -79,32 +71,22 @@
     <div id="mystery-text" class="mystery-toast">NADA ACONTECENDO...</div>
 
     <div class="ui-overlay">
-        <div id="chat-container" class="ui-element">
-            <div id="chat-msgs"></div>
-            <input type="text" id="chat-input" style="background:#000; border:1px solid var(--neon); color:var(--neon); width:100%; margin-top:5px; padding:5px;" placeholder="MSG..." onkeypress="handleChat(event)">
-        </div>
-
         <div class="controls ui-element">
-            <button class="btn" onclick="resetView()">RESET</button>
-            <button class="btn" onclick="toggleChat()">CHAT</button>
+            <button class="btn" onclick="scrollToCenter()">CENTER</button>
             <button class="btn" style="border-color:var(--pink); color:var(--pink)" onclick="window.location.href='index.html'">EXIT</button>
         </div>
     </div>
 
     <div id="city-viewport">
-        <svg id="main-svg" width="3000" height="1000" viewBox="0 0 3000 1000">
-            <rect width="3000" height="1000" fill="#000" />
+        <svg id="main-svg" width="5000" height="1000" viewBox="0 0 5000 1000">
             <g id="stars-layer"></g>
-            <circle id="celestial-body" r="30" fill="#fff" filter="url(#glow)" />
+            
+            <rect x="0" y="850" width="5000" height="4" fill="var(--neon)" filter="url(#glow)" />
 
-            <g id="zoom-layer">
-                <rect x="0" y="880" width="3000" height="2" fill="var(--neon)" filter="url(#glow)" />
-                <g id="flash-traffic"></g>
-                <g id="buildings-container"></g>
-            </g>
+            <g id="buildings-container"></g>
 
             <defs>
-                <filter id="glow"><feGaussianBlur stdDeviation="4" result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/></filter>
+                <filter id="glow"><feGaussianBlur stdDeviation="5" result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/></filter>
             </defs>
         </svg>
     </div>
@@ -112,14 +94,18 @@
     <script>
         const viewport = document.getElementById('city-viewport');
         const bContainer = document.getElementById('buildings-container');
-        const names = ["AURA", "VERTEX", "NOVA", "CIPHER", "ION", "ECHO", "ZENITH", "FLUX", "OMEGA", "TITAN"];
+        const names = ["CORE", "AURA", "VERTEX", "NOVA", "CIPHER", "ION", "ECHO", "ZENITH", "FLUX", "TITAN", "NEON", "VOID"];
 
         function init() {
             renderStars();
             renderBuildings();
-            animateFlashTraffic();
-            // Centraliza no meio dos 3000px
-            setTimeout(() => { viewport.scrollLeft = (3000 / 2) - (window.innerWidth / 2); }, 50);
+            scrollToCenter();
+        }
+
+        function scrollToCenter() {
+            // Centraliza o scroll no meio do cenário
+            const center = (5000 / 2) - (window.innerWidth / 2);
+            viewport.scrollLeft = center;
         }
 
         function showMystery() {
@@ -130,80 +116,52 @@
 
         function renderStars() {
             const layer = document.getElementById('stars-layer');
-            for(let i=0; i<150; i++) {
+            for(let i=0; i<250; i++) {
                 const s = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                s.setAttribute("cx", Math.random() * 3000);
-                s.setAttribute("cy", Math.random() * 600);
-                s.setAttribute("r", Math.random() * 0.8);
+                s.setAttribute("cx", Math.random() * 5000);
+                s.setAttribute("cy", Math.random() * 700);
+                s.setAttribute("r", Math.random() * 1.2);
                 s.setAttribute("fill", "#fff");
+                s.setAttribute("opacity", Math.random());
                 layer.appendChild(s);
             }
         }
 
         function renderBuildings() {
-            let x = 100;
-            for(let i=0; i<10; i++) {
-                const w = 160 + Math.random() * 40;
-                const h = 300 + Math.random() * 300;
-                const y = 880 - h;
+            let x = 200;
+            for(let i=0; i < names.length; i++) {
+                // Prédios muito maiores (Largura entre 250 e 350)
+                const w = 250 + Math.random() * 100;
+                const h = 400 + Math.random() * 350;
+                const y = 850 - h;
                 const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
                 
                 g.innerHTML = `
                     <rect x="${x}" y="${y}" width="${w}" height="${h}" class="building-base" />
-                    <text x="${x + w/2}" y="${y - 12}" class="label" text-anchor="middle">${names[i] || 'NEXUS'}</text>
-                    <rect x="${x + w/2 - 12}" y="845" width="24" height="35" class="door-btn" onclick="event.stopPropagation(); showMystery()" />
+                    <text x="${x + w/2}" y="${y - 20}" class="label" text-anchor="middle">${names[i]}</text>
+                    <rect x="${x + w/2 - 25}" y="790" width="50" height="60" class="door-btn" onclick="showMystery()" />
                 `;
 
-                // Janelas Simplificadas
-                for(let r=0; r<5; r++) {
-                    for(let c=0; c<3; c++) {
-                        if(Math.random() > 0.4) {
-                            const wx = x + (c + 1) * (w/4) - 6;
-                            const wy = y + 40 + (r * (h/7));
+                // Janelas maiores para preencher o espaço
+                const cols = 4;
+                const rows = 6;
+                for(let r=0; r<rows; r++) {
+                    for(let c=0; c<cols; c++) {
+                        if(Math.random() > 0.3) {
+                            const wx = x + (c + 1) * (w/(cols+1)) - 10;
+                            const wy = y + 50 + (r * (h/(rows+1)));
                             const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
                             rect.setAttribute("x", wx); rect.setAttribute("y", wy);
-                            rect.setAttribute("width", "12"); rect.setAttribute("height", "12");
+                            rect.setAttribute("width", "20"); rect.setAttribute("height", "22");
                             rect.setAttribute("class", "window-btn");
-                            rect.setAttribute("style", `--dur:${1+Math.random()*2}s; --delay:${Math.random()*3}s`);
-                            rect.onclick = (e) => { e.stopPropagation(); showMystery(); };
+                            rect.setAttribute("style", `--dur:${1.5+Math.random()*2}s; --delay:${Math.random()*4}s`);
+                            rect.onclick = showMystery;
                             g.appendChild(rect);
                         }
                     }
                 }
                 bContainer.appendChild(g);
-                x += w + 120; // Espaçamento menor para aproximar
-            }
-        }
-
-        function resetView() {
-            document.getElementById('zoom-layer').style.transform = `scale(1)`;
-            viewport.scrollLeft = (3000 / 2) - (window.innerWidth / 2);
-        }
-
-        function animateFlashTraffic() {
-            const g = document.getElementById('flash-traffic');
-            setInterval(() => {
-                const l = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-                l.setAttribute("x", "-500"); l.setAttribute("y", 882 + Math.random() * 30);
-                l.setAttribute("width", "200"); l.setAttribute("height", "1");
-                l.setAttribute("fill", "var(--neon)");
-                l.innerHTML = `<animate attributeName="x" from="-500" to="3000" dur="0.3s" fill="freeze" />`;
-                g.appendChild(l);
-                setTimeout(() => l.remove(), 400);
-            }, 400);
-        }
-
-        function toggleChat() {
-            const c = document.getElementById('chat-container');
-            c.style.display = c.style.display === 'flex' ? 'none' : 'flex';
-        }
-
-        function handleChat(e) {
-            if(e.key === 'Enter' && e.target.value) {
-                const m = document.createElement('div');
-                m.innerHTML = `<b style="color:var(--neon)">USER:</b> ${e.target.value}`;
-                document.getElementById('chat-msgs').appendChild(m);
-                e.target.value = "";
+                x += w + 150; // Espaço para não ficar sobrecarregado, mas próximo
             }
         }
     </script>
