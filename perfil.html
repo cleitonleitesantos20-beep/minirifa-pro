@@ -3,110 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Habitat | Live Sync</title>
+    <title>Nexus Habitat | Live</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --accent-color: #00f2ff; /* Padrão */
+            --accent-color: #555; /* Cinza Neon Padrão */
             --gold: #ffcc00; 
+            --bg-card: rgba(15, 15, 15, 0.95);
         }
         body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; overflow-x: hidden; }
 
-        /* HEADER */
-        .habitat-header { padding: 40px 20px 20px; text-align: center; }
-        .user-rank { font-family: 'Orbitron'; font-size: 0.7rem; color: var(--gold); letter-spacing: 3px; }
-        .user-name { font-family: 'Orbitron'; font-size: 1.8rem; margin: 10px 0; text-shadow: 0 0 15px var(--accent-color); }
+        /* NAVEGAÇÃO GERAL */
+        .top-nav { display: flex; justify-content: space-between; padding: 15px; position: absolute; width: 100%; box-sizing: border-box; z-index: 100; }
+        .btn-back { background: var(--glass); border: 1px solid #333; color: #fff; padding: 5px 15px; border-radius: 5px; cursor: pointer; text-decoration: none; font-size: 0.8rem; font-family: 'Orbitron'; }
 
-        /* MUNDO VISUAL */
-        .world-container {
-            position: relative; height: 500px; width: 100%;
+        /* HEADER COMPACTO */
+        .habitat-header { padding: 50px 20px 10px; text-align: center; }
+        .user-name { font-family: 'Orbitron'; font-size: 1.4rem; margin: 5px 0; text-shadow: 0 0 10px var(--accent-color); }
+        .status-badge { font-size: 0.6rem; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; }
+
+        /* MUNDO VISUAL COMPACTO */
+        .world-view {
+            position: relative; height: 320px; width: 100%;
             display: flex; align-items: flex-end; justify-content: center;
-            perspective: 1200px; background: radial-gradient(circle at bottom, #0a141a 0%, #000 85%);
-            gap: 15px; padding-bottom: 20px;
+            perspective: 1000px; background: radial-gradient(circle at bottom, #0a1015 0%, #000 70%);
+            gap: 10px; padding-bottom: 20px;
         }
 
-        .grid-floor {
-            position: absolute; bottom: 0; width: 200%; height: 150px;
-            background-image: linear-gradient(var(--accent-color) 1px, transparent 1px), linear-gradient(90deg, var(--accent-color) 1px, transparent 1px);
-            background-size: 50px 50px; opacity: 0.05; transform: rotateX(70deg);
-        }
-
-        /* CUBO E PRÉDIOS */
         .identity-cube {
-            width: 90px; height: 90px; z-index: 10; margin-bottom: 60px;
-            background: var(--accent-color); box-shadow: 0 0 60px var(--accent-color);
-            border-radius: 20px; animation: float 4s ease-in-out infinite;
+            width: 60px; height: 60px; z-index: 10; margin-bottom: 30px;
+            background: var(--accent-color); box-shadow: 0 0 40px var(--accent-color);
+            border-radius: 12px; animation: float 4s ease-in-out infinite;
         }
 
         .building-asset {
-            width: 150px; background: linear-gradient(to top, #050505, #151515);
+            width: 100px; background: #0a0a0a;
             border: 2px solid #222; border-bottom: none; display: flex; flex-wrap: wrap;
-            padding: 12px; gap: 6px; transition: 1s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 8px; gap: 4px; transition: 0.5s; box-shadow: inset 0 0 15px #000;
         }
 
-        .window { width: 14px; height: 14px; background: #111; border-radius: 2px; transition: 0.5s; }
-        .active-win { background: var(--accent-color); box-shadow: 0 0 10px var(--accent-color); }
+        .window { width: 10px; height: 10px; background: #111; border-radius: 1px; }
+        .active-win { background: var(--accent-color); box-shadow: 0 0 5px var(--accent-color); }
 
-        /* PAINEL DE CUSTOMIZAÇÃO */
-        .custom-panel {
-            background: rgba(10,10,10,0.9); padding: 20px; margin: 20px;
-            border-radius: 20px; border: 1px solid #1a1a1a; text-align: center;
+        /* PAINEL DE CONTROLE (SÓ DONO) */
+        .control-panel { background: var(--bg-card); padding: 20px; border-top: 1px solid #222; }
+        .selector-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+        .opt-btn { 
+            background: #111; border: 1px solid #333; color: #aaa; padding: 10px 5px; 
+            border-radius: 8px; cursor: pointer; font-size: 0.6rem; font-family: 'Orbitron'; text-align: center;
         }
-        .color-options { display: flex; justify-content: center; gap: 15px; margin-top: 15px; }
-        .color-dot { 
-            width: 35px; height: 35px; border-radius: 50%; cursor: pointer; 
-            border: 3px solid transparent; transition: 0.3s;
-        }
-        .color-dot:hover { transform: scale(1.2); }
-        .color-dot.selected { border-color: #fff; }
+        .opt-btn.active { border-color: var(--gold); color: #fff; background: #1a1a1a; }
 
-        .btn-buy-color {
-            margin-top: 15px; background: var(--gold); color: #000; border: none;
-            padding: 8px 20px; font-family: 'Orbitron'; font-weight: bold;
-            border-radius: 5px; cursor: pointer; font-size: 0.7rem;
-        }
+        /* VITRINE DE PRODUTOS */
+        .store-section { padding: 20px; background: #050505; min-height: 200px; }
+        .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+        .product-card { background: #111; border-radius: 10px; padding: 10px; border: 1px solid #222; }
+        .product-img { width: 100%; height: 80px; background: #1a1a1a; border-radius: 5px; margin-bottom: 8px; }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(10deg); }
-            50% { transform: translateY(-35px) rotate(-10deg); }
-        }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
     </style>
 </head>
 <body>
 
     <script type="module" src="nexus-overlay.js"></script>
 
+    <nav class="top-nav">
+        <a href="index.html" class="btn-back"> < VOLTAR</a>
+        <div id="user-balance" style="color:var(--gold); font-family:Orbitron; font-size:0.7rem;">0.00 NP</div>
+    </nav>
+
     <div class="habitat-header">
-        <div class="user-rank" id="display-rank">SYNCING PROTOCOL...</div>
+        <div class="status-badge" id="display-role">CIDADÃO</div>
         <div class="user-name" id="display-name">---</div>
     </div>
 
-    <div class="world-container">
-        <div class="grid-floor" id="floor"></div>
-        
+    <div class="world-view">
         <div id="user-cube" class="identity-cube"></div>
-        
-        <div id="user-building" class="building-asset" style="height: 120px;"></div>
+        <div id="user-building" class="building-asset"></div>
+    </div>
 
-        <div id="commerce-building" class="building-asset" style="display: none; border-color: var(--gold); width: 130px;">
-            <div style="color:var(--gold); font-family:Orbitron; font-size:0.5rem; width:100%; text-align:center;">OFFICIAL STORE</div>
+    <div id="owner-controls" class="control-panel" style="display:none;">
+        <span class="status-badge">Configurar Identidade</span>
+        <div class="selector-grid">
+            <div class="opt-btn active" onclick="setRole('citizen')">CIDADÃO</div>
+            <div class="opt-btn" onclick="setRole('clothes')">ROUPAS</div>
+            <div class="opt-btn" onclick="setRole('shoes')">SAPATOS</div>
+            <div class="opt-btn" onclick="setRole('tech')">ELETRO</div>
+            <div class="opt-btn" onclick="setRole('auto')">MOTOS/CARROS</div>
+            <div class="opt-btn" onclick="setRole('jewelry')">JOIAS</div>
         </div>
     </div>
 
-    <div class="custom-panel" id="custom-ui" style="display:none;">
-        <span class="user-rank" style="color:#aaa;">Customizar Ambiente (500 NP)</span>
-        <div class="color-options">
-            <div class="color-dot" style="background:#00f2ff;" onclick="previewColor('#00f2ff')"></div>
-            <div class="color-dot" style="background:#ff0055;" onclick="previewColor('#ff0055')"></div>
-            <div class="color-dot" style="background:#bd00ff;" onclick="previewColor('#bd00ff')"></div>
-            <div class="color-dot" style="background:#00ff88;" onclick="previewColor('#00ff88')"></div>
+    <div id="store-area" class="store-section" style="display:none;">
+        <span class="status-badge" style="color:#555">VITRINE DO COMERCIANTE</span>
+        <div class="product-grid" id="product-list">
+            <div class="product-card">
+                <div class="product-img"></div>
+                <div style="font-size:0.7rem; font-family:Orbitron;">ITEM EXEMPLO</div>
+                <div style="color:var(--gold); font-size:0.8rem;">100.00 NP</div>
+            </div>
         </div>
-        <button class="btn-buy-color" id="btn-save-color">APLICAR MODIFICAÇÃO</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, updateDoc, increment } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
         const firebaseConfig = { 
@@ -121,75 +122,68 @@
         const auth = getAuth(app);
 
         const urlParams = new URLSearchParams(window.location.search);
-        const targetUserID = urlParams.get('id');
-        let selectedColor = "#00f2ff";
+        const targetID = urlParams.get('id');
 
-        // Sincronização em Tempo Real
-        if (targetUserID) {
-            onSnapshot(doc(db, "usuarios", targetUserID), (snap) => {
+        const roles = {
+            citizen: { label: "CIDADÃO", color: "#555" },
+            clothes: { label: "MODA NEON", color: "#00f2ff" }, // Azul
+            shoes: { label: "CALÇADOS", color: "#8b4513" }, // Marrom
+            tech: { label: "TECH HUB", color: "#00ff88" }, // Verde
+            auto: { label: "MOTORS", color: "#bd00ff" }, // Roxo
+            jewelry: { label: "JOALHERIA", color: "#e5e5e5" } // Prata
+        };
+
+        if (targetID) {
+            onSnapshot(doc(db, "usuarios", targetID), (snap) => {
                 if (snap.exists()) {
                     const data = snap.data();
-                    renderHabitat(data);
-                    
-                    // Só mostra painel de customização se o dono for o usuário logado
-                    onAuthStateChanged(auth, user => {
-                        if(user && user.uid === targetUserID) {
-                            document.getElementById('custom-ui').style.display = 'block';
-                        }
-                    });
+                    updateHabitat(data);
+                }
+            });
+
+            onAuthStateChanged(auth, user => {
+                if(user && user.uid === targetID) {
+                    document.getElementById('owner-controls').style.display = 'block';
                 }
             });
         }
 
-        window.previewColor = (color) => {
-            selectedColor = color;
-            document.documentElement.style.setProperty('--accent-color', color);
+        window.setRole = async (roleKey) => {
+            const userRef = doc(db, "usuarios", auth.currentUser.uid);
+            await updateDoc(userRef, {
+                role: roleKey,
+                temComercio: roleKey !== 'citizen'
+            });
+            // Feedback visual imediato nos botões
+            document.querySelectorAll('.opt-btn').forEach(btn => btn.classList.remove('active'));
         };
 
-        function renderHabitat(data) {
-            const level = Math.floor((data.xp || 0) / 1000) + 1;
-            document.getElementById('display-name').innerText = (data.nome || "USER").toUpperCase();
-            document.getElementById('display-rank').innerText = `HABITAT LEVEL ${level}`;
-
-            // Aplica cor salva no banco (se existir)
-            const userTheme = data.habitatColor || (data.genero === 'F' ? '#ff0055' : '#00f2ff');
-            previewColor(userTheme);
-
-            // Prédio
-            const building = document.getElementById('user-building');
-            const height = 120 + (level * 25);
-            building.style.height = height + "px";
+        function updateHabitat(data) {
+            const userRole = data.role || 'citizen';
+            const config = roles[userRole];
             
-            building.innerHTML = "";
-            for(let i=0; i < (level * 4); i++) {
+            // Aplica Cores
+            document.documentElement.style.setProperty('--accent-color', config.color);
+            document.getElementById('display-role').innerText = config.label;
+            document.getElementById('display-name').innerText = (data.nome || "USER").toUpperCase();
+            document.getElementById('user-balance').innerText = `${(data.saldo || 0).toFixed(2)} NP`;
+
+            // Altura do Prédio
+            const level = Math.floor((data.xp || 0) / 1000) + 1;
+            const b = document.getElementById('user-building');
+            b.style.height = (80 + (level * 15)) + "px";
+            
+            // Janelas
+            b.innerHTML = "";
+            for(let i=0; i < (level * 3); i++){
                 const w = document.createElement('div');
                 w.className = "window active-win";
-                building.appendChild(w);
+                b.appendChild(w);
             }
 
-            // Comércio
-            if(data.temComercio) {
-                const comm = document.getElementById('commerce-building');
-                comm.style.display = "flex";
-                comm.style.height = (height * 0.8) + "px";
-            }
+            // Mostra/Esconde Vitrine
+            document.getElementById('store-area').style.display = data.temComercio ? 'block' : 'none';
         }
-
-        // Salvar Nova Cor (Gasta 500 NP)
-        document.getElementById('btn-save-color').onclick = async () => {
-            const user = auth.currentUser;
-            if(!user) return;
-
-            if(confirm("Deseja aplicar esta nova skin por 500 NP (R$ 5,00)?")) {
-                const userRef = doc(db, "usuarios", user.uid);
-                // Verifica saldo antes (Ideal fazer via Rules, mas aqui vai a lógica JS)
-                await updateDoc(userRef, {
-                    habitatColor: selectedColor,
-                    saldo: increment(-500)
-                });
-                alert("Protocolo de Skin Aplicado!");
-            }
-        };
     </script>
 </body>
 </html>
