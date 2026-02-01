@@ -9,8 +9,6 @@
         :root {
             --neon: #00f2ff;
             --pink: #ff0055;
-            --dark-purple: #4b0082;
-            --dark-blue: #00008b;
             --bg: #050508;
         }
 
@@ -31,28 +29,26 @@
             overflow-x: scroll;
             overflow-y: hidden;
             z-index: 1;
-            /* Scroll suave */
             scroll-behavior: smooth;
         }
 
         #zoom-layer {
             transform-origin: center bottom;
             transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
-            transform: scale(0.7); /* Zoom inicial */
+            transform: scale(0.7);
         }
 
-        /* SVG ajustado dinamicamente via JS, mas base aqui */
         .city-svg { height: 100%; display: block; }
 
-        /* Nuvens em toda a tela */
+        /* Nuvens mais leves */
         .square-cloud {
             fill: #1a1a2e;
-            opacity: 0.4;
-            animation: cloudPass 80s linear infinite;
+            opacity: 0.3;
+            animation: cloudPass 90s linear infinite;
         }
         @keyframes cloudPass {
             from { transform: translateX(-400px); }
-            to { transform: translateX(6500px); }
+            to { transform: translateX(100%); } /* Usa % para ser mais performático */
         }
 
         /* Estruturas */
@@ -60,102 +56,103 @@
         
         .building-front { 
             fill: #08080c; 
-            stroke: #1a1a2e; /* Contorno mais sutil */
+            stroke: #151525; 
             stroke-width: 2; 
         }
 
-        /* Janelas Escuras (Azul/Roxo) */
+        /* Janelas Otimizadas */
         .window-dark { 
             animation: flicker-dark var(--d) infinite; 
             opacity: 0.6;
         }
         .window-clickable { cursor: pointer; pointer-events: all; }
-        .window-clickable:hover { fill: #fff !important; filter: drop-shadow(0 0 5px #fff); opacity: 1; }
+        .window-clickable:hover { fill: #fff !important; opacity: 1; }
 
         @keyframes flicker-dark { 
             0%, 100% { opacity: 0.1; fill: #0a0a12; } 
-            50% { opacity: 0.8; fill: var(--win-color); filter: drop-shadow(0 0 2px var(--win-color)); } 
+            50% { opacity: 0.8; fill: var(--win-color); } 
         }
 
         /* Banners e Textos */
-        .ad-banner-bg { fill: rgba(0,0,0,0.8); stroke: var(--neon); stroke-width: 1; }
+        .ad-banner-bg { fill: rgba(0,0,0,0.6); stroke: var(--neon); stroke-width: 1; }
         .ad-text { 
             font-family: 'Orbitron'; 
             font-weight: bold; 
             fill: var(--neon); 
             text-anchor: middle;
-            filter: drop-shadow(0 0 3px var(--neon));
             font-size: 24px;
         }
 
-        /* Detalhes do Telhado */
-        .roof-antenna { stroke: #555; stroke-width: 2; }
-        .warning-light { fill: #ff0000; animation: blinkRed 1s infinite alternate; }
-        @keyframes blinkRed { from { opacity: 0.2; } to { opacity: 1; box-shadow: 0 0 10px red; } }
+        /* Detalhes Leves */
+        .roof-antenna { stroke: #444; stroke-width: 2; }
+        .warning-light { fill: #ff0000; animation: blinkRed 2s infinite alternate; }
+        @keyframes blinkRed { from { opacity: 0.3; } to { opacity: 1; } }
 
-        /* Interface */
+        /* Interface Transparente */
         .nav-bar {
             position: fixed;
             bottom: 30px; left: 50%;
             transform: translateX(-50%);
             display: flex; gap: 20px;
             z-index: 100;
-            background: rgba(5, 5, 10, 0.85);
+            background: transparent; /* Totalmente transparente */
             padding: 10px 25px;
-            border-radius: 40px;
-            border: 1px solid #333;
-            box-shadow: 0 10px 30px #000;
         }
 
         .v-button {
             width: 50px; height: 50px;
-            background: #111;
-            border: 1px solid #333;
+            background: rgba(0,0,0,0.2); /* Quase invisível */
+            border: 1px solid rgba(255,255,255,0.1);
             border-radius: 50%;
             color: #ccc;
             display: flex; align-items: center; justify-content: center;
             font-size: 1.2rem; cursor: pointer; transition: 0.3s;
+            backdrop-filter: blur(2px);
         }
-        .v-button:hover { border-color: var(--neon); color: var(--neon); box-shadow: 0 0 15px rgba(0, 242, 255, 0.2); }
-        .btn-exit { color: var(--pink); border-color: #331111; font-size: 0.6rem; font-family: 'Orbitron'; }
+        .v-button:hover { border-color: var(--neon); color: var(--neon); background: rgba(0, 242, 255, 0.1); }
+        .btn-exit { color: var(--pink); border-color: rgba(255, 0, 85, 0.2); font-size: 0.6rem; font-family: 'Orbitron'; }
         
-        /* Ícone de Zoom Novo */
         .zoom-icon { font-weight: bold; letter-spacing: -2px; }
 
+        /* Chat Minimalista (Sem caixa) */
         #chat-window {
             position: fixed;
-            bottom: 110px; left: 50%;
+            bottom: 100px; left: 50%;
             transform: translateX(-50%);
-            width: 320px; height: 220px;
+            width: 350px; height: 250px;
             z-index: 90; display: none; flex-direction: column;
-            pointer-events: none; /* Deixa passar clique fora */
+            pointer-events: none; 
         }
 
         .chat-messages { 
             flex: 1; 
             overflow-y: auto; 
             padding: 10px;
-            background: rgba(0,0,0,0.6);
-            border-radius: 10px 10px 0 0;
-            border: 1px solid #222;
-            font-size: 0.85rem;
+            background: transparent; /* Sem fundo */
+            border: none; /* Sem borda */
+            font-size: 0.9rem;
             color: #ddd;
+            text-shadow: 1px 1px 2px #000, 0 0 5px #000; /* Sombra para ler em cima da cidade */
+            /* Esconder barra de rolagem mas permitir rolar */
+            scrollbar-width: none; 
         }
-        .chat-entry { margin-bottom: 5px; }
+        .chat-messages::-webkit-scrollbar { display: none; }
+
+        .chat-entry { margin-bottom: 8px; }
         .user-name { color: var(--neon); font-weight: bold; margin-right: 5px; }
         
         .chat-input-area { 
             display: flex; 
-            background: #000; 
-            border: 1px solid #333; 
-            border-top: none;
-            border-radius: 0 0 10px 10px;
+            background: rgba(0,0,0,0.3); /* Leve fundo só no input */
+            border-bottom: 1px solid var(--neon); 
+            border-radius: 0;
             pointer-events: all; 
             padding: 5px;
+            margin-top: 10px;
         }
-        input { background: transparent; border: none; color: #fff; flex: 1; padding: 5px; outline: none; font-family: 'Rajdhani'; }
+        input { background: transparent; border: none; color: #fff; flex: 1; padding: 5px; outline: none; font-family: 'Rajdhani'; text-shadow: 1px 1px 1px #000; }
 
-        @media (max-width: 600px) { #chat-window { width: 90vw; } }
+        @media (max-width: 600px) { #chat-window { width: 95vw; } }
     </style>
 </head>
 <body>
@@ -167,18 +164,17 @@
     </div>
 
     <div id="chat-window">
-        <div class="chat-messages" id="chat-box">
-            </div>
+        <div class="chat-messages" id="chat-box"></div>
         <div class="chat-input-area">
-            <input type="text" placeholder="Global Link..." id="chat-input">
-            <button onclick="sendMsg()" style="background:none; border:none; color:var(--neon); padding:0 10px; cursor:pointer; font-weight:bold;">SEND</button>
+            <input type="text" placeholder="Escreva..." id="chat-input">
+            <button onclick="sendMsg()" style="background:none; border:none; color:var(--neon); padding:0 10px; cursor:pointer; font-weight:bold;">></button>
         </div>
     </div>
 
     <div id="city-container">
-        <svg id="city-svg" class="city-svg" viewBox="0 0 6000 1000">
+        <svg id="city-svg" class="city-svg" viewBox="0 0 1000 1000">
             <defs>
-                <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                <filter id="glow"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
             </defs>
 
             <g id="zoom-layer">
@@ -187,11 +183,10 @@
                 
                 <g id="far-buildings"></g>
 
-                <rect x="-100" y="900" width="6500" height="200" class="platform-base" />
-                <line x1="-100" y1="900" x2="6500" y2="900" stroke="#333" stroke-width="4" />
+                <rect id="plat-rect" x="-100" y="900" width="1000" height="200" class="platform-base" />
+                <line id="plat-line" x1="-100" y1="900" x2="1000" y2="900" stroke="#333" stroke-width="4" />
 
                 <g id="mid-buildings"></g>
-                
                 <g id="air-traffic"></g>
             </g>
         </svg>
@@ -199,128 +194,128 @@
 
     <script type="module">
         let isZoomed = false;
-        // Paleta escura para janelas
-        const darkColors = ['#1a0b2e', '#0f0f3d', '#2d004d', '#000033', '#330033', '#002244'];
-        const bannerWords = ["NEXUS", "SYSTEM", "DATA", "VOID", "LINK", "CYBER", "HOTEL", "BAR", "ZION", "CORE"];
+        const darkColors = ['#1a0b2e', '#0f0f3d', '#2d004d', '#000033']; // Cores reduzidas para otimizar
+        const bannerWords = ["NEXUS", "SYSTEM", "DATA", "VOID", "LINK", "CYBER"];
 
         document.addEventListener('DOMContentLoaded', () => {
-            renderSky();
-            renderClouds();
-            const finalX = renderCity(); // Retorna onde o último prédio termina
+            renderSky(); // Menos estrelas
+            renderClouds(); // Menos nuvens
             
-            // Ajustar tamanho do container ao último prédio
+            const finalX = renderCity(); // Renderiza e pega o final exato
+            
+            // Ajustar Limites do Mapa EXATAMENTE onde acaba o prédio
             const svg = document.getElementById('city-svg');
-            svg.setAttribute('width', finalX + 200);
-            svg.setAttribute('viewBox', `0 0 ${finalX + 200} 1000`);
+            const totalWidth = finalX + 100; // Margem pequena
+            
+            svg.setAttribute('width', totalWidth);
+            svg.setAttribute('viewBox', `0 0 ${totalWidth} 1000`);
+            
+            // Ajusta o chão para acabar junto
+            document.getElementById('plat-rect').setAttribute('width', totalWidth + 100);
+            document.getElementById('plat-line').setAttribute('x2', totalWidth);
 
             startAirTraffic();
             
             const container = document.getElementById('city-container');
-            container.scrollLeft = 200; // Começa no início
+            container.scrollLeft = 100;
 
-            // Paralaxe Fundo
+            // Paralaxe Otimizado
+            let ticking = false;
             container.addEventListener('scroll', () => {
-                const scrollPos = container.scrollLeft;
-                const farLayer = document.getElementById('far-buildings');
-                farLayer.style.transform = `translateX(${scrollPos * 0.85}px)`; // Segue quase junto para dar profundidade
+                if (!ticking) {
+                    window.requestAnimationFrame(() => {
+                        const scrollPos = container.scrollLeft;
+                        document.getElementById('far-buildings').style.transform = `translateX(${scrollPos * 0.9}px)`;
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
             });
         });
 
         function renderSky() {
             const sky = document.getElementById('sky-layer');
-            // Estrelas
-            for(let i=0; i<200; i++) {
-                sky.innerHTML += `<circle cx="${Math.random()*6500}" cy="${Math.random()*800}" r="${Math.random()*1.2}" fill="#fff" opacity="${Math.random()*0.8}"/>`;
+            let html = '';
+            // Reduzido para 80 estrelas (Performance)
+            for(let i=0; i<80; i++) {
+                html += `<circle cx="${Math.random()*6000}" cy="${Math.random()*800}" r="${Math.random()*1.5}" fill="#fff" opacity="${Math.random()*0.6}"/>`;
             }
+            sky.innerHTML = html;
         }
 
         function renderClouds() {
             const clouds = document.getElementById('clouds-layer');
-            // Nuvens em toda a tela (y de 0 a 800)
-            for(let i=0; i<40; i++) {
-                const w = 150 + Math.random()*300;
-                const h = 30 + Math.random()*50;
+            let html = '';
+            // Reduzido para 15 nuvens (Performance)
+            for(let i=0; i<15; i++) {
+                const w = 200 + Math.random()*300;
+                const h = 40 + Math.random()*40;
                 const y = Math.random()*800; 
-                const d = 60 + Math.random()*120; 
-                clouds.innerHTML += `<rect x="${Math.random()*6000}" y="${y}" width="${w}" height="${h}" class="square-cloud" style="animation-duration:${d}s" />`;
+                const d = 80 + Math.random()*100; 
+                html += `<rect x="${Math.random()*4000}" y="${y}" width="${w}" height="${h}" class="square-cloud" style="animation-duration:${d}s" />`;
             }
+            clouds.innerHTML = html;
         }
 
         function renderCity() {
             const far = document.getElementById('far-buildings');
             const mid = document.getElementById('mid-buildings');
+            let farHTML = '';
+            let midHTML = '';
             
-            // --- Prédios de Fundo (Mais variados) ---
-            let farX = -200;
-            while (farX < 6500) {
-                const w = 80 + Math.random()*150;
-                const h = 200 + Math.random()*400; // Altura bem variada
-                const gap = Math.random()*50;
-                
-                // Desenha
-                let b = `<rect x="${farX}" y="${900-h}" width="${w}" height="${h}" fill="#0a0a14" opacity="0.9" />`;
-                // Detalhe simples no fundo
-                if(Math.random() > 0.5) {
-                    b += `<rect x="${farX + w/2 - 2}" y="${900-h-30}" width="4" height="30" fill="#222" />`; // Antena fundo
-                }
-                far.innerHTML += b;
-                farX += w + gap;
+            // --- Prédios de Fundo (Quantidade Reduzida) ---
+            let farX = -100;
+            while (farX < 6000) {
+                const w = 100 + Math.random()*150;
+                const h = 150 + Math.random()*350;
+                farHTML += `<rect x="${farX}" y="${900-h}" width="${w}" height="${h}" fill="#0a0a14" opacity="0.8" />`;
+                farX += w + 20; // Menos gaps
             }
+            far.innerHTML = farHTML;
 
-            // --- Prédios da Frente (Com a lógica de banners) ---
+            // --- Prédios da Frente ---
             let x = 50;
-            while(x < 6000) {
-                const w = 160 + Math.random()*220;
-                const h = 350 + Math.random()*500;
+            // Loop controlado para não estourar memória
+            while(x < 5500) { 
+                const w = 180 + Math.random()*200;
+                const h = 300 + Math.random()*500;
                 const y = 900 - h;
                 
-                // Estrutura Base
+                // Prédio
                 let b = `<rect x="${x}" y="${y}" width="${w}" height="${h}" class="building-front" />`;
 
-                // --- Detalhes do Telhado ---
-                // Antena
-                if(Math.random() > 0.3) {
-                    b += `<line x1="${x+w-20}" y1="${y}" x2="${x+w-20}" y2="${y-50}" class="roof-antenna" />`;
-                    b += `<circle cx="${x+w-20}" cy="${y-50}" r="2" class="warning-light" />`;
-                }
-                // Caixa de ventilação
-                if(Math.random() > 0.5) {
-                    b += `<rect x="${x+20}" y="${y-15}" width="30" height="15" fill="#222" stroke="#444" stroke-width="1"/>`;
+                // Detalhe topo (Simples)
+                if(Math.random() > 0.4) {
+                    b += `<line x1="${x+w-20}" y1="${y}" x2="${x+w-20}" y2="${y-40}" class="roof-antenna" />`;
+                    b += `<circle cx="${x+w-20}" cy="${y-40}" r="2" class="warning-light" />`;
                 }
 
-                // --- Banner Logic ---
-                let hasBanner = Math.random() > 0.5;
-                let bannerY = 0;
-                let bannerH = 0;
+                // Banner
+                let hasBanner = Math.random() > 0.6; // Menos banners
+                let bannerY = 0, bannerH = 0;
 
                 if (hasBanner) {
-                    bannerH = 50 + Math.random()*40;
-                    bannerY = y + 50 + Math.random()*(h - 200); // Posição aleatória na fachada
+                    bannerH = 40 + Math.random()*30;
+                    bannerY = y + 50 + Math.random()*(h - 200);
                 }
 
-                // --- Porta ---
-                const doorW = 50;
-                b += `<rect x="${x + w/2 - doorW/2}" y="${900-70}" width="${doorW}" height="70" fill="#000" stroke="#333" stroke-width="2" />`;
+                // Porta
+                b += `<rect x="${x + w/2 - 25}" y="${900-60}" width="50" height="60" fill="#000" stroke="#222" />`;
 
-                // --- Janelas ---
-                const rows = Math.floor(h/40);
-                const cols = Math.floor(w/30);
+                // Janelas (Geração Otimizada - Menos loops)
+                const rows = Math.floor(h/50); // Menos linhas (grade maior)
+                const cols = Math.floor(w/40); // Menos colunas
 
-                for(let r=2; r < rows-2; r++) { // Margem topo/base
+                for(let r=1; r < rows-1; r++) {
                     for(let c=1; c < cols; c++) {
-                        const winX = x + c*30;
-                        const winY = y + r*40;
-                        
-                        // Verifica se está na área do banner
-                        if (hasBanner && winY >= bannerY - 10 && winY <= bannerY + bannerH + 10) {
-                            continue; // NÃO desenha janela aqui
-                        }
+                        const winY = y + r*50;
+                        if (hasBanner && winY >= bannerY - 10 && winY <= bannerY + bannerH + 10) continue;
 
-                        // Desenha janela escura
-                        if(Math.random() > 0.2) {
+                        // Probabilidade menor de janela (0.3 em vez de 0.8) -> MUITO mais leve
+                        if(Math.random() > 0.6) {
                             const color = darkColors[Math.floor(Math.random() * darkColors.length)];
                             const delay = Math.random() * 5;
-                            b += `<rect x="${winX}" y="${winY}" width="14" height="20" 
+                            b += `<rect x="${x + c*40}" y="${winY}" width="12" height="18" 
                                    class="window-dark window-clickable" 
                                    style="--d:${2+delay}s; --win-color:${color}" 
                                    onclick="console.log('Building ${x}')" />`;
@@ -328,35 +323,35 @@
                     }
                 }
 
-                // --- Desenha o Banner por último (para garantir, mas sem janelas embaixo fica ok) ---
                 if (hasBanner) {
                     const word = bannerWords[Math.floor(Math.random() * bannerWords.length)];
                     b += `<rect x="${x+5}" y="${bannerY}" width="${w-10}" height="${bannerH}" class="ad-banner-bg" />`;
-                    // Texto do Banner
                     b += `<text x="${x + w/2}" y="${bannerY + bannerH/2 + 8}" class="ad-text">${word}</text>`;
                 }
 
-                mid.innerHTML += b;
-                x += w + 80 + Math.random()*100; // Espaço entre prédios
+                midHTML += b;
+                x += w + 50 + Math.random()*80; // Espaço
             }
-            return x; // Retorna a posição final para limitar o mapa
+            mid.innerHTML = midHTML;
+            return x; // Retorna o X final
         }
 
         function startAirTraffic() {
             const air = document.getElementById('air-traffic');
             setInterval(() => {
                 const fCar = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                const posY = 50 + Math.random()*500;
-                fCar.setAttribute("d", "M0 0 L40 0 L50 8 L-10 8 Z"); 
+                const posY = 100 + Math.random()*400;
+                fCar.setAttribute("d", "M0 0 L40 0 L50 6 L-10 6 Z"); 
                 fCar.setAttribute("fill", "#00f2ff");
                 fCar.setAttribute("filter", "url(#glow)");
                 fCar.style.transform = `translate(-100px, ${posY}px)`;
                 fCar.style.transition = "transform 6s linear";
                 air.appendChild(fCar);
                 
-                setTimeout(() => fCar.style.transform = `translate(6500px, ${posY}px)`, 50);
+                // Limpa o DOM logo depois
+                setTimeout(() => fCar.style.transform = `translate(6000px, ${posY}px)`, 50);
                 setTimeout(() => fCar.remove(), 6100);
-            }, 3000);
+            }, 3500); // Menos tráfego
         }
 
         window.toggleChat = () => {
@@ -371,7 +366,7 @@
             
             if(isZoomed) {
                 layer.style.transform = "scale(1.0)";
-                btn.innerHTML = "[ - ]"; // Muda ícone
+                btn.innerHTML = "[ - ]";
             } else {
                 layer.style.transform = "scale(0.7)";
                 btn.innerHTML = "[ + ]";
@@ -381,9 +376,7 @@
         window.sendMsg = () => {
             const input = document.getElementById('chat-input');
             if(!input.value) return;
-            
-            // Formato simples: Nome: Mensagem
-            const fakeUser = "User" + Math.floor(Math.random()*999);
+            const fakeUser = "User" + Math.floor(Math.random()*99);
             
             document.getElementById('chat-box').innerHTML += `
                 <div class="chat-entry">
