@@ -73,7 +73,7 @@
         #chat-input { flex: 1; background: transparent; border: none; padding: 5px 10px; color: #fff; font-family: 'Rajdhani'; outline: none; width: 100%; }
         .btn-send { background: var(--neon); border: none; padding: 5px 15px; cursor: pointer; color: #000; font-weight: bold; font-family: 'Rajdhani'; }
         
-        /* CHAT STREAM - AJUSTADO PARA SER MENOR E MAIS LENTO */
+        /* CHAT STREAM */
         #chat-stream { position: fixed; top: 0; left: 10px; width: 350px; height: 100vh; pointer-events: none; overflow: hidden; z-index: 999999; }
         .chat-msg { position: absolute; left: 0; top: -150px; color: var(--neon); font-family: 'Rajdhani'; font-weight: bold; text-shadow: 2px 2px 4px #000; font-size: 1.1rem; animation: fallDown 18s linear forwards; white-space: nowrap; pointer-events: none; }
         .msg-user { color: var(--pink); margin-right: 5px; font-size: 0.9rem; opacity: 0.9; }
@@ -142,13 +142,13 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        let currentNexusName = "VISITANTE";
+        let userRole = "VISITANTE";
 
-        // Monitor de Autenticação para pegar o nome correto
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                currentNexusName = user.displayName || user.email.split('@')[0] || "USER_NEXUS";
-                console.log("Usuário Nexus identificado:", currentNexusName);
+                userRole = "MORADOR";
+            } else {
+                userRole = "VISITANTE";
             }
         });
 
@@ -160,7 +160,7 @@
             msg.innerHTML = `<span class="msg-user">[${user}]</span> ${text}`;
             msg.style.left = (Math.random() * 30) + "px"; 
             
-            const delay = Math.random() * 3;
+            const delay = Math.random() * 2;
             msg.style.animationDelay = `${delay}s`;
             
             stream.appendChild(msg);
@@ -172,12 +172,13 @@
             const text = input.value.trim();
             if (!text) return;
 
+            const currentText = text.toUpperCase();
             input.value = "";
 
             try {
                 await addDoc(collection(db, "chat_messages"), {
-                    text: text.toUpperCase(),
-                    userName: currentNexusName,
+                    text: currentText,
+                    userName: userRole,
                     createdAt: serverTimestamp()
                 });
             } catch (e) {
@@ -190,7 +191,8 @@
             if(e.key === 'Enter') sendMessage();
         });
 
-        const q = query(collection(db, "chat_messages"), orderBy("createdAt", "desc"), limit(8));
+        // Escuta simplificada para garantir sincronia entre usuários
+        const q = query(collection(db, "chat_messages"), orderBy("createdAt", "desc"), limit(10));
         onSnapshot(q, (snapshot) => {
             snapshot.docChanges().forEach((change) => {
                 if (change.type === "added") {
