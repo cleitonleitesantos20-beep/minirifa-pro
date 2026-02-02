@@ -17,162 +17,113 @@
             background: #000;
             color: #fff;
             font-family: 'Rajdhani', sans-serif;
-            height: 100vh;
-            width: 100vw;
+            height: 100vh; width: 100vw;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            display: flex; flex-direction: column;
         }
 
-        #city-bg {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, #000 0%, #020205 100%);
-            z-index: 1;
-        }
+        #city-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #020205; z-index: 1; }
 
         header {
-            position: relative;
-            z-index: 2000;
-            padding: 10px 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(0,0,0,0.9);
-            border-bottom: 2px solid #111;
+            position: relative; z-index: 2000; padding: 10px 15px;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(0,0,0,0.9); border-bottom: 2px solid #111;
         }
 
         .np-display { font-family: 'Orbitron'; color: #ffcc00; font-size: 14px; }
 
-        .top-btns { display: flex; gap: 8px; }
-        .nav-btn {
-            background: #111;
-            color: var(--user-color);
-            border: 1px solid var(--user-color);
-            padding: 5px 10px;
-            font-family: 'Orbitron';
-            font-size: 10px;
-            cursor: pointer;
-        }
-
         #main-container {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
-            padding: 20px;
-            overflow: auto;
+            flex: 1; display: flex; justify-content: center; align-items: center;
+            z-index: 10; overflow: auto; padding: 40px;
         }
 
         #viewport {
             position: relative;
             background: rgba(10, 10, 15, 0.95);
-            border: 2px solid #222;
-            box-shadow: 0 0 30px rgba(0,0,0,1);
+            border: 2px solid #333;
             background-image: 
                 linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
             background-size: var(--grid-size) var(--grid-size);
-            transition: 0.3s;
-            overflow: hidden; /* Impede que móveis saiam visualmente */
+            box-shadow: 0 0 50px rgba(0,0,0,1);
         }
 
         #protagonist {
-            position: absolute;
-            width: 20px; height: 20px;
+            position: absolute; width: 20px; height: 20px;
             background: var(--user-color);
             filter: drop-shadow(0 0 8px var(--user-color));
-            left: 50%; top: 50%;
-            z-index: 100;
-            pointer-events: none;
+            z-index: 100; pointer-events: none; transition: 0.2s;
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); /* Sempre Losango */
         }
 
-        .shape-masculino { clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
-        .shape-feminino { border-radius: 50%; }
-        .shape-outro { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
-
+        /* FORMATOS DOS MÓVEIS */
         .voxel {
-            position: absolute;
-            z-index: 50;
-            touch-action: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Orbitron';
-            font-size: 7px;
-            color: #fff;
-            border-radius: 2px;
-            background: rgba(255,255,255,0.05);
-            cursor: move;
-            text-align: center;
-            padding: 2px;
+            position: absolute; z-index: 50; touch-action: none;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Orbitron'; font-size: 7px; color: #fff;
+            background: rgba(255,255,255,0.05); cursor: move;
         }
+        .f-triangulo { clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
+        .f-quadrado { border-radius: 0; }
+        .f-retangulo { border-radius: 4px; }
+
+        /* LOJA ROLÁVEL */
+        #ui-panel {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: rgba(0,0,0,0.95); border-top: 2px solid var(--user-color);
+            z-index: 3000; transform: translateY(100%); transition: 0.4s;
+            padding: 15px;
+        }
+        #ui-panel.open { transform: translateY(0); }
+
+        .shop-scroll {
+            display: flex; overflow-x: auto; gap: 15px; padding: 10px 5px;
+            scrollbar-width: none;
+        }
+        .shop-scroll::-webkit-scrollbar { display: none; }
+
+        .furniture-card {
+            min-width: 110px; background: #111; border: 1px solid #222;
+            padding: 10px; text-align: center; flex-shrink: 0;
+        }
+        .furniture-card h5 { font-family: 'Orbitron'; font-size: 9px; color: var(--user-color); margin-bottom: 5px; }
+        .furniture-card p { font-size: 11px; color: #ffcc00; margin-bottom: 8px; }
 
         footer {
-            position: relative;
-            z-index: 2000;
-            padding: 15px;
-            display: flex;
-            gap: 10px;
-            background: #000;
+            position: relative; z-index: 2000; padding: 10px;
+            display: flex; gap: 10px; background: #000;
         }
-
-        .action-btn { flex: 1; padding: 12px; font-family: 'Orbitron'; font-size: 11px; font-weight: bold; border: none; cursor: pointer; }
+        .action-btn { flex: 1; padding: 12px; font-family: 'Orbitron'; font-size: 11px; border: none; cursor: pointer; }
         .btn-save { background: var(--user-color); color: #000; }
         .btn-exit { background: #1a1a1a; color: #fff; }
-
-        #ui-panel {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0,0,0,0.98);
-            z-index: 3000;
-            display: none;
-            flex-direction: column;
-            padding: 20px;
-            overflow-y: auto;
-        }
-        #ui-panel.open { display: flex; }
-
-        .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        .furniture-card { background: #111; border: 1px solid #222; padding: 10px; text-align: center; }
-        .furniture-card h5 { font-family: 'Orbitron'; font-size: 9px; color: var(--user-color); }
-        .furniture-card p { font-size: 11px; color: #ffcc00; }
-        .buy-btn { width: 100%; padding: 6px; background: #222; color: #fff; border: 1px solid #333; font-size: 8px; margin-top: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div id="city-bg"></div>
-
     <header>
-        <div class="np-display" id="balance">CARREGANDO...</div>
+        <div class="np-display" id="balance">SYNC...</div>
         <div class="top-btns">
-            <button class="nav-btn" onclick="expandApartment()">EXPANDIR (10k NP)</button>
+            <button class="nav-btn" onclick="buyPlot()">+ TERRENO (5k NP)</button>
             <button class="nav-btn" style="background:var(--user-color); color:#000;" onclick="toggleMenu()">LOJA</button>
         </div>
     </header>
 
     <div id="main-container">
-        <div id="viewport" style="width: 450px; height: 225px;">
-            <div id="protagonist" class="shape-outro"></div>
+        <div id="viewport" style="width: 300px; height: 300px;">
+            <div id="protagonist"></div>
         </div>
     </div>
+
+    <aside id="ui-panel">
+        <h4 style="font-family:'Orbitron'; font-size:10px; color:#888; margin-bottom:10px;">LOJA NEXUS</h4>
+        <div class="shop-scroll" id="furniture-list"></div>
+        <button class="action-btn btn-exit" style="width:100%; margin-top:10px;" onclick="toggleMenu()">FECHAR LOJA</button>
+    </aside>
 
     <footer>
         <button class="action-btn btn-exit" onclick="window.location.href='index.html'">SAIR</button>
         <button class="action-btn btn-save" onclick="saveApartment()">SALVAR NEXUS</button>
     </footer>
-
-    <aside id="ui-panel">
-        <h2 style="font-family:'Orbitron'; text-align: center; color: var(--user-color);">NEXUS DECOR</h2>
-        <div style="background:#080808; padding:15px; border:1px solid #222; margin-top:15px;">
-            <h4 style="font-family:'Orbitron'; font-size: 10px;">CUSTOMIZAR NÉON</h4>
-            <input type="color" id="color-pick" value="#00f2ff" style="width:100%; height:40px; border:none; background:none;">
-        </div>
-        <div class="shop-grid" id="furniture-list"></div>
-        <button class="action-btn btn-exit" style="margin-top: 20px;" onclick="toggleMenu()">VOLTAR</button>
-    </aside>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
@@ -183,79 +134,69 @@
         const db = getFirestore(app);
 
         let userNP = 0;
-        let expansionLevel = 1;
         const gridSize = 15;
         const viewport = document.getElementById('viewport');
         const userId = localStorage.getItem('userId') || "TEST_USER";
 
         const furniture = [
-            { id: 'tv', name: 'Painel TV', price: 500, w: 60, h: 15 },
-            { id: 'sofa', name: 'Sofá L', price: 800, w: 75, h: 45 },
-            { id: 'cama', name: 'Cama King', price: 1200, w: 60, h: 75 },
-            { id: 'mesa', name: 'Desk Setup', price: 600, w: 60, h: 30 },
-            { id: 'geladeira', name: 'Geladeira', price: 1000, w: 30, h: 30 },
-            { id: 'fogao', name: 'Cooktop', price: 700, w: 30, h: 15 },
-            { id: 'lampada', name: 'Luz Neon', price: 15, h: 15 }
+            { id: 'tv', name: 'Painel TV', price: 500, w: 60, h: 15, shape: 'f-retangulo' },
+            { id: 'sofa', name: 'Sofá L', price: 800, w: 60, h: 60, shape: 'f-triangulo' },
+            { id: 'cama', name: 'Cama King', price: 1200, w: 60, h: 75, shape: 'f-quadrado' },
+            { id: 'mesa', name: 'Desk', price: 600, w: 45, h: 30, shape: 'f-retangulo' },
+            { id: 'luz', name: 'Neon Tip', price: 300, w: 15, h: 15, shape: 'f-triangulo' }
         ];
 
         async function loadUserData() {
+            // Sincronização com usuários-saldos
+            const saldoSnap = await getDoc(doc(db, "usuarios-saldos", userId));
             const userSnap = await getDoc(doc(db, "usuarios", userId));
+
+            if (saldoSnap.exists()) {
+                userNP = Number(saldoSnap.data().nexusPoints) || 0;
+            }
+
             if (userSnap.exists()) {
                 const data = userSnap.data();
-                userNP = Number(data.nexusPoints) || 0;
-                expansionLevel = data.apt_expansion || 1;
+                viewport.style.width = (data.apt_w || 300) + "px";
+                viewport.style.height = (data.apt_h || 300) + "px";
                 
                 const prota = document.getElementById('protagonist');
-                prota.className = '';
-                if(data.sexo === 'Masculino') prota.classList.add('shape-masculino');
-                else if(data.sexo === 'Feminino') prota.classList.add('shape-feminino');
-                else prota.classList.add('shape-outro');
-
                 prota.style.backgroundColor = data.cor_favorita || '#00f2ff';
                 document.documentElement.style.setProperty('--user-color', data.cor_favorita || '#00f2ff');
 
-                viewport.style.width = (450 + (expansionLevel-1)*150) + "px";
-                viewport.style.height = (225 + (expansionLevel-1)*75) + "px";
-
-                if(data.apartment_voxels) {
-                    data.apartment_voxels.forEach(v => spawnFurnitureElement(v));
-                }
-                updateNP();
+                if(data.apartment_voxels) data.apartment_voxels.forEach(v => spawnFurnitureElement(v));
             }
+            updateNP();
         }
 
-        window.expandApartment = async () => {
-            if(userNP < 10000) return alert("NP Insuficiente!");
-            userNP -= 10000;
-            expansionLevel++;
-            viewport.style.width = (parseInt(viewport.style.width) + 150) + "px";
-            viewport.style.height = (parseInt(viewport.style.height) + 75) + "px";
+        window.buyPlot = async () => {
+            if(userNP < 5000) return alert("NP Insuficiente!");
+            userNP -= 5000;
+            // Aumenta o retângulo principal
+            viewport.style.width = (parseInt(viewport.style.width) + 30) + "px";
+            viewport.style.height = (parseInt(viewport.style.height) + 30) + "px";
             updateNP();
-            alert("Espaço ampliado!");
+            alert("Terreno Expandido!");
         };
 
         window.buyFurniture = (id) => {
             const item = furniture.find(f => f.id === id);
             if(userNP < item.price) return alert("NP Insuficiente!");
-            
             userNP -= item.price;
-            spawnFurnitureElement({
-                name: item.name, w: item.w, h: item.h,
-                x: "0px", y: "0px", color: document.getElementById('color-pick').value
-            });
+            spawnFurnitureElement({ ...item, x: "0px", y: "0px", color: "var(--user-color)" });
             updateNP();
             toggleMenu();
         };
 
         function spawnFurnitureElement(data) {
             const el = document.createElement('div');
-            el.className = 'voxel';
+            el.className = `voxel ${data.shape}`;
             el.style.width = data.w + "px";
             el.style.height = data.h + "px";
             el.style.left = data.x;
             el.style.top = data.y;
-            el.style.border = `2px solid ${data.color}`;
-            el.style.boxShadow = `0 0 10px ${data.color}`;
+            el.style.border = `1px solid ${data.color || 'var(--user-color)'}`;
+            el.style.boxShadow = `0 0 5px ${data.color || 'var(--user-color)'}`;
             el.innerText = data.name;
             makeDraggable(el);
             viewport.appendChild(el);
@@ -267,20 +208,12 @@
                 const ev = e.type === 'touchstart' ? e.touches[0] : e;
                 pos3 = ev.clientX; pos4 = ev.clientY;
                 document.onmouseup = document.ontouchend = () => {
-                    // Trava de Limite (Bounds Check)
                     let left = Math.round(el.offsetLeft / gridSize) * gridSize;
                     let top = Math.round(el.offsetTop / gridSize) * gridSize;
-                    
-                    const maxLeft = viewport.clientWidth - el.offsetWidth;
-                    const maxTop = viewport.clientHeight - el.offsetHeight;
-
-                    if(left < 0) left = 0;
-                    if(top < 0) top = 0;
-                    if(left > maxLeft) left = Math.floor(maxLeft/gridSize)*gridSize;
-                    if(top > maxTop) top = Math.floor(maxTop/gridSize)*gridSize;
-
-                    el.style.left = left + "px";
-                    el.style.top = top + "px";
+                    const maxL = viewport.clientWidth - el.offsetWidth;
+                    const maxT = viewport.clientHeight - el.offsetHeight;
+                    el.style.left = Math.max(0, Math.min(left, maxL)) + "px";
+                    el.style.top = Math.max(0, Math.min(top, maxT)) + "px";
                     document.onmouseup = document.onmousemove = document.ontouchend = document.ontouchmove = null;
                 };
                 document.onmousemove = document.ontouchmove = (e) => {
@@ -299,26 +232,33 @@
                 voxels.push({
                     name: v.innerText, x: v.style.left, y: v.style.top,
                     w: parseInt(v.style.width), h: parseInt(v.style.height),
-                    color: v.style.borderColor
+                    shape: Array.from(v.classList).find(c => c.startsWith('f-'))
                 });
             });
             try {
+                // Salva saldo e dados do apto
+                await updateDoc(doc(db, "usuarios-saldos", userId), { nexusPoints: userNP });
                 await updateDoc(doc(db, "usuarios", userId), {
                     apartment_voxels: voxels,
-                    nexusPoints: userNP,
-                    apt_expansion: expansionLevel
+                    apt_w: parseInt(viewport.style.width),
+                    apt_h: parseInt(viewport.style.height)
                 });
-                alert("Progresso Salvo!");
+                alert("Sincronizado!");
             } catch (e) { alert("Erro ao salvar."); }
         };
 
         window.toggleMenu = () => document.getElementById('ui-panel').classList.toggle('open');
         function updateNP() { document.getElementById('balance').innerText = `${userNP} NP`; }
 
+        // Renderizar Loja com formatos
         const list = document.getElementById('furniture-list');
         furniture.forEach(item => {
-            list.innerHTML += `<div class="furniture-card"><h5>${item.name}</h5><p>${item.price} NP</p>
-            <button class="buy-btn" onclick="buyFurniture('${item.id}')">COMPRAR</button></div>`;
+            list.innerHTML += `
+                <div class="furniture-card">
+                    <h5>${item.name}</h5>
+                    <p>${item.price} NP</p>
+                    <button class="buy-btn" onclick="buyFurniture('${item.id}')">ADQUIRIR</button>
+                </div>`;
         });
         loadUserData();
     </script>
