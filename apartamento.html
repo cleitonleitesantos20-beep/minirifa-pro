@@ -15,12 +15,10 @@
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
         body {
-            background: #000;
-            color: #fff;
+            background: #000; color: #fff;
             font-family: 'Rajdhani', sans-serif;
             height: 100vh; width: 100vw;
-            overflow: hidden;
-            display: flex; flex-direction: column;
+            overflow: hidden; display: flex; flex-direction: column;
         }
 
         #city-bg { 
@@ -34,23 +32,18 @@
             display: flex; justify-content: flex-end; align-items: center;
         }
 
-        .top-btns { display: flex; gap: 12px; }
         .nav-btn {
             background: rgba(0, 242, 255, 0.1);
             color: var(--user-color);
             border: 1px solid var(--user-color);
-            padding: 10px 20px;
-            font-family: 'Orbitron';
-            font-size: 10px;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: 0.3s;
+            padding: 10px 20px; font-family: 'Orbitron'; font-size: 10px;
+            text-transform: uppercase; cursor: pointer;
             clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
         }
 
         #main-container {
             flex: 1; display: flex; justify-content: center; align-items: center;
-            z-index: 10; overflow: auto; padding: 40px;
+            z-index: 10; overflow: auto; padding: 100px;
         }
 
         #viewport {
@@ -62,7 +55,8 @@
                 linear-gradient(rgba(0, 242, 255, 0.05) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(0, 242, 255, 0.05) 1px, transparent 1px);
             background-size: var(--grid-size) var(--grid-size);
-            min-width: 500px; min-height: 300px;
+            min-width: 400px; min-height: 200px;
+            transition: width 0.3s, height 0.3s;
         }
 
         #protagonist {
@@ -71,7 +65,7 @@
             filter: drop-shadow(0 0 10px var(--user-color));
             z-index: 100; pointer-events: none;
             clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-            left: 50%; top: 50%;
+            left: 50%; top: 50%; transform: translate(-50%, -50%);
         }
 
         .voxel {
@@ -80,23 +74,24 @@
             font-family: 'Orbitron'; font-size: 8px; color: #fff;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--user-color);
-            box-shadow: inset 0 0 10px rgba(0, 242, 255, 0.2);
-            cursor: move;
+            cursor: move; text-align: center;
         }
 
-        /* Classes de Formas */
+        .f-comodo { 
+            border: 2px dashed var(--user-color); 
+            background: rgba(0, 242, 255, 0.1);
+            z-index: 5;
+        }
+
         .f-triangulo { clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
         .f-quadrado { border-radius: 2px; }
         .f-retangulo { border-radius: 2px; }
-        .f-comodo { border: 2px dashed var(--user-color); background: rgba(0, 242, 255, 0.02); z-index: 10; }
 
-        /* Preview na Loja */
         .preview-box {
-            width: 50px; height: 50px; margin: 0 auto 10px;
-            border: 1px solid #333; display: flex; align-items: center; justify-content: center;
-            background: #111;
+            width: 60px; height: 60px; margin: 0 auto 10px;
+            border: 1px solid #222; display: flex; align-items: center; justify-content: center;
+            background: #050505;
         }
-        .shape-preview { background: var(--user-color); opacity: 0.7; }
 
         #ui-panel {
             position: fixed; bottom: 0; left: 0; width: 100%;
@@ -107,16 +102,16 @@
 
         .shop-scroll { display: flex; overflow-x: auto; gap: 15px; padding: 10px 0; }
         .furniture-card {
-            min-width: 140px; background: #000; border: 1px solid #222;
-            padding: 15px; text-align: center; flex-shrink: 0;
+            min-width: 130px; background: #000; border: 1px solid #222;
+            padding: 12px; text-align: center; flex-shrink: 0;
         }
 
         footer {
             position: relative; z-index: 2000; padding: 15px;
-            display: flex; gap: 10px; background: #000; border-top: 1px solid #222;
+            display: flex; gap: 10px; background: #000;
         }
-        .action-btn { flex: 1; padding: 12px; font-family: 'Orbitron'; font-size: 11px; font-weight: bold; border: none; cursor: pointer; }
-        .btn-save { background: var(--user-color); color: #000; }
+        .action-btn { flex: 1; padding: 12px; font-family: 'Orbitron'; font-size: 11px; cursor: pointer; border: none; text-transform: uppercase; }
+        .btn-save { background: var(--user-color); color: #000; font-weight: bold; }
         .btn-exit { background: #111; color: #fff; }
     </style>
 </head>
@@ -125,10 +120,7 @@
     <div id="city-bg"></div>
 
     <header>
-        <div class="top-btns">
-            <button class="nav-btn" onclick="window.addRoom()">+ Novo Cômodo</button>
-            <button class="nav-btn" style="background:var(--user-color); color:#000;" onclick="window.toggleMenu()">Móveis</button>
-        </div>
+        <button class="nav-btn" onclick="window.toggleMenu()">Catálogo de Construção</button>
     </header>
 
     <div id="main-container">
@@ -138,14 +130,14 @@
     </div>
 
     <aside id="ui-panel">
-        <h4 style="font-family:'Orbitron'; font-size:12px; color:#555; margin-bottom:15px;">NEXUS CATALOG</h4>
+        <h4 style="font-family:'Orbitron'; font-size:12px; color:var(--user-color); margin-bottom:15px;">NEXUS BUILDER</h4>
         <div class="shop-scroll" id="furniture-list"></div>
         <button class="action-btn btn-exit" style="width:100%; margin-top:15px;" onclick="window.toggleMenu()">FECHAR</button>
     </aside>
 
     <footer>
         <button class="action-btn btn-exit" onclick="window.location.href='index.html'">SAIR</button>
-        <button class="action-btn btn-save" onclick="window.saveApartment()">SALVAR PROJETO</button>
+        <button class="action-btn btn-save" onclick="window.saveApartment()">SALVAR NEXUS</button>
     </footer>
 
     <script type="module">
@@ -160,12 +152,13 @@
         const userId = localStorage.getItem('userId') || "TEST_USER";
         const gridSize = 20;
 
-        const furniture = [
-            { id: 'comodo', name: 'Divisória', w: 160, h: 120, shape: 'f-comodo' },
-            { id: 'tv', name: 'Painel Led', w: 100, h: 20, shape: 'f-retangulo' },
-            { id: 'sofa', name: 'Sofá Modular', w: 80, h: 60, shape: 'f-quadrado' },
-            { id: 'cama', name: 'Cama Bio', w: 80, h: 100, shape: 'f-quadrado' },
-            { id: 'mesa', name: 'Holo Table', w: 60, h: 60, shape: 'f-triangulo' }
+        const catalog = [
+            { id: 'c1', name: 'Suíte Master', w: 200, h: 140, shape: 'f-comodo', type: 'room' },
+            { id: 'c2', name: 'Varanda Neon', w: 100, h: 180, shape: 'f-comodo', type: 'room' },
+            { id: 'c3', name: 'Nexus Hall', w: 140, h: 140, shape: 'f-comodo', type: 'room' },
+            { id: 'm1', name: 'Holo TV', w: 80, h: 20, shape: 'f-retangulo', type: 'mob' },
+            { id: 'm2', name: 'Bio Bed', w: 80, h: 100, shape: 'f-quadrado', type: 'mob' },
+            { id: 'm3', name: 'Cyber Table', w: 60, h: 60, shape: 'f-triangulo', type: 'mob' }
         ];
 
         async function loadUserData() {
@@ -174,30 +167,22 @@
                 const data = userSnap.data();
                 const favColor = data.cor_favorita || '#00f2ff';
                 document.documentElement.style.setProperty('--user-color', favColor);
-                
                 viewport.style.width = (data.apt_w || 500) + "px";
                 viewport.style.height = (data.apt_h || 300) + "px";
-
-                if(data.apartment_voxels) {
-                    data.apartment_voxels.forEach(v => spawnFurnitureElement(v));
-                }
+                if(data.apartment_voxels) data.apartment_voxels.forEach(v => spawnElement(v));
             }
             renderShop();
         }
 
         window.toggleMenu = () => document.getElementById('ui-panel').classList.toggle('open');
 
-        window.addRoom = () => {
-            spawnFurnitureElement({ name: 'CÔMODO', w: 200, h: 160, shape: 'f-comodo', x: '20px', y: '20px' });
-        };
-
-        window.buyFurniture = (id) => {
-            const item = furniture.find(f => f.id === id);
-            spawnFurnitureElement({ ...item, x: "40px", y: "40px" });
+        window.buyItem = (id) => {
+            const item = catalog.find(i => i.id === id);
+            spawnElement({ ...item, x: "20px", y: "20px" });
             window.toggleMenu();
         };
 
-        function spawnFurnitureElement(data) {
+        function spawnElement(data) {
             const el = document.createElement('div');
             el.className = `voxel ${data.shape}`;
             el.style.width = data.w + "px";
@@ -205,10 +190,9 @@
             el.style.left = data.x || "0px";
             el.style.top = data.y || "0px";
             el.innerText = data.name;
-            
-            // Duplo clique para remover
+            el.dataset.type = data.type;
+
             el.ondblclick = () => el.remove();
-            
             makeDraggable(el);
             viewport.appendChild(el);
         }
@@ -218,19 +202,68 @@
             el.onmousedown = el.ontouchstart = (e) => {
                 const ev = e.type === 'touchstart' ? e.touches[0] : e;
                 pos3 = ev.clientX; pos4 = ev.clientY;
-                document.onmouseup = document.ontouchend = () => {
-                    let left = Math.round(el.offsetLeft / gridSize) * gridSize;
-                    let top = Math.round(el.offsetTop / gridSize) * gridSize;
-                    el.style.left = Math.max(0, Math.min(left, viewport.clientWidth - el.offsetWidth)) + "px";
-                    el.style.top = Math.max(0, Math.min(top, viewport.clientHeight - el.offsetHeight)) + "px";
-                    document.onmouseup = document.onmousemove = document.ontouchend = document.ontouchmove = null;
-                };
+                
                 document.onmousemove = document.ontouchmove = (e) => {
                     const evm = e.type === 'touchmove' ? e.touches[0] : e;
                     pos1 = pos3 - evm.clientX; pos2 = pos4 - evm.clientY;
                     pos3 = evm.clientX; pos4 = evm.clientY;
-                    el.style.top = (el.offsetTop - pos2) + "px";
-                    el.style.left = (el.offsetLeft - pos1) + "px";
+                    
+                    let newTop = el.offsetTop - pos2;
+                    let newLeft = el.offsetLeft - pos1;
+
+                    // Se for cômodo, permite sair para expandir
+                    if (el.dataset.type === 'room') {
+                        el.style.top = newTop + "px";
+                        el.style.left = newLeft + "px";
+                    } else {
+                        // Móveis ficam presos dentro do viewport
+                        el.style.top = Math.max(0, Math.min(newTop, viewport.clientHeight - el.offsetHeight)) + "px";
+                        el.style.left = Math.max(0, Math.min(newLeft, viewport.clientWidth - el.offsetWidth)) + "px";
+                    }
+                };
+
+                document.onmouseup = document.ontouchend = () => {
+                    // Alinhamento ao Grid
+                    let finalLeft = Math.round(el.offsetLeft / gridSize) * gridSize;
+                    let finalTop = Math.round(el.offsetTop / gridSize) * gridSize;
+                    
+                    el.style.left = finalLeft + "px";
+                    el.style.top = finalTop + "px";
+
+                    // MECÂNICA DE EXPANSÃO
+                    if (el.dataset.type === 'room') {
+                        let needsExpand = false;
+                        let addW = 0, addH = 0;
+
+                        if (finalLeft + el.offsetWidth > viewport.clientWidth) {
+                            addW = (finalLeft + el.offsetWidth) - viewport.clientWidth;
+                            needsExpand = true;
+                        }
+                        if (finalTop + el.offsetHeight > viewport.clientHeight) {
+                            addH = (finalTop + el.offsetHeight) - viewport.clientHeight;
+                            needsExpand = true;
+                        }
+                        // Expansão para a esquerda ou topo (ajusta posição de todos os itens)
+                        if (finalLeft < 0 || finalTop < 0) {
+                            const shiftX = finalLeft < 0 ? Math.abs(finalLeft) : 0;
+                            const shiftY = finalTop < 0 ? Math.abs(finalTop) : 0;
+                            
+                            viewport.style.width = (viewport.clientWidth + shiftX) + "px";
+                            viewport.style.height = (viewport.clientHeight + shiftY) + "px";
+                            
+                            document.querySelectorAll('.voxel').forEach(v => {
+                                v.style.left = (parseInt(v.style.left) + shiftX) + "px";
+                                v.style.top = (parseInt(v.style.top) + shiftY) + "px";
+                            });
+                        }
+
+                        if (needsExpand) {
+                            viewport.style.width = (viewport.clientWidth + addW) + "px";
+                            viewport.style.height = (viewport.clientHeight + addH) + "px";
+                        }
+                    }
+
+                    document.onmouseup = document.onmousemove = document.ontouchend = document.ontouchmove = null;
                 };
             };
         }
@@ -241,7 +274,8 @@
                 voxels.push({
                     name: v.innerText, x: v.style.left, y: v.style.top,
                     w: parseInt(v.style.width), h: parseInt(v.style.height),
-                    shape: Array.from(v.classList).find(c => c.startsWith('f-'))
+                    shape: Array.from(v.classList).find(c => c.startsWith('f-')),
+                    type: v.dataset.type
                 });
             });
             await updateDoc(doc(db, "usuarios", userId), {
@@ -249,24 +283,21 @@
                 apt_w: parseInt(viewport.style.width),
                 apt_h: parseInt(viewport.style.height)
             });
-            alert("Sincronizado com o Nexus!");
+            alert("Estrutura salva no Nexus!");
         };
 
         function renderShop() {
             const list = document.getElementById('furniture-list');
             list.innerHTML = '';
-            furniture.forEach(item => {
-                const scale = 0.3;
+            catalog.forEach(item => {
+                const scale = 0.25;
                 list.innerHTML += `
                     <div class="furniture-card">
                         <div class="preview-box">
-                            <div class="shape-preview ${item.shape}" 
-                                 style="width:${item.w * scale}px; height:${item.h * scale}px; 
-                                 border:1px solid var(--user-color); 
-                                 background: var(--user-color);"></div>
+                            <div class="${item.shape}" style="width:${item.w * scale}px; height:${item.h * scale}px; border:1px solid var(--user-color); background:rgba(0,242,255,0.2)"></div>
                         </div>
-                        <h5>${item.name}</h5>
-                        <button class="action-btn btn-save" style="width:100%; font-size:9px;" onclick="window.buyFurniture('${item.id}')">ADICIONAR</button>
+                        <h5 style="font-size:9px; margin-bottom:8px;">${item.name}</h5>
+                        <button class="action-btn btn-save" style="width:100%; padding:5px; font-size:8px;" onclick="window.buyItem('${item.id}')">OBTER</button>
                     </div>`;
             });
         }
