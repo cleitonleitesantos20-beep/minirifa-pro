@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexusVL - Cyber Real Estate</title>
+    <title>NexusVL - Real Estate System</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --user-color: #00f2ff;
-            --grid-size: 15px;
+            --grid-size: 20px;
+            --panel-bg: rgba(5, 5, 10, 0.98);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -22,107 +23,157 @@
             display: flex; flex-direction: column;
         }
 
-        #city-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #020205; z-index: 1; }
-
-        header {
-            position: relative; z-index: 2000; padding: 10px 15px;
-            display: flex; justify-content: space-between; align-items: center;
-            background: rgba(0,0,0,0.9); border-bottom: 2px solid #111;
+        /* Fundo de grade cibernética */
+        #city-bg { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: radial-gradient(circle at center, #0a0a1a 0%, #000 100%);
+            z-index: 1; 
         }
 
-        .np-display { font-family: 'Orbitron'; color: #ffcc00; font-size: 14px; }
+        header {
+            position: relative; z-index: 2000; padding: 15px 20px;
+            display: flex; justify-content: flex-end; align-items: center;
+            background: linear-gradient(to bottom, rgba(0,0,0,1), transparent);
+        }
+
+        .top-btns { display: flex; gap: 12px; }
+        .nav-btn {
+            background: rgba(0, 242, 255, 0.1);
+            color: var(--user-color);
+            border: 1px solid var(--user-color);
+            padding: 8px 16px;
+            font-family: 'Orbitron';
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: 0.3s;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+        }
+        .nav-btn:hover { background: var(--user-color); color: #000; }
 
         #main-container {
             flex: 1; display: flex; justify-content: center; align-items: center;
-            z-index: 10; overflow: auto; padding: 40px;
+            z-index: 10; overflow: auto; padding: 60px;
+            perspective: 1000px;
         }
 
+        /* Retângulo do Apartamento Ajustado */
         #viewport {
             position: relative;
-            background: rgba(10, 10, 15, 0.95);
-            border: 2px solid #333;
+            background: rgba(20, 20, 30, 0.8);
+            border: 2px solid #00f2ff;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2), inset 0 0 50px rgba(0,0,0,0.8);
             background-image: 
-                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+                linear-gradient(rgba(0, 242, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 242, 255, 0.05) 1px, transparent 1px);
             background-size: var(--grid-size) var(--grid-size);
-            box-shadow: 0 0 50px rgba(0,0,0,1);
+            transition: width 0.5s ease, height 0.5s ease;
         }
 
         #protagonist {
-            position: absolute; width: 20px; height: 20px;
+            position: absolute; width: 24px; height: 24px;
             background: var(--user-color);
-            filter: drop-shadow(0 0 8px var(--user-color));
-            z-index: 100; pointer-events: none; transition: 0.2s;
-            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); /* Sempre Losango */
+            filter: drop-shadow(0 0 12px var(--user-color));
+            z-index: 100; pointer-events: none;
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+            left: 50%; top: 50%; transform: translate(-50%, -50%);
         }
 
-        /* FORMATOS DOS MÓVEIS */
+        /* Estilo dos Móveis (Voxels) */
         .voxel {
             position: absolute; z-index: 50; touch-action: none;
             display: flex; align-items: center; justify-content: center;
-            font-family: 'Orbitron'; font-size: 7px; color: #fff;
-            background: rgba(255,255,255,0.05); cursor: move;
+            font-family: 'Orbitron'; font-size: 8px; color: #fff;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(2px);
+            cursor: move;
+            border: 1px solid rgba(255,255,255,0.3);
+            text-shadow: 0 0 5px #000;
         }
         .f-triangulo { clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
-        .f-quadrado { border-radius: 0; }
-        .f-retangulo { border-radius: 4px; }
+        .f-quadrado { border-radius: 2px; }
+        .f-retangulo { border-radius: 2px; }
 
-        /* LOJA ROLÁVEL */
+        /* Loja Futurista Inferior */
         #ui-panel {
             position: fixed; bottom: 0; left: 0; width: 100%;
-            background: rgba(0,0,0,0.95); border-top: 2px solid var(--user-color);
-            z-index: 3000; transform: translateY(100%); transition: 0.4s;
-            padding: 15px;
+            background: var(--panel-bg);
+            border-top: 3px solid var(--user-color);
+            z-index: 3000; transform: translateY(100%); transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 20px;
+            box-shadow: 0 -20px 50px rgba(0,0,0,0.9);
         }
         #ui-panel.open { transform: translateY(0); }
 
-        .shop-scroll {
-            display: flex; overflow-x: auto; gap: 15px; padding: 10px 5px;
-            scrollbar-width: none;
+        .shop-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 15px; border-bottom: 1px solid #222; padding-bottom: 10px;
         }
-        .shop-scroll::-webkit-scrollbar { display: none; }
+
+        .shop-scroll {
+            display: flex; overflow-x: auto; gap: 20px; padding: 10px 0;
+            scroll-behavior: smooth; -webkit-overflow-scrolling: touch;
+        }
+        .shop-scroll::-webkit-scrollbar { height: 4px; }
+        .shop-scroll::-webkit-scrollbar-thumb { background: var(--user-color); }
 
         .furniture-card {
-            min-width: 110px; background: #111; border: 1px solid #222;
-            padding: 10px; text-align: center; flex-shrink: 0;
+            min-width: 130px; background: #0a0a0a; border: 1px solid #1a1a1a;
+            padding: 15px; text-align: center; flex-shrink: 0;
+            transition: 0.3s; position: relative;
         }
-        .furniture-card h5 { font-family: 'Orbitron'; font-size: 9px; color: var(--user-color); margin-bottom: 5px; }
-        .furniture-card p { font-size: 11px; color: #ffcc00; margin-bottom: 8px; }
+        .furniture-card:hover { border-color: var(--user-color); background: #111; }
+        .furniture-card h5 { font-family: 'Orbitron'; font-size: 10px; color: #fff; margin-bottom: 8px; }
+        .furniture-card p { font-size: 13px; color: #ffcc00; font-weight: bold; margin-bottom: 12px; }
+
+        .buy-btn {
+            width: 100%; padding: 8px; background: var(--user-color);
+            color: #000; font-family: 'Orbitron'; font-size: 9px;
+            font-weight: bold; border: none; cursor: pointer;
+        }
 
         footer {
-            position: relative; z-index: 2000; padding: 10px;
-            display: flex; gap: 10px; background: #000;
+            position: relative; z-index: 2000; padding: 15px 20px;
+            display: flex; gap: 15px; background: #000;
         }
-        .action-btn { flex: 1; padding: 12px; font-family: 'Orbitron'; font-size: 11px; border: none; cursor: pointer; }
-        .btn-save { background: var(--user-color); color: #000; }
-        .btn-exit { background: #1a1a1a; color: #fff; }
+        .action-btn { 
+            flex: 1; padding: 14px; font-family: 'Orbitron'; font-size: 11px; 
+            font-weight: bold; border: none; cursor: pointer; letter-spacing: 1px;
+        }
+        .btn-save { background: var(--user-color); color: #000; clip-path: polygon(0 0, 95% 0, 100% 100%, 5% 100%); }
+        .btn-exit { background: #1a1a1a; color: #666; }
     </style>
 </head>
 <body>
 
+    <div id="city-bg"></div>
+
     <header>
-        <div class="np-display" id="balance">SYNC...</div>
         <div class="top-btns">
-            <button class="nav-btn" onclick="buyPlot()">+ TERRENO (5k NP)</button>
-            <button class="nav-btn" style="background:var(--user-color); color:#000;" onclick="toggleMenu()">LOJA</button>
+            <button class="nav-btn" onclick="buyPlot()">Expandir Lote (500 NP)</button>
+            <button class="nav-btn" style="background:var(--user-color); color:#000;" onclick="toggleMenu()">Catalogar Itens</button>
         </div>
     </header>
 
     <div id="main-container">
-        <div id="viewport" style="width: 300px; height: 300px;">
+        <div id="viewport" style="width: 500px; height: 300px;">
             <div id="protagonist"></div>
         </div>
     </div>
 
     <aside id="ui-panel">
-        <h4 style="font-family:'Orbitron'; font-size:10px; color:#888; margin-bottom:10px;">LOJA NEXUS</h4>
+        <div class="shop-header">
+            <h2 style="font-family:'Orbitron'; font-size: 14px; color: var(--user-color);">NEXUS ASSETS</h2>
+            <span style="font-size: 10px; color: #444;">ARRASTE PARA NAVEGAR</span>
+        </div>
         <div class="shop-scroll" id="furniture-list"></div>
-        <button class="action-btn btn-exit" style="width:100%; margin-top:10px;" onclick="toggleMenu()">FECHAR LOJA</button>
+        <button class="action-btn btn-exit" style="width:100%; margin-top:15px; clip-path: none;" onclick="toggleMenu()">VOLTAR AO NEXUS</button>
     </aside>
 
     <footer>
-        <button class="action-btn btn-exit" onclick="window.location.href='index.html'">SAIR</button>
-        <button class="action-btn btn-save" onclick="saveApartment()">SALVAR NEXUS</button>
+        <button class="action-btn btn-exit" onclick="window.location.href='dashboard.html'">ABANDONAR</button>
+        <button class="action-btn btn-save" onclick="saveApartment()">SINCRONIZAR PROJETO</button>
     </footer>
 
     <script type="module">
@@ -133,31 +184,23 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        let userNP = 0;
-        const gridSize = 15;
         const viewport = document.getElementById('viewport');
         const userId = localStorage.getItem('userId') || "TEST_USER";
+        const gridSize = 20;
 
         const furniture = [
-            { id: 'tv', name: 'Painel TV', price: 500, w: 60, h: 15, shape: 'f-retangulo' },
-            { id: 'sofa', name: 'Sofá L', price: 800, w: 60, h: 60, shape: 'f-triangulo' },
-            { id: 'cama', name: 'Cama King', price: 1200, w: 60, h: 75, shape: 'f-quadrado' },
-            { id: 'mesa', name: 'Desk', price: 600, w: 45, h: 30, shape: 'f-retangulo' },
-            { id: 'luz', name: 'Neon Tip', price: 300, w: 15, h: 15, shape: 'f-triangulo' }
+            { id: 'tv', name: 'Terminal Holo', price: 500, w: 80, h: 20, shape: 'f-retangulo' },
+            { id: 'sofa', name: 'Módulo Descanso', price: 800, w: 60, h: 60, shape: 'f-triangulo' },
+            { id: 'cama', name: 'Cápsula Sono', price: 1200, w: 80, h: 100, shape: 'f-quadrado' },
+            { id: 'mesa', name: 'Workstation', price: 600, w: 60, h: 40, shape: 'f-retangulo' },
+            { id: 'dec', name: 'Planta Neon', price: 150, w: 20, h: 20, shape: 'f-triangulo' }
         ];
 
         async function loadUserData() {
-            // Sincronização com usuários-saldos
-            const saldoSnap = await getDoc(doc(db, "usuarios-saldos", userId));
             const userSnap = await getDoc(doc(db, "usuarios", userId));
-
-            if (saldoSnap.exists()) {
-                userNP = Number(saldoSnap.data().nexusPoints) || 0;
-            }
-
             if (userSnap.exists()) {
                 const data = userSnap.data();
-                viewport.style.width = (data.apt_w || 300) + "px";
+                viewport.style.width = (data.apt_w || 500) + "px";
                 viewport.style.height = (data.apt_h || 300) + "px";
                 
                 const prota = document.getElementById('protagonist');
@@ -166,26 +209,40 @@
 
                 if(data.apartment_voxels) data.apartment_voxels.forEach(v => spawnFurnitureElement(v));
             }
-            updateNP();
+        }
+
+        // Função para verificar saldo no firebase-saldos antes de comprar
+        async function checkAndPay(amount) {
+            const saldoRef = doc(db, "usuarios-saldos", userId);
+            const saldoSnap = await getDoc(saldoRef);
+            if (!saldoSnap.exists()) return false;
+            
+            const currentNP = Number(saldoSnap.data().nexusPoints) || 0;
+            if (currentNP < amount) {
+                alert("NP Insuficiente no Nexus Wallet!");
+                return false;
+            }
+
+            await updateDoc(saldoRef, { nexusPoints: currentNP - amount });
+            // Força atualização do overlay se ele tiver uma função de refresh
+            if(window.refreshNexusOverlay) window.refreshNexusOverlay();
+            return true;
         }
 
         window.buyPlot = async () => {
-            if(userNP < 5000) return alert("NP Insuficiente!");
-            userNP -= 5000;
-            // Aumenta o retângulo principal
-            viewport.style.width = (parseInt(viewport.style.width) + 30) + "px";
-            viewport.style.height = (parseInt(viewport.style.height) + 30) + "px";
-            updateNP();
-            alert("Terreno Expandido!");
+            if(await checkAndPay(500)) {
+                viewport.style.width = (parseInt(viewport.style.width) + 40) + "px";
+                viewport.style.height = (parseInt(viewport.style.height) + 20) + "px";
+                alert("Área Expandida!");
+            }
         };
 
-        window.buyFurniture = (id) => {
+        window.buyFurniture = async (id) => {
             const item = furniture.find(f => f.id === id);
-            if(userNP < item.price) return alert("NP Insuficiente!");
-            userNP -= item.price;
-            spawnFurnitureElement({ ...item, x: "0px", y: "0px", color: "var(--user-color)" });
-            updateNP();
-            toggleMenu();
+            if(await checkAndPay(item.price)) {
+                spawnFurnitureElement({ ...item, x: "0px", y: "0px", color: "var(--user-color)" });
+                toggleMenu();
+            }
         };
 
         function spawnFurnitureElement(data) {
@@ -196,7 +253,7 @@
             el.style.left = data.x;
             el.style.top = data.y;
             el.style.border = `1px solid ${data.color || 'var(--user-color)'}`;
-            el.style.boxShadow = `0 0 5px ${data.color || 'var(--user-color)'}`;
+            el.style.boxShadow = `0 0 10px rgba(0, 242, 255, 0.2)`;
             el.innerText = data.name;
             makeDraggable(el);
             viewport.appendChild(el);
@@ -236,28 +293,24 @@
                 });
             });
             try {
-                // Salva saldo e dados do apto
-                await updateDoc(doc(db, "usuarios-saldos", userId), { nexusPoints: userNP });
                 await updateDoc(doc(db, "usuarios", userId), {
                     apartment_voxels: voxels,
                     apt_w: parseInt(viewport.style.width),
                     apt_h: parseInt(viewport.style.height)
                 });
-                alert("Sincronizado!");
-            } catch (e) { alert("Erro ao salvar."); }
+                alert("Projeto Salvo no Nexus!");
+            } catch (e) { alert("Erro de sincronização."); }
         };
 
         window.toggleMenu = () => document.getElementById('ui-panel').classList.toggle('open');
-        function updateNP() { document.getElementById('balance').innerText = `${userNP} NP`; }
 
-        // Renderizar Loja com formatos
         const list = document.getElementById('furniture-list');
         furniture.forEach(item => {
             list.innerHTML += `
                 <div class="furniture-card">
                     <h5>${item.name}</h5>
                     <p>${item.price} NP</p>
-                    <button class="buy-btn" onclick="buyFurniture('${item.id}')">ADQUIRIR</button>
+                    <button class="buy-btn" onclick="buyFurniture('${item.id}')">REQUISITAR</button>
                 </div>`;
         });
         loadUserData();
