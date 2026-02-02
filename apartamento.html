@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusVL - Apartment Constructor</title>
+    <title>NexusVL - Apartment</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --user-color: #00f2ff;
-            --bg-dark: #020202;
+            --bg-dark: #050505;
             --grid-size: 30px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        
         body {
             background: #000;
             color: #fff;
@@ -24,40 +25,66 @@
             align-items: center;
         }
 
-        /* CENÁRIO DE PRÉDIO (BACKGROUND) */
-        #city-backdrop {
+        /* CENÁRIO DE PRÉDIO EM CSS (SEM IMAGENS EXTERNAS) */
+        #city-bg {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: 
-                linear-gradient(to bottom, transparent 60%, #050505 100%),
-                url('https://i.imgur.com/8Q9Z5bX.png'); /* Placeholder para luzes da cidade */
-            background-size: cover;
-            filter: brightness(0.3) blur(2px);
-            z-index: -1;
+            background: linear-gradient(to bottom, #000 0%, #050510 100%);
+            z-index: 1;
         }
 
-        /* ÁREA DE VISUALIZAÇÃO CENTRALIZADA */
-        #viewport-wrapper {
+        /* Janelas do prédio ao fundo */
+        #city-bg::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 30%, #ffcc0022 1px, transparent 1px),
+                radial-gradient(circle at 50% 10%, #00f2ff22 1px, transparent 1px),
+                radial-gradient(circle at 80% 40%, #ffffff11 1px, transparent 1px);
+            background-size: 100px 100px;
+            opacity: 0.5;
+        }
+
+        /* BOTÃO COMPRAS (Sempre visível) */
+        #shop-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 2000;
+            background: var(--user-color);
+            color: #000;
+            border: none;
+            padding: 12px 25px;
+            font-family: 'Orbitron';
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 20px var(--user-color);
+            border-radius: 2px;
+        }
+
+        /* ÁREA CENTRAL */
+        #viewport {
             position: relative;
+            z-index: 10;
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 100vw;
-            height: 100vh;
         }
 
-        /* O RETÂNGULO DEITADO (APARTAMENTO) */
+        /* APARTAMENTO (RETÂNGULO DEITADO) */
         .room-module {
             position: relative;
-            width: 720px; /* 24 colunas */
-            height: 360px; /* 12 linhas - Deitado */
-            background-color: rgba(5, 5, 5, 0.9);
+            width: 720px; 
+            height: 360px;
+            background: rgba(10, 10, 15, 0.95);
+            border: 2px solid #222;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.8), 0 0 30px rgba(0,0,0,0.5);
+            /* Grid interno */
             background-image: 
-                linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
             background-size: var(--grid-size) var(--grid-size);
-            border: 2px solid #333;
-            box-shadow: 0 0 50px rgba(0,0,0,0.8), inset 0 0 100px rgba(0, 242, 255, 0.05);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -71,133 +98,111 @@
             clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
             filter: drop-shadow(0 0 15px var(--user-color));
             z-index: 100;
-            pointer-events: none;
         }
 
+        /* BLOCOS DE CONSTRUÇÃO */
         .voxel {
             position: absolute;
             width: var(--grid-size);
             height: var(--grid-size);
-            background: var(--user-color);
-            border: 1px solid rgba(0,0,0,0.3);
-            box-shadow: inset 0 0 10px rgba(255,255,255,0.2), 0 0 8px var(--user-color);
-            cursor: grab;
-            z-index: 10;
+            border: 1px solid rgba(0,0,0,0.2);
+            cursor: move;
+            z-index: 50;
         }
 
-        /* BOTÃO DE COMPRAS E MENU COMPACTO */
-        #shop-toggle {
-            position: fixed;
-            top: 20px; right: 20px;
-            background: var(--user-color);
-            color: #000;
-            padding: 10px 20px;
-            font-family: 'Orbitron';
-            font-weight: bold;
-            cursor: pointer;
-            border: none;
-            z-index: 1100;
-            box-shadow: 0 0 15px var(--user-color);
-        }
-
+        /* MENU LATERAL */
         #ui-panel {
             position: fixed;
-            right: -350px; /* Escondido */
-            top: 0;
-            width: 300px;
-            height: 100vh;
-            background: rgba(10, 10, 10, 0.95);
+            top: 0; right: -320px;
+            width: 300px; height: 100vh;
+            background: #0a0a0a;
             border-left: 2px solid var(--user-color);
-            padding: 80px 20px 20px 20px;
-            display: flex; flex-direction: column; gap: 15px;
-            z-index: 1000;
-            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(10px);
+            z-index: 1500;
+            padding: 80px 20px 20px;
+            transition: 0.3s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
         #ui-panel.open { right: 0; }
 
-        .section {
-            border: 1px solid #222;
-            padding: 10px;
-            background: #0f0f0f;
-        }
-
-        .section-title {
-            font-family: 'Orbitron'; font-size: 10px; color: var(--user-color);
-            margin-bottom: 10px; letter-spacing: 1px;
-        }
-
-        .shop-btn {
-            width: 100%;
+        .np-box {
+            font-family: 'Orbitron';
+            color: #ffcc00;
+            font-size: 18px;
+            text-align: center;
+            padding: 15px;
             background: #111;
             border: 1px solid #333;
-            color: #eee;
+        }
+
+        .shop-item {
+            background: #151515;
+            padding: 15px;
+            border: 1px solid #222;
+        }
+
+        .shop-item h4 { font-family: 'Orbitron'; font-size: 10px; color: var(--user-color); margin-bottom: 10px; }
+
+        .btn-buy {
+            width: 100%;
+            background: transparent;
+            border: 1px solid var(--user-color);
+            color: var(--user-color);
             padding: 10px;
-            margin-bottom: 5px;
+            cursor: pointer;
             font-family: 'Orbitron';
             font-size: 9px;
-            cursor: pointer;
-            display: flex; justify-content: space-between;
+        }
+        .btn-buy:hover { background: var(--user-color); color: #000; }
+
+        #color-pick { width: 100%; height: 40px; border: none; background: none; cursor: pointer; }
+
+        .save-btn {
+            background: #fff; color: #000;
+            padding: 15px; border: none; font-family: 'Orbitron';
+            font-weight: bold; cursor: pointer; margin-top: auto;
         }
 
-        .np-display {
-            font-family: 'Orbitron'; color: #ffcc00; font-size: 16px;
-            text-align: center; padding: 10px; border: 1px solid #ffcc0033;
-        }
-
-        #color-selector { width: 100%; height: 30px; margin-top: 5px; cursor: pointer; border: none; background: none; }
-
-        .btn-action {
-            background: var(--user-color); color: #000;
-            border: none; padding: 12px; font-family: 'Orbitron';
-            font-weight: bold; cursor: pointer;
-        }
-
-        .btn-exit {
-            background: none; border: 1px solid #ff4444; color: #ff4444;
-            padding: 8px; font-family: 'Orbitron'; font-size: 10px; cursor: pointer; margin-top: 10px;
+        .exit-btn {
+            background: transparent; border: 1px solid #444; color: #666;
+            padding: 10px; cursor: pointer; font-family: 'Orbitron'; font-size: 10px;
         }
     </style>
 </head>
 <body>
 
-    <div id="city-backdrop"></div>
+    <div id="city-bg"></div>
 
     <button id="shop-toggle" onclick="toggleMenu()">COMPRAS</button>
 
-    <div id="viewport-wrapper">
+    <div id="viewport">
         <div id="apartment-grid" class="room-module">
             <div id="protagonist"></div>
         </div>
     </div>
 
     <aside id="ui-panel">
-        <div class="np-display" id="balance">0.00 NP</div>
+        <div class="np-box" id="balance">0 NP</div>
 
-        <div class="section">
-            <div class="section-title">CONSTRUÇÃO</div>
-            <button class="shop-btn" onclick="spawnVoxel()">
-                <span>+ MINI BLOCO</span>
-                <span style="color:#ffcc00">100 NP</span>
-            </button>
+        <div class="shop-item">
+            <h4>MINI BLOCO NÉON</h4>
+            <button class="btn-buy" onclick="spawnVoxel()">ADICIONAR (100 NP)</button>
         </div>
 
-        <div class="section">
-            <div class="section-title">COR DO BLOCO</div>
-            <input type="color" id="color-selector" value="#00f2ff">
+        <div class="shop-item">
+            <h4>COR DO BLOCO</h4>
+            <input type="color" id="color-pick" value="#00f2ff">
         </div>
 
-        <div class="section">
-            <div class="section-title">EXPANSÃO</div>
-            <button class="shop-btn" onclick="addRoom()">
-                <span>+ NOVO QUARTO</span>
-                <span style="color:#ffcc00">2500 NP</span>
-            </button>
+        <div class="shop-item">
+            <h4>MODULAR</h4>
+            <button class="btn-buy" onclick="addRoom()">NOVO QUARTO (2500 NP)</button>
         </div>
 
-        <button class="btn-action" onclick="saveApartment()">SALVAR</button>
-        <button class="btn-exit" onclick="window.location.href='index.html'">SAIR</button>
+        <button class="save-btn" onclick="saveApartment()">SALVAR NEXUS</button>
+        <button class="exit-btn" onclick="window.location.href='index.html'">SAIR DO APTO</button>
     </aside>
 
     <script type="module">
@@ -212,13 +217,12 @@
         const gridSize = 30;
         const mainGrid = document.getElementById('apartment-grid');
 
-        // Toggle Menu
         window.toggleMenu = () => {
             document.getElementById('ui-panel').classList.toggle('open');
         };
 
         function updateNP() {
-            document.getElementById('balance').innerText = `${userNP.toLocaleString('pt-BR')} NP`;
+            document.getElementById('balance').innerText = `${userNP} NP`;
         }
 
         window.spawnVoxel = () => {
@@ -228,7 +232,7 @@
 
             const voxel = document.createElement('div');
             voxel.className = 'voxel';
-            const color = document.getElementById('color-selector').value;
+            const color = document.getElementById('color-pick').value;
             voxel.style.backgroundColor = color;
             voxel.style.boxShadow = `0 0 10px ${color}`;
             voxel.style.left = "0px";
@@ -242,9 +246,9 @@
             if(userNP < 2500) return alert("NP insuficiente!");
             userNP -= 2500;
             updateNP();
-            const newRoom = document.createElement('div');
-            newRoom.className = 'room-module';
-            document.getElementById('viewport-wrapper').appendChild(newRoom);
+            const r = document.createElement('div');
+            r.className = 'room-module';
+            document.getElementById('viewport').appendChild(r);
         };
 
         function makeDraggable(el) {
@@ -262,7 +266,6 @@
                     document.onmousemove = null;
                 };
                 document.onmousemove = (e) => {
-                    e.preventDefault();
                     pos1 = pos3 - e.clientX;
                     pos2 = pos4 - e.clientY;
                     pos3 = e.clientX;
@@ -281,7 +284,7 @@
             try {
                 const userId = localStorage.getItem('userId') || "TEST_USER";
                 await updateDoc(doc(db, "usuarios", userId), { apartment_voxels: voxels, nexusPoints: userNP });
-                alert("Salvo!");
+                alert("Apartamento sincronizado!");
             } catch (e) { console.error(e); }
         };
 
