@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexusVL - Cyber Apartment</title>
+    <title>NexusVL - Cyber Real Estate</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --user-color: #00f2ff;
-            --grid-size: 15px; /* Grid menor para móveis menores */
+            --grid-size: 15px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -27,7 +27,7 @@
         #city-bg {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, #000 0%, #050510 100%);
+            background: linear-gradient(to bottom, #000 0%, #020205 100%);
             z-index: 1;
         }
 
@@ -42,20 +42,16 @@
             border-bottom: 2px solid #111;
         }
 
-        .np-display {
-            font-family: 'Orbitron';
-            color: #ffcc00;
-            font-size: 14px;
-        }
+        .np-display { font-family: 'Orbitron'; color: #ffcc00; font-size: 14px; }
 
-        #shop-toggle {
-            background: var(--user-color);
-            color: #000;
-            border: none;
-            padding: 8px 15px;
+        .top-btns { display: flex; gap: 8px; }
+        .nav-btn {
+            background: #111;
+            color: var(--user-color);
+            border: 1px solid var(--user-color);
+            padding: 5px 10px;
             font-family: 'Orbitron';
-            font-weight: bold;
-            font-size: 11px;
+            font-size: 10px;
             cursor: pointer;
         }
 
@@ -66,49 +62,54 @@
             align-items: center;
             z-index: 10;
             padding: 20px;
+            overflow: auto;
         }
 
         #viewport {
             position: relative;
-            width: 100%;
-            max-width: 800px;
-            aspect-ratio: 2 / 1;
-            background: rgba(5, 5, 10, 0.95);
-            border: 1px solid #333;
-            box-shadow: inset 0 0 50px #000;
+            min-width: 400px;
+            min-height: 200px;
+            background: rgba(10, 10, 15, 0.95);
+            border: 2px solid #222;
+            box-shadow: 0 0 30px rgba(0,0,0,1);
             background-image: 
                 linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
             background-size: var(--grid-size) var(--grid-size);
+            transition: 0.3s;
         }
 
-        /* PROTAGONISTA (LOSANGO) */
+        /* PROTAGONISTA DINÂMICO */
         #protagonist {
             position: absolute;
             width: 20px; height: 20px;
             background: var(--user-color);
-            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
             filter: drop-shadow(0 0 8px var(--user-color));
             left: 50%; top: 50%;
             z-index: 100;
             pointer-events: none;
+            transition: 0.2s;
         }
 
-        /* MÓVEIS */
+        .shape-masculino { clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
+        .shape-feminino { border-radius: 50%; }
+        .shape-outro { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
+
+        /* MÓVEIS ESTILIZADOS */
         .voxel {
             position: absolute;
-            border: 1px solid rgba(255,255,255,0.2);
             z-index: 50;
             touch-action: none;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-end;
             font-family: 'Orbitron';
-            font-size: 6px;
+            font-size: 7px;
             color: #fff;
-            text-transform: uppercase;
-            font-weight: bold;
-            text-align: center;
+            padding-bottom: 2px;
+            border-radius: 2px;
+            background: rgba(255,255,255,0.05);
         }
 
         footer {
@@ -120,20 +121,11 @@
             background: #000;
         }
 
-        .action-btn {
-            flex: 1;
-            padding: 12px;
-            font-family: 'Orbitron';
-            font-size: 11px;
-            font-weight: bold;
-            border: none;
-            cursor: pointer;
-        }
-
+        .action-btn { flex: 1; padding: 12px; font-family: 'Orbitron'; font-size: 11px; font-weight: bold; border: none; cursor: pointer; }
         .btn-save { background: var(--user-color); color: #000; }
         .btn-exit { background: #1a1a1a; color: #fff; }
 
-        /* SHOP MODAL */
+        /* MODAIS */
         #ui-panel {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
@@ -144,49 +136,15 @@
             padding: 20px;
             overflow-y: auto;
         }
-
         #ui-panel.open { display: flex; }
 
-        .shop-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 20px;
-        }
+        .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .furniture-card { background: #111; border: 1px solid #222; padding: 10px; text-align: center; }
+        .furniture-card h5 { font-family: 'Orbitron'; font-size: 9px; color: var(--user-color); }
+        .furniture-card p { font-size: 11px; color: #ffcc00; }
 
-        .furniture-card {
-            background: #111;
-            border: 1px solid #222;
-            padding: 15px;
-            text-align: center;
-        }
+        .buy-btn { width: 100%; padding: 6px; background: #222; color: #fff; border: 1px solid #333; font-size: 8px; margin-top: 5px; cursor: pointer; }
 
-        .furniture-card h5 { font-family: 'Orbitron'; font-size: 10px; margin-bottom: 5px; color: var(--user-color); }
-        .furniture-card p { font-size: 12px; color: #ffcc00; margin-bottom: 10px; }
-
-        .btn-buy-item {
-            width: 100%;
-            padding: 8px;
-            background: #222;
-            color: #fff;
-            border: 1px solid #333;
-            font-family: 'Orbitron';
-            font-size: 9px;
-            cursor: pointer;
-        }
-
-        .color-section {
-            margin-top: 20px;
-            padding: 15px;
-            border: 1px solid #333;
-            background: #080808;
-        }
-
-        .price-tag {
-            font-size: 10px;
-            color: #888;
-            margin-top: 5px;
-        }
     </style>
 </head>
 <body>
@@ -195,165 +153,182 @@
 
     <header>
         <div class="np-display" id="balance">0 NP</div>
-        <div style="font-family:'Orbitron'; font-size: 10px; color: #444;">NEXUS APARTMENT v2.0</div>
-        <button id="shop-toggle" onclick="toggleMenu()">LOJA DE MÓVEIS</button>
+        <div class="top-btns">
+            <button class="nav-btn" onclick="expandApartment()">EXPANDIR (10k NP)</button>
+            <button class="nav-btn" style="background:var(--user-color); color:#000;" onclick="toggleMenu('shop')">LOJA</button>
+        </div>
     </header>
 
     <div id="main-container">
-        <div id="viewport">
-            <div id="protagonist"></div>
+        <div id="viewport" style="width: 450px; height: 225px;">
+            <div id="protagonist" class="shape-outro"></div>
         </div>
     </div>
 
     <footer>
-        <button class="action-btn btn-exit" onclick="window.location.href='index.html'">SAIR</button>
-        <button class="action-btn btn-save" onclick="saveApartment()">SALVAR APTO</button>
+        <button class="action-btn btn-exit" onclick="window.location.href='dashboard.html'">SAIR</button>
+        <button class="action-btn btn-save" onclick="saveApartment()">SALVAR NEXUS</button>
     </footer>
 
     <aside id="ui-panel">
-        <h2 style="font-family:'Orbitron'; text-align: center; color: var(--user-color);">NEXUS SHOP</h2>
+        <h2 style="font-family:'Orbitron'; text-align: center; color: var(--user-color);">NEXUS DECOR</h2>
         
-        <div class="color-section">
-            <h4 style="font-family:'Orbitron'; font-size: 11px;">1. ESCOLHA A COR NÉON</h4>
-            <input type="color" id="color-pick" value="#00f2ff" onchange="calculateColorPremium()">
-            <p class="price-tag" id="color-premium-text">Cor padrão: +0 NP</p>
+        <div style="background:#080808; padding:15px; border:1px solid #222; margin-top:15px;">
+            <h4 style="font-family:'Orbitron'; font-size: 10px;">CUSTOMIZAR NÉON</h4>
+            <input type="color" id="color-pick" value="#00f2ff" style="width:100%; height:40px; border:none; background:none;">
+            <p id="premium-info" style="font-size:10px; color:#888; margin-top:5px;">Cores raras custam +2000 NP</p>
         </div>
 
-        <div class="shop-grid" id="furniture-list">
-            </div>
+        <div class="shop-grid" id="furniture-list"></div>
 
         <button class="action-btn btn-exit" style="margin-top: 20px;" onclick="toggleMenu()">VOLTAR</button>
     </aside>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", projectId: "minharifadigital" };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        let userNP = 10000;
-        let colorPremium = 0;
+        let userNP = 0;
+        let expansionLevel = 1;
         const gridSize = 15;
         const viewport = document.getElementById('viewport');
+        const userId = localStorage.getItem('userId') || "TEST_USER";
 
         const furniture = [
-            { id: 'tv', name: 'Smart TV', price: 500, w: 45, h: 30 },
-            { id: 'sofa', name: 'Sofá Cyber', price: 800, w: 60, h: 30 },
-            { id: 'cama', name: 'Cama Biohacker', price: 1200, w: 45, h: 60 },
-            { id: 'mesa', name: 'Mesa Gamer', price: 600, w: 45, h: 45 },
-            { id: 'geladeira', name: 'Geladeira', price: 1000, w: 30, h: 45 },
-            { id: 'fogao', name: 'Fogão Indução', price: 700, w: 30, h: 30 },
-            { id: 'lampada', name: 'Lâmpada Néon', price: 300, w: 15, h: 15 }
+            { id: 'tv', name: 'Painel TV', price: 500, w: 60, h: 15 },
+            { id: 'sofa', name: 'Sofá L', price: 800, w: 75, h: 45 },
+            { id: 'cama', name: 'Cama King', price: 1200, w: 60, h: 75 },
+            { id: 'mesa', name: 'Desk Setup', price: 600, w: 60, h: 30 },
+            { id: 'geladeira', name: 'Geladeira', price: 1000, w: 30, h: 30 },
+            { id: 'fogao', name: 'Cooktop', price: 700, w: 30, h: 15 },
+            { id: 'lampada', name: 'Luz Neon', price: 300, w: 15, h: 15 }
         ];
 
-        function initShop() {
-            const list = document.getElementById('furniture-list');
-            furniture.forEach(item => {
-                list.innerHTML += `
-                    <div class="furniture-card">
-                        <h5>${item.name}</h5>
-                        <p>${item.price} NP</p>
-                        <button class="btn-buy-item" onclick="buyFurniture('${item.id}')">COMPRAR</button>
-                    </div>
-                `;
-            });
+        async function loadUserData() {
+            const userSnap = await getDoc(doc(db, "usuarios", userId));
+            if (userSnap.exists()) {
+                const data = userSnap.data();
+                userNP = data.nexusPoints || 0;
+                expansionLevel = data.apt_expansion || 1;
+                
+                // Ajustar forma do protagonista pelo sexo
+                const prota = document.getElementById('protagonist');
+                prota.className = '';
+                if(data.sexo === 'Masculino') prota.classList.add('shape-masculino');
+                else if(data.sexo === 'Feminino') prota.classList.add('shape-feminino');
+                else prota.classList.add('shape-outro');
+
+                // Aplicar cor do perfil
+                prota.style.backgroundColor = data.cor_favorita || '#00f2ff';
+                document.documentElement.style.setProperty('--user-color', data.cor_favorita || '#00f2ff');
+
+                // Carregar expansão
+                viewport.style.width = (450 + (expansionLevel-1)*150) + "px";
+                viewport.style.height = (225 + (expansionLevel-1)*75) + "px";
+
+                // Carregar móveis salvos
+                if(data.apartment_voxels) {
+                    data.apartment_voxels.forEach(v => spawnFurnitureElement(v));
+                }
+                updateNP();
+            }
         }
 
-        window.calculateColorPremium = () => {
-            const color = document.getElementById('color-pick').value;
-            // Cores raras (tons de roxo, dourado e branco) custam mais
-            if (color.toLowerCase() === '#ffffff') colorPremium = 2000;
-            else if (color.toLowerCase() === '#ff00ff') colorPremium = 1000;
-            else if (color.toLowerCase() === '#ffd700') colorPremium = 1500;
-            else colorPremium = 200;
-            
-            document.getElementById('color-premium-text').innerText = `Premium da Cor: +${colorPremium} NP`;
-        };
-
-        window.toggleMenu = () => {
-            document.getElementById('ui-panel').classList.toggle('open');
+        window.expandApartment = async () => {
+            if(userNP < 10000) return alert("NP Insuficiente para expansão!");
+            userNP -= 10000;
+            expansionLevel++;
+            viewport.style.width = (parseInt(viewport.style.width) + 150) + "px";
+            viewport.style.height = (parseInt(viewport.style.height) + 75) + "px";
+            updateNP();
+            alert("Lote expandido!");
         };
 
         window.buyFurniture = (id) => {
             const item = furniture.find(f => f.id === id);
-            const totalCost = item.price + colorPremium;
-
-            if(userNP < totalCost) return alert("NP Insuficiente para este item e cor!");
-
-            userNP -= totalCost;
-            updateNP();
-
-            const voxel = document.createElement('div');
-            voxel.className = 'voxel';
             const color = document.getElementById('color-pick').value;
-            
-            voxel.style.width = item.w + "px";
-            voxel.style.height = item.h + "px";
-            voxel.style.backgroundColor = color + "33"; // Transparência
-            voxel.style.border = `2px solid ${color}`;
-            voxel.style.boxShadow = `0 0 15px ${color}`;
-            voxel.style.left = "0px";
-            voxel.style.top = "0px";
-            voxel.innerText = item.name;
+            let premium = (color === '#ffffff' || color === '#ff00ff') ? 2000 : 200;
+            const total = item.price + premium;
 
-            makeDraggable(voxel);
-            viewport.appendChild(voxel);
+            if(userNP < total) return alert("NP Insuficiente!");
+            
+            userNP -= total;
+            spawnFurnitureElement({
+                name: item.name, w: item.w, h: item.h,
+                x: "0px", y: "0px", color: color
+            });
+            updateNP();
             toggleMenu();
         };
 
-        function makeDraggable(el) {
-            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-            const startDrag = (e) => {
-                const event = e.type === 'touchstart' ? e.touches[0] : e;
-                pos3 = event.clientX; pos4 = event.clientY;
-                document.onmouseup = endDrag; document.ontouchend = endDrag;
-                document.onmousemove = moveDrag; document.ontouchmove = moveDrag;
-            };
-            const moveDrag = (e) => {
-                const event = e.type === 'touchmove' ? e.touches[0] : e;
-                pos1 = pos3 - event.clientX; pos2 = pos4 - event.clientY;
-                pos3 = event.clientX; pos4 = event.clientY;
-                el.style.top = (el.offsetTop - pos2) + "px";
-                el.style.left = (el.offsetLeft - pos1) + "px";
-            };
-            const endDrag = () => {
-                const x = Math.round(el.offsetLeft / gridSize) * gridSize;
-                const y = Math.round(el.offsetTop / gridSize) * gridSize;
-                el.style.left = x + "px"; el.style.top = y + "px";
-                document.onmouseup = null; document.onmousemove = null;
-                document.ontouchend = null; document.ontouchmove = null;
-            };
-            el.onmousedown = startDrag; el.ontouchstart = startDrag;
+        function spawnFurnitureElement(data) {
+            const el = document.createElement('div');
+            el.className = 'voxel';
+            el.style.width = data.w + "px";
+            el.style.height = data.h + "px";
+            el.style.left = data.x;
+            el.style.top = data.y;
+            el.style.border = `2px solid ${data.color}`;
+            el.style.boxShadow = `inset 0 0 10px ${data.color}55, 0 0 10px ${data.color}`;
+            el.innerText = data.name;
+            makeDraggable(el);
+            viewport.appendChild(el);
         }
 
         window.saveApartment = async () => {
             const voxels = [];
             document.querySelectorAll('.voxel').forEach(v => {
-                voxels.push({ 
-                    name: v.innerText, 
-                    x: v.style.left, 
-                    y: v.style.top, 
-                    w: v.style.width, 
-                    h: v.style.height, 
-                    color: v.style.borderColor 
+                voxels.push({
+                    name: v.innerText, x: v.style.left, y: v.style.top,
+                    w: parseInt(v.style.width), h: parseInt(v.style.height),
+                    color: v.style.borderColor
                 });
             });
             try {
-                const userId = localStorage.getItem('userId') || "TEST_USER";
-                await updateDoc(doc(db, "usuarios", userId), { 
-                    apartment_voxels: voxels, 
-                    nexusPoints: userNP 
+                await updateDoc(doc(db, "usuarios", userId), {
+                    apartment_voxels: voxels,
+                    nexusPoints: userNP,
+                    apt_expansion: expansionLevel
                 });
-                alert("Apartamento Sincronizado!");
-            } catch (e) { console.error(e); }
+                alert("Nexus Sincronizado!");
+            } catch (e) { alert("Erro ao salvar."); }
         };
 
+        // Reuso da lógica de drag
+        function makeDraggable(el) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            el.onmousedown = el.ontouchstart = (e) => {
+                const ev = e.type === 'touchstart' ? e.touches[0] : e;
+                pos3 = ev.clientX; pos4 = ev.clientY;
+                document.onmouseup = document.ontouchend = () => {
+                    el.style.left = Math.round(el.offsetLeft / gridSize) * gridSize + "px";
+                    el.style.top = Math.round(el.offsetTop / gridSize) * gridSize + "px";
+                    document.onmouseup = document.onmousemove = document.ontouchend = document.ontouchmove = null;
+                };
+                document.onmousemove = document.ontouchmove = (e) => {
+                    const evm = e.type === 'touchmove' ? e.touches[0] : e;
+                    pos1 = pos3 - evm.clientX; pos2 = pos4 - evm.clientY;
+                    pos3 = evm.clientX; pos4 = evm.clientY;
+                    el.style.top = (el.offsetTop - pos2) + "px";
+                    el.style.left = (el.offsetLeft - pos1) + "px";
+                };
+            };
+        }
+
+        window.toggleMenu = () => document.getElementById('ui-panel').classList.toggle('open');
         function updateNP() { document.getElementById('balance').innerText = `${userNP} NP`; }
-        
-        updateNP();
-        initShop();
+
+        // Init
+        const list = document.getElementById('furniture-list');
+        furniture.forEach(item => {
+            list.innerHTML += `<div class="furniture-card"><h5>${item.name}</h5><p>${item.price} NP</p>
+            <button class="buy-btn" onclick="buyFurniture('${item.id}')">ADQUIRIR</button></div>`;
+        });
+        loadUserData();
     </script>
     <script type="module" src="nexus-overlay.js"></script>
 </body>
