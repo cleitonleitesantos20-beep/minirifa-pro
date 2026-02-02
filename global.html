@@ -27,12 +27,29 @@
         #map-container { position: absolute; width: 100%; height: 100%; z-index: 2; overflow: hidden; }
         svg { width: 100%; height: 100%; }
 
+        /* ESTADOS COM NEON CINZA NAS LINHAS */
         .state {
-            fill: #050505; stroke: var(--neon-grey); stroke-width: 0.5px;
+            fill: #050505; 
+            stroke: var(--neon-grey); 
+            stroke-width: 1px;
+            filter: drop-shadow(0 0 2px var(--neon-grey));
             transition: 0.4s; cursor: pointer;
         }
-        .state:hover { fill: #0a0a0a; stroke: var(--user-neon-color); filter: drop-shadow(0 0 8px var(--user-neon-color)); }
-        .state.selected { fill: rgba(30, 30, 30, 0.8); stroke: var(--user-neon-color); stroke-width: 1.5px; }
+
+        /* HOVER COM A COR DO USUÁRIO */
+        .state:hover { 
+            fill: #0a0a0a; 
+            stroke: var(--user-neon-color); 
+            filter: drop-shadow(0 0 8px var(--user-neon-color)); 
+        }
+
+        /* SELECIONADO: PREENCHIDO EM NEON CINZA */
+        .state.selected { 
+            fill: var(--neon-grey); 
+            stroke: #fff; 
+            stroke-width: 1.5px;
+            filter: drop-shadow(0 0 15px var(--neon-grey));
+        }
 
         .state-sigla {
             fill: var(--neon-grey); font-family: 'Orbitron'; font-size: 11px;
@@ -48,7 +65,6 @@
             transition: opacity 0.3s, left 0.1s, top 0.1s;
         }
 
-        /* MENU DE SETOR ATUALIZADO */
         #sector-menu {
             position: fixed; top: 50%; left: 50%;
             transform: translate(-50%, -50%) scale(0.9);
@@ -67,7 +83,6 @@
         .menu-header { text-align: center; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; }
         .menu-header h2 { font-family: 'Orbitron'; font-size: 1rem; letter-spacing: 3px; color: #fff; }
 
-        /* BUSCADOR */
         #niche-search {
             width: 100%; background: rgba(255,255,255,0.05);
             border: 1px solid #333; color: #fff;
@@ -97,7 +112,6 @@
         .building-commerce { font-family: 'Rajdhani'; font-size: 6px; color: rgba(255,255,255,0.8); font-weight: 700; width: 100%; text-align: center; overflow: hidden; text-overflow: ellipsis; }
         .building-tag { font-size: 4px; font-family: 'Orbitron'; background: currentColor; color: #000; padding: 1px 3px; font-weight: 900; }
 
-        /* LEGENDA / RODAPÉ */
         #map-legend {
             position: fixed; bottom: 80px; width: 90%; max-width: 600px;
             display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
@@ -121,7 +135,6 @@
 <body>
 
     <a href="index.html" class="btn-exit">VOLTAR</a>
-
     <div id="map-legend"></div>
 
     <div id="sector-menu">
@@ -162,7 +175,6 @@
             jewelry: { label: "JOALHERIA", color: "#e5e5e5" }
         };
 
-        // Gerar Legenda no Rodapé
         const legend = document.getElementById('map-legend');
         Object.values(roles).forEach(r => {
             legend.innerHTML += `<div class="legend-item"><div class="color-dot" style="background:${r.color}"></div>${r.label}</div>`;
@@ -171,8 +183,9 @@
         const sectorMenu = document.getElementById('sector-menu');
         const buildingsGrid = document.getElementById('buildings-grid');
         const protagonist = d3.select("#protagonist");
+        const userColor = localStorage.getItem('userNeonColor') || '#00f2ff';
+        document.documentElement.style.setProperty('--user-neon-color', userColor);
 
-        // Função de Busca
         window.filterNiches = () => {
             const val = document.getElementById('niche-search').value.toUpperCase();
             document.querySelectorAll('.building-wrapper').forEach(el => {
@@ -193,15 +206,11 @@
                 const q = query(collection(db, "usuarios"), where("estado", "==", cleanSigla));
                 const snap = await getDocs(q);
                 buildingsGrid.innerHTML = '';
-
                 snap.forEach((doc) => {
                     const data = doc.data();
                     const config = roles[data.role] || roles.citizen;
-                    
-                    // LÓGICA: Se não houver nome de comércio, usa o Label do Nicho
                     const storeName = (data.nomeComercio || data.comercio || config.label).toUpperCase();
                     const userName = (data.nome || 'NEXUS UNIT').toUpperCase();
-
                     const wrapper = document.createElement('div');
                     wrapper.className = 'building-wrapper';
                     wrapper.style.color = config.color;
@@ -219,10 +228,8 @@
         window.closeMenu = () => {
             sectorMenu.classList.remove('active');
             d3.selectAll(".state").classed("selected", false);
-            document.getElementById('niche-search').value = '';
         };
 
-        // --- D3 MAP RENDER ---
         const svg = d3.select("#brazil-map");
         const mapGroup = svg.select("#map-group");
         const projection = d3.geoMercator().center([-52, -15]).scale(2200).translate([window.innerWidth / 2, window.innerHeight / 2]);
