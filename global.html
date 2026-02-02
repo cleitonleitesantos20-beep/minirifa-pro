@@ -10,9 +10,9 @@
         :root {
             --user-neon-color: #00f2ff;
             --neon-grey: #4a4a4a;
-            --neon-grey-glow: rgba(100, 100, 100, 0.3);
+            --neon-grey-glow: rgba(100, 100, 100, 0.2);
             --bg-dark: #000000;
-            --overlay-bg: rgba(5, 5, 5, 0.98);
+            --overlay-bg: rgba(2, 2, 2, 0.95);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -29,15 +29,15 @@
         svg { width: 100%; height: 100%; }
 
         .state {
-            fill: #080808; stroke: var(--neon-grey); stroke-width: 0.5px;
+            fill: #050505; stroke: var(--neon-grey); stroke-width: 0.5px;
             transition: 0.4s; cursor: pointer;
         }
-        .state:hover { fill: #111; stroke: var(--user-neon-color); }
-        .state.selected { fill: rgba(74, 74, 74, 0.2); stroke: var(--user-neon-color); stroke-width: 1.5px; }
+        .state:hover { fill: #0a0a0a; stroke: var(--user-neon-color); filter: drop-shadow(0 0 5px var(--user-neon-color)); }
+        .state.selected { fill: rgba(20, 20, 20, 0.8); stroke: var(--user-neon-color); stroke-width: 1.5px; }
 
         .state-sigla {
             fill: var(--neon-grey); font-family: 'Orbitron'; font-size: 10px;
-            pointer-events: none; text-anchor: middle; opacity: 0.6;
+            pointer-events: none; text-anchor: middle; opacity: 0.5;
         }
 
         #protagonist {
@@ -46,83 +46,103 @@
             clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
             filter: drop-shadow(0 0 10px var(--user-neon-color));
             pointer-events: none; opacity: 0; z-index: 100;
+            transition: opacity 0.3s, left 0.1s, top 0.1s;
         }
 
-        /* Modal - Vista de Cima (Urban Scan) */
+        /* Modal - Interface de Escaneamento */
         #sector-menu {
             position: fixed; top: 50%; left: 50%;
             transform: translate(-50%, -50%) scale(0.9);
-            width: 90%; max-width: 550px;
-            max-height: 80vh;
+            width: 90%; max-width: 600px;
+            max-height: 75vh;
             background: var(--overlay-bg);
-            border: 1px solid var(--neon-grey);
-            z-index: 10000; padding: 20px;
+            border: 2px solid var(--neon-grey);
+            z-index: 10000; padding: 30px;
             display: none; flex-direction: column;
-            backdrop-filter: blur(20px);
-            opacity: 0; transition: 0.3s;
+            backdrop-filter: blur(25px);
+            opacity: 0; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 50px rgba(0,0,0,1);
         }
         #sector-menu.active { display: flex; opacity: 1; transform: translate(-50%, -50%) scale(1); border-color: var(--user-neon-color); }
 
-        .menu-header { text-align: left; border-left: 4px solid var(--user-neon-color); padding-left: 15px; margin-bottom: 20px; }
-        .menu-header h2 { font-family: 'Orbitron'; font-size: 1.1rem; color: #fff; }
+        .menu-header { 
+            text-align: center; margin-bottom: 25px; 
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            padding: 10px 0;
+        }
+        .menu-header h2 { font-family: 'Orbitron'; font-size: 1.4rem; letter-spacing: 5px; color: #fff; text-shadow: 0 0 10px var(--user-neon-color); }
 
-        /* Grid que simula Quadras/Ruas */
+        /* Grid de Edifícios */
         #buildings-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-            gap: 10px; overflow-y: auto; padding: 10px;
-            background-color: #050505;
-            background-image: 
-                linear-gradient(var(--neon-grey-glow) 1px, transparent 1px),
-                linear-gradient(90deg, var(--neon-grey-glow) 1px, transparent 1px);
-            background-size: 40px 40px;
-            border: 1px solid #111;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 25px; overflow-y: auto; padding: 20px;
+            scrollbar-width: none;
         }
 
-        /* Estilo "Bloco de Prédio visto de cima" */
+        /* O Edifício Neon Estilizado */
         .building-wrapper {
-            background: #000;
-            border: 1px solid #222;
-            height: 100px;
-            cursor: pointer;
-            transition: 0.2s;
-            display: flex; flex-direction: column;
-            justify-content: flex-end;
-            padding: 10px;
             position: relative;
-            overflow: hidden;
+            height: 120px;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid currentColor; /* O neon fica no edifício todo */
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            box-shadow: inset 0 0 15px currentColor; /* Brilho interno */
         }
-        /* Luz no topo do prédio (vista aérea) */
-        .building-wrapper::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
-            background: currentColor; opacity: 0.8;
-        }
-        .building-wrapper:hover { 
-            transform: translateY(-2px); 
-            background: #0a0a0a;
-            box-shadow: 0 0 15px currentColor;
-            border-color: currentColor;
+        
+        /* Efeito de Profundidade/Luz no topo */
+        .building-wrapper::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+            pointer-events: none;
         }
 
-        .building-name { font-family: 'Orbitron'; font-size: 9px; color: #fff; font-weight: bold; margin-bottom: 2px; }
-        .building-niche { font-family: 'Orbitron'; font-size: 7px; opacity: 0.6; letter-spacing: 1px; }
+        .building-wrapper:hover {
+            transform: scale(1.1) rotateX(10deg);
+            box-shadow: 0 0 25px currentColor, inset 0 0 20px currentColor;
+            z-index: 2;
+        }
 
-        /* Botão Voltar centralizado embaixo */
+        .building-name { 
+            font-family: 'Orbitron'; font-size: 10px; color: #fff; font-weight: bold; 
+            text-align: center; padding: 0 5px; z-index: 1;
+        }
+        
+        .building-tag {
+            font-size: 7px; margin-top: 8px; font-family: 'Orbitron';
+            background: currentColor; color: #000; padding: 2px 6px;
+            font-weight: 900; z-index: 1;
+        }
+
+        /* Botão Voltar Estilizado */
         .btn-exit {
             position: fixed; bottom: 30px; left: 50%;
             transform: translateX(-50%);
-            padding: 10px 40px; border: 1px solid var(--user-neon-color);
-            color: var(--user-neon-color); text-decoration: none; 
-            font-family: 'Orbitron'; font-size: 12px; font-weight: bold;
-            background: rgba(0,0,0,0.9); z-index: 20000;
-            transition: 0.3s; text-transform: uppercase;
+            padding: 12px 50px; border: 1px solid var(--user-neon-color);
+            color: #fff; text-decoration: none; 
+            font-family: 'Orbitron'; font-size: 13px; font-weight: bold;
+            background: rgba(0,0,0,0.8); z-index: 20000;
+            transition: 0.3s; letter-spacing: 4px;
+            overflow: hidden;
         }
-        .btn-exit:hover { background: var(--user-neon-color); color: #000; box-shadow: 0 0 20px var(--user-neon-color); }
+        .btn-exit::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, var(--user-neon-color), transparent);
+            transition: 0.5s;
+        }
+        .btn-exit:hover::before { left: 100%; }
+        .btn-exit:hover { background: var(--user-neon-color); color: #000; box-shadow: 0 0 30px var(--user-neon-color); }
 
         .close-btn {
-            margin-top: 15px; background: none; border: 1px solid #333;
-            color: #555; padding: 8px; cursor: pointer; font-family: 'Orbitron'; font-size: 9px;
+            margin-top: 20px; background: none; border: 1px solid #222;
+            color: #444; padding: 10px; cursor: pointer; font-family: 'Orbitron'; font-size: 9px;
+            letter-spacing: 2px; transition: 0.3s;
         }
+        .close-btn:hover { border-color: #fff; color: #fff; }
+
     </style>
 </head>
 <body>
@@ -131,11 +151,11 @@
 
     <div id="sector-menu">
         <div class="menu-header">
-            <h2 id="sector-title">SETOR: --</h2>
-            <p id="connection-count" style="font-size: 8px; color: var(--neon-grey); font-family:'Orbitron';">AERIAL VIEW - SCANNING HABITATS</p>
+            <h2 id="sector-title">NEXUS</h2>
+            <p id="connection-count" style="font-size: 8px; color: var(--user-neon-color); font-family:'Orbitron'; opacity: 0.7;">MAPA DE DENSIDADE POPULACIONAL</p>
         </div>
         <div id="buildings-grid"></div>
-        <button class="close-btn" onclick="closeMenu()">DISCONNECT MAP</button>
+        <button class="close-btn" onclick="closeMenu()">FECHAR CONEXÃO</button>
     </div>
     
     <div id="map-container">
@@ -158,13 +178,13 @@
         const db = getFirestore(app);
 
         const nicheAssets = {
-            citizen: { label: "CITIZEN", color: "#4a4a4a" },
-            clothes: { label: "APPAREL", color: "#ff00ff" },
-            shoes: { label: "FOOTWEAR", color: "#00ff00" },
-            tech: { label: "ELECTRONICS", color: "#00f2ff" },
-            appliances: { label: "EQUIPMENT", color: "#ffff00" },
-            auto: { label: "VEHICLES", color: "#ff4400" },
-            jewelry: { label: "JEWELRY", color: "#ffaa00" }
+            citizen: { label: "CIVIL", color: "#4a4a4a" },
+            clothes: { label: "MODA", color: "#ff00ff" },
+            shoes: { label: "CALÇADOS", color: "#00ff00" },
+            tech: { label: "HARDWARE", color: "#00f2ff" },
+            appliances: { label: "EQUIP", color: "#ffff00" },
+            auto: { label: "MOTOR", color: "#ff4400" },
+            jewelry: { label: "LUXO", color: "#ffaa00" }
         };
 
         const sectorMenu = document.getElementById('sector-menu');
@@ -179,14 +199,14 @@
 
             const cleanSigla = stateSigla.replace("BR_", "").toUpperCase();
             document.getElementById('sector-title').innerText = `${stateName.toUpperCase()}`;
-            buildingsGrid.innerHTML = '<p style="font-size:9px; grid-column:1/-1; padding:20px; color:#333;">LOADING URBAN DATA...</p>';
+            buildingsGrid.innerHTML = '<p style="font-size:10px; grid-column:1/-1; text-align:center; color:#333;">SINCRONIZANDO DADOS DO SETOR...</p>';
             sectorMenu.classList.add('active');
 
             try {
                 const q = query(collection(db, "usuarios"), where("estado", "==", cleanSigla));
                 const querySnapshot = await getDocs(q);
                 buildingsGrid.innerHTML = '';
-                document.getElementById('connection-count').innerText = `${querySnapshot.size} UNITS DETECTED IN QUADRANT`;
+                document.getElementById('connection-count').innerText = `${querySnapshot.size} SINAIS IDENTIFICADOS`;
 
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
@@ -199,7 +219,7 @@
                     wrapper.onclick = () => window.location.href = `perfil.html?id=${doc.id}`;
                     wrapper.innerHTML = `
                         <div class="building-name">${(data.nome || 'NEXUS').toUpperCase()}</div>
-                        <div class="building-niche" style="color:${resColor}">${config.label}</div>
+                        <div class="building-tag">${config.label}</div>
                     `;
                     buildingsGrid.appendChild(wrapper);
                 });
