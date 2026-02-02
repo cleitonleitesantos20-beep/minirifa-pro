@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusVL - Apartamento</title>
+    <title>NexusVL - Apartment Constructor</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --user-color: #00f2ff;
-            --bg-dark: #050505;
+            --bg-dark: #020202;
+            --grid-size: 30px; /* Tamanho dos mini-blocos */
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -16,267 +17,265 @@
             background: var(--bg-dark);
             color: #fff;
             font-family: 'Rajdhani', sans-serif;
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
+            height: 100vh; display: flex; overflow: hidden;
         }
 
-        /* ÁREA DO APARTAMENTO */
-        #apartment-viewport {
+        /* ÁREA DE CONSTRUÇÃO */
+        #viewport-wrapper {
             flex-grow: 1;
-            position: relative;
-            perspective: 1000px;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: radial-gradient(circle, #111 0%, #000 100%);
+            overflow: auto;
+            background: radial-gradient(circle, #0a0a0a 0%, #000 100%);
+            position: relative;
         }
 
-        /* PERSONAGEM (LOSANGO) */
+        /* O RETÂNGULO DO APARTAMENTO (MODULAR) */
+        .room-module {
+            position: relative;
+            width: 600px; /* 20 colunas */
+            height: 450px; /* 15 linhas */
+            background-color: #050505;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: var(--grid-size) var(--grid-size);
+            border: 2px solid #222;
+            margin: 10px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+        }
+
+        /* MINI-BLOCO NÉON (MÓVEIS) */
+        .voxel {
+            position: absolute;
+            width: var(--grid-size);
+            height: var(--grid-size);
+            background: var(--user-color);
+            border: 1px solid rgba(0,0,0,0.3);
+            box-shadow: inset 0 0 10px rgba(255,255,255,0.2), 0 0 5px var(--user-color);
+            cursor: grab;
+            z-index: 10;
+        }
+        .voxel:active { cursor: grabbing; }
+
+        /* PROTAGONISTA (CENTRO DO GRID) */
         #protagonist {
             position: absolute;
-            width: 40px;
-            height: 40px;
+            width: 30px; height: 30px;
             background: var(--user-color);
             clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-            filter: drop-shadow(0 0 20px var(--user-color));
+            filter: drop-shadow(0 0 15px var(--user-color));
             z-index: 100;
-            animation: float 3s ease-in-out infinite;
+            pointer-events: none;
+            transition: 0.1s;
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-15px) rotate(5deg); }
-        }
-
-        /* MÓVEIS GEOMÉTRICOS */
-        .furniture {
-            position: absolute;
-            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: pointer;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .furniture:hover { border-color: #fff; transform: scale(1.05); }
-
-        /* PAINEL LATERAL (LOJA/MODIFICAÇÃO) */
+        /* MENU LATERAL */
         #ui-panel {
-            width: 300px;
-            background: rgba(10, 10, 10, 0.95);
-            border-left: 2px solid #222;
+            width: 320px;
+            background: #0a0a0a;
+            border-left: 2px solid #1a1a1a;
             padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            z-index: 200;
-            backdrop-filter: blur(10px);
+            display: flex; flex-direction: column; gap: 15px;
+            z-index: 1000;
+        }
+
+        .section {
+            border: 1px solid #222;
+            padding: 10px;
+            background: #0f0f0f;
         }
 
         .section-title {
-            font-family: 'Orbitron';
-            font-size: 12px;
-            color: var(--user-color);
-            letter-spacing: 2px;
-            border-bottom: 1px solid #333;
-            padding-bottom: 5px;
+            font-family: 'Orbitron'; font-size: 10px; color: var(--user-color);
+            margin-bottom: 10px; letter-spacing: 1px;
         }
 
-        .shop-item {
+        .shop-btn {
+            width: 100%;
             background: #111;
+            border: 1px solid #333;
+            color: #eee;
             padding: 10px;
-            border: 1px solid #222;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .shop-item:hover { border-color: var(--user-color); background: #1a1a1a; }
-        .shop-item p { font-size: 10px; color: #888; margin-top: 5px; }
-
-        .controls { display: flex; flex-direction: column; gap: 10px; }
-        
-        button {
-            background: none;
-            border: 1px solid var(--user-color);
-            color: var(--user-color);
-            padding: 8px;
+            margin-bottom: 5px;
             font-family: 'Orbitron';
-            font-size: 10px;
+            font-size: 9px;
             cursor: pointer;
-            transition: 0.3s;
+            text-align: left;
+            display: flex; justify-content: space-between;
         }
-        button:hover { background: var(--user-color); color: #000; }
-
-        input[type="color"] {
-            width: 100%; height: 30px; border: none; background: none; cursor: pointer;
-        }
+        .shop-btn:hover { border-color: var(--user-color); }
 
         .np-display {
-            font-family: 'Orbitron';
-            color: #ffcc00;
-            font-size: 14px;
-            text-align: center;
-            background: rgba(255, 204, 0, 0.1);
-            padding: 10px;
+            font-family: 'Orbitron'; color: #ffcc00; font-size: 16px;
+            text-align: center; padding: 10px; border: 1px solid #ffcc0033;
+        }
+
+        #color-selector { width: 100%; height: 30px; margin-top: 5px; cursor: pointer; border: none; }
+
+        .btn-action {
+            background: var(--user-color); color: #000;
+            border: none; padding: 12px; font-family: 'Orbitron';
+            font-weight: bold; cursor: pointer; margin-top: auto;
         }
     </style>
 </head>
 <body>
 
-    <div id="apartment-viewport">
-        <div id="protagonist"></div>
+    <div id="viewport-wrapper">
+        <div id="apartment-grid" class="room-module">
+            <div id="protagonist"></div>
         </div>
+    </div>
 
     <aside id="ui-panel">
         <div class="np-display" id="balance">0.00 NP</div>
 
-        <div class="section-title">EXPANDIR APARTAMENTO</div>
-        <div class="controls">
-            <div class="shop-item" onclick="buyFurniture('rect')">
-                <strong>BLOCO RETANGULAR</strong>
-                <p>CUSTO: 500 NP (R$ 5,00)</p>
-            </div>
-            <div class="shop-item" onclick="buyFurniture('cube')">
-                <strong>BLOCO QUADRADO</strong>
-                <p>CUSTO: 300 NP (R$ 3,00)</p>
-            </div>
-            <div class="shop-item" onclick="buyFurniture('circle')">
-                <strong>MÓDULO REDONDO</strong>
-                <p>CUSTO: 700 NP (R$ 7,00)</p>
-            </div>
+        <div class="section">
+            <div class="section-title">CONSTRUÇÃO (VOXELS)</div>
+            <button class="shop-btn" onclick="spawnVoxel()">
+                <span>+ MINI BLOCO NÉON</span>
+                <span style="color:#ffcc00">100 NP</span>
+            </button>
+            <p style="font-size: 9px; color:#666; margin-top:5px;">Arraste os blocos para montar sua mesa, cama ou sofá no grid.</p>
         </div>
 
-        <div id="edit-menu" style="display:none;">
-            <div class="section-title">CUSTOMIZAR SELECIONADO</div>
-            <div class="controls">
-                <label style="font-size: 10px;">COR DO NEON:</label>
-                <input type="color" id="color-picker" onchange="updateFurnitureColor(this.value)">
-                <p style="font-size: 8px; color: #666;">Taxa de alteração: 100 NP</p>
-                <button onclick="removeFurniture()">DELETAR OBJETO</button>
-            </div>
+        <div class="section">
+            <div class="section-title">EXPANSÃO</div>
+            <button class="shop-btn" onclick="addRoom()">
+                <span>+ NOVO MÓDULO (QUARTO)</span>
+                <span style="color:#ffcc00">2500 NP</span>
+            </button>
         </div>
 
-        <button style="margin-top:auto;" onclick="saveApartment()">SALVAR CONFIGURAÇÃO</button>
-        <button onclick="window.location.href='dashboard.html'">VOLTAR AO MAPA</button>
+        <div class="section">
+            <div class="section-title">CUSTOMIZAÇÃO</div>
+            <label style="font-size: 9px;">COR DO PRÓXIMO BLOCO:</label>
+            <input type="color" id="color-selector" value="#00f2ff">
+        </div>
+
+        <button class="btn-action" onclick="saveApartment()">SALVAR NEXUS APARTMENT</button>
+        <button onclick="window.location.href='dashboard.html'" style="background:none; border:1px solid #444; color:#888; padding:5px; font-family:'Orbitron'; font-size:8px; cursor:pointer;">SAIR</button>
     </aside>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-        const firebaseConfig = { 
-            apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", 
-            projectId: "minharifadigital" 
-        };
+        const firebaseConfig = { apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", projectId: "minharifadigital" };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        const userId = localStorage.getItem('userId') || "TEST_USER"; 
-        let userNP = 5000; // Simulação de saldo inicial
-        let selectedElement = null;
+        let userNP = 10000; // Saldo de teste
+        const gridSize = 30;
+        const mainGrid = document.getElementById('apartment-grid');
+        const protagonist = document.getElementById('protagonist');
 
-        // Configurar cor do protagonista do perfil
-        const profileColor = localStorage.getItem('userNeonColor') || '#00f2ff';
-        document.documentElement.style.setProperty('--user-color', profileColor);
+        // Centralizar protagonista no grid
+        protagonist.style.left = '270px';
+        protagonist.style.top = '210px';
 
-        const viewport = document.getElementById('apartment-viewport');
-        const balanceDisplay = document.getElementById('balance');
-
-        function updateBalance() {
-            balanceDisplay.innerText = `${userNP.toLocaleString('pt-BR')} NP`;
+        function updateNP() {
+            document.getElementById('balance').innerText = `${userNP.toLocaleString('pt-BR')} NP`;
         }
 
-        // Função para comprar móveis
-        window.buyFurniture = (type) => {
-            const costs = { rect: 500, cube: 300, circle: 700 };
-            if (userNP < costs[type]) return alert("Saldo NP insuficiente!");
-
-            userNP -= costs[type];
-            updateBalance();
-
-            const el = document.createElement('div');
-            el.className = 'furniture';
-            el.dataset.type = type;
-            
-            // Estilos baseados no tipo
-            if(type === 'rect') { el.style.width = '120px'; el.style.height = '40px'; }
-            if(type === 'cube') { el.style.width = '60px'; el.style.height = '60px'; }
-            if(type === 'circle') { el.style.width = '80px'; el.style.height = '80px'; el.style.borderRadius = '50%'; }
-
-            // Posição aleatória inicial
-            el.style.left = (Math.random() * 60 + 20) + '%';
-            el.style.top = (Math.random() * 60 + 20) + '%';
-            el.style.background = 'rgba(255,255,255,0.05)';
-            el.style.boxShadow = `0 0 10px rgba(255,255,255,0.1)`;
-
-            el.onclick = (e) => {
-                e.stopPropagation();
-                selectFurniture(el);
-            };
-
-            viewport.appendChild(el);
-            makeDraggable(el);
-        };
-
-        function selectFurniture(el) {
-            if(selectedElement) selectedElement.style.borderColor = 'rgba(255,255,255,0.1)';
-            selectedElement = el;
-            selectedElement.style.borderColor = profileColor;
-            document.getElementById('edit-menu').style.display = 'block';
-        }
-
-        window.updateFurnitureColor = (color) => {
-            if(!selectedElement) return;
-            if(userNP < 100) return alert("NP insuficiente para pintar!");
+        // FUNÇÃO: COMPRAR E GERAR MINI BLOCO
+        window.spawnVoxel = () => {
+            if(userNP < 100) return alert("NP Insuficiente!");
             
             userNP -= 100;
-            updateBalance();
-            selectedElement.style.background = color + '33'; // 20% opacidade
-            selectedElement.style.borderColor = color;
-            selectedElement.style.boxShadow = `0 0 15px ${color}`;
+            updateNP();
+
+            const voxel = document.createElement('div');
+            voxel.className = 'voxel';
+            const color = document.getElementById('color-selector').value;
+            voxel.style.backgroundColor = color;
+            voxel.style.boxShadow = `0 0 10px ${color}`;
+            
+            // Posiciona no centro do módulo
+            voxel.style.left = '0px';
+            voxel.style.top = '0px';
+
+            makeDraggable(voxel);
+            mainGrid.appendChild(voxel);
         };
 
-        window.removeFurniture = () => {
-            if(selectedElement) {
-                selectedElement.remove();
-                selectedElement = null;
-                document.getElementById('edit-menu').style.display = 'none';
-            }
+        // FUNÇÃO: ADICIONAR NOVO QUARTO (MODULAR)
+        window.addRoom = () => {
+            if(userNP < 2500) return alert("NP Insuficiente!");
+            
+            userNP -= 2500;
+            updateNP();
+
+            const newRoom = document.createElement('div');
+            newRoom.className = 'room-module';
+            document.getElementById('viewport-wrapper').appendChild(newRoom);
         };
 
-        // Função simples de arrastar
+        // LÓGICA DE ARRASTAR E ENCAIXAR NO GRID (SNAP TO GRID)
         function makeDraggable(el) {
-            let isDragging = false;
-            el.onmousedown = (e) => { isDragging = true; };
-            window.onmousemove = (e) => {
-                if(isDragging && selectedElement) {
-                    selectedElement.style.left = (e.clientX - 30) + 'px';
-                    selectedElement.style.top = (e.clientY - 30) + 'px';
-                }
-            };
-            window.onmouseup = () => { isDragging = false; };
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            el.onmousedown = dragMouseDown;
+
+            function dragMouseDown(e) {
+                e.preventDefault();
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+                el.style.zIndex = 1000;
+            }
+
+            function elementDrag(e) {
+                e.preventDefault();
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                
+                // Posição livre durante o arraste
+                el.style.top = (el.offsetTop - pos2) + "px";
+                el.style.left = (el.offsetLeft - pos1) + "px";
+            }
+
+            function closeDragElement() {
+                // EFEITO SNAP: Encaixa no múltiplo de 30px mais próximo
+                const x = Math.round(el.offsetLeft / gridSize) * gridSize;
+                const y = Math.round(el.offsetTop / gridSize) * gridSize;
+                
+                el.style.left = x + "px";
+                el.style.top = y + "px";
+                el.style.zIndex = 10;
+                
+                document.onmouseup = null;
+                document.onmousemove = null;
+            }
         }
 
-        // Salvar no Firebase
+        // SALVAR ESTADO
         window.saveApartment = async () => {
-            const items = [];
-            document.querySelectorAll('.furniture').forEach(f => {
-                items.push({
-                    type: f.dataset.type,
-                    left: f.style.left,
-                    top: f.style.top,
-                    color: f.style.borderColor
+            const voxels = [];
+            document.querySelectorAll('.voxel').forEach(v => {
+                voxels.push({
+                    x: v.style.left,
+                    y: v.style.top,
+                    color: v.style.backgroundColor
                 });
             });
 
             try {
+                const userId = localStorage.getItem('userId') || "TEST_USER";
                 const userRef = doc(db, "usuarios", userId);
                 await updateDoc(userRef, { 
-                    apartamento: items,
+                    apartment_voxels: voxels,
                     nexusPoints: userNP 
                 });
-                alert("Apartamento sincronizado no Nexus!");
+                alert("Apartamento Salvo no Nexus!");
             } catch (e) { console.error(e); }
         };
 
-        updateBalance();
+        updateNP();
     </script>
     <script type="module" src="nexus-overlay.js"></script>
 </body>
