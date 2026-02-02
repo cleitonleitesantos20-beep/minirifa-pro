@@ -10,9 +10,8 @@
         :root {
             --user-neon-color: #00f2ff;
             --neon-grey: #4a4a4a;
-            --neon-grey-glow: rgba(100, 100, 100, 0.2);
             --bg-dark: #000000;
-            --overlay-bg: rgba(2, 2, 2, 0.95);
+            --overlay-bg: rgba(2, 2, 2, 0.98);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -32,12 +31,12 @@
             fill: #050505; stroke: var(--neon-grey); stroke-width: 0.5px;
             transition: 0.4s; cursor: pointer;
         }
-        .state:hover { fill: #0a0a0a; stroke: var(--user-neon-color); filter: drop-shadow(0 0 5px var(--user-neon-color)); }
-        .state.selected { fill: rgba(20, 20, 20, 0.8); stroke: var(--user-neon-color); stroke-width: 1.5px; }
+        .state:hover { fill: #0a0a0a; stroke: var(--user-neon-color); filter: drop-shadow(0 0 8px var(--user-neon-color)); }
+        .state.selected { fill: rgba(30, 30, 30, 0.8); stroke: var(--user-neon-color); stroke-width: 1.5px; }
 
         .state-sigla {
-            fill: var(--neon-grey); font-family: 'Orbitron'; font-size: 10px;
-            pointer-events: none; text-anchor: middle; opacity: 0.5;
+            fill: var(--neon-grey); font-family: 'Orbitron'; font-size: 11px;
+            pointer-events: none; text-anchor: middle; opacity: 0.6;
         }
 
         #protagonist {
@@ -49,101 +48,76 @@
             transition: opacity 0.3s, left 0.1s, top 0.1s;
         }
 
-        /* Modal - Interface de Escaneamento */
         #sector-menu {
             position: fixed; top: 50%; left: 50%;
             transform: translate(-50%, -50%) scale(0.9);
-            width: 90%; max-width: 600px;
-            max-height: 75vh;
+            width: 95%; max-width: 550px;
+            max-height: 80vh;
             background: var(--overlay-bg);
             border: 2px solid var(--neon-grey);
-            z-index: 10000; padding: 25px;
+            z-index: 10000; padding: 20px;
             display: none; flex-direction: column;
-            backdrop-filter: blur(25px);
-            opacity: 0; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 0 50px rgba(0,0,0,1);
+            backdrop-filter: blur(30px);
+            opacity: 0; transition: 0.3s;
+            box-shadow: 0 0 60px rgba(0,0,0,1);
         }
         #sector-menu.active { display: flex; opacity: 1; transform: translate(-50%, -50%) scale(1); border-color: var(--user-neon-color); }
 
-        .menu-header { 
-            text-align: center; margin-bottom: 15px; 
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-            padding: 8px 0;
-        }
-        .menu-header h2 { font-family: 'Orbitron'; font-size: 1.2rem; letter-spacing: 5px; color: #fff; text-shadow: 0 0 10px var(--user-neon-color); }
+        .menu-header { text-align: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; }
+        .menu-header h2 { font-family: 'Orbitron'; font-size: 1.1rem; letter-spacing: 3px; color: #fff; }
 
-        /* Grid de Edifícios Menor e mais Compacto */
         #buildings-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); /* Reduzi de 110px para 90px */
-            gap: 12px; /* Reduzi de 25px para 12px */
-            overflow-y: auto; padding: 15px;
+            grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
+            gap: 8px; overflow-y: auto; padding: 10px;
             scrollbar-width: none;
         }
 
-        /* O Edifício Neon Estilizado (Menor) */
         .building-wrapper {
             position: relative;
-            height: 90px; /* Reduzi de 120px para 90px */
-            background: rgba(0,0,0,0.6);
+            height: 65px;
+            background: rgba(0,0,0,0.8);
             border: 1px solid currentColor;
             cursor: pointer;
-            transition: 0.3s;
+            transition: 0.2s;
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
-            box-shadow: inset 0 0 10px currentColor;
+            box-shadow: inset 0 0 8px currentColor;
         }
         
-        .building-wrapper::after {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
-            pointer-events: none;
-        }
-
         .building-wrapper:hover {
-            transform: scale(1.05) translateY(-3px);
-            box-shadow: 0 0 20px currentColor, inset 0 0 15px currentColor;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px currentColor, inset 0 0 12px currentColor;
             z-index: 2;
         }
 
         .building-name { 
-            font-family: 'Orbitron'; font-size: 8px; color: #fff; font-weight: bold; /* Fonte menor */
-            text-align: center; padding: 0 5px; z-index: 1;
-            text-transform: uppercase;
+            font-family: 'Orbitron'; font-size: 7px; color: #fff; font-weight: bold; 
+            text-align: center; padding: 0 3px; z-index: 1;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;
         }
         
         .building-tag {
-            font-size: 6px; margin-top: 5px; font-family: 'Orbitron';
-            background: currentColor; color: #000; padding: 1px 4px;
+            font-size: 5px; margin-top: 4px; font-family: 'Orbitron';
+            background: currentColor; color: #000; padding: 1px 3px;
             font-weight: 900; z-index: 1;
         }
 
-        /* Botão Voltar Estilizado */
         .btn-exit {
             position: fixed; bottom: 30px; left: 50%;
             transform: translateX(-50%);
-            padding: 12px 50px; border: 1px solid var(--user-neon-color);
+            padding: 10px 40px; border: 1px solid var(--user-neon-color);
             color: #fff; text-decoration: none; 
-            font-family: 'Orbitron'; font-size: 13px; font-weight: bold;
-            background: rgba(0,0,0,0.8); z-index: 20000;
-            transition: 0.3s; letter-spacing: 4px;
-            overflow: hidden;
+            font-family: 'Orbitron'; font-size: 12px; font-weight: bold;
+            background: rgba(0,0,0,0.9); z-index: 20000;
+            transition: 0.3s; letter-spacing: 3px;
         }
-        .btn-exit::before {
-            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, var(--user-neon-color), transparent);
-            transition: 0.5s;
-        }
-        .btn-exit:hover::before { left: 100%; }
-        .btn-exit:hover { background: var(--user-neon-color); color: #000; box-shadow: 0 0 30px var(--user-neon-color); }
+        .btn-exit:hover { background: var(--user-neon-color); color: #000; box-shadow: 0 0 25px var(--user-neon-color); }
 
         .close-btn {
-            margin-top: 15px; background: none; border: 1px solid #222;
-            color: #444; padding: 8px; cursor: pointer; font-family: 'Orbitron'; font-size: 8px;
-            letter-spacing: 2px; transition: 0.3s;
+            margin-top: 15px; background: none; border: 1px solid #333;
+            color: #666; padding: 8px; cursor: pointer; font-family: 'Orbitron'; font-size: 8px;
         }
-        .close-btn:hover { border-color: #fff; color: #fff; }
-
     </style>
 </head>
 <body>
@@ -152,11 +126,11 @@
 
     <div id="sector-menu">
         <div class="menu-header">
-            <h2 id="sector-title">NEXUS</h2>
-            <p id="connection-count" style="font-size: 8px; color: var(--user-neon-color); font-family:'Orbitron'; opacity: 0.7;">MAPA DE DENSIDADE POPULACIONAL</p>
+            <h2 id="sector-title">SETOR</h2>
+            <p id="connection-count" style="font-size: 7px; color: var(--user-neon-color); font-family:'Orbitron';">SISTEMA DE MAPEAMENTO DE NICHOS</p>
         </div>
         <div id="buildings-grid"></div>
-        <button class="close-btn" onclick="closeMenu()">FECHAR CONEXÃO</button>
+        <button class="close-btn" onclick="closeMenu()">DESCONECTAR</button>
     </div>
     
     <div id="map-container">
@@ -178,6 +152,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // Cores fixas por nicho conforme solicitado
         const nicheAssets = {
             citizen: { label: "CIVIL", color: "#4a4a4a" },
             clothes: { label: "MODA", color: "#ff00ff" },
@@ -199,20 +174,21 @@
             d3.select(element).classed("selected", true);
 
             const cleanSigla = stateSigla.replace("BR_", "").toUpperCase();
-            document.getElementById('sector-title').innerText = `${stateName.toUpperCase()}`;
-            buildingsGrid.innerHTML = '<p style="font-size:9px; grid-column:1/-1; text-align:center; color:#333;">SINCRONIZANDO SETOR...</p>';
+            document.getElementById('sector-title').innerText = stateName.toUpperCase();
+            buildingsGrid.innerHTML = '<p style="font-size:8px; grid-column:1/-1; text-align:center; color:#444;">SCANNING...</p>';
             sectorMenu.classList.add('active');
 
             try {
                 const q = query(collection(db, "usuarios"), where("estado", "==", cleanSigla));
                 const querySnapshot = await getDocs(q);
                 buildingsGrid.innerHTML = '';
-                document.getElementById('connection-count').innerText = `${querySnapshot.size} SINAIS IDENTIFICADOS`;
+                document.getElementById('connection-count').innerText = `${querySnapshot.size} UNIDADES NO QUADRANTE`;
 
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
+                    // Prioriza a cor do nicho (nicheAssets)
                     const config = nicheAssets[data.role] || nicheAssets.citizen;
-                    const resColor = data.userNeonColor || config.color;
+                    const resColor = config.color; 
 
                     const wrapper = document.createElement('div');
                     wrapper.className = 'building-wrapper';
@@ -234,7 +210,8 @@
 
         const svg = d3.select("#brazil-map");
         const mapGroup = svg.select("#map-group");
-        const projection = d3.geoMercator().center([-52, -15]).scale(1600)
+        // Aumentado scale para 2200 para ficar mais próximo
+        const projection = d3.geoMercator().center([-52, -15]).scale(2200)
             .translate([window.innerWidth / 2, window.innerHeight / 2]);
         const pathGenerator = d3.geoPath().projection(projection);
 
@@ -256,7 +233,7 @@
                 .attr("dy", ".35em").text(d => (d.properties.sigla || d.id).replace("BR_", ""));
         });
 
-        svg.call(d3.zoom().scaleExtent([0.8, 10]).on("zoom", (e) => {
+        svg.call(d3.zoom().scaleExtent([0.5, 10]).on("zoom", (e) => {
             mapGroup.attr("transform", e.transform);
             protagonist.style("opacity", "0");
         }));
