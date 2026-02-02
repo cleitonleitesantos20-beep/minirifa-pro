@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexusVL - Apartment</title>
+    <title>NexusVL - Cyber Apartment</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --user-color: #00f2ff;
-            --bg-dark: #050505;
-            --grid-size: 30px;
+            --grid-size: 15px; /* Grid menor para móveis menores */
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -32,23 +31,21 @@
             z-index: 1;
         }
 
-        /* HEADER FIXO */
         header {
             position: relative;
             z-index: 2000;
-            padding: 15px;
+            padding: 10px 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(0,0,0,0.8);
-            border-bottom: 1px solid #222;
+            background: rgba(0,0,0,0.9);
+            border-bottom: 2px solid #111;
         }
 
         .np-display {
             font-family: 'Orbitron';
             color: #ffcc00;
             font-size: 14px;
-            text-shadow: 0 0 10px #ffcc0055;
         }
 
         #shop-toggle {
@@ -58,64 +55,69 @@
             padding: 8px 15px;
             font-family: 'Orbitron';
             font-weight: bold;
-            font-size: 12px;
-            border-radius: 2px;
+            font-size: 11px;
             cursor: pointer;
         }
 
-        /* VIEWPORT DO APARTAMENTO */
         #main-container {
             flex: 1;
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 10;
-            padding: 10px;
+            padding: 20px;
         }
 
         #viewport {
             position: relative;
             width: 100%;
-            max-width: 720px;
+            max-width: 800px;
             aspect-ratio: 2 / 1;
-            background: rgba(10, 10, 15, 0.95);
-            border: 2px solid #333;
-            overflow: hidden;
+            background: rgba(5, 5, 10, 0.95);
+            border: 1px solid #333;
+            box-shadow: inset 0 0 50px #000;
             background-image: 
-                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
             background-size: var(--grid-size) var(--grid-size);
         }
 
+        /* PROTAGONISTA (LOSANGO) */
         #protagonist {
             position: absolute;
-            width: 30px; height: 30px;
+            width: 20px; height: 20px;
             background: var(--user-color);
             clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-            filter: drop-shadow(0 0 10px var(--user-color));
-            left: calc(50% - 15px);
-            top: calc(50% - 15px);
+            filter: drop-shadow(0 0 8px var(--user-color));
+            left: 50%; top: 50%;
             z-index: 100;
+            pointer-events: none;
         }
 
+        /* MÓVEIS */
         .voxel {
             position: absolute;
-            width: var(--grid-size);
-            height: var(--grid-size);
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
             z-index: 50;
             touch-action: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron';
+            font-size: 6px;
+            color: #fff;
+            text-transform: uppercase;
+            font-weight: bold;
+            text-align: center;
         }
 
-        /* RODAPÉ COM BOTÕES DE SAIR E SALVAR */
         footer {
             position: relative;
             z-index: 2000;
             padding: 15px;
             display: flex;
             gap: 10px;
-            background: rgba(0,0,0,0.8);
-            border-top: 1px solid #222;
+            background: #000;
         }
 
         .action-btn {
@@ -126,49 +128,65 @@
             font-weight: bold;
             border: none;
             cursor: pointer;
-            text-align: center;
         }
 
         .btn-save { background: var(--user-color); color: #000; }
-        .btn-exit { background: #222; color: #fff; }
+        .btn-exit { background: #1a1a1a; color: #fff; }
 
-        /* MENU DE COMPRAS (MODAL OVERLAY) */
+        /* SHOP MODAL */
         #ui-panel {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0,0,0,0.95);
+            background: rgba(0,0,0,0.98);
             z-index: 3000;
             display: none;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 40px;
+            padding: 20px;
+            overflow-y: auto;
         }
 
         #ui-panel.open { display: flex; }
 
-        .shop-box {
-            width: 100%;
-            max-width: 300px;
-            background: #111;
-            border: 1px solid var(--user-color);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+        .shop-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
         }
 
-        #color-pick { width: 100%; height: 45px; border: none; background: none; cursor: pointer; }
+        .furniture-card {
+            background: #111;
+            border: 1px solid #222;
+            padding: 15px;
+            text-align: center;
+        }
 
-        .close-shop {
-            margin-top: 20px;
+        .furniture-card h5 { font-family: 'Orbitron'; font-size: 10px; margin-bottom: 5px; color: var(--user-color); }
+        .furniture-card p { font-size: 12px; color: #ffcc00; margin-bottom: 10px; }
+
+        .btn-buy-item {
+            width: 100%;
+            padding: 8px;
+            background: #222;
             color: #fff;
-            text-decoration: underline;
+            border: 1px solid #333;
             font-family: 'Orbitron';
-            font-size: 12px;
+            font-size: 9px;
             cursor: pointer;
         }
 
+        .color-section {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #333;
+            background: #080808;
+        }
+
+        .price-tag {
+            font-size: 10px;
+            color: #888;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -177,7 +195,8 @@
 
     <header>
         <div class="np-display" id="balance">0 NP</div>
-        <button id="shop-toggle" onclick="toggleMenu()">COMPRAR BLOCO</button>
+        <div style="font-family:'Orbitron'; font-size: 10px; color: #444;">NEXUS APARTMENT v2.0</div>
+        <button id="shop-toggle" onclick="toggleMenu()">LOJA DE MÓVEIS</button>
     </header>
 
     <div id="main-container">
@@ -188,18 +207,22 @@
 
     <footer>
         <button class="action-btn btn-exit" onclick="window.location.href='index.html'">SAIR</button>
-        <button class="action-btn btn-save" onclick="saveApartment()">SALVAR NEXUS</button>
+        <button class="action-btn btn-save" onclick="saveApartment()">SALVAR APTO</button>
     </footer>
 
     <aside id="ui-panel">
-        <div class="shop-box">
-            <h4 style="font-family:'Orbitron'; color:var(--user-color); font-size: 12px;">LOJA DE BLOCOS</h4>
-            <button class="action-btn btn-save" onclick="spawnVoxel()">ADICIONAR (100 NP)</button>
-            
-            <h4 style="font-family:'Orbitron'; color:var(--user-color); font-size: 12px; margin-top: 10px;">COR DO BLOCO</h4>
-            <input type="color" id="color-pick" value="#00f2ff">
+        <h2 style="font-family:'Orbitron'; text-align: center; color: var(--user-color);">NEXUS SHOP</h2>
+        
+        <div class="color-section">
+            <h4 style="font-family:'Orbitron'; font-size: 11px;">1. ESCOLHA A COR NÉON</h4>
+            <input type="color" id="color-pick" value="#00f2ff" onchange="calculateColorPremium()">
+            <p class="price-tag" id="color-premium-text">Cor padrão: +0 NP</p>
         </div>
-        <div class="close-shop" onclick="toggleMenu()">FECHAR LOJA</div>
+
+        <div class="shop-grid" id="furniture-list">
+            </div>
+
+        <button class="action-btn btn-exit" style="margin-top: 20px;" onclick="toggleMenu()">VOLTAR</button>
     </aside>
 
     <script type="module">
@@ -211,86 +234,126 @@
         const db = getFirestore(app);
 
         let userNP = 10000;
-        const gridSize = 30;
+        let colorPremium = 0;
+        const gridSize = 15;
         const viewport = document.getElementById('viewport');
+
+        const furniture = [
+            { id: 'tv', name: 'Smart TV', price: 500, w: 45, h: 30 },
+            { id: 'sofa', name: 'Sofá Cyber', price: 800, w: 60, h: 30 },
+            { id: 'cama', name: 'Cama Biohacker', price: 1200, w: 45, h: 60 },
+            { id: 'mesa', name: 'Mesa Gamer', price: 600, w: 45, h: 45 },
+            { id: 'geladeira', name: 'Geladeira', price: 1000, w: 30, h: 45 },
+            { id: 'fogao', name: 'Fogão Indução', price: 700, w: 30, h: 30 },
+            { id: 'lampada', name: 'Lâmpada Néon', price: 300, w: 15, h: 15 }
+        ];
+
+        function initShop() {
+            const list = document.getElementById('furniture-list');
+            furniture.forEach(item => {
+                list.innerHTML += `
+                    <div class="furniture-card">
+                        <h5>${item.name}</h5>
+                        <p>${item.price} NP</p>
+                        <button class="btn-buy-item" onclick="buyFurniture('${item.id}')">COMPRAR</button>
+                    </div>
+                `;
+            });
+        }
+
+        window.calculateColorPremium = () => {
+            const color = document.getElementById('color-pick').value;
+            // Cores raras (tons de roxo, dourado e branco) custam mais
+            if (color.toLowerCase() === '#ffffff') colorPremium = 2000;
+            else if (color.toLowerCase() === '#ff00ff') colorPremium = 1000;
+            else if (color.toLowerCase() === '#ffd700') colorPremium = 1500;
+            else colorPremium = 200;
+            
+            document.getElementById('color-premium-text').innerText = `Premium da Cor: +${colorPremium} NP`;
+        };
 
         window.toggleMenu = () => {
             document.getElementById('ui-panel').classList.toggle('open');
         };
 
-        function updateNP() {
-            document.getElementById('balance').innerText = `${userNP} NP`;
-        }
+        window.buyFurniture = (id) => {
+            const item = furniture.find(f => f.id === id);
+            const totalCost = item.price + colorPremium;
 
-        window.spawnVoxel = () => {
-            if(userNP < 100) return alert("NP insuficiente!");
-            userNP -= 100;
+            if(userNP < totalCost) return alert("NP Insuficiente para este item e cor!");
+
+            userNP -= totalCost;
             updateNP();
 
             const voxel = document.createElement('div');
             voxel.className = 'voxel';
             const color = document.getElementById('color-pick').value;
-            voxel.style.backgroundColor = color;
+            
+            voxel.style.width = item.w + "px";
+            voxel.style.height = item.h + "px";
+            voxel.style.backgroundColor = color + "33"; // Transparência
+            voxel.style.border = `2px solid ${color}`;
             voxel.style.boxShadow = `0 0 15px ${color}`;
             voxel.style.left = "0px";
             voxel.style.top = "0px";
+            voxel.innerText = item.name;
 
             makeDraggable(voxel);
             viewport.appendChild(voxel);
-            toggleMenu(); // Fecha após comprar
+            toggleMenu();
         };
 
         function makeDraggable(el) {
             let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-            
             const startDrag = (e) => {
                 const event = e.type === 'touchstart' ? e.touches[0] : e;
-                pos3 = event.clientX;
-                pos4 = event.clientY;
-                document.onmouseup = endDrag;
-                document.ontouchend = endDrag;
-                document.onmousemove = moveDrag;
-                document.ontouchmove = moveDrag;
+                pos3 = event.clientX; pos4 = event.clientY;
+                document.onmouseup = endDrag; document.ontouchend = endDrag;
+                document.onmousemove = moveDrag; document.ontouchmove = moveDrag;
             };
-
             const moveDrag = (e) => {
                 const event = e.type === 'touchmove' ? e.touches[0] : e;
-                pos1 = pos3 - event.clientX;
-                pos2 = pos4 - event.clientY;
-                pos3 = event.clientX;
-                pos4 = event.clientY;
+                pos1 = pos3 - event.clientX; pos2 = pos4 - event.clientY;
+                pos3 = event.clientX; pos4 = event.clientY;
                 el.style.top = (el.offsetTop - pos2) + "px";
                 el.style.left = (el.offsetLeft - pos1) + "px";
             };
-
             const endDrag = () => {
                 const x = Math.round(el.offsetLeft / gridSize) * gridSize;
                 const y = Math.round(el.offsetTop / gridSize) * gridSize;
-                el.style.left = x + "px";
-                el.style.top = y + "px";
-                document.onmouseup = null;
-                document.onmousemove = null;
-                document.ontouchend = null;
-                document.ontouchmove = null;
+                el.style.left = x + "px"; el.style.top = y + "px";
+                document.onmouseup = null; document.onmousemove = null;
+                document.ontouchend = null; document.ontouchmove = null;
             };
-
-            el.onmousedown = startDrag;
-            el.ontouchstart = startDrag;
+            el.onmousedown = startDrag; el.ontouchstart = startDrag;
         }
 
         window.saveApartment = async () => {
             const voxels = [];
             document.querySelectorAll('.voxel').forEach(v => {
-                voxels.push({ x: v.style.left, y: v.style.top, color: v.style.backgroundColor });
+                voxels.push({ 
+                    name: v.innerText, 
+                    x: v.style.left, 
+                    y: v.style.top, 
+                    w: v.style.width, 
+                    h: v.style.height, 
+                    color: v.style.borderColor 
+                });
             });
             try {
                 const userId = localStorage.getItem('userId') || "TEST_USER";
-                await updateDoc(doc(db, "usuarios", userId), { apartment_voxels: voxels, nexusPoints: userNP });
-                alert("Sincronizado com o Nexus!");
-            } catch (e) { alert("Erro ao salvar."); }
+                await updateDoc(doc(db, "usuarios", userId), { 
+                    apartment_voxels: voxels, 
+                    nexusPoints: userNP 
+                });
+                alert("Apartamento Sincronizado!");
+            } catch (e) { console.error(e); }
         };
 
+        function updateNP() { document.getElementById('balance').innerText = `${userNP} NP`; }
+        
         updateNP();
+        initShop();
     </script>
     <script type="module" src="nexus-overlay.js"></script>
 </body>
