@@ -21,4 +21,18 @@ export const products = [
             { name: "Nexus Pad Pro", tag: "TECH", desc: "Mousepad de alta performance.", price: 65, img: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=200", link: "#", type: "external" }
         ]
     }
+    {
+        section: "Móveis Cyber", // Nome da categoria que aparecerá no site
+        items: [
+            { 
+                name: "Carro", 
+                tag: "NEXUS", 
+                desc: "Carro cyber", 
+                price: 150.00, // Valor em NP
+                img: "https://i.postimg.cc/1418wnBT/Gemini-Generated-Image-8ldms78ldms78ldm-(1).png", // Link da imagem PNG sem fundo
+                rar: "common", // Raridade (common, rare, epic, legendary)
+                type: "internal" // "internal" faz ele ir para o inventário
+            }
+        ]
+    }
 ];
