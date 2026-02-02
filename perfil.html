@@ -18,8 +18,7 @@
         .top-nav { display: flex; justify-content: space-between; align-items: center; padding: 15px; position: absolute; width: 100%; box-sizing: border-box; z-index: 100; gap: 10px; }
         .nav-group { display: flex; gap: 8px; }
         .btn-nav { background: rgba(255,255,255,0.05); border: 1px solid #222; color: #fff; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 0.6rem; font-family: 'Orbitron'; cursor: pointer; transition: 0.3s; }
-        .btn-nav:hover { background: var(--accent-color); border-color: #fff; }
-
+        
         /* HEADER */
         .habitat-header { padding: 80px 20px 10px; text-align: center; }
         .user-name { font-family: 'Orbitron'; font-size: 1.3rem; margin: 5px 0; text-shadow: 0 0 10px var(--accent-color); }
@@ -28,10 +27,10 @@
         .status-badge { 
             display: inline-block; padding: 4px 12px; border: 1px solid var(--accent-color);
             border-radius: 20px; font-size: 0.6rem; color: var(--accent-color); 
-            letter-spacing: 2px; text-transform: uppercase; transition: 0.3s;
+            letter-spacing: 2px; text-transform: uppercase; transition: 0.3s; cursor: pointer;
         }
 
-        /* WORLD - Ajustado para centralizar */
+        /* WORLD */
         .world-view {
             position: relative; height: 320px; width: 100%;
             display: flex; align-items: flex-end; justify-content: center;
@@ -44,39 +43,33 @@
             border-radius: 10px; animation: float 4s ease-in-out infinite;
             clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
         }
+        .rainbow-mode {
+            background: linear-gradient(45deg, #ff0000, #ff00ff, #0000ff, #00ffff, #00ff00, #ffff00, #ff0000);
+            background-size: 400% 400%;
+            animation: float 4s ease-in-out infinite, rainbow-shift 8s linear infinite !important;
+        }
 
         .building-asset {
-            width: 90px; background: #080808; 
-            border: 2px solid var(--accent-color); 
+            width: 90px; background: #080808; border: 2px solid var(--accent-color); 
             border-bottom: none; display: flex; flex-wrap: wrap; padding: 10px; gap: 5px; 
-            box-shadow: inset 0 0 15px #000, 0 0 15px var(--accent-color); 
-            transition: 0.8s; cursor: pointer; position: relative;
-            justify-content: center; align-content: flex-start;
+            justify-content: center; position: relative;
         }
-        
-        .building-door {
-            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 20px; height: 25px; background: #111;
-            border: 1px solid var(--accent-color); border-bottom: none;
-            box-shadow: 0 0 10px var(--accent-color);
-        }
-
+        .building-door { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 20px; height: 25px; background: #111; border: 1px solid var(--accent-color); border-bottom: none; }
         .window { width: 9px; height: 9px; background: #111; border-radius: 1px; }
         .active-win { background: var(--accent-color); box-shadow: 0 0 5px var(--accent-color); }
 
-        /* FOOTER ACTION */
-        .action-bar {
-            position: fixed; bottom: 0; left: 0; width: 100%; padding: 20px;
-            background: linear-gradient(transparent, #000 70%);
-            display: flex; justify-content: center; z-index: 150;
-        }
-        .btn-assets {
-            background: #fff; color: #000; border: none; padding: 14px 40px;
-            border-radius: 50px; font-family: 'Orbitron'; font-size: 0.75rem; font-weight: bold;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2); cursor: pointer;
-        }
+        /* MODAL STYLE */
+        .niche-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 200; align-items: center; justify-content: center; }
+        .modal-content { background: #0a0a0a; border: 1px solid #222; padding: 20px; border-radius: 15px; width: 85%; max-width: 400px; max-height: 90vh; overflow-y: auto; }
+        .selector-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; }
+        .opt-btn { background: #111; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 6px; cursor: pointer; font-size: 0.55rem; font-family: 'Orbitron'; text-align: center; }
+        input, select { width: 100%; background: #111; border: 1px solid #333; color: #fff; padding: 10px; margin: 5px 0; border-radius: 5px; font-family: 'Rajdhani'; box-sizing: border-box; }
+
+        .action-bar { position: fixed; bottom: 0; left: 0; width: 100%; padding: 20px; background: linear-gradient(transparent, #000 70%); display: flex; justify-content: center; z-index: 150; }
+        .btn-assets { background: #fff; color: #000; border: none; padding: 14px 40px; border-radius: 50px; font-family: 'Orbitron'; font-size: 0.75rem; font-weight: bold; cursor: pointer; }
 
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        @keyframes rainbow-shift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
     </style>
 </head>
 <body>
@@ -93,7 +86,7 @@
 
     <div class="habitat-header">
         <div class="geo-tag"><span id="display-city">CARREGANDO</span> / <span id="display-state">...</span></div>
-        <div class="status-badge" id="display-role">...</div>
+        <div class="status-badge" id="display-role" onclick="toggleNicheMenu()">...</div>
         <div class="user-name" id="display-name">---</div>
     </div>
 
@@ -102,30 +95,39 @@
         <div id="user-building" class="building-asset"></div>
     </div>
 
-    <div class="info-container" style="padding: 20px; background: var(--bg-card); border-top: 1px solid #111;">
-        <div class="info-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
-            <div class="info-item" style="background: #0a0a0a; padding: 10px; border: 1px solid #1a1a1a; border-radius: 8px; text-align: center;">
-                <span style="font-size: 0.5rem; color: #555; font-family: 'Orbitron'; display: block;">NEXUS ID</span>
-                <span id="info-id" style="font-size: 0.8rem; color: #eee; font-family: 'Orbitron';">#0000</span>
-            </div>
-            <div class="info-item" style="background: #0a0a0a; padding: 10px; border: 1px solid #1a1a1a; border-radius: 8px; text-align: center;">
-                <span style="font-size: 0.5rem; color: #555; font-family: 'Orbitron'; display: block;">LEVEL</span>
-                <span id="info-lvl" style="font-size: 0.8rem; color: #eee; font-family: 'Orbitron';">1</span>
-            </div>
-            <div class="info-item" style="background: #0a0a0a; padding: 10px; border: 1px solid #1a1a1a; border-radius: 8px; text-align: center;">
-                <span style="font-size: 0.5rem; color: #555; font-family: 'Orbitron'; display: block;">XP</span>
-                <span id="info-xp" style="font-size: 0.8rem; color: #eee; font-family: 'Orbitron';">0</span>
-            </div>
-        </div>
-    </div>
-
     <div class="action-bar">
         <button class="btn-assets" id="btn-view-assets">VISUALIZAR ATIVOS</button>
     </div>
 
+    <div id="niche-modal" class="niche-modal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <p style="font-size:0.6rem; font-family:Orbitron; color:#555; text-align:center;">IDENTIDADE VISUAL</p>
+            <div class="selector-grid">
+                <div class="opt-btn" style="border-bottom: 2px solid #00d9ff" onclick="setGender('masc')">MASCULINO</div>
+                <div class="opt-btn" style="border-bottom: 2px solid #ff00ea" onclick="setGender('fem')">FEMININO</div>
+                <div class="opt-btn" style="background: linear-gradient(90deg, red, blue); border:none;" onclick="setGender('other')">OUTROS</div>
+            </div>
+
+            <p style="font-size:0.6rem; font-family:Orbitron; color:#555; text-align:center;">PROTOCOLO</p>
+            <div class="selector-grid">
+                <div class="opt-btn" onclick="setRole('citizen')">CIDADÃO</div>
+                <div class="opt-btn" onclick="setRole('tech')">ELETRÔNICOS</div>
+                <div class="opt-btn" onclick="setRole('clothes')">MODA</div>
+            </div>
+
+            <input type="text" id="input-city" placeholder="Sua Cidade">
+            <select id="input-state">
+                <option value="">Estado</option>
+                <option value="AC">Acre</option><option value="SP">São Paulo</option><option value="RJ">Rio de Janeiro</option>
+                </select>
+
+            <button onclick="saveAll()" style="width:100%; margin-top:10px; background:var(--gold); border:none; padding:12px; font-family:Orbitron; font-weight:bold; cursor:pointer;">SALVAR ALTERAÇÕES</button>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
         const firebaseConfig = { apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", authDomain: "minharifadigital.firebaseapp.com", projectId: "minharifadigital", appId: "1:59630725905:web:396c8cfca385dc3d957ab0" };
@@ -135,17 +137,21 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const targetID = urlParams.get('id');
+        let isOwner = false;
+        let selectedRole = 'citizen';
+        let selectedGender = 'masc';
 
         const roles = {
             citizen: { label: "CIDADÃO", color: "#555" },
             tech: { label: "ELETRÔNICOS", color: "#00ff88" },
             clothes: { label: "MODA", color: "#00f2ff" }
-            // Adicione os outros conforme necessário
         };
 
-        // Carregar Dados
+        const genders = { masc: "#00d9ff", fem: "#ff00ea", other: "rainbow" };
+
         onAuthStateChanged(auth, user => {
             const uid = targetID || (user ? user.uid : null);
+            if (user && user.uid === uid) isOwner = true;
             if (uid) {
                 onSnapshot(doc(db, "usuarios", uid), (snap) => {
                     if (snap.exists()) updateHabitat(snap.data(), uid);
@@ -153,32 +159,54 @@
             }
         });
 
+        window.toggleNicheMenu = () => { if(isOwner) document.getElementById('niche-modal').style.display = 'flex'; };
+        window.closeModal = (e) => { if(e.target.id === 'niche-modal') e.target.style.display = 'none'; };
+
+        window.setRole = (r) => selectedRole = r;
+        window.setGender = (g) => selectedGender = g;
+
+        window.saveAll = async () => {
+            const userRef = doc(db, "usuarios", auth.currentUser.uid);
+            let color = genders[selectedGender];
+            if(color === 'rainbow') color = '#ffffff';
+
+            await updateDoc(userRef, {
+                role: selectedRole,
+                gender: selectedGender,
+                userNeonColor: color,
+                cidade: document.getElementById('input-city').value,
+                estado: document.getElementById('input-state').value
+            });
+            document.getElementById('niche-modal').style.display = 'none';
+        };
+
         function updateHabitat(data, uid) {
-            const currentRole = data.role || 'citizen';
-            const config = roles[currentRole] || roles.citizen;
-            
-            // Cores e Textos
+            const roleKey = data.role || 'citizen';
+            const config = roles[roleKey] || roles.citizen;
+            const gender = data.gender || 'masc';
+
             document.documentElement.style.setProperty('--accent-color', config.color);
-            document.documentElement.style.setProperty('--identity-color', data.userNeonColor || config.color);
             
+            const cube = document.getElementById('user-cube');
+            cube.classList.remove('rainbow-mode');
+            if(gender === 'other') {
+                cube.classList.add('rainbow-mode');
+            } else {
+                document.documentElement.style.setProperty('--identity-color', genders[gender] || config.color);
+            }
+
             document.getElementById('display-name').innerText = (data.nome || "NEXUS").toUpperCase();
-            document.getElementById('display-city').innerText = (data.cidade || "NÃO INFORMADA").toUpperCase();
+            document.getElementById('display-city').innerText = (data.cidade || "CIDADE").toUpperCase();
             document.getElementById('display-state').innerText = (data.estado || "---").toUpperCase();
             document.getElementById('display-role').innerText = config.label;
             document.getElementById('user-balance').innerText = `${(data.saldo || 0).toFixed(2)} NP`;
-            document.getElementById('info-id').innerText = `#${uid.substring(0, 5).toUpperCase()}`;
-            document.getElementById('info-xp').innerText = data.xp || 0;
 
+            // Construir Prédio
             const level = Math.floor((data.xp || 0) / 1000) + 1;
-            document.getElementById('info-lvl').innerText = level;
-
-            // Construir Prédio dinamicamente
             const b = document.getElementById('user-building');
             b.style.height = (70 + (level * 15)) + "px";
             b.innerHTML = '<div class="building-door"></div>'; 
-            
-            const numWindows = Math.min(level * 3, 24); // Limite para não quebrar o layout
-            for(let i=0; i < numWindows; i++){
+            for(let i=0; i < Math.min(level * 3, 24); i++){
                 const w = document.createElement('div');
                 w.className = "window active-win";
                 b.appendChild(w);
