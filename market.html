@@ -8,38 +8,25 @@
     <style>
         :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --gold: #ffcc00; --dark: #0a0a0a; }
         body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden; }
-        
-        /* HEADER HUD */
         .header { height: 70px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #1a1a1a; position: sticky; top: 0; background: rgba(0,0,0,0.9); z-index: 100; backdrop-filter: blur(10px); }
         .user-stats { display: flex; gap: 15px; }
         .stat-mini { font-family: 'Orbitron'; font-size: 0.6rem; color: var(--green); display: flex; flex-direction: column; }
         .stat-mini span { color: #fff; font-size: 0.8rem; }
-
         .container { padding: 20px 0; }
-        
-        /* SEÇÕES E GRIDS */
         .shelf-section { margin-bottom: 40px; }
         .shelf-title { font-family: 'Orbitron'; font-size: 0.75rem; color: var(--neon); padding: 0 20px; margin-bottom: 20px; letter-spacing: 3px; border-left: 3px solid var(--neon); margin-left: 20px; padding-left: 10px; text-transform: uppercase; }
-        
         .shelf-row { display: flex; overflow-x: auto; padding: 0 20px; gap: 20px; scroll-snap-type: x mandatory; scrollbar-width: none; }
         .shelf-row::-webkit-scrollbar { display: none; }
-
-        /* CARD STYLE */
         .market-card { min-width: 180px; max-width: 180px; background: #080808; border: 1px solid #1a1a1a; border-radius: 15px; scroll-snap-align: start; flex-shrink: 0; transition: 0.3s; position: relative; overflow: hidden; display: flex; flex-direction: column; }
         .market-card:hover { border-color: var(--neon); transform: translateY(-5px); box-shadow: 0 0 15px rgba(0, 242, 255, 0.2); }
-        
         .item-img { width: 100%; height: 120px; background: #111; object-fit: cover; border-bottom: 1px solid #1a1a1a; }
-        
         .item-info { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
         .item-name { font-family: 'Orbitron'; font-size: 0.7rem; color: #fff; display: block; margin-bottom: 8px; height: 35px; overflow: hidden; }
         .item-desc { font-size: 0.6rem; color: #777; height: 30px; line-height: 1.2; display: block; margin-bottom: 12px; }
-        
         .price-tag { font-family: 'Orbitron'; font-size: 0.9rem; color: var(--green); display: block; margin-bottom: 12px; }
         .price-tag small { font-size: 0.5rem; color: #444; margin-left: 4px; }
-
         .btn-buy { width: 100%; background: transparent; color: var(--neon); border: 1px solid var(--neon); padding: 10px; border-radius: 5px; font-family: 'Orbitron'; font-size: 0.55rem; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: auto; }
         .btn-buy:hover { background: var(--neon); color: #000; }
-        
         .partner-tag { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.8); padding: 4px 8px; border-radius: 4px; font-size: 0.5rem; font-family: 'Orbitron'; color: var(--gold); border: 1px solid var(--gold); z-index: 2; }
     </style>
 </head>
@@ -52,48 +39,21 @@
         </div>
     </div>
 
-    <div class="container" id="market-shelf">
-        </div>
+    <div class="container" id="market-shelf"></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, arrayUnion, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+        
+        // AQUI ESTÁ O SEGREDO: Importando os produtos do outro arquivo
+        import { products } from './produtos.js';
 
-        // CONFIG
         const firebaseConfig = { apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", authDomain: "minharifadigital.firebaseapp.com", projectId: "minharifadigital", appId: "1:59630725905:web:396c8cfca385dc3d957ab0" };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // ==========================================
-        // BANCO DE DADOS DA LOJA (ADICIONE NOVOS AQUI)
-        // ==========================================
-        const products = [
-            {
-                section: "Conhecimento Digital",
-                items: [
-                    { name: "Mastering AI Prompting", tag: "HOTMART", desc: "Guia definitivo para engenharia de prompts.", price: 45, img: "https://images.unsplash.com/photo-1512428559087-560fa5ceab42?w=200", link: "https://hotmart.com", type: "external" },
-                    { name: "Cyber Security 2026", tag: "E-BOOK", desc: "Proteção de dados em redes neurais.", price: 30, img: "https://images.unsplash.com/photo-1532012197367-e83802163959?w=200", link: "#", type: "external" }
-                ]
-            },
-            {
-                section: "Nexus Lifestyle (Roupas)",
-                items: [
-                    { name: "Nexus Tech Tee", tag: "AMAZON", desc: "Camiseta em algodão egípcio.", price: 89, img: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=200", link: "https://amazon.com", type: "external" },
-                    { name: "Jaqueta Tech (Avatar)", tag: "ATIVO", desc: "Item para usar no seu apartamento.", price: 120, img: "https://cdn-icons-png.flaticon.com/512/3345/3345396.png", rar: "epic", type: "internal" }
-                ]
-            },
-            {
-                section: "Hardware & Assets",
-                items: [
-                    { name: "PC Gamer Cyber", tag: "MÓVEL", desc: "Decore seu espaço com estilo.", price: 250, img: "https://cdn-icons-png.flaticon.com/512/5693/5693547.png", rar: "legendary", type: "internal" },
-                    { name: "Nexus Pad Pro", tag: "TECH", desc: "Mousepad de alta performance.", price: 65, img: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=200", link: "#", type: "external" }
-                ]
-            }
-        ];
-
-        // RENDERIZAR LOJA
         const shelfContainer = document.getElementById('market-shelf');
 
         function renderShop() {
@@ -103,6 +63,7 @@
                     <div class="shelf-row">`;
                 
                 sec.items.forEach(item => {
+                    const itemData = encodeURIComponent(JSON.stringify(item));
                     html += `
                         <div class="market-card">
                             <span class="partner-tag">${item.tag}</span>
@@ -111,25 +72,67 @@
                                 <span class="item-name">${item.name}</span>
                                 <span class="item-desc">${item.desc}</span>
                                 <span class="price-tag">${item.price.toFixed(2)} <small>NP</small></span>
-                                <button class="btn-buy" onclick="handlePurchase('${encodeURIComponent(JSON.stringify(item))}')">
+                                <button class="btn-buy" data-item="${itemData}">
                                     ${item.type === 'external' ? 'ACESSAR AGORA' : 'ADQUIRIR ATIVO'}
                                 </button>
                             </div>
                         </div>`;
                 });
-
                 html += `</div></div>`;
                 shelfContainer.innerHTML += html;
             });
+
+            // Adiciona evento nos botões após renderizar
+            document.querySelectorAll('.btn-buy').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const data = JSON.parse(decodeURIComponent(e.target.getAttribute('data-item')));
+                    handlePurchase(data);
+                });
+            });
         }
 
-        // LÓGICA DE COMPRA / ACESSO
-        window.handlePurchase = async (itemDataEncoded) => {
-            const item = JSON.parse(decodeURIComponent(itemDataEncoded));
+        async function handlePurchase(item) {
             const user = auth.currentUser;
-
             if (!user) return alert("Faça login para comprar.");
 
             if (item.type === 'external') {
                 if (item.link === '#') return alert("Em breve!");
-                window.open(item.link,
+                window.open(item.link, '_blank');
+            } else {
+                const userRef = doc(db, "usuarios", user.uid);
+                const snap = await getDoc(userRef);
+                const d = snap.data();
+
+                if (d.saldo >= item.price) {
+                    if (confirm(`Confirmar compra de ${item.name}?`)) {
+                        await updateDoc(userRef, {
+                            saldo: d.saldo - item.price,
+                            ativos_comprados: arrayUnion({
+                                name: item.name,
+                                img: item.img,
+                                rar: item.rar || 'common',
+                                type: 'asset'
+                            })
+                        });
+                        alert("Item adquirido! Verifique sua página de Ativos.");
+                    }
+                } else {
+                    alert("Saldo insuficiente.");
+                }
+            }
+        }
+
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                onSnapshot(doc(db, "usuarios", user.uid), snap => {
+                    const d = snap.data();
+                    if(d) document.getElementById('u-saldo').innerText = (d.saldo || 0).toFixed(2) + " NP";
+                });
+            }
+        });
+
+        renderShop();
+    </script>
+    <script type="module" src="nexus-overlay.js"></script>
+</body>
+</html>
