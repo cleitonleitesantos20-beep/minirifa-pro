@@ -8,25 +8,29 @@
     <style>
         :root { --neon: #00f2ff; --pink: #ff0055; --green: #00ff88; --gold: #ffcc00; --dark: #0a0a0a; }
         body { background: #000; color: #fff; font-family: 'Rajdhani'; margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden; }
+        
         .header { height: 70px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #1a1a1a; position: sticky; top: 0; background: rgba(0,0,0,0.9); z-index: 100; backdrop-filter: blur(10px); }
         .user-stats { display: flex; gap: 15px; }
         .stat-mini { font-family: 'Orbitron'; font-size: 0.6rem; color: var(--green); display: flex; flex-direction: column; }
-        .stat-mini span { color: #fff; font-size: 0.8rem; }
+        
         .container { padding: 20px 0; }
         .shelf-section { margin-bottom: 40px; }
         .shelf-title { font-family: 'Orbitron'; font-size: 0.75rem; color: var(--neon); padding: 0 20px; margin-bottom: 20px; letter-spacing: 3px; border-left: 3px solid var(--neon); margin-left: 20px; padding-left: 10px; text-transform: uppercase; }
-        .shelf-row { display: flex; overflow-x: auto; padding: 0 20px; gap: 20px; scroll-snap-type: x mandatory; scrollbar-width: none; }
+        
+        .shelf-row { display: flex; overflow-x: auto; padding: 0 20px; gap: 20px; scrollbar-width: none; }
         .shelf-row::-webkit-scrollbar { display: none; }
-        .market-card { min-width: 180px; max-width: 180px; background: #080808; border: 1px solid #1a1a1a; border-radius: 15px; scroll-snap-align: start; flex-shrink: 0; transition: 0.3s; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+
+        .market-card { min-width: 180px; max-width: 180px; background: #080808; border: 1px solid #1a1a1a; border-radius: 15px; flex-shrink: 0; transition: 0.3s; position: relative; overflow: hidden; display: flex; flex-direction: column; }
         .market-card:hover { border-color: var(--neon); transform: translateY(-5px); box-shadow: 0 0 15px rgba(0, 242, 255, 0.2); }
+        
         .item-img { width: 100%; height: 120px; background: #111; object-fit: cover; border-bottom: 1px solid #1a1a1a; }
         .item-info { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
-        .item-name { font-family: 'Orbitron'; font-size: 0.7rem; color: #fff; display: block; margin-bottom: 8px; height: 35px; overflow: hidden; }
-        .item-desc { font-size: 0.6rem; color: #777; height: 30px; line-height: 1.2; display: block; margin-bottom: 12px; }
-        .price-tag { font-family: 'Orbitron'; font-size: 0.9rem; color: var(--green); display: block; margin-bottom: 12px; }
-        .price-tag small { font-size: 0.5rem; color: #444; margin-left: 4px; }
-        .btn-buy { width: 100%; background: transparent; color: var(--neon); border: 1px solid var(--neon); padding: 10px; border-radius: 5px; font-family: 'Orbitron'; font-size: 0.55rem; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: auto; }
+        .item-name { font-family: 'Orbitron'; font-size: 0.7rem; color: #fff; margin-bottom: 8px; height: 35px; overflow: hidden; }
+        .price-tag { font-family: 'Orbitron'; font-size: 0.9rem; color: var(--green); margin-bottom: 12px; }
+
+        .btn-buy { width: 100%; background: transparent; color: var(--neon); border: 1px solid var(--neon); padding: 10px; border-radius: 5px; font-family: 'Orbitron'; font-size: 0.55rem; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .btn-buy:hover { background: var(--neon); color: #000; }
+        
         .partner-tag { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.8); padding: 4px 8px; border-radius: 4px; font-size: 0.5rem; font-family: 'Orbitron'; color: var(--gold); border: 1px solid var(--gold); z-index: 2; }
     </style>
 </head>
@@ -45,10 +49,43 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
         import { getFirestore, doc, onSnapshot, updateDoc, arrayUnion, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-        
-        // AQUI ESTÁ O SEGREDO: Importando os produtos do outro arquivo
-        import { products } from './produtos.js';
 
+        // ==========================================
+        // ADICIONE SEUS ITENS AQUI (BANCO DE DADOS)
+        // ==========================================
+        const products = [
+            {
+                section: "Ativos Nexus",
+                items: [
+                    { 
+                        name: "Cadeira Gamer Neon", 
+                        tag: "NEXUS", 
+                        desc: "Conforto com LEDs.", 
+                        price: 150, 
+                        img: "https://cdn-icons-png.flaticon.com/512/3063/3063822.png", 
+                        rar: "rare", 
+                        type: "internal" 
+                    }
+                ]
+            },
+            {
+                section: "Conhecimento",
+                items: [
+                    { 
+                        name: "Master AI", 
+                        tag: "HOTMART", 
+                        desc: "Curso de Prompt.", 
+                        price: 45, 
+                        img: "https://images.unsplash.com/photo-1512428559087-560fa5ceab42?w=200", 
+                        link: "https://hotmart.com", 
+                        type: "external" 
+                    }
+                ]
+            }
+            
+        ];
+
+        // CONFIG FIREBASE
         const firebaseConfig = { apiKey: "AIzaSyAYO5RWaJy5y7r7jvzFk3wq-ByqM_dWWO8", authDomain: "minharifadigital.firebaseapp.com", projectId: "minharifadigital", appId: "1:59630725905:web:396c8cfca385dc3d957ab0" };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
@@ -57,46 +94,46 @@
         const shelfContainer = document.getElementById('market-shelf');
 
         function renderShop() {
+            shelfContainer.innerHTML = '';
             products.forEach(sec => {
                 let html = `<div class="shelf-section">
                     <div class="shelf-title">${sec.section}</div>
                     <div class="shelf-row">`;
                 
-                sec.items.forEach(item => {
-                    const itemData = encodeURIComponent(JSON.stringify(item));
+                sec.items.forEach((item, index) => {
+                    const itemID = `item-${sec.section.replace(/\s/g, '')}-${index}`;
                     html += `
                         <div class="market-card">
                             <span class="partner-tag">${item.tag}</span>
                             <img src="${item.img}" class="item-img">
                             <div class="item-info">
                                 <span class="item-name">${item.name}</span>
-                                <span class="item-desc">${item.desc}</span>
                                 <span class="price-tag">${item.price.toFixed(2)} <small>NP</small></span>
-                                <button class="btn-buy" data-item="${itemData}">
-                                    ${item.type === 'external' ? 'ACESSAR AGORA' : 'ADQUIRIR ATIVO'}
+                                <button class="btn-buy" id="${itemID}">
+                                    ${item.type === 'external' ? 'ACESSAR' : 'COMPRAR'}
                                 </button>
                             </div>
                         </div>`;
                 });
                 html += `</div></div>`;
                 shelfContainer.innerHTML += html;
-            });
 
-            // Adiciona evento nos botões após renderizar
-            document.querySelectorAll('.btn-buy').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const data = JSON.parse(decodeURIComponent(e.target.getAttribute('data-item')));
-                    handlePurchase(data);
+                // Ativa os botões
+                sec.items.forEach((item, index) => {
+                    const itemID = `item-${sec.section.replace(/\s/g, '')}-${index}`;
+                    setTimeout(() => {
+                        const btn = document.getElementById(itemID);
+                        if(btn) btn.onclick = () => handlePurchase(item);
+                    }, 100);
                 });
             });
         }
 
         async function handlePurchase(item) {
             const user = auth.currentUser;
-            if (!user) return alert("Faça login para comprar.");
+            if (!user) return alert("Logue primeiro!");
 
             if (item.type === 'external') {
-                if (item.link === '#') return alert("Em breve!");
                 window.open(item.link, '_blank');
             } else {
                 const userRef = doc(db, "usuarios", user.uid);
@@ -104,21 +141,18 @@
                 const d = snap.data();
 
                 if (d.saldo >= item.price) {
-                    if (confirm(`Confirmar compra de ${item.name}?`)) {
+                    if (confirm(`Comprar ${item.name}?`)) {
                         await updateDoc(userRef, {
                             saldo: d.saldo - item.price,
                             ativos_comprados: arrayUnion({
                                 name: item.name,
                                 img: item.img,
-                                rar: item.rar || 'common',
-                                type: 'asset'
+                                rar: item.rar || 'common'
                             })
                         });
-                        alert("Item adquirido! Verifique sua página de Ativos.");
+                        alert("Sucesso! Veja em 'Ativos'.");
                     }
-                } else {
-                    alert("Saldo insuficiente.");
-                }
+                } else { alert("Saldo insuficiente."); }
             }
         }
 
@@ -128,10 +162,11 @@
                     const d = snap.data();
                     if(d) document.getElementById('u-saldo').innerText = (d.saldo || 0).toFixed(2) + " NP";
                 });
+                renderShop();
+            } else {
+                window.location.href = 'login.html';
             }
         });
-
-        renderShop();
     </script>
     <script type="module" src="nexus-overlay.js"></script>
 </body>
