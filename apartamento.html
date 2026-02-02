@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexusVL - Real Estate System</title>
+    <title>NexusVL - Cyber Real Estate</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -23,7 +23,6 @@
             display: flex; flex-direction: column;
         }
 
-        /* Fundo de grade cibernética */
         #city-bg { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: radial-gradient(circle at center, #0a0a1a 0%, #000 100%);
@@ -33,7 +32,6 @@
         header {
             position: relative; z-index: 2000; padding: 15px 20px;
             display: flex; justify-content: flex-end; align-items: center;
-            background: linear-gradient(to bottom, rgba(0,0,0,1), transparent);
         }
 
         .top-btns { display: flex; gap: 12px; }
@@ -41,108 +39,94 @@
             background: rgba(0, 242, 255, 0.1);
             color: var(--user-color);
             border: 1px solid var(--user-color);
-            padding: 8px 16px;
+            padding: 10px 20px;
             font-family: 'Orbitron';
             font-size: 10px;
             text-transform: uppercase;
-            letter-spacing: 1px;
             cursor: pointer;
             transition: 0.3s;
             clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
         }
-        .nav-btn:hover { background: var(--user-color); color: #000; }
+        .nav-btn:hover { background: var(--user-color); color: #000; box-shadow: 0 0 15px var(--user-color); }
 
         #main-container {
             flex: 1; display: flex; justify-content: center; align-items: center;
-            z-index: 10; overflow: auto; padding: 60px;
-            perspective: 1000px;
+            z-index: 10; overflow: auto; padding: 40px;
         }
 
-        /* Retângulo do Apartamento Ajustado */
+        /* Proporção de Planta Baixa (Retangular) */
         #viewport {
             position: relative;
-            background: rgba(20, 20, 30, 0.8);
-            border: 2px solid #00f2ff;
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2), inset 0 0 50px rgba(0,0,0,0.8);
+            background: rgba(15, 15, 25, 0.9);
+            border: 2px solid var(--user-color);
+            box-shadow: 0 0 30px rgba(0,0,0,1), inset 0 0 50px rgba(0, 242, 255, 0.1);
             background-image: 
                 linear-gradient(rgba(0, 242, 255, 0.05) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(0, 242, 255, 0.05) 1px, transparent 1px);
             background-size: var(--grid-size) var(--grid-size);
-            transition: width 0.5s ease, height 0.5s ease;
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         #protagonist {
-            position: absolute; width: 24px; height: 24px;
+            position: absolute; width: 22px; height: 22px;
             background: var(--user-color);
-            filter: drop-shadow(0 0 12px var(--user-color));
+            filter: drop-shadow(0 0 10px var(--user-color));
             z-index: 100; pointer-events: none;
             clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-            left: 50%; top: 50%; transform: translate(-50%, -50%);
+            transition: 0.2s;
         }
 
-        /* Estilo dos Móveis (Voxels) */
         .voxel {
             position: absolute; z-index: 50; touch-action: none;
             display: flex; align-items: center; justify-content: center;
             font-family: 'Orbitron'; font-size: 8px; color: #fff;
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(2px);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255,255,255,0.2);
             cursor: move;
-            border: 1px solid rgba(255,255,255,0.3);
-            text-shadow: 0 0 5px #000;
         }
         .f-triangulo { clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
         .f-quadrado { border-radius: 2px; }
         .f-retangulo { border-radius: 2px; }
 
-        /* Loja Futurista Inferior */
+        /* Loja */
         #ui-panel {
             position: fixed; bottom: 0; left: 0; width: 100%;
             background: var(--panel-bg);
             border-top: 3px solid var(--user-color);
-            z-index: 3000; transform: translateY(100%); transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 3000; transform: translateY(100%); transition: 0.5s;
             padding: 20px;
-            box-shadow: 0 -20px 50px rgba(0,0,0,0.9);
         }
         #ui-panel.open { transform: translateY(0); }
 
-        .shop-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 15px; border-bottom: 1px solid #222; padding-bottom: 10px;
-        }
-
         .shop-scroll {
-            display: flex; overflow-x: auto; gap: 20px; padding: 10px 0;
-            scroll-behavior: smooth; -webkit-overflow-scrolling: touch;
+            display: flex; overflow-x: auto; gap: 15px; padding: 10px 0;
         }
-        .shop-scroll::-webkit-scrollbar { height: 4px; }
-        .shop-scroll::-webkit-scrollbar-thumb { background: var(--user-color); }
-
         .furniture-card {
-            min-width: 130px; background: #0a0a0a; border: 1px solid #1a1a1a;
+            min-width: 140px; background: #000; border: 1px solid #222;
             padding: 15px; text-align: center; flex-shrink: 0;
-            transition: 0.3s; position: relative;
+            border-bottom: 3px solid transparent;
         }
-        .furniture-card:hover { border-color: var(--user-color); background: #111; }
-        .furniture-card h5 { font-family: 'Orbitron'; font-size: 10px; color: #fff; margin-bottom: 8px; }
-        .furniture-card p { font-size: 13px; color: #ffcc00; font-weight: bold; margin-bottom: 12px; }
+        .furniture-card:hover { border-bottom-color: var(--user-color); }
+        .furniture-card h5 { font-family: 'Orbitron'; font-size: 10px; color: var(--user-color); margin-bottom: 5px; }
+        .furniture-card p { font-size: 14px; color: #ffcc00; margin-bottom: 12px; font-weight: bold; }
 
         .buy-btn {
-            width: 100%; padding: 8px; background: var(--user-color);
-            color: #000; font-family: 'Orbitron'; font-size: 9px;
-            font-weight: bold; border: none; cursor: pointer;
+            width: 100%; padding: 8px; background: #111; color: #fff;
+            border: 1px solid #333; font-family: 'Orbitron'; font-size: 9px;
+            cursor: pointer; transition: 0.3s;
         }
+        .buy-btn:hover { background: var(--user-color); color: #000; }
 
         footer {
             position: relative; z-index: 2000; padding: 15px 20px;
-            display: flex; gap: 15px; background: #000;
+            display: flex; gap: 15px; background: #000; border-top: 1px solid #111;
         }
         .action-btn { 
-            flex: 1; padding: 14px; font-family: 'Orbitron'; font-size: 11px; 
-            font-weight: bold; border: none; cursor: pointer; letter-spacing: 1px;
+            flex: 1; padding: 15px; font-family: 'Orbitron'; font-size: 11px; 
+            font-weight: bold; border: none; cursor: pointer;
         }
-        .btn-save { background: var(--user-color); color: #000; clip-path: polygon(0 0, 95% 0, 100% 100%, 5% 100%); }
-        .btn-exit { background: #1a1a1a; color: #666; }
+        .btn-save { background: var(--user-color); color: #000; }
+        .btn-exit { background: #111; color: #fff; }
     </style>
 </head>
 <body>
@@ -151,8 +135,8 @@
 
     <header>
         <div class="top-btns">
-            <button class="nav-btn" onclick="buyPlot()">Expandir Lote (500 NP)</button>
-            <button class="nav-btn" style="background:var(--user-color); color:#000;" onclick="toggleMenu()">Catalogar Itens</button>
+            <button class="nav-btn" onclick="window.buyPlot()">+ Terreno (500 NP)</button>
+            <button class="nav-btn" style="background:var(--user-color); color:#000;" onclick="window.toggleMenu()">Loja de Móveis</button>
         </div>
     </header>
 
@@ -163,17 +147,14 @@
     </div>
 
     <aside id="ui-panel">
-        <div class="shop-header">
-            <h2 style="font-family:'Orbitron'; font-size: 14px; color: var(--user-color);">NEXUS ASSETS</h2>
-            <span style="font-size: 10px; color: #444;">ARRASTE PARA NAVEGAR</span>
-        </div>
+        <h4 style="font-family:'Orbitron'; font-size:12px; color:#555; margin-bottom:15px; text-transform:uppercase;">Nexus Catalog</h4>
         <div class="shop-scroll" id="furniture-list"></div>
-        <button class="action-btn btn-exit" style="width:100%; margin-top:15px; clip-path: none;" onclick="toggleMenu()">VOLTAR AO NEXUS</button>
+        <button class="action-btn btn-exit" style="width:100%; margin-top:15px;" onclick="window.toggleMenu()">FECHAR LOJA</button>
     </aside>
 
     <footer>
-        <button class="action-btn btn-exit" onclick="window.location.href='dashboard.html'">ABANDONAR</button>
-        <button class="action-btn btn-save" onclick="saveApartment()">SINCRONIZAR PROJETO</button>
+        <button class="action-btn btn-exit" onclick="window.location.href='dashboard.html'">SAIR</button>
+        <button class="action-btn btn-save" onclick="window.saveApartment()">SALVAR PROJETO</button>
     </footer>
 
     <script type="module">
@@ -189,11 +170,10 @@
         const gridSize = 20;
 
         const furniture = [
-            { id: 'tv', name: 'Terminal Holo', price: 500, w: 80, h: 20, shape: 'f-retangulo' },
-            { id: 'sofa', name: 'Módulo Descanso', price: 800, w: 60, h: 60, shape: 'f-triangulo' },
-            { id: 'cama', name: 'Cápsula Sono', price: 1200, w: 80, h: 100, shape: 'f-quadrado' },
-            { id: 'mesa', name: 'Workstation', price: 600, w: 60, h: 40, shape: 'f-retangulo' },
-            { id: 'dec', name: 'Planta Neon', price: 150, w: 20, h: 20, shape: 'f-triangulo' }
+            { id: 'tv', name: 'Painel Led', price: 500, w: 100, h: 20, shape: 'f-retangulo' },
+            { id: 'sofa', name: 'Sofá Modular', price: 800, w: 80, h: 60, shape: 'f-quadrado' },
+            { id: 'cama', name: 'Cama Bio', price: 1200, w: 80, h: 100, shape: 'f-quadrado' },
+            { id: 'mesa', name: 'Holo Table', price: 600, w: 60, h: 60, shape: 'f-triangulo' }
         ];
 
         async function loadUserData() {
@@ -204,46 +184,49 @@
                 viewport.style.height = (data.apt_h || 300) + "px";
                 
                 const prota = document.getElementById('protagonist');
-                prota.style.backgroundColor = data.cor_favorita || '#00f2ff';
-                document.documentElement.style.setProperty('--user-color', data.cor_favorita || '#00f2ff');
+                const favColor = data.cor_favorita || '#00f2ff';
+                prota.style.backgroundColor = favColor;
+                document.documentElement.style.setProperty('--user-color', favColor);
 
                 if(data.apartment_voxels) data.apartment_voxels.forEach(v => spawnFurnitureElement(v));
             }
         }
 
-        // Função para verificar saldo no firebase-saldos antes de comprar
-        async function checkAndPay(amount) {
-            const saldoRef = doc(db, "usuarios-saldos", userId);
-            const saldoSnap = await getDoc(saldoRef);
-            if (!saldoSnap.exists()) return false;
-            
-            const currentNP = Number(saldoSnap.data().nexusPoints) || 0;
-            if (currentNP < amount) {
-                alert("NP Insuficiente no Nexus Wallet!");
-                return false;
-            }
-
-            await updateDoc(saldoRef, { nexusPoints: currentNP - amount });
-            // Força atualização do overlay se ele tiver uma função de refresh
-            if(window.refreshNexusOverlay) window.refreshNexusOverlay();
-            return true;
-        }
+        // Tornando as funções globais para o HTML reconhecer
+        window.toggleMenu = () => document.getElementById('ui-panel').classList.toggle('open');
 
         window.buyPlot = async () => {
-            if(await checkAndPay(500)) {
+            const success = await checkAndPay(500);
+            if (success) {
                 viewport.style.width = (parseInt(viewport.style.width) + 40) + "px";
                 viewport.style.height = (parseInt(viewport.style.height) + 20) + "px";
-                alert("Área Expandida!");
+                alert("Espaço ampliado!");
             }
         };
 
         window.buyFurniture = async (id) => {
             const item = furniture.find(f => f.id === id);
-            if(await checkAndPay(item.price)) {
-                spawnFurnitureElement({ ...item, x: "0px", y: "0px", color: "var(--user-color)" });
-                toggleMenu();
+            const success = await checkAndPay(item.price);
+            if (success) {
+                spawnFurnitureElement({ ...item, x: "10px", y: "10px", color: "var(--user-color)" });
+                window.toggleMenu();
             }
         };
+
+        async function checkAndPay(amount) {
+            const saldoRef = doc(db, "usuarios-saldos", userId);
+            const snap = await getDoc(saldoRef);
+            
+            if (snap.exists()) {
+                const currentNP = Number(snap.data().nexusPoints) || 0;
+                if (currentNP >= amount) {
+                    await updateDoc(saldoRef, { nexusPoints: currentNP - amount });
+                    return true;
+                }
+            }
+            alert("NP insuficiente na sua carteira!");
+            return false;
+        }
 
         function spawnFurnitureElement(data) {
             const el = document.createElement('div');
@@ -252,8 +235,7 @@
             el.style.height = data.h + "px";
             el.style.left = data.x;
             el.style.top = data.y;
-            el.style.border = `1px solid ${data.color || 'var(--user-color)'}`;
-            el.style.boxShadow = `0 0 10px rgba(0, 242, 255, 0.2)`;
+            el.style.border = `1px solid var(--user-color)`;
             el.innerText = data.name;
             makeDraggable(el);
             viewport.appendChild(el);
@@ -267,10 +249,8 @@
                 document.onmouseup = document.ontouchend = () => {
                     let left = Math.round(el.offsetLeft / gridSize) * gridSize;
                     let top = Math.round(el.offsetTop / gridSize) * gridSize;
-                    const maxL = viewport.clientWidth - el.offsetWidth;
-                    const maxT = viewport.clientHeight - el.offsetHeight;
-                    el.style.left = Math.max(0, Math.min(left, maxL)) + "px";
-                    el.style.top = Math.max(0, Math.min(top, maxT)) + "px";
+                    el.style.left = Math.max(0, Math.min(left, viewport.clientWidth - el.offsetWidth)) + "px";
+                    el.style.top = Math.max(0, Math.min(top, viewport.clientHeight - el.offsetHeight)) + "px";
                     document.onmouseup = document.onmousemove = document.ontouchend = document.ontouchmove = null;
                 };
                 document.onmousemove = document.ontouchmove = (e) => {
@@ -292,17 +272,13 @@
                     shape: Array.from(v.classList).find(c => c.startsWith('f-'))
                 });
             });
-            try {
-                await updateDoc(doc(db, "usuarios", userId), {
-                    apartment_voxels: voxels,
-                    apt_w: parseInt(viewport.style.width),
-                    apt_h: parseInt(viewport.style.height)
-                });
-                alert("Projeto Salvo no Nexus!");
-            } catch (e) { alert("Erro de sincronização."); }
+            await updateDoc(doc(db, "usuarios", userId), {
+                apartment_voxels: voxels,
+                apt_w: parseInt(viewport.style.width),
+                apt_h: parseInt(viewport.style.height)
+            });
+            alert("Sistema Sincronizado!");
         };
-
-        window.toggleMenu = () => document.getElementById('ui-panel').classList.toggle('open');
 
         const list = document.getElementById('furniture-list');
         furniture.forEach(item => {
@@ -310,9 +286,10 @@
                 <div class="furniture-card">
                     <h5>${item.name}</h5>
                     <p>${item.price} NP</p>
-                    <button class="buy-btn" onclick="buyFurniture('${item.id}')">REQUISITAR</button>
+                    <button class="buy-btn" onclick="window.buyFurniture('${item.id}')">ADQUIRIR</button>
                 </div>`;
         });
+
         loadUserData();
     </script>
     <script type="module" src="nexus-overlay.js"></script>
