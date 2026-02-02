@@ -32,7 +32,6 @@
         header {
             position: relative; z-index: 2000; padding: 15px 20px;
             display: flex; justify-content: flex-end; align-items: center;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
         }
 
         .top-btns { display: flex; gap: 12px; }
@@ -51,19 +50,19 @@
 
         #main-container {
             flex: 1; display: flex; justify-content: center; align-items: center;
-            z-index: 10; overflow: hidden; padding: 20px;
+            z-index: 10; overflow: auto; padding: 40px;
         }
 
         #viewport {
             position: relative;
             background: rgba(15, 15, 25, 0.9);
             border: 2px solid var(--user-color);
-            box-shadow: 0 0 30px rgba(0,0,0,1), inset 0 0 50px rgba(0, 242, 255, 0.1);
+            box-shadow: 0 0 30px rgba(0,0,0,1), inset 0 0 50px rgba(0, 242, 255, 0.05);
             background-image: 
                 linear-gradient(rgba(0, 242, 255, 0.05) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(0, 242, 255, 0.05) 1px, transparent 1px);
             background-size: var(--grid-size) var(--grid-size);
-            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            min-width: 500px; min-height: 300px;
         }
 
         #protagonist {
@@ -72,28 +71,37 @@
             filter: drop-shadow(0 0 10px var(--user-color));
             z-index: 100; pointer-events: none;
             clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-            left: 50%; top: 50%; transform: translate(-50%, -50%);
+            left: 50%; top: 50%;
         }
 
         .voxel {
             position: absolute; z-index: 50; touch-action: none;
             display: flex; align-items: center; justify-content: center;
             font-family: 'Orbitron'; font-size: 8px; color: #fff;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255,255,255,0.3);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--user-color);
+            box-shadow: inset 0 0 10px rgba(0, 242, 255, 0.2);
             cursor: move;
-            text-align: center;
         }
+
+        /* Classes de Formas */
         .f-triangulo { clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
         .f-quadrado { border-radius: 2px; }
         .f-retangulo { border-radius: 2px; }
+        .f-comodo { border: 2px dashed var(--user-color); background: rgba(0, 242, 255, 0.02); z-index: 10; }
+
+        /* Preview na Loja */
+        .preview-box {
+            width: 50px; height: 50px; margin: 0 auto 10px;
+            border: 1px solid #333; display: flex; align-items: center; justify-content: center;
+            background: #111;
+        }
+        .shape-preview { background: var(--user-color); opacity: 0.7; }
 
         #ui-panel {
             position: fixed; bottom: 0; left: 0; width: 100%;
-            background: var(--panel-bg);
-            border-top: 3px solid var(--user-color);
-            z-index: 3000; transform: translateY(100%); transition: 0.5s;
-            padding: 20px;
+            background: var(--panel-bg); border-top: 3px solid var(--user-color);
+            z-index: 3000; transform: translateY(100%); transition: 0.5s; padding: 20px;
         }
         #ui-panel.open { transform: translateY(0); }
 
@@ -102,27 +110,14 @@
             min-width: 140px; background: #000; border: 1px solid #222;
             padding: 15px; text-align: center; flex-shrink: 0;
         }
-        .furniture-card h5 { font-family: 'Orbitron'; font-size: 10px; color: var(--user-color); margin-bottom: 5px; }
-        .furniture-card p { font-size: 14px; color: #00ff00; margin-bottom: 12px; font-weight: bold; }
-
-        .buy-btn {
-            width: 100%; padding: 8px; background: var(--user-color); color: #000;
-            border: none; font-family: 'Orbitron'; font-size: 9px; font-weight: bold;
-            cursor: pointer;
-        }
 
         footer {
             position: relative; z-index: 2000; padding: 15px;
-            display: flex; gap: 10px; background: #000; 
-            border-top: 1px solid #222;
+            display: flex; gap: 10px; background: #000; border-top: 1px solid #222;
         }
-        .action-btn { 
-            flex: 1; padding: 12px; font-family: 'Orbitron'; font-size: 11px; 
-            font-weight: bold; border: none; cursor: pointer;
-            text-transform: uppercase;
-        }
+        .action-btn { flex: 1; padding: 12px; font-family: 'Orbitron'; font-size: 11px; font-weight: bold; border: none; cursor: pointer; }
         .btn-save { background: var(--user-color); color: #000; }
-        .btn-exit { background: #222; color: #fff; }
+        .btn-exit { background: #111; color: #fff; }
     </style>
 </head>
 <body>
@@ -131,8 +126,8 @@
 
     <header>
         <div class="top-btns">
-            <button class="nav-btn" onclick="window.buyPlot()">+ Expandir (Grátis)</button>
-            <button class="nav-btn" style="background:var(--user-color); color:#000;" onclick="window.toggleMenu()">Catálogo</button>
+            <button class="nav-btn" onclick="window.addRoom()">+ Novo Cômodo</button>
+            <button class="nav-btn" style="background:var(--user-color); color:#000;" onclick="window.toggleMenu()">Móveis</button>
         </div>
     </header>
 
@@ -143,7 +138,7 @@
     </div>
 
     <aside id="ui-panel">
-        <h4 style="font-family:'Orbitron'; font-size:12px; color:#555; margin-bottom:15px;">MÓVEIS DISPONÍVEIS</h4>
+        <h4 style="font-family:'Orbitron'; font-size:12px; color:#555; margin-bottom:15px;">NEXUS CATALOG</h4>
         <div class="shop-scroll" id="furniture-list"></div>
         <button class="action-btn btn-exit" style="width:100%; margin-top:15px;" onclick="window.toggleMenu()">FECHAR</button>
     </aside>
@@ -166,37 +161,39 @@
         const gridSize = 20;
 
         const furniture = [
+            { id: 'comodo', name: 'Divisória', w: 160, h: 120, shape: 'f-comodo' },
             { id: 'tv', name: 'Painel Led', w: 100, h: 20, shape: 'f-retangulo' },
             { id: 'sofa', name: 'Sofá Modular', w: 80, h: 60, shape: 'f-quadrado' },
             { id: 'cama', name: 'Cama Bio', w: 80, h: 100, shape: 'f-quadrado' },
-            { id: 'mesa', name: 'Holo Table', w: 60, h: 60, shape: 'f-triangulo' },
-            { id: 'lamp', name: 'Poste Neon', w: 20, h: 20, shape: 'f-quadrado' }
+            { id: 'mesa', name: 'Holo Table', w: 60, h: 60, shape: 'f-triangulo' }
         ];
 
         async function loadUserData() {
-            try {
-                const userSnap = await getDoc(doc(db, "usuarios", userId));
-                if (userSnap.exists()) {
-                    const data = userSnap.data();
-                    viewport.style.width = (data.apt_w || 500) + "px";
-                    viewport.style.height = (data.apt_h || 300) + "px";
-                    const favColor = data.cor_favorita || '#00f2ff';
-                    document.documentElement.style.setProperty('--user-color', favColor);
-                    if(data.apartment_voxels) data.apartment_voxels.forEach(v => spawnFurnitureElement(v));
+            const userSnap = await getDoc(doc(db, "usuarios", userId));
+            if (userSnap.exists()) {
+                const data = userSnap.data();
+                const favColor = data.cor_favorita || '#00f2ff';
+                document.documentElement.style.setProperty('--user-color', favColor);
+                
+                viewport.style.width = (data.apt_w || 500) + "px";
+                viewport.style.height = (data.apt_h || 300) + "px";
+
+                if(data.apartment_voxels) {
+                    data.apartment_voxels.forEach(v => spawnFurnitureElement(v));
                 }
-            } catch(e) { console.error("Erro ao carregar dados", e); }
+            }
+            renderShop();
         }
 
         window.toggleMenu = () => document.getElementById('ui-panel').classList.toggle('open');
 
-        window.buyPlot = () => {
-            viewport.style.width = (parseInt(viewport.style.width) + 40) + "px";
-            viewport.style.height = (parseInt(viewport.style.height) + 20) + "px";
+        window.addRoom = () => {
+            spawnFurnitureElement({ name: 'CÔMODO', w: 200, h: 160, shape: 'f-comodo', x: '20px', y: '20px' });
         };
 
         window.buyFurniture = (id) => {
             const item = furniture.find(f => f.id === id);
-            spawnFurnitureElement({ ...item, x: "20px", y: "20px" });
+            spawnFurnitureElement({ ...item, x: "40px", y: "40px" });
             window.toggleMenu();
         };
 
@@ -207,9 +204,11 @@
             el.style.height = data.h + "px";
             el.style.left = data.x || "0px";
             el.style.top = data.y || "0px";
-            el.style.border = `1px solid var(--user-color)`;
-            el.style.boxShadow = `0 0 10px var(--user-color)`;
             el.innerText = data.name;
+            
+            // Duplo clique para remover
+            el.ondblclick = () => el.remove();
+            
             makeDraggable(el);
             viewport.appendChild(el);
         }
@@ -245,25 +244,32 @@
                     shape: Array.from(v.classList).find(c => c.startsWith('f-'))
                 });
             });
-            try {
-                await updateDoc(doc(db, "usuarios", userId), {
-                    apartment_voxels: voxels,
-                    apt_w: parseInt(viewport.style.width),
-                    apt_h: parseInt(viewport.style.height)
-                });
-                alert("Projeto Salvo!");
-            } catch (e) { alert("Erro ao salvar."); }
+            await updateDoc(doc(db, "usuarios", userId), {
+                apartment_voxels: voxels,
+                apt_w: parseInt(viewport.style.width),
+                apt_h: parseInt(viewport.style.height)
+            });
+            alert("Sincronizado com o Nexus!");
         };
 
-        const list = document.getElementById('furniture-list');
-        furniture.forEach(item => {
-            list.innerHTML += `
-                <div class="furniture-card">
-                    <h5>${item.name}</h5>
-                    <p>GRÁTIS</p>
-                    <button class="buy-btn" onclick="window.buyFurniture('${item.id}')">ADICIONAR</button>
-                </div>`;
-        });
+        function renderShop() {
+            const list = document.getElementById('furniture-list');
+            list.innerHTML = '';
+            furniture.forEach(item => {
+                const scale = 0.3;
+                list.innerHTML += `
+                    <div class="furniture-card">
+                        <div class="preview-box">
+                            <div class="shape-preview ${item.shape}" 
+                                 style="width:${item.w * scale}px; height:${item.h * scale}px; 
+                                 border:1px solid var(--user-color); 
+                                 background: var(--user-color);"></div>
+                        </div>
+                        <h5>${item.name}</h5>
+                        <button class="action-btn btn-save" style="width:100%; font-size:9px;" onclick="window.buyFurniture('${item.id}')">ADICIONAR</button>
+                    </div>`;
+            });
+        }
 
         loadUserData();
     </script>
