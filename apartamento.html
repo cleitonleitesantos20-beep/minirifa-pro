@@ -3,13 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexusVL - Cyber Real Estate</title>
+    <title>NexusVL - NFT Card Builder</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --user-color: #00f2ff;
-            --grid-size: 20px;
-            --panel-bg: rgba(5, 5, 10, 0.98);
+            --bg-dark: #050510;
+            --grid-line: rgba(0, 242, 255, 0.1);
+            
+            /* Cores de Raridade */
+            --r-common: #b0b0b0;       /* Cinza */
+            --r-rare: #00f2ff;         /* Cyan Neon */
+            --r-epic: #bd00ff;         /* Roxo Neon */
+            --r-legendary: #ffaa00;    /* Dourado Pulsante */
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -21,98 +27,159 @@
             overflow: hidden; display: flex; flex-direction: column;
         }
 
+        /* Fundo estilo Matrix/Grid Digital */
         #city-bg { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: radial-gradient(circle at center, #0a0a1a 0%, #000 100%);
+            background: 
+                linear-gradient(rgba(0,0,0,0.9), rgba(0,0,0,0.9)),
+                url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTTAgNDBMMCAwTDQwIDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgwLCAyNDIsIDI1NSwgMC4xKSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIiAvPjwvc3ZnPg==');
             z-index: 1; 
         }
 
         header {
-            position: relative; z-index: 2000; padding: 15px 20px;
-            display: flex; justify-content: flex-end; align-items: center;
+            position: relative; z-index: 2000; padding: 15px;
+            display: flex; justify-content: space-between; align-items: center;
+            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
         }
 
+        .hud-stat { font-family: 'Orbitron'; font-size: 12px; color: var(--r-legendary); text-shadow: 0 0 5px var(--r-legendary); }
+
         .nav-btn {
-            background: rgba(0, 242, 255, 0.1);
-            color: var(--user-color);
-            border: 1px solid var(--user-color);
-            padding: 10px 20px; font-family: 'Orbitron'; font-size: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            color: #fff; border: 1px solid #fff;
+            padding: 8px 16px; font-family: 'Orbitron'; font-size: 10px;
             text-transform: uppercase; cursor: pointer;
-            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+            transition: 0.2s;
         }
+        .nav-btn:active { transform: scale(0.95); }
 
         #main-container {
             flex: 1; display: flex; justify-content: center; align-items: center;
-            z-index: 10; overflow: auto; padding: 100px;
+            z-index: 10; overflow: auto; padding: 50px;
+            perspective: 1000px; /* Efeito 3D leve */
         }
 
+        /* O "Playmat" (Antigo Viewport) */
         #viewport {
             position: relative;
-            background: rgba(15, 15, 25, 0.9);
-            border: 2px solid var(--user-color);
-            box-shadow: 0 0 30px rgba(0,0,0,1), inset 0 0 50px rgba(0, 242, 255, 0.05);
-            background-image: 
-                linear-gradient(rgba(0, 242, 255, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 242, 255, 0.05) 1px, transparent 1px);
-            background-size: var(--grid-size) var(--grid-size);
-            min-width: 400px; min-height: 200px;
+            background: rgba(10, 10, 20, 0.8);
+            border: 2px solid #333;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            min-width: 600px; min-height: 400px;
             transition: width 0.3s, height 0.3s;
+            /* Grid interno para alinhar cards */
+            background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
         }
 
         #protagonist {
-            position: absolute; width: 22px; height: 22px;
+            position: absolute; width: 24px; height: 24px;
             background: var(--user-color);
-            filter: drop-shadow(0 0 10px var(--user-color));
-            z-index: 100; pointer-events: none;
+            box-shadow: 0 0 15px var(--user-color);
+            z-index: 200; pointer-events: none;
             clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
             left: 50%; top: 50%; transform: translate(-50%, -50%);
+            animation: float 2s infinite ease-in-out;
         }
 
+        /* ESTILO DOS CARDS NO MAPA (VOXELS) */
         .voxel {
             position: absolute; z-index: 50; touch-action: none;
-            display: flex; align-items: center; justify-content: center;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
             font-family: 'Orbitron'; font-size: 8px; color: #fff;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--user-color);
-            cursor: move; text-align: center;
+            background: rgba(0, 0, 0, 0.8);
+            cursor: grab; text-align: center;
+            border-width: 1px; border-style: solid;
+            transition: box-shadow 0.3s;
         }
 
-        .f-comodo { 
-            border: 2px dashed var(--user-color); 
-            background: rgba(0, 242, 255, 0.1);
-            z-index: 5;
+        /* Estilo para Terrenos (Cômodos) */
+        .card-field { 
+            z-index: 10; 
+            background: rgba(255, 255, 255, 0.02);
+            border: 2px dashed #444;
+            justify-content: flex-start; padding-top: 5px;
+        }
+        .card-field::after { content: 'SLOT DE TERRENO'; font-size: 6px; opacity: 0.5; margin-top: 2px;}
+
+        /* Estilo para Itens (Ativos) */
+        .card-asset { z-index: 60; border-radius: 4px; }
+        
+        /* Pixel Art Placeholder Css */
+        .pixel-art {
+            width: 60%; height: 60%;
+            background-image: linear-gradient(45deg, #ccc 25%, transparent 25%), 
+                              linear-gradient(-45deg, #ccc 25%, transparent 25%), 
+                              linear-gradient(45deg, transparent 75%, #ccc 75%), 
+                              linear-gradient(-45deg, transparent 75%, #ccc 75%);
+            background-size: 10px 10px;
+            opacity: 0.3; margin-bottom: 2px;
         }
 
-        .f-triangulo { clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
-        .f-quadrado { border-radius: 2px; }
-        .f-retangulo { border-radius: 2px; }
-
-        .preview-box {
-            width: 60px; height: 60px; margin: 0 auto 10px;
-            border: 1px solid #222; display: flex; align-items: center; justify-content: center;
-            background: #050505;
+        /* RARIDADES (Cores e Brilhos) */
+        .r-common { border-color: var(--r-common); color: var(--r-common); }
+        .r-rare { border-color: var(--r-rare); color: var(--r-rare); box-shadow: inset 0 0 10px rgba(0, 242, 255, 0.2); }
+        .r-epic { border-color: var(--r-epic); color: var(--r-epic); box-shadow: 0 0 10px var(--r-epic); }
+        .r-legendary { 
+            border-color: var(--r-legendary); color: var(--r-legendary); 
+            box-shadow: 0 0 15px var(--r-legendary), inset 0 0 15px rgba(255, 170, 0, 0.2);
+            animation: pulse-gold 2s infinite;
         }
 
+        @keyframes pulse-gold {
+            0% { box-shadow: 0 0 10px var(--r-legendary); }
+            50% { box-shadow: 0 0 25px var(--r-legendary); }
+            100% { box-shadow: 0 0 10px var(--r-legendary); }
+        }
+
+        /* UI DO DECK (LOJA) */
         #ui-panel {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            background: var(--panel-bg); border-top: 3px solid var(--user-color);
-            z-index: 3000; transform: translateY(100%); transition: 0.5s; padding: 20px;
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 320px;
+            background: rgba(10, 10, 15, 0.98); 
+            border-top: 2px solid var(--user-color);
+            z-index: 3000; transform: translateY(110%); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex; flex-direction: column;
         }
         #ui-panel.open { transform: translateY(0); }
 
-        .shop-scroll { display: flex; overflow-x: auto; gap: 15px; padding: 10px 0; }
-        .furniture-card {
-            min-width: 130px; background: #000; border: 1px solid #222;
-            padding: 12px; text-align: center; flex-shrink: 0;
+        .deck-header {
+            padding: 10px 20px; border-bottom: 1px solid #333;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .filter-tags { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; }
+        .filter-tag { font-size: 10px; padding: 4px 8px; border: 1px solid #444; cursor: pointer; border-radius: 4px; }
+        .filter-tag.active { background: var(--user-color); color: #000; border-color: var(--user-color); }
+
+        .shop-scroll { 
+            flex: 1; overflow-x: auto; overflow-y: hidden; 
+            display: flex; gap: 20px; padding: 20px; align-items: center; 
         }
 
-        footer {
-            position: relative; z-index: 2000; padding: 15px;
-            display: flex; gap: 10px; background: #000;
+        /* CARD DESIGN NA LOJA */
+        .nexus-card {
+            min-width: 140px; height: 200px;
+            background: #000;
+            border: 2px solid #333;
+            display: flex; flex-direction: column;
+            position: relative;
+            transition: 0.3s; cursor: pointer;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
         }
-        .action-btn { flex: 1; padding: 12px; font-family: 'Orbitron'; font-size: 11px; cursor: pointer; border: none; text-transform: uppercase; }
-        .btn-save { background: var(--user-color); color: #000; font-weight: bold; }
-        .btn-exit { background: #111; color: #fff; }
+        .nexus-card:hover { transform: translateY(-10px); z-index: 100; }
+        
+        .card-img { flex: 1; background: #111; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+        .card-img::after { content: ''; position: absolute; width: 100%; height: 100%; background: linear-gradient(transparent, #000); }
+        
+        .card-info { padding: 10px; font-family: 'Rajdhani'; }
+        .card-type { font-size: 9px; text-transform: uppercase; opacity: 0.7; letter-spacing: 1px; }
+        .card-name { font-size: 14px; font-weight: bold; margin: 2px 0 5px; font-family: 'Orbitron'; }
+        .card-rarity { font-size: 8px; text-transform: uppercase; padding: 2px 4px; border-radius: 2px; display: inline-block; font-weight: bold; }
+
+        footer {
+            position: fixed; bottom: 20px; right: 20px; z-index: 2000;
+            display: flex; gap: 10px;
+        }
     </style>
 </head>
 <body>
@@ -120,24 +187,38 @@
     <div id="city-bg"></div>
 
     <header>
-        <button class="nav-btn" onclick="window.toggleMenu()">Catálogo de Construção</button>
+        <div class="hud-stat">NEXUS LVL 1</div>
+        <button class="nav-btn" style="border-color: var(--r-legendary); color: var(--r-legendary);" onclick="window.toggleMenu()">ABRIR DECK</button>
     </header>
 
     <div id="main-container">
-        <div id="viewport" style="width: 500px; height: 300px;">
+        <div id="viewport">
             <div id="protagonist"></div>
         </div>
     </div>
 
     <aside id="ui-panel">
-        <h4 style="font-family:'Orbitron'; font-size:12px; color:var(--user-color); margin-bottom:15px;">NEXUS BUILDER</h4>
-        <div class="shop-scroll" id="furniture-list"></div>
-        <button class="action-btn btn-exit" style="width:100%; margin-top:15px;" onclick="window.toggleMenu()">FECHAR</button>
+        <div class="deck-header">
+            <h4 style="font-family:'Orbitron'; color:#fff;">CATÁLOGO DE ATIVOS</h4>
+            <button class="nav-btn" style="padding: 4px 10px; font-size: 8px;" onclick="window.toggleMenu()">X</button>
+        </div>
+        <div style="padding: 10px 20px;">
+            <div class="filter-tags">
+                <span class="filter-tag active" onclick="filterShop('all')">TUDO</span>
+                <span class="filter-tag" onclick="filterShop('room')">TERRENOS</span>
+                <span class="filter-tag" onclick="filterShop('tech')">TECH</span>
+                <span class="filter-tag" onclick="filterShop('moveis')">MÓVEIS</span>
+                <span class="filter-tag" onclick="filterShop('roupas')">ROUPAS</span>
+                <span class="filter-tag" onclick="filterShop('veiculos')">VEÍCULOS</span>
+            </div>
+        </div>
+        <div class="shop-scroll" id="card-list">
+            </div>
     </aside>
 
     <footer>
-        <button class="action-btn btn-exit" onclick="window.location.href='index.html'">SAIR</button>
-        <button class="action-btn btn-save" onclick="window.saveApartment()">SALVAR NEXUS</button>
+        <button class="nav-btn" onclick="window.saveApartment()">SALVAR DECK</button>
+        <button class="nav-btn" style="background: darkred; border-color: red;" onclick="window.location.href='index.html'">SAIR</button>
     </footer>
 
     <script type="module">
@@ -152,13 +233,36 @@
         const userId = localStorage.getItem('userId') || "TEST_USER";
         const gridSize = 20;
 
+        // --- DATABASE DE CARDS ---
         const catalog = [
-            { id: 'c1', name: 'Suíte Master', w: 200, h: 140, shape: 'f-comodo', type: 'room' },
-            { id: 'c2', name: 'Varanda Neon', w: 100, h: 180, shape: 'f-comodo', type: 'room' },
-            { id: 'c3', name: 'Nexus Hall', w: 140, h: 140, shape: 'f-comodo', type: 'room' },
-            { id: 'm1', name: 'Holo TV', w: 80, h: 20, shape: 'f-retangulo', type: 'mob' },
-            { id: 'm2', name: 'Bio Bed', w: 80, h: 100, shape: 'f-quadrado', type: 'mob' },
-            { id: 'm3', name: 'Cyber Table', w: 60, h: 60, shape: 'f-triangulo', type: 'mob' }
+            // TERRENOS (Field Cards)
+            { id: 'c1', name: 'Base Inicial', cat: 'room', rar: 'common', w: 200, h: 200, type: 'field' },
+            { id: 'c2', name: 'Garagem Cyber', cat: 'room', rar: 'rare', w: 140, h: 200, type: 'field' },
+            { id: 'c3', name: 'Suíte Neon', cat: 'room', rar: 'epic', w: 180, h: 160, type: 'field' },
+            { id: 'c4', name: 'Penthouse', cat: 'room', rar: 'legendary', w: 300, h: 300, type: 'field' },
+
+            // TECH (Asset Cards)
+            { id: 't1', name: 'Smartphone Z', cat: 'tech', rar: 'common', w: 20, h: 40, type: 'asset' },
+            { id: 't2', name: 'PC Gamer RGB', cat: 'tech', rar: 'epic', w: 60, h: 40, type: 'asset' },
+            { id: 't3', name: 'Holo TV 8K', cat: 'tech', rar: 'rare', w: 80, h: 20, type: 'asset' },
+            { id: 't4', name: 'Sound System', cat: 'tech', rar: 'common', w: 40, h: 60, type: 'asset' },
+            { id: 't5', name: 'Fone Quantum', cat: 'tech', rar: 'legendary', w: 20, h: 20, type: 'asset' },
+
+            // MÓVEIS
+            { id: 'm1', name: 'Cama Box', cat: 'moveis', rar: 'common', w: 80, h: 100, type: 'asset' },
+            { id: 'm2', name: 'Sofá Modular', cat: 'moveis', rar: 'rare', w: 100, h: 60, type: 'asset' },
+            { id: 'm3', name: 'Geladeira Smart', cat: 'moveis', rar: 'epic', w: 60, h: 60, type: 'asset' },
+            { id: 'm4', name: 'Fogão Indução', cat: 'moveis', rar: 'common', w: 60, h: 60, type: 'asset' },
+
+            // ROUPAS
+            { id: 'r1', name: 'Tênis Mag', cat: 'roupas', rar: 'rare', w: 40, h: 20, type: 'asset' },
+            { id: 'r2', name: 'Jaqueta Tech', cat: 'roupas', rar: 'epic', w: 60, h: 60, type: 'asset' },
+            { id: 'r3', name: 'Boné Vibe', cat: 'roupas', rar: 'common', w: 20, h: 20, type: 'asset' },
+            { id: 'r4', name: 'Calça Cargo', cat: 'roupas', rar: 'common', w: 40, h: 80, type: 'asset' },
+
+            // VEÍCULOS
+            { id: 'v1', name: 'Moto Akira', cat: 'veiculos', rar: 'legendary', w: 100, h: 40, type: 'asset' },
+            { id: 'v2', name: 'Sedan 2077', cat: 'veiculos', rar: 'epic', w: 120, h: 60, type: 'asset' }
         ];
 
         async function loadUserData() {
@@ -167,32 +271,81 @@
                 const data = userSnap.data();
                 const favColor = data.cor_favorita || '#00f2ff';
                 document.documentElement.style.setProperty('--user-color', favColor);
-                viewport.style.width = (data.apt_w || 500) + "px";
-                viewport.style.height = (data.apt_h || 300) + "px";
-                if(data.apartment_voxels) data.apartment_voxels.forEach(v => spawnElement(v));
+                viewport.style.width = (data.apt_w || 600) + "px";
+                viewport.style.height = (data.apt_h || 400) + "px";
+                if(data.apartment_voxels) data.apartment_voxels.forEach(v => spawnCardOnBoard(v));
             }
-            renderShop();
+            filterShop('all');
         }
 
         window.toggleMenu = () => document.getElementById('ui-panel').classList.toggle('open');
 
-        window.buyItem = (id) => {
-            const item = catalog.find(i => i.id === id);
-            spawnElement({ ...item, x: "20px", y: "20px" });
-            window.toggleMenu();
+        // Filtragem da Loja
+        window.filterShop = (category) => {
+            const list = document.getElementById('card-list');
+            list.innerHTML = '';
+            
+            // Atualizar botões
+            document.querySelectorAll('.filter-tag').forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.innerText.toLowerCase().includes(category === 'all' ? 'tudo' : category)) btn.classList.add('active');
+            });
+
+            const filtered = category === 'all' ? catalog : catalog.filter(i => i.cat === category);
+
+            filtered.forEach(item => {
+                let colorVar = `var(--r-${item.rar})`;
+                list.innerHTML += `
+                    <div class="nexus-card" style="border-color: ${colorVar}" onclick="window.spawnItem('${item.id}')">
+                        <div class="card-img">
+                            <div class="pixel-art" style="background-color:${colorVar}"></div>
+                        </div>
+                        <div class="card-info">
+                            <div class="card-type" style="color:${colorVar}">${item.type === 'field' ? 'TERRENO' : 'ATIVO'}</div>
+                            <div class="card-name">${item.name}</div>
+                            <span class="card-rarity" style="border: 1px solid ${colorVar}; color:${colorVar}">${item.rar}</span>
+                        </div>
+                    </div>`;
+            });
         };
 
-        function spawnElement(data) {
+        window.spawnItem = (id) => {
+            const item = catalog.find(i => i.id === id);
+            // Spawn aleatório levemente deslocado
+            const offsetX = Math.floor(Math.random() * 5) * 20;
+            spawnCardOnBoard({ ...item, x: (40 + offsetX)+"px", y: (40 + offsetX)+"px" });
+            
+            // Se for mobile, fecha o menu pra ver o item
+            if(window.innerWidth < 768) window.toggleMenu();
+        };
+
+        function spawnCardOnBoard(data) {
             const el = document.createElement('div');
-            el.className = `voxel ${data.shape}`;
+            // Define classes baseadas no tipo e raridade
+            const typeClass = data.type === 'field' ? 'card-field' : 'card-asset';
+            const rarClass = `r-${data.rar}`;
+            
+            el.className = `voxel ${typeClass} ${rarClass}`;
             el.style.width = data.w + "px";
             el.style.height = data.h + "px";
             el.style.left = data.x || "0px";
             el.style.top = data.y || "0px";
-            el.innerText = data.name;
-            el.dataset.type = data.type;
+            
+            // Conteúdo visual do token no tabuleiro
+            el.innerHTML = `
+                ${data.type === 'asset' ? '<div class="pixel-art" style="width:20px; height:20px; margin-bottom:5px;"></div>' : ''}
+                <span>${data.name}</span>
+            `;
 
-            el.ondblclick = () => el.remove();
+            el.dataset.id = data.id;
+            el.dataset.type = data.type; // Guardar tipo para lógica de colisão/expansão
+            el.dataset.rar = data.rar;
+            
+            // Duplo clique remove
+            el.ondblclick = () => {
+                if(confirm("Remover este card do tabuleiro?")) el.remove();
+            };
+
             makeDraggable(el);
             viewport.appendChild(el);
         }
@@ -203,6 +356,10 @@
                 const ev = e.type === 'touchstart' ? e.touches[0] : e;
                 pos3 = ev.clientX; pos4 = ev.clientY;
                 
+                // Trazer para frente ao arrastar
+                const originalZ = el.style.zIndex;
+                el.style.zIndex = 1000;
+
                 document.onmousemove = document.ontouchmove = (e) => {
                     const evm = e.type === 'touchmove' ? e.touches[0] : e;
                     pos1 = pos3 - evm.clientX; pos2 = pos4 - evm.clientY;
@@ -211,56 +368,30 @@
                     let newTop = el.offsetTop - pos2;
                     let newLeft = el.offsetLeft - pos1;
 
-                    // Se for cômodo, permite sair para expandir
-                    if (el.dataset.type === 'room') {
+                    // Lógica de Expansão: Só TERRENOS (field) podem sair do limite para expandir
+                    if (el.dataset.type === 'field') {
                         el.style.top = newTop + "px";
                         el.style.left = newLeft + "px";
                     } else {
-                        // Móveis ficam presos dentro do viewport
+                        // Ativos (Itens) ficam presos no tabuleiro
                         el.style.top = Math.max(0, Math.min(newTop, viewport.clientHeight - el.offsetHeight)) + "px";
                         el.style.left = Math.max(0, Math.min(newLeft, viewport.clientWidth - el.offsetWidth)) + "px";
                     }
                 };
 
                 document.onmouseup = document.ontouchend = () => {
-                    // Alinhamento ao Grid
+                    el.style.zIndex = originalZ; // Volta ao Z original
+
+                    // Snap to Grid
                     let finalLeft = Math.round(el.offsetLeft / gridSize) * gridSize;
                     let finalTop = Math.round(el.offsetTop / gridSize) * gridSize;
                     
                     el.style.left = finalLeft + "px";
                     el.style.top = finalTop + "px";
 
-                    // MECÂNICA DE EXPANSÃO
-                    if (el.dataset.type === 'room') {
-                        let needsExpand = false;
-                        let addW = 0, addH = 0;
-
-                        if (finalLeft + el.offsetWidth > viewport.clientWidth) {
-                            addW = (finalLeft + el.offsetWidth) - viewport.clientWidth;
-                            needsExpand = true;
-                        }
-                        if (finalTop + el.offsetHeight > viewport.clientHeight) {
-                            addH = (finalTop + el.offsetHeight) - viewport.clientHeight;
-                            needsExpand = true;
-                        }
-                        // Expansão para a esquerda ou topo (ajusta posição de todos os itens)
-                        if (finalLeft < 0 || finalTop < 0) {
-                            const shiftX = finalLeft < 0 ? Math.abs(finalLeft) : 0;
-                            const shiftY = finalTop < 0 ? Math.abs(finalTop) : 0;
-                            
-                            viewport.style.width = (viewport.clientWidth + shiftX) + "px";
-                            viewport.style.height = (viewport.clientHeight + shiftY) + "px";
-                            
-                            document.querySelectorAll('.voxel').forEach(v => {
-                                v.style.left = (parseInt(v.style.left) + shiftX) + "px";
-                                v.style.top = (parseInt(v.style.top) + shiftY) + "px";
-                            });
-                        }
-
-                        if (needsExpand) {
-                            viewport.style.width = (viewport.clientWidth + addW) + "px";
-                            viewport.style.height = (viewport.clientHeight + addH) + "px";
-                        }
+                    // EXPANSÃO DO TABULEIRO (Só se for terreno)
+                    if (el.dataset.type === 'field') {
+                        expandViewportLogic(el, finalLeft, finalTop);
                     }
 
                     document.onmouseup = document.onmousemove = document.ontouchend = document.ontouchmove = null;
@@ -268,13 +399,49 @@
             };
         }
 
+        function expandViewportLogic(el, left, top) {
+            let addW = 0, addH = 0;
+            let needsExpand = false;
+
+            // Expandir direita/baixo
+            if (left + el.offsetWidth > viewport.clientWidth) {
+                addW = (left + el.offsetWidth) - viewport.clientWidth;
+                needsExpand = true;
+            }
+            if (top + el.offsetHeight > viewport.clientHeight) {
+                addH = (top + el.offsetHeight) - viewport.clientHeight;
+                needsExpand = true;
+            }
+
+            // Expandir esquerda/cima (Move tudo)
+            if (left < 0 || top < 0) {
+                const shiftX = left < 0 ? Math.abs(left) : 0;
+                const shiftY = top < 0 ? Math.abs(top) : 0;
+                
+                viewport.style.width = (viewport.clientWidth + shiftX) + "px";
+                viewport.style.height = (viewport.clientHeight + shiftY) + "px";
+                
+                document.querySelectorAll('.voxel').forEach(v => {
+                    v.style.left = (parseInt(v.style.left) + shiftX) + "px";
+                    v.style.top = (parseInt(v.style.top) + shiftY) + "px";
+                });
+            }
+
+            if (needsExpand) {
+                viewport.style.width = (viewport.clientWidth + addW) + "px";
+                viewport.style.height = (viewport.clientHeight + addH) + "px";
+            }
+        }
+
         window.saveApartment = async () => {
             const voxels = [];
             document.querySelectorAll('.voxel').forEach(v => {
                 voxels.push({
-                    name: v.innerText, x: v.style.left, y: v.style.top,
+                    id: v.dataset.id, // Importante para reconstruir
+                    name: v.innerText, 
+                    x: v.style.left, y: v.style.top,
                     w: parseInt(v.style.width), h: parseInt(v.style.height),
-                    shape: Array.from(v.classList).find(c => c.startsWith('f-')),
+                    rar: v.dataset.rar,
                     type: v.dataset.type
                 });
             });
@@ -283,24 +450,8 @@
                 apt_w: parseInt(viewport.style.width),
                 apt_h: parseInt(viewport.style.height)
             });
-            alert("Estrutura salva no Nexus!");
+            alert("Deck Imobiliário Salvo!");
         };
-
-        function renderShop() {
-            const list = document.getElementById('furniture-list');
-            list.innerHTML = '';
-            catalog.forEach(item => {
-                const scale = 0.25;
-                list.innerHTML += `
-                    <div class="furniture-card">
-                        <div class="preview-box">
-                            <div class="${item.shape}" style="width:${item.w * scale}px; height:${item.h * scale}px; border:1px solid var(--user-color); background:rgba(0,242,255,0.2)"></div>
-                        </div>
-                        <h5 style="font-size:9px; margin-bottom:8px;">${item.name}</h5>
-                        <button class="action-btn btn-save" style="width:100%; padding:5px; font-size:8px;" onclick="window.buyItem('${item.id}')">OBTER</button>
-                    </div>`;
-            });
-        }
 
         loadUserData();
     </script>
