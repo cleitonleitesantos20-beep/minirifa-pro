@@ -9,57 +9,61 @@
         :root {
             --user-color: #00f2ff;
             --bg-dark: #020202;
-            --grid-size: 30px; /* Tamanho dos mini-blocos */
+            --grid-size: 30px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            background: var(--bg-dark);
+            background: #000;
             color: #fff;
             font-family: 'Rajdhani', sans-serif;
-            height: 100vh; display: flex; overflow: hidden;
-        }
-
-        /* ÁREA DE CONSTRUÇÃO */
-        #viewport-wrapper {
-            flex-grow: 1;
+            height: 100vh;
+            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: auto;
-            background: radial-gradient(circle, #0a0a0a 0%, #000 100%);
-            position: relative;
         }
 
-        /* O RETÂNGULO DO APARTAMENTO (MODULAR) */
+        /* CENÁRIO DE PRÉDIO (BACKGROUND) */
+        #city-backdrop {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: 
+                linear-gradient(to bottom, transparent 60%, #050505 100%),
+                url('https://i.imgur.com/8Q9Z5bX.png'); /* Placeholder para luzes da cidade */
+            background-size: cover;
+            filter: brightness(0.3) blur(2px);
+            z-index: -1;
+        }
+
+        /* ÁREA DE VISUALIZAÇÃO CENTRALIZADA */
+        #viewport-wrapper {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* O RETÂNGULO DEITADO (APARTAMENTO) */
         .room-module {
             position: relative;
-            width: 600px; /* 20 colunas */
-            height: 450px; /* 15 linhas */
-            background-color: #050505;
+            width: 720px; /* 24 colunas */
+            height: 360px; /* 12 linhas - Deitado */
+            background-color: rgba(5, 5, 5, 0.9);
             background-image: 
-                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+                linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
             background-size: var(--grid-size) var(--grid-size);
-            border: 2px solid #222;
-            margin: 10px;
-            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            border: 2px solid #333;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8), inset 0 0 100px rgba(0, 242, 255, 0.05);
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        /* MINI-BLOCO NÉON (MÓVEIS) */
-        .voxel {
-            position: absolute;
-            width: var(--grid-size);
-            height: var(--grid-size);
-            background: var(--user-color);
-            border: 1px solid rgba(0,0,0,0.3);
-            box-shadow: inset 0 0 10px rgba(255,255,255,0.2), 0 0 5px var(--user-color);
-            cursor: grab;
-            z-index: 10;
-        }
-        .voxel:active { cursor: grabbing; }
-
-        /* PROTAGONISTA (CENTRO DO GRID) */
+        /* PROTAGONISTA CENTRALIZADO */
         #protagonist {
             position: absolute;
             width: 30px; height: 30px;
@@ -68,18 +72,50 @@
             filter: drop-shadow(0 0 15px var(--user-color));
             z-index: 100;
             pointer-events: none;
-            transition: 0.1s;
         }
 
-        /* MENU LATERAL */
+        .voxel {
+            position: absolute;
+            width: var(--grid-size);
+            height: var(--grid-size);
+            background: var(--user-color);
+            border: 1px solid rgba(0,0,0,0.3);
+            box-shadow: inset 0 0 10px rgba(255,255,255,0.2), 0 0 8px var(--user-color);
+            cursor: grab;
+            z-index: 10;
+        }
+
+        /* BOTÃO DE COMPRAS E MENU COMPACTO */
+        #shop-toggle {
+            position: fixed;
+            top: 20px; right: 20px;
+            background: var(--user-color);
+            color: #000;
+            padding: 10px 20px;
+            font-family: 'Orbitron';
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            z-index: 1100;
+            box-shadow: 0 0 15px var(--user-color);
+        }
+
         #ui-panel {
-            width: 320px;
-            background: #0a0a0a;
-            border-left: 2px solid #1a1a1a;
-            padding: 20px;
+            position: fixed;
+            right: -350px; /* Escondido */
+            top: 0;
+            width: 300px;
+            height: 100vh;
+            background: rgba(10, 10, 10, 0.95);
+            border-left: 2px solid var(--user-color);
+            padding: 80px 20px 20px 20px;
             display: flex; flex-direction: column; gap: 15px;
             z-index: 1000;
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
         }
+
+        #ui-panel.open { right: 0; }
 
         .section {
             border: 1px solid #222;
@@ -102,26 +138,33 @@
             font-family: 'Orbitron';
             font-size: 9px;
             cursor: pointer;
-            text-align: left;
             display: flex; justify-content: space-between;
         }
-        .shop-btn:hover { border-color: var(--user-color); }
 
         .np-display {
             font-family: 'Orbitron'; color: #ffcc00; font-size: 16px;
             text-align: center; padding: 10px; border: 1px solid #ffcc0033;
         }
 
-        #color-selector { width: 100%; height: 30px; margin-top: 5px; cursor: pointer; border: none; }
+        #color-selector { width: 100%; height: 30px; margin-top: 5px; cursor: pointer; border: none; background: none; }
 
         .btn-action {
             background: var(--user-color); color: #000;
             border: none; padding: 12px; font-family: 'Orbitron';
-            font-weight: bold; cursor: pointer; margin-top: auto;
+            font-weight: bold; cursor: pointer;
+        }
+
+        .btn-exit {
+            background: none; border: 1px solid #ff4444; color: #ff4444;
+            padding: 8px; font-family: 'Orbitron'; font-size: 10px; cursor: pointer; margin-top: 10px;
         }
     </style>
 </head>
 <body>
+
+    <div id="city-backdrop"></div>
+
+    <button id="shop-toggle" onclick="toggleMenu()">COMPRAS</button>
 
     <div id="viewport-wrapper">
         <div id="apartment-grid" class="room-module">
@@ -133,30 +176,28 @@
         <div class="np-display" id="balance">0.00 NP</div>
 
         <div class="section">
-            <div class="section-title">CONSTRUÇÃO (VOXELS)</div>
+            <div class="section-title">CONSTRUÇÃO</div>
             <button class="shop-btn" onclick="spawnVoxel()">
-                <span>+ MINI BLOCO NÉON</span>
+                <span>+ MINI BLOCO</span>
                 <span style="color:#ffcc00">100 NP</span>
             </button>
-            <p style="font-size: 9px; color:#666; margin-top:5px;">Arraste os blocos para montar sua mesa, cama ou sofá no grid.</p>
+        </div>
+
+        <div class="section">
+            <div class="section-title">COR DO BLOCO</div>
+            <input type="color" id="color-selector" value="#00f2ff">
         </div>
 
         <div class="section">
             <div class="section-title">EXPANSÃO</div>
             <button class="shop-btn" onclick="addRoom()">
-                <span>+ NOVO MÓDULO (QUARTO)</span>
+                <span>+ NOVO QUARTO</span>
                 <span style="color:#ffcc00">2500 NP</span>
             </button>
         </div>
 
-        <div class="section">
-            <div class="section-title">CUSTOMIZAÇÃO</div>
-            <label style="font-size: 9px;">COR DO PRÓXIMO BLOCO:</label>
-            <input type="color" id="color-selector" value="#00f2ff">
-        </div>
-
-        <button class="btn-action" onclick="saveApartment()">SALVAR NEXUS APARTMENT</button>
-        <button onclick="window.location.href='dashboard.html'" style="background:none; border:1px solid #444; color:#888; padding:5px; font-family:'Orbitron'; font-size:8px; cursor:pointer;">SAIR</button>
+        <button class="btn-action" onclick="saveApartment()">SALVAR</button>
+        <button class="btn-exit" onclick="window.location.href='index.html'">SAIR</button>
     </aside>
 
     <script type="module">
@@ -167,23 +208,21 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        let userNP = 10000; // Saldo de teste
+        let userNP = 10000;
         const gridSize = 30;
         const mainGrid = document.getElementById('apartment-grid');
-        const protagonist = document.getElementById('protagonist');
 
-        // Centralizar protagonista no grid
-        protagonist.style.left = '270px';
-        protagonist.style.top = '210px';
+        // Toggle Menu
+        window.toggleMenu = () => {
+            document.getElementById('ui-panel').classList.toggle('open');
+        };
 
         function updateNP() {
             document.getElementById('balance').innerText = `${userNP.toLocaleString('pt-BR')} NP`;
         }
 
-        // FUNÇÃO: COMPRAR E GERAR MINI BLOCO
         window.spawnVoxel = () => {
-            if(userNP < 100) return alert("NP Insuficiente!");
-            
+            if(userNP < 100) return alert("NP insuficiente!");
             userNP -= 100;
             updateNP();
 
@@ -192,86 +231,57 @@
             const color = document.getElementById('color-selector').value;
             voxel.style.backgroundColor = color;
             voxel.style.boxShadow = `0 0 10px ${color}`;
-            
-            // Posiciona no centro do módulo
-            voxel.style.left = '0px';
-            voxel.style.top = '0px';
+            voxel.style.left = "0px";
+            voxel.style.top = "0px";
 
             makeDraggable(voxel);
             mainGrid.appendChild(voxel);
         };
 
-        // FUNÇÃO: ADICIONAR NOVO QUARTO (MODULAR)
         window.addRoom = () => {
-            if(userNP < 2500) return alert("NP Insuficiente!");
-            
+            if(userNP < 2500) return alert("NP insuficiente!");
             userNP -= 2500;
             updateNP();
-
             const newRoom = document.createElement('div');
             newRoom.className = 'room-module';
             document.getElementById('viewport-wrapper').appendChild(newRoom);
         };
 
-        // LÓGICA DE ARRASTAR E ENCAIXAR NO GRID (SNAP TO GRID)
         function makeDraggable(el) {
             let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-            el.onmousedown = dragMouseDown;
-
-            function dragMouseDown(e) {
+            el.onmousedown = (e) => {
                 e.preventDefault();
                 pos3 = e.clientX;
                 pos4 = e.clientY;
-                document.onmouseup = closeDragElement;
-                document.onmousemove = elementDrag;
-                el.style.zIndex = 1000;
-            }
-
-            function elementDrag(e) {
-                e.preventDefault();
-                pos1 = pos3 - e.clientX;
-                pos2 = pos4 - e.clientY;
-                pos3 = e.clientX;
-                pos4 = e.clientY;
-                
-                // Posição livre durante o arraste
-                el.style.top = (el.offsetTop - pos2) + "px";
-                el.style.left = (el.offsetLeft - pos1) + "px";
-            }
-
-            function closeDragElement() {
-                // EFEITO SNAP: Encaixa no múltiplo de 30px mais próximo
-                const x = Math.round(el.offsetLeft / gridSize) * gridSize;
-                const y = Math.round(el.offsetTop / gridSize) * gridSize;
-                
-                el.style.left = x + "px";
-                el.style.top = y + "px";
-                el.style.zIndex = 10;
-                
-                document.onmouseup = null;
-                document.onmousemove = null;
-            }
+                document.onmouseup = () => {
+                    const x = Math.round(el.offsetLeft / gridSize) * gridSize;
+                    const y = Math.round(el.offsetTop / gridSize) * gridSize;
+                    el.style.left = x + "px";
+                    el.style.top = y + "px";
+                    document.onmouseup = null;
+                    document.onmousemove = null;
+                };
+                document.onmousemove = (e) => {
+                    e.preventDefault();
+                    pos1 = pos3 - e.clientX;
+                    pos2 = pos4 - e.clientY;
+                    pos3 = e.clientX;
+                    pos4 = e.clientY;
+                    el.style.top = (el.offsetTop - pos2) + "px";
+                    el.style.left = (el.offsetLeft - pos1) + "px";
+                };
+            };
         }
 
-        // SALVAR ESTADO
         window.saveApartment = async () => {
             const voxels = [];
             document.querySelectorAll('.voxel').forEach(v => {
-                voxels.push({
-                    x: v.style.left,
-                    y: v.style.top,
-                    color: v.style.backgroundColor
-                });
+                voxels.push({ x: v.style.left, y: v.style.top, color: v.style.backgroundColor });
             });
-
             try {
                 const userId = localStorage.getItem('userId') || "TEST_USER";
-                const userRef = doc(db, "usuarios", userId);
-                await updateDoc(userRef, { 
-                    apartment_voxels: voxels,
-                    nexusPoints: userNP 
-                });
-                alert("Apartamento Salvo no Nexus!");
+                await updateDoc(doc(db, "usuarios", userId), { apartment_voxels: voxels, nexusPoints: userNP });
+                alert("Salvo!");
             } catch (e) { console.error(e); }
         };
 
