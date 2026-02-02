@@ -32,6 +32,7 @@
         header {
             position: relative; z-index: 2000; padding: 15px 20px;
             display: flex; justify-content: flex-end; align-items: center;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
         }
 
         .top-btns { display: flex; gap: 12px; }
@@ -47,14 +48,12 @@
             transition: 0.3s;
             clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
         }
-        .nav-btn:hover { background: var(--user-color); color: #000; box-shadow: 0 0 15px var(--user-color); }
 
         #main-container {
             flex: 1; display: flex; justify-content: center; align-items: center;
-            z-index: 10; overflow: auto; padding: 40px;
+            z-index: 10; overflow: hidden; padding: 20px;
         }
 
-        /* Proporção de Planta Baixa (Retangular) */
         #viewport {
             position: relative;
             background: rgba(15, 15, 25, 0.9);
@@ -73,22 +72,22 @@
             filter: drop-shadow(0 0 10px var(--user-color));
             z-index: 100; pointer-events: none;
             clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-            transition: 0.2s;
+            left: 50%; top: 50%; transform: translate(-50%, -50%);
         }
 
         .voxel {
             position: absolute; z-index: 50; touch-action: none;
             display: flex; align-items: center; justify-content: center;
             font-family: 'Orbitron'; font-size: 8px; color: #fff;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255,255,255,0.3);
             cursor: move;
+            text-align: center;
         }
         .f-triangulo { clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
         .f-quadrado { border-radius: 2px; }
         .f-retangulo { border-radius: 2px; }
 
-        /* Loja */
         #ui-panel {
             position: fixed; bottom: 0; left: 0; width: 100%;
             background: var(--panel-bg);
@@ -98,35 +97,32 @@
         }
         #ui-panel.open { transform: translateY(0); }
 
-        .shop-scroll {
-            display: flex; overflow-x: auto; gap: 15px; padding: 10px 0;
-        }
+        .shop-scroll { display: flex; overflow-x: auto; gap: 15px; padding: 10px 0; }
         .furniture-card {
             min-width: 140px; background: #000; border: 1px solid #222;
             padding: 15px; text-align: center; flex-shrink: 0;
-            border-bottom: 3px solid transparent;
         }
-        .furniture-card:hover { border-bottom-color: var(--user-color); }
         .furniture-card h5 { font-family: 'Orbitron'; font-size: 10px; color: var(--user-color); margin-bottom: 5px; }
-        .furniture-card p { font-size: 14px; color: #ffcc00; margin-bottom: 12px; font-weight: bold; }
+        .furniture-card p { font-size: 14px; color: #00ff00; margin-bottom: 12px; font-weight: bold; }
 
         .buy-btn {
-            width: 100%; padding: 8px; background: #111; color: #fff;
-            border: 1px solid #333; font-family: 'Orbitron'; font-size: 9px;
-            cursor: pointer; transition: 0.3s;
+            width: 100%; padding: 8px; background: var(--user-color); color: #000;
+            border: none; font-family: 'Orbitron'; font-size: 9px; font-weight: bold;
+            cursor: pointer;
         }
-        .buy-btn:hover { background: var(--user-color); color: #000; }
 
         footer {
-            position: relative; z-index: 2000; padding: 15px 20px;
-            display: flex; gap: 15px; background: #000; border-top: 1px solid #111;
+            position: relative; z-index: 2000; padding: 15px;
+            display: flex; gap: 10px; background: #000; 
+            border-top: 1px solid #222;
         }
         .action-btn { 
-            flex: 1; padding: 15px; font-family: 'Orbitron'; font-size: 11px; 
+            flex: 1; padding: 12px; font-family: 'Orbitron'; font-size: 11px; 
             font-weight: bold; border: none; cursor: pointer;
+            text-transform: uppercase;
         }
         .btn-save { background: var(--user-color); color: #000; }
-        .btn-exit { background: #111; color: #fff; }
+        .btn-exit { background: #222; color: #fff; }
     </style>
 </head>
 <body>
@@ -135,8 +131,8 @@
 
     <header>
         <div class="top-btns">
-            <button class="nav-btn" onclick="window.buyPlot()">+ Terreno (500 NP)</button>
-            <button class="nav-btn" style="background:var(--user-color); color:#000;" onclick="window.toggleMenu()">Loja de Móveis</button>
+            <button class="nav-btn" onclick="window.buyPlot()">+ Expandir (Grátis)</button>
+            <button class="nav-btn" style="background:var(--user-color); color:#000;" onclick="window.toggleMenu()">Catálogo</button>
         </div>
     </header>
 
@@ -147,13 +143,13 @@
     </div>
 
     <aside id="ui-panel">
-        <h4 style="font-family:'Orbitron'; font-size:12px; color:#555; margin-bottom:15px; text-transform:uppercase;">Nexus Catalog</h4>
+        <h4 style="font-family:'Orbitron'; font-size:12px; color:#555; margin-bottom:15px;">MÓVEIS DISPONÍVEIS</h4>
         <div class="shop-scroll" id="furniture-list"></div>
-        <button class="action-btn btn-exit" style="width:100%; margin-top:15px;" onclick="window.toggleMenu()">FECHAR LOJA</button>
+        <button class="action-btn btn-exit" style="width:100%; margin-top:15px;" onclick="window.toggleMenu()">FECHAR</button>
     </aside>
 
     <footer>
-        <button class="action-btn btn-exit" onclick="window.location.href='dashboard.html'">SAIR</button>
+        <button class="action-btn btn-exit" onclick="window.location.href='index.html'">SAIR</button>
         <button class="action-btn btn-save" onclick="window.saveApartment()">SALVAR PROJETO</button>
     </footer>
 
@@ -170,72 +166,49 @@
         const gridSize = 20;
 
         const furniture = [
-            { id: 'tv', name: 'Painel Led', price: 500, w: 100, h: 20, shape: 'f-retangulo' },
-            { id: 'sofa', name: 'Sofá Modular', price: 800, w: 80, h: 60, shape: 'f-quadrado' },
-            { id: 'cama', name: 'Cama Bio', price: 1200, w: 80, h: 100, shape: 'f-quadrado' },
-            { id: 'mesa', name: 'Holo Table', price: 600, w: 60, h: 60, shape: 'f-triangulo' }
+            { id: 'tv', name: 'Painel Led', w: 100, h: 20, shape: 'f-retangulo' },
+            { id: 'sofa', name: 'Sofá Modular', w: 80, h: 60, shape: 'f-quadrado' },
+            { id: 'cama', name: 'Cama Bio', w: 80, h: 100, shape: 'f-quadrado' },
+            { id: 'mesa', name: 'Holo Table', w: 60, h: 60, shape: 'f-triangulo' },
+            { id: 'lamp', name: 'Poste Neon', w: 20, h: 20, shape: 'f-quadrado' }
         ];
 
         async function loadUserData() {
-            const userSnap = await getDoc(doc(db, "usuarios", userId));
-            if (userSnap.exists()) {
-                const data = userSnap.data();
-                viewport.style.width = (data.apt_w || 500) + "px";
-                viewport.style.height = (data.apt_h || 300) + "px";
-                
-                const prota = document.getElementById('protagonist');
-                const favColor = data.cor_favorita || '#00f2ff';
-                prota.style.backgroundColor = favColor;
-                document.documentElement.style.setProperty('--user-color', favColor);
-
-                if(data.apartment_voxels) data.apartment_voxels.forEach(v => spawnFurnitureElement(v));
-            }
+            try {
+                const userSnap = await getDoc(doc(db, "usuarios", userId));
+                if (userSnap.exists()) {
+                    const data = userSnap.data();
+                    viewport.style.width = (data.apt_w || 500) + "px";
+                    viewport.style.height = (data.apt_h || 300) + "px";
+                    const favColor = data.cor_favorita || '#00f2ff';
+                    document.documentElement.style.setProperty('--user-color', favColor);
+                    if(data.apartment_voxels) data.apartment_voxels.forEach(v => spawnFurnitureElement(v));
+                }
+            } catch(e) { console.error("Erro ao carregar dados", e); }
         }
 
-        // Tornando as funções globais para o HTML reconhecer
         window.toggleMenu = () => document.getElementById('ui-panel').classList.toggle('open');
 
-        window.buyPlot = async () => {
-            const success = await checkAndPay(500);
-            if (success) {
-                viewport.style.width = (parseInt(viewport.style.width) + 40) + "px";
-                viewport.style.height = (parseInt(viewport.style.height) + 20) + "px";
-                alert("Espaço ampliado!");
-            }
+        window.buyPlot = () => {
+            viewport.style.width = (parseInt(viewport.style.width) + 40) + "px";
+            viewport.style.height = (parseInt(viewport.style.height) + 20) + "px";
         };
 
-        window.buyFurniture = async (id) => {
+        window.buyFurniture = (id) => {
             const item = furniture.find(f => f.id === id);
-            const success = await checkAndPay(item.price);
-            if (success) {
-                spawnFurnitureElement({ ...item, x: "10px", y: "10px", color: "var(--user-color)" });
-                window.toggleMenu();
-            }
+            spawnFurnitureElement({ ...item, x: "20px", y: "20px" });
+            window.toggleMenu();
         };
-
-        async function checkAndPay(amount) {
-            const saldoRef = doc(db, "usuarios-saldos", userId);
-            const snap = await getDoc(saldoRef);
-            
-            if (snap.exists()) {
-                const currentNP = Number(snap.data().nexusPoints) || 0;
-                if (currentNP >= amount) {
-                    await updateDoc(saldoRef, { nexusPoints: currentNP - amount });
-                    return true;
-                }
-            }
-            alert("NP insuficiente na sua carteira!");
-            return false;
-        }
 
         function spawnFurnitureElement(data) {
             const el = document.createElement('div');
             el.className = `voxel ${data.shape}`;
             el.style.width = data.w + "px";
             el.style.height = data.h + "px";
-            el.style.left = data.x;
-            el.style.top = data.y;
+            el.style.left = data.x || "0px";
+            el.style.top = data.y || "0px";
             el.style.border = `1px solid var(--user-color)`;
+            el.style.boxShadow = `0 0 10px var(--user-color)`;
             el.innerText = data.name;
             makeDraggable(el);
             viewport.appendChild(el);
@@ -272,12 +245,14 @@
                     shape: Array.from(v.classList).find(c => c.startsWith('f-'))
                 });
             });
-            await updateDoc(doc(db, "usuarios", userId), {
-                apartment_voxels: voxels,
-                apt_w: parseInt(viewport.style.width),
-                apt_h: parseInt(viewport.style.height)
-            });
-            alert("Sistema Sincronizado!");
+            try {
+                await updateDoc(doc(db, "usuarios", userId), {
+                    apartment_voxels: voxels,
+                    apt_w: parseInt(viewport.style.width),
+                    apt_h: parseInt(viewport.style.height)
+                });
+                alert("Projeto Salvo!");
+            } catch (e) { alert("Erro ao salvar."); }
         };
 
         const list = document.getElementById('furniture-list');
@@ -285,8 +260,8 @@
             list.innerHTML += `
                 <div class="furniture-card">
                     <h5>${item.name}</h5>
-                    <p>${item.price} NP</p>
-                    <button class="buy-btn" onclick="window.buyFurniture('${item.id}')">ADQUIRIR</button>
+                    <p>GRÁTIS</p>
+                    <button class="buy-btn" onclick="window.buyFurniture('${item.id}')">ADICIONAR</button>
                 </div>`;
         });
 
