@@ -12,7 +12,7 @@
             --grid-size: 30px;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
         body {
             background: #000;
@@ -23,8 +23,6 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
         }
 
         #city-bg {
@@ -34,41 +32,55 @@
             z-index: 1;
         }
 
-        /* BOTÃO COMPRAS - MAIS VISÍVEL NO MOBILE */
-        #shop-toggle {
-            position: fixed;
-            top: 15px;
-            right: 15px;
+        /* HEADER FIXO */
+        header {
+            position: relative;
             z-index: 2000;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.8);
+            border-bottom: 1px solid #222;
+        }
+
+        .np-display {
+            font-family: 'Orbitron';
+            color: #ffcc00;
+            font-size: 14px;
+            text-shadow: 0 0 10px #ffcc0055;
+        }
+
+        #shop-toggle {
             background: var(--user-color);
             color: #000;
             border: none;
-            padding: 12px 20px;
+            padding: 8px 15px;
             font-family: 'Orbitron';
             font-weight: bold;
-            font-size: 14px;
+            font-size: 12px;
+            border-radius: 2px;
             cursor: pointer;
-            box-shadow: 0 0 15px var(--user-color);
-            border-radius: 4px;
+        }
+
+        /* VIEWPORT DO APARTAMENTO */
+        #main-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            padding: 10px;
         }
 
         #viewport {
             position: relative;
-            z-index: 10;
-            width: 95%;
+            width: 100%;
             max-width: 720px;
             aspect-ratio: 2 / 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .room-module {
-            position: relative;
-            width: 100%;
-            height: 100%;
             background: rgba(10, 10, 15, 0.95);
             border: 2px solid #333;
+            overflow: hidden;
             background-image: 
                 linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
@@ -90,105 +102,104 @@
             position: absolute;
             width: var(--grid-size);
             height: var(--grid-size);
-            border: 1px solid rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
             z-index: 50;
             touch-action: none;
         }
 
-        /* MENU LATERAL CORRIGIDO PARA MOBILE */
-        #ui-panel {
-            position: fixed;
-            top: 0; 
-            right: -300px; /* Escondido */
-            width: 280px; 
-            height: 100vh;
-            background: #080808;
-            border-left: 2px solid var(--user-color);
-            z-index: 3000;
-            padding: 80px 20px 20px;
-            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
-        }
-
-        #ui-panel.open { right: 0; }
-
-        .np-box {
-            font-family: 'Orbitron';
-            color: #ffcc00;
-            font-size: 18px;
-            text-align: center;
+        /* RODAPÉ COM BOTÕES DE SAIR E SALVAR */
+        footer {
+            position: relative;
+            z-index: 2000;
             padding: 15px;
-            background: #111;
-            border: 1px solid #ffcc0044;
-            margin-bottom: 10px;
-        }
-
-        .shop-item {
-            background: #111;
-            padding: 15px;
-            border: 1px solid #222;
             display: flex;
-            flex-direction: column;
             gap: 10px;
+            background: rgba(0,0,0,0.8);
+            border-top: 1px solid #222;
         }
 
-        .shop-item h4 { font-family: 'Orbitron'; font-size: 10px; color: var(--user-color); letter-spacing: 1px; }
-
-        .btn-buy, .save-btn, .exit-btn {
-            width: 100%;
-            padding: 14px;
+        .action-btn {
+            flex: 1;
+            padding: 12px;
             font-family: 'Orbitron';
             font-size: 11px;
             font-weight: bold;
-            cursor: pointer;
             border: none;
-            text-transform: uppercase;
+            cursor: pointer;
+            text-align: center;
         }
 
-        .btn-buy { background: transparent; border: 1px solid var(--user-color); color: var(--user-color); }
-        .save-btn { background: var(--user-color); color: #000; margin-top: auto; }
-        .exit-btn { background: #1a1a1a; color: #ff4444; border: 1px solid #333; margin-top: 5px; }
-        .close-btn { background: transparent; color: var(--user-color); border: 1px solid var(--user-color); margin-top: 5px; }
+        .btn-save { background: var(--user-color); color: #000; }
+        .btn-exit { background: #222; color: #fff; }
 
-        #color-pick { width: 100%; height: 40px; border: none; background: none; cursor: pointer; }
-
-        @media (max-width: 480px) {
-            #ui-panel { width: 85%; right: -100%; }
-            #ui-panel.open { right: 0; }
+        /* MENU DE COMPRAS (MODAL OVERLAY) */
+        #ui-panel {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.95);
+            z-index: 3000;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
         }
+
+        #ui-panel.open { display: flex; }
+
+        .shop-box {
+            width: 100%;
+            max-width: 300px;
+            background: #111;
+            border: 1px solid var(--user-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        #color-pick { width: 100%; height: 45px; border: none; background: none; cursor: pointer; }
+
+        .close-shop {
+            margin-top: 20px;
+            color: #fff;
+            text-decoration: underline;
+            font-family: 'Orbitron';
+            font-size: 12px;
+            cursor: pointer;
+        }
+
     </style>
 </head>
 <body>
 
     <div id="city-bg"></div>
 
-    <button id="shop-toggle" onclick="toggleMenu()">MENU</button>
+    <header>
+        <div class="np-display" id="balance">0 NP</div>
+        <button id="shop-toggle" onclick="toggleMenu()">COMPRAR BLOCO</button>
+    </header>
 
-    <div id="viewport">
-        <div id="apartment-grid" class="room-module">
+    <div id="main-container">
+        <div id="viewport">
             <div id="protagonist"></div>
         </div>
     </div>
 
+    <footer>
+        <button class="action-btn btn-exit" onclick="window.location.href='index.html'">SAIR</button>
+        <button class="action-btn btn-save" onclick="saveApartment()">SALVAR NEXUS</button>
+    </footer>
+
     <aside id="ui-panel">
-        <div class="np-box" id="balance">0 NP</div>
-
-        <div class="shop-item">
-            <h4>CONSTRUÇÃO</h4>
-            <button class="btn-buy" onclick="spawnVoxel()">COMPRAR BLOCO (100 NP)</button>
-        </div>
-
-        <div class="shop-item">
-            <h4>CUSTOMIZAÇÃO</h4>
+        <div class="shop-box">
+            <h4 style="font-family:'Orbitron'; color:var(--user-color); font-size: 12px;">LOJA DE BLOCOS</h4>
+            <button class="action-btn btn-save" onclick="spawnVoxel()">ADICIONAR (100 NP)</button>
+            
+            <h4 style="font-family:'Orbitron'; color:var(--user-color); font-size: 12px; margin-top: 10px;">COR DO BLOCO</h4>
             <input type="color" id="color-pick" value="#00f2ff">
         </div>
-
-        <button class="save-btn" onclick="saveApartment()">SALVAR NEXUS</button>
-        <button class="exit-btn" onclick="window.location.href='index.html'">SAIR</button>
-        <button class="close-btn" onclick="toggleMenu()">VOLTAR AO JOGO</button>
+        <div class="close-shop" onclick="toggleMenu()">FECHAR LOJA</div>
     </aside>
 
     <script type="module">
@@ -201,11 +212,10 @@
 
         let userNP = 10000;
         const gridSize = 30;
-        const mainGrid = document.getElementById('apartment-grid');
+        const viewport = document.getElementById('viewport');
 
         window.toggleMenu = () => {
-            const panel = document.getElementById('ui-panel');
-            panel.classList.toggle('open');
+            document.getElementById('ui-panel').classList.toggle('open');
         };
 
         function updateNP() {
@@ -221,12 +231,13 @@
             voxel.className = 'voxel';
             const color = document.getElementById('color-pick').value;
             voxel.style.backgroundColor = color;
-            voxel.style.boxShadow = `0 0 10px ${color}`;
+            voxel.style.boxShadow = `0 0 15px ${color}`;
             voxel.style.left = "0px";
             voxel.style.top = "0px";
 
             makeDraggable(voxel);
-            mainGrid.appendChild(voxel);
+            viewport.appendChild(voxel);
+            toggleMenu(); // Fecha após comprar
         };
 
         function makeDraggable(el) {
@@ -275,8 +286,8 @@
             try {
                 const userId = localStorage.getItem('userId') || "TEST_USER";
                 await updateDoc(doc(db, "usuarios", userId), { apartment_voxels: voxels, nexusPoints: userNP });
-                alert("Progresso Salvo!");
-            } catch (e) { alert("Erro ao salvar!"); }
+                alert("Sincronizado com o Nexus!");
+            } catch (e) { alert("Erro ao salvar."); }
         };
 
         updateNP();
