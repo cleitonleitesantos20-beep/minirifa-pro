@@ -57,7 +57,7 @@
             max-height: 75vh;
             background: var(--overlay-bg);
             border: 2px solid var(--neon-grey);
-            z-index: 10000; padding: 30px;
+            z-index: 10000; padding: 25px;
             display: none; flex-direction: column;
             backdrop-filter: blur(25px);
             opacity: 0; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -66,34 +66,34 @@
         #sector-menu.active { display: flex; opacity: 1; transform: translate(-50%, -50%) scale(1); border-color: var(--user-neon-color); }
 
         .menu-header { 
-            text-align: center; margin-bottom: 25px; 
+            text-align: center; margin-bottom: 15px; 
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-            padding: 10px 0;
+            padding: 8px 0;
         }
-        .menu-header h2 { font-family: 'Orbitron'; font-size: 1.4rem; letter-spacing: 5px; color: #fff; text-shadow: 0 0 10px var(--user-neon-color); }
+        .menu-header h2 { font-family: 'Orbitron'; font-size: 1.2rem; letter-spacing: 5px; color: #fff; text-shadow: 0 0 10px var(--user-neon-color); }
 
-        /* Grid de Edifícios */
+        /* Grid de Edifícios Menor e mais Compacto */
         #buildings-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-            gap: 25px; overflow-y: auto; padding: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); /* Reduzi de 110px para 90px */
+            gap: 12px; /* Reduzi de 25px para 12px */
+            overflow-y: auto; padding: 15px;
             scrollbar-width: none;
         }
 
-        /* O Edifício Neon Estilizado */
+        /* O Edifício Neon Estilizado (Menor) */
         .building-wrapper {
             position: relative;
-            height: 120px;
+            height: 90px; /* Reduzi de 120px para 90px */
             background: rgba(0,0,0,0.6);
-            border: 1px solid currentColor; /* O neon fica no edifício todo */
+            border: 1px solid currentColor;
             cursor: pointer;
             transition: 0.3s;
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
-            box-shadow: inset 0 0 15px currentColor; /* Brilho interno */
+            box-shadow: inset 0 0 10px currentColor;
         }
         
-        /* Efeito de Profundidade/Luz no topo */
         .building-wrapper::after {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
@@ -101,19 +101,20 @@
         }
 
         .building-wrapper:hover {
-            transform: scale(1.1) rotateX(10deg);
-            box-shadow: 0 0 25px currentColor, inset 0 0 20px currentColor;
+            transform: scale(1.05) translateY(-3px);
+            box-shadow: 0 0 20px currentColor, inset 0 0 15px currentColor;
             z-index: 2;
         }
 
         .building-name { 
-            font-family: 'Orbitron'; font-size: 10px; color: #fff; font-weight: bold; 
+            font-family: 'Orbitron'; font-size: 8px; color: #fff; font-weight: bold; /* Fonte menor */
             text-align: center; padding: 0 5px; z-index: 1;
+            text-transform: uppercase;
         }
         
         .building-tag {
-            font-size: 7px; margin-top: 8px; font-family: 'Orbitron';
-            background: currentColor; color: #000; padding: 2px 6px;
+            font-size: 6px; margin-top: 5px; font-family: 'Orbitron';
+            background: currentColor; color: #000; padding: 1px 4px;
             font-weight: 900; z-index: 1;
         }
 
@@ -137,8 +138,8 @@
         .btn-exit:hover { background: var(--user-neon-color); color: #000; box-shadow: 0 0 30px var(--user-neon-color); }
 
         .close-btn {
-            margin-top: 20px; background: none; border: 1px solid #222;
-            color: #444; padding: 10px; cursor: pointer; font-family: 'Orbitron'; font-size: 9px;
+            margin-top: 15px; background: none; border: 1px solid #222;
+            color: #444; padding: 8px; cursor: pointer; font-family: 'Orbitron'; font-size: 8px;
             letter-spacing: 2px; transition: 0.3s;
         }
         .close-btn:hover { border-color: #fff; color: #fff; }
@@ -199,7 +200,7 @@
 
             const cleanSigla = stateSigla.replace("BR_", "").toUpperCase();
             document.getElementById('sector-title').innerText = `${stateName.toUpperCase()}`;
-            buildingsGrid.innerHTML = '<p style="font-size:10px; grid-column:1/-1; text-align:center; color:#333;">SINCRONIZANDO DADOS DO SETOR...</p>';
+            buildingsGrid.innerHTML = '<p style="font-size:9px; grid-column:1/-1; text-align:center; color:#333;">SINCRONIZANDO SETOR...</p>';
             sectorMenu.classList.add('active');
 
             try {
@@ -260,5 +261,6 @@
             protagonist.style("opacity", "0");
         }));
     </script>
+    <script type="module" src="nexus-overlay.js"></script>
 </body>
 </html>
