@@ -21,124 +21,133 @@
             font-family: 'Rajdhani', sans-serif;
             overflow: hidden;
             height: 100vh; width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        /* Menu Lateral */
-        #sector-menu {
-            position: fixed; 
-            top: 15%; 
-            right: -330px;
-            width: 300px; 
-            height: 70vh; 
-            background: var(--overlay-bg);
-            border: 1px solid #333;
-            z-index: 9999;
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            padding: 20px;
-            display: flex; 
-            flex-direction: column;
-            box-shadow: -10px 0 30px rgba(0,0,0,0.8);
+        /* Fundo de Grade Dinâmico */
+        body::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: 
+                radial-gradient(circle at 50% 50%, rgba(0, 242, 255, 0.03) 0%, transparent 70%),
+                linear-gradient(var(--grid-color) 1px, transparent 1px) 0 0 / 50px 50px,
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px) 0 0 / 50px 50px;
+            z-index: 1; pointer-events: none;
         }
 
-        #sector-menu.active { transform: translateX(-330px); border-color: var(--user-neon-color); }
-
-        .menu-header { border-bottom: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 15px; padding-bottom: 10px; }
-        .menu-header h2 { font-family: 'Orbitron'; color: #fff; font-size: 0.9rem; letter-spacing: 1px; }
-
-        #buildings-grid {
-            display: grid; 
-            grid-template-columns: 1fr 1fr;
-            gap: 10px; 
-            overflow-y: auto; 
-            padding-right: 5px;
+        #map-container { 
+            position: absolute; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            z-index: 2; 
         }
 
-        /* Prédios */
-        .building-wrapper {
-            display: flex; flex-direction: column; align-items: center; gap: 6px;
-            padding: 10px; background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.05);
-            cursor: pointer; transition: 0.2s;
-        }
+        svg { width: 100%; height: 100%; display: block; }
 
-        .building-structure {
-            width: 45px; height: 45px; border: 2px solid;
-            display: flex; align-items: center; justify-content: center;
-            background: rgba(0,0,0,0.4);
-        }
-
-        .resident-diamond {
-            width: 12px; height: 12px;
-            background: currentColor;
-            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-        }
-
-        .building-name { 
-            font-family: 'Orbitron'; font-size: 7px; color: #fff; 
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: center;
-        }
-
-        .niche-label { font-size: 6px; font-family: 'Orbitron'; margin-top: 2px; opacity: 0.4; color: #fff; }
-
-        /* Mapa e Estados */
-        #map-container { position: relative; z-index: 10; width: 100vw; height: 100vh; background: #000; }
-        
+        /* Estados do Mapa */
         .state {
-            fill: #111111; /* Cinza bem escuro para diferenciar do fundo preto */
-            stroke: #333333; /* Borda visível */
-            stroke-width: 0.8px; 
-            transition: all 0.3s; 
+            fill: #0a0a0a;
+            stroke: #222;
+            stroke-width: 0.5px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
+            filter: drop-shadow(0 0 2px rgba(0,0,0,1));
         }
         
-        .state:hover { 
-            fill: #1a1a1a; 
-            stroke: #666; 
+        .state:hover {
+            fill: #151515;
+            stroke: var(--user-neon-color);
+            stroke-width: 1px;
+            filter: drop-shadow(0 0 8px var(--user-neon-color));
         }
 
-        /* Estilo para quando clicar no estado */
         .state.selected {
-            fill: rgba(0, 242, 255, 0.1);
+            fill: rgba(0, 242, 255, 0.15);
             stroke: var(--user-neon-color);
-            stroke-width: 1.5px;
+            stroke-width: 2px;
+            filter: drop-shadow(0 0 15px var(--user-neon-color));
         }
         
         .state-sigla {
-            fill: #ffffff; 
+            fill: #fff;
             font-family: 'Orbitron';
-            font-size: 10px; 
-            pointer-events: none; 
+            font-size: 11px;
+            font-weight: bold;
+            pointer-events: none;
             text-anchor: middle;
-            opacity: 0.3;
+            opacity: 0.4;
+            text-shadow: 0 0 5px #000;
         }
 
+        /* Protagonista (Losango) */
         #protagonist {
-            position: absolute; width: 18px; height: 18px;
+            position: absolute; width: 20px; height: 20px;
             background: var(--user-neon-color);
             clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-            filter: drop-shadow(0 0 10px var(--user-neon-color));
+            filter: drop-shadow(0 0 12px var(--user-neon-color));
             pointer-events: none; opacity: 0; z-index: 100;
+            transition: left 0.2s ease-out, top 0.2s ease-out, opacity 0.3s;
         }
 
-        .btn-exit {
-            position: fixed; top: 20px; left: 20px;
-            padding: 8px 15px; border: 1px solid #444;
-            color: #fff; text-decoration: none; font-family: 'Orbitron'; font-size: 9px;
-            background: rgba(0,0,0,0.8); z-index: 1000;
+        /* Menu Lateral Scanner */
+        #sector-menu {
+            position: fixed; top: 10%; right: -350px;
+            width: 320px; height: 80vh; 
+            background: var(--overlay-bg);
+            border-left: 2px solid var(--user-neon-color);
+            z-index: 10000;
+            transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            padding: 25px;
+            display: flex; flex-direction: column;
+            backdrop-filter: blur(10px);
         }
+        #sector-menu.active { transform: translateX(-350px); }
+
+        .menu-header h2 { font-family: 'Orbitron'; color: var(--user-neon-color); font-size: 1rem; margin-bottom: 5px; }
+        
+        #buildings-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 15px; overflow-y: auto; margin-top: 20px; padding-bottom: 20px;
+        }
+
+        .building-wrapper {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 12px; cursor: pointer; text-align: center;
+            transition: 0.3s;
+        }
+        .building-wrapper:hover { background: rgba(255,255,255,0.08); border-color: var(--user-neon-color); }
+
+        .building-structure {
+            width: 40px; height: 40px; margin: 8px auto; border: 1px solid;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* Botão Voltar - Z-index alto para não sumir */
+        .btn-exit {
+            position: fixed; top: 30px; left: 30px;
+            padding: 10px 20px; border: 1px solid var(--user-neon-color);
+            color: var(--user-neon-color); text-decoration: none; 
+            font-family: 'Orbitron'; font-size: 10px; font-weight: bold;
+            background: rgba(0,0,0,0.8); z-index: 20000;
+            letter-spacing: 2px; transition: 0.3s;
+        }
+        .btn-exit:hover { background: var(--user-neon-color); color: #000; box-shadow: 0 0 20px var(--user-neon-color); }
+
     </style>
 </head>
 <body>
 
-    <a href="index.html" class="btn-exit">VOLTAR</a>
+    <a href="dashboard.html" class="btn-exit">◄ VOLTAR</a>
 
     <div id="sector-menu">
         <div class="menu-header">
             <h2 id="sector-title">SETOR: --</h2>
-            <p id="connection-count" style="font-size: 7px; opacity: 0.5; margin-top: 4px;">SCANNER ATIVO</p>
+            <p id="connection-count" style="font-size: 9px; opacity: 0.6; font-family: 'Orbitron';">ESTABELECENDO CONEXÃO...</p>
         </div>
         <div id="buildings-grid"></div>
-        <button style="margin-top:auto; font-size:10px; background:none; border:1px solid #444; color:#fff; padding:10px; cursor:pointer; font-family:'Orbitron';" onclick="closeMenu()">DESCONECTAR</button>
+        <button style="margin-top:auto; background:none; border:1px solid #444; color:#666; padding:12px; cursor:pointer; font-family:'Orbitron'; font-size:9px;" onclick="closeMenu()">DESCONECTAR SCANNER</button>
     </div>
     
     <div id="map-container">
@@ -178,44 +187,39 @@
         document.documentElement.style.setProperty('--user-neon-color', userColor);
 
         window.openSector = async (stateName, stateSigla, element) => {
-            // Remove seleção anterior
             d3.selectAll(".state").classed("selected", false);
-            // Destaca o estado clicado
             d3.select(element).classed("selected", true);
 
             const cleanSigla = stateSigla.replace("BR_", "").toUpperCase();
             document.getElementById('sector-title').innerText = `SETOR: ${stateName}`;
-            buildingsGrid.innerHTML = '<p style="font-size:8px; grid-column:1/-1;">SCAN...</p>';
+            buildingsGrid.innerHTML = '<p style="font-size:9px; grid-column:1/-1;">SCANNING...</p>';
             sectorMenu.classList.add('active');
 
             try {
                 const q = query(collection(db, "usuarios"), where("estado", "==", cleanSigla));
                 const querySnapshot = await getDocs(q);
                 buildingsGrid.innerHTML = '';
-                document.getElementById('connection-count').innerText = `${querySnapshot.size} HABITATS`;
+                document.getElementById('connection-count').innerText = `${querySnapshot.size} HABITATS ENCONTRADOS`;
 
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
                     const isCitizen = data.role === 'citizen' || !data.role;
-                    const residentColor = isCitizen ? "#555555" : (data.userNeonColor || userColor);
+                    const resColor = isCitizen ? "#555" : (data.userNeonColor || userColor);
                     const config = nicheAssets[data.role] || nicheAssets.citizen;
 
                     const wrapper = document.createElement('div');
                     wrapper.className = 'building-wrapper';
                     wrapper.onclick = () => window.location.href = `perfil.html?id=${doc.id}`;
-
                     wrapper.innerHTML = `
-                        <div class="building-name" style="color: ${residentColor}">${(data.nome || 'NEXUS').toUpperCase()}</div>
-                        <div class="building-structure" style="border-color: ${residentColor}; color: ${residentColor};">
-                            <div class="resident-diamond"></div>
+                        <div style="font-size:8px; color:${resColor}; font-family:'Orbitron'; font-weight:bold;">${(data.nome || 'NEXUS').toUpperCase()}</div>
+                        <div class="building-structure" style="border-color:${resColor}; color:${resColor}; box-shadow: inset 0 0 10px ${resColor}44">
+                            <div style="width:10px; height:10px; background:currentColor; clip-path:polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)"></div>
                         </div>
-                        <div class="niche-label">${config.label}</div>
+                        <div style="font-size:6px; opacity:0.5; font-family:'Orbitron';">${config.label}</div>
                     `;
                     buildingsGrid.appendChild(wrapper);
                 });
-            } catch (error) {
-                buildingsGrid.innerHTML = '<p style="font-size:8px; color:red;">FAIL</p>';
-            }
+            } catch (e) { console.error(e); }
         };
 
         window.closeMenu = () => {
@@ -226,32 +230,27 @@
         const svg = d3.select("#brazil-map");
         const mapGroup = svg.select("#map-group");
         
-        const projection = d3.geoMercator().center([-52, -15]).scale(1000)
+        // Escala aumentada para o mapa ficar grande na tela
+        const projection = d3.geoMercator().center([-52, -15]).scale(1300)
             .translate([window.innerWidth / 2, window.innerHeight / 2]);
         const pathGenerator = d3.geoPath().projection(projection);
 
         d3.json("https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson").then(data => {
             mapGroup.selectAll("path").data(data.features).join("path")
-                .attr("class", "state")
-                .attr("d", pathGenerator)
+                .attr("class", "state").attr("d", pathGenerator)
                 .on("mouseenter", (event, d) => {
                     const [x, y] = pathGenerator.centroid(d);
                     const t = d3.zoomTransform(svg.node());
                     protagonist.style("opacity", "1")
-                        .style("left", `${t.applyX(x) - 9}px`)
-                        .style("top", `${t.applyY(y) - 9}px`);
+                        .style("left", `${t.applyX(x) - 10}px`)
+                        .style("top", `${t.applyY(y) - 10}px`);
                 })
                 .on("mouseleave", () => protagonist.style("opacity", "0"))
-                .on("click", function(event, d) {
-                    const sigla = d.properties.sigla || d.id; 
-                    openSector(d.properties.name, sigla, this);
-                });
+                .on("click", function(e, d) { openSector(d.properties.name, d.properties.sigla || d.id, this); });
 
             mapGroup.selectAll("text").data(data.features).join("text")
-                .attr("class", "state-sigla")
-                .attr("transform", d => `translate(${pathGenerator.centroid(d)})`)
-                .attr("dy", "0.35em")
-                .text(d => (d.properties.sigla || d.id).replace("BR_", ""));
+                .attr("class", "state-sigla").attr("transform", d => `translate(${pathGenerator.centroid(d)})`)
+                .attr("dy", ".35em").text(d => (d.properties.sigla || d.id).replace("BR_", ""));
         });
 
         svg.call(d3.zoom().scaleExtent([1, 15]).on("zoom", (e) => {
