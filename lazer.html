@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexusVL - Ultra Metropolis</title>
+    <title>NexusVL - Strategic Map</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --user-neon-color: #00f2ff;
-            --bg-dark: #010206;
-            --road-color: #05070a;
-            --line-color: rgba(0, 242, 255, 0.03);
+            --bg-void: #000205;
+            --road-dark: #050505;
+            --road-glow: rgba(0, 242, 255, 0.15);
+            --building-decor: #0d1117;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         
         body {
             background-color: #000;
@@ -24,115 +25,114 @@
             cursor: grab;
         }
 
-        body:active { cursor: grabbing; }
-
         #viewport {
             width: 100vw; height: 100vh;
             position: relative;
             overflow: hidden;
-            background: radial-gradient(circle at center, #0a1018 0%, #000 100%);
+            background: #000;
         }
 
-        /* MAPA ORBITAL - 8000px */
+        /* MAPA DE ALTA ESCALA - 8000px */
         #city-map {
             position: absolute;
             width: 8000px; 
             height: 8000px;
-            background-color: var(--bg-dark);
+            background-color: var(--bg-void);
             background-image: 
-                linear-gradient(var(--line-color) 2px, transparent 2px),
-                linear-gradient(90deg, var(--line-color) 2px, transparent 2px);
-            background-size: 200px 200px;
+                linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px);
+            background-size: 100px 100px;
             transform-origin: 0 0;
             will-change: transform;
         }
 
-        /* AVENIDAS ILUMINADAS */
+        /* AVENIDAS (Atrás de tudo, pretas com borda brilhante) */
         .street-h, .street-v {
             position: absolute;
-            background: var(--road-color);
-            box-shadow: 0 0 100px rgba(0, 242, 255, 0.05);
+            background: var(--road-dark);
             z-index: 1;
+            border: 2px solid var(--road-glow);
         }
-        .street-h { width: 100%; height: 160px; }
-        .street-v { height: 100%; width: 160px; }
+        .street-h { width: 100%; height: 200px; }
+        .street-v { height: 100%; width: 200px; }
 
-        /* PRÉDIOS INTERATIVOS (NÉON FORTE) */
+        /* PRÉDIOS INTERATIVOS (Destaque Máximo) */
         .block {
             position: absolute;
             background: #000;
-            border: 4px solid var(--neon-color);
+            border: 8px solid var(--neon-color);
             display: flex; align-items: center; justify-content: center;
-            z-index: 10;
-            box-shadow: 0 0 80px var(--neon-color), inset 0 0 30px var(--neon-color);
+            z-index: 10; /* Sempre no topo */
+            box-shadow: 0 0 100px rgba(0,0,0,1), 0 0 40px var(--neon-color);
         }
 
-        /* PRÉDIOS DECORATIVOS COM NÉON (SEED FIXA) */
+        /* PRÉDIOS DECORATIVOS (Sóbrios para dar profundidade) */
         .decor {
             position: absolute;
-            background: #05070a;
-            border: 1px solid rgba(255,255,255,0.1);
-            z-index: 2;
-            box-shadow: 0 0 15px rgba(0, 242, 255, 0.1);
+            background: var(--building-decor);
+            border: 1px solid rgba(255,255,255,0.05);
+            z-index: 5;
         }
-
-        /* Detalhes de janelas néon nos prédios decorativos */
         .decor::after {
             content: ''; position: absolute; width: 100%; height: 100%;
-            background-image: radial-gradient(var(--user-neon-color) 1px, transparent 1px);
-            background-size: 15px 15px;
-            opacity: 0.15;
+            background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
         }
 
         .district-node {
-            padding: 30px 60px;
+            padding: 40px;
             text-decoration: none;
             color: #fff;
             font-family: 'Orbitron';
-            font-size: 50px; /* Aumentado para a visão orbital */
+            font-size: 70px; /* Grande para leitura orbital */
             font-weight: bold;
             text-align: center;
-            text-shadow: 0 0 20px #fff;
-            white-space: nowrap;
+            text-shadow: 0 0 30px var(--neon-color);
         }
 
-        /* POSIÇÕES ESTRATÉGICAS (Seed Fixa) */
-        .pos-cafeteria { top: 1200px; left: 1200px; width: 800px; height: 500px; }
-        .pos-cinema    { top: 1200px; left: 5500px; width: 900px; height: 600px; }
-        .pos-centro    { top: 3500px; left: 3400px; width: 1200px; height: 1000px; border-width: 8px; }
-        .pos-bar       { top: 6200px; left: 1500px; width: 800px; height: 500px; }
-        .pos-livraria  { top: 6200px; left: 5800px; width: 850px; height: 550px; }
-        .pos-parque    { top: 3500px; left: 800px; width: 1000px; height: 1500px; background: #010801; border-color: #00ff88; }
+        /* CONFIGURAÇÃO DA SEED (Nenhum prédio toca nas ruas em 3000px e 6000px) */
+        /* RUAS CENTRAIS */
+        .r-h1 { top: 2900px; }
+        .r-h2 { top: 5900px; }
+        .r-v1 { left: 2900px; }
+        .r-v2 { left: 5900px; }
 
-        /* UI */
+        /* POSIÇÕES DOS PRÉDIOS (Ajustadas para os vãos entre ruas) */
+        .pos-cafeteria { top: 1000px; left: 1000px; width: 1000px; height: 600px; }
+        .pos-cinema    { top: 1000px; left: 6500px; width: 1100px; height: 700px; }
+        .pos-centro    { top: 4000px; left: 4000px; width: 1500px; height: 1200px; border-width: 15px; }
+        .pos-bar       { top: 7000px; left: 1000px; width: 1000px; height: 600px; }
+        .pos-livraria  { top: 7000px; left: 6500px; width: 1100px; height: 700px; }
+        .pos-parque    { top: 3500px; left: 500px; width: 1200px; height: 2000px; background: #020a02; border-color: #00ff88; }
+
+        /* UI FIXA */
         .ui-fixed { position: fixed; width: 100%; z-index: 1000; pointer-events: none; }
-        .social-header { top: 40px; text-align: center; }
+        .social-header { top: 30px; text-align: center; }
         .social-header h1 { 
-            font-family: 'Orbitron'; letter-spacing: 30px; 
-            text-shadow: 0 0 30px var(--user-neon-color); font-size: 2.5rem; 
+            font-family: 'Orbitron'; letter-spacing: 20px; 
+            text-shadow: 0 0 20px var(--user-neon-color); font-size: 1.8rem; 
         }
         
         .btn-exit {
-            position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
-            padding: 20px 80px; border: 2px solid var(--user-neon-color);
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            padding: 20px 60px; border: 2px solid var(--user-neon-color);
             color: var(--user-neon-color); text-decoration: none; font-family: 'Orbitron';
-            background: #000; z-index: 1000; pointer-events: auto; font-size: 1.2rem;
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
+            background: #000; z-index: 1000; pointer-events: auto;
         }
     </style>
 </head>
 <body>
 
     <div class="ui-fixed social-header">
-        <h1>NEXUS ORBITAL</h1>
+        <h1>NEXUS STRATEGIC MAP</h1>
     </div>
 
     <div id="viewport">
         <div id="city-map">
-            <div class="street-h" style="top: 2500px;"></div>
-            <div class="street-h" style="top: 5500px;"></div>
-            <div class="street-v" style="left: 2500px;"></div>
-            <div class="street-v" style="left: 5500px;"></div>
+            <div class="street-h r-h1"></div>
+            <div class="street-h r-h2"></div>
+            <div class="street-v r-v1"></div>
+            <div class="street-v r-v2"></div>
 
             <div class="block pos-cafeteria"><a href="cafeteria.html" class="district-node" style="--neon-color: #ff00ff;">CAFETERIA</a></div>
             <div class="block pos-cinema"><a href="cinema.html" class="district-node" style="--neon-color: #ffcc00;">CINEMA</a></div>
@@ -141,28 +141,22 @@
             <div class="block pos-livraria"><a href="livraria.html" class="district-node" style="--neon-color: #bd00ff;">LIVRARIA</a></div>
             <div class="block pos-parque"><a href="parque.html" class="district-node" style="--neon-color: #00ff88;">PARQUE</a></div>
 
-            <div class="decor" style="top: 200px; left: 200px; width: 600px; height: 600px;"></div>
-            <div class="decor" style="top: 1500px; left: 300px; width: 400px; height: 400px;"></div>
-            <div class="decor" style="top: 400px; left: 1500px; width: 500px; height: 300px;"></div>
-            <div class="decor" style="top: 300px; left: 4000px; width: 800px; height: 400px;"></div>
-            <div class="decor" style="top: 1200px; left: 7000px; width: 500px; height: 800px;"></div>
-            <div class="decor" style="top: 3000px; left: 6000px; width: 600px; height: 300px;"></div>
-            <div class="decor" style="top: 6000px; left: 400px; width: 500px; height: 1000px;"></div>
-            <div class="decor" style="top: 7200px; left: 2000px; width: 800px; height: 400px;"></div>
-            <div class="decor" style="top: 6000px; left: 4000px; width: 1000px; height: 800px;"></div>
-            <div class="decor" style="top: 7000px; left: 6500px; width: 600px; height: 600px;"></div>
-            <div class="decor" style="top: 4500px; left: 7200px; width: 300px; height: 900px;"></div>
+            <div class="decor" style="top: 500px; left: 3500px; width: 800px; height: 800px;"></div>
+            <div class="decor" style="top: 4000px; left: 2000px; width: 600px; height: 900px;"></div>
+            <div class="decor" style="top: 7000px; left: 4000px; width: 1200px; height: 500px;"></div>
+            <div class="decor" style="top: 2000px; left: 6500px; width: 700px; height: 700px;"></div>
+            <div class="decor" style="top: 5000px; left: 7000px; width: 500px; height: 500px;"></div>
+            <div class="decor" style="top: 1500px; left: 500px; width: 400px; height: 800px;"></div>
         </div>
     </div>
 
-    <a href="index.html" class="btn-exit">SAIR DO MAPA</a>
+    <a href="index.html" class="btn-exit">VOLTAR</a>
 
     <script type="module">
         const cityMap = document.getElementById('city-map');
-        const zoomScale = 0.12; // VISÃO MUITO MAIS DISTANTE (ORBITAL)
+        const zoomScale = 0.08; // Visão de Satélite Extrema
         const mapSize = 8000;
 
-        // Centraliza no Centro da Cidade ao carregar
         let currentX = window.innerWidth / 2 - (4000 * zoomScale);
         let currentY = window.innerHeight / 2 - (4000 * zoomScale);
         let isDragging = false;
@@ -171,13 +165,10 @@
         function updateTransform() {
             const minX = window.innerWidth - (mapSize * zoomScale);
             const minY = window.innerHeight - (mapSize * zoomScale);
-            
-            // Limites de borda para não sair do mapa
             if (currentX > 0) currentX = 0;
             if (currentY > 0) currentY = 0;
             if (currentX < minX) currentX = minX;
             if (currentY < minY) currentY = minY;
-
             cityMap.style.transform = `translate(${currentX}px, ${currentY}px) scale(${zoomScale})`;
         }
 
