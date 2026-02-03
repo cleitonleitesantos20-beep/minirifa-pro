@@ -9,7 +9,7 @@
     <style>
         :root {
             --user-neon-color: #00f2ff;
-            --neon-grey: #333; /* Cinza mais discreto para performance */
+            --neon-grey: #333;
             --bg-dark: #000000;
         }
 
@@ -22,10 +22,28 @@
             height: 100vh; width: 100vw;
         }
 
+        /* BOTÃO VOLTAR - GARANTIDO NO TOPO */
+        .btn-exit {
+            position: fixed; 
+            top: 20px; 
+            left: 20px;
+            padding: 10px 25px; 
+            border: 1px solid var(--user-neon-color);
+            color: #fff; 
+            text-decoration: none; 
+            font-family: 'Orbitron'; 
+            font-size: 10px;
+            background: rgba(0,0,0,0.8); 
+            z-index: 99999;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: 0.3s;
+        }
+        .btn-exit:hover { background: var(--user-neon-color); color: #000; }
+
         #map-container { position: absolute; width: 100%; height: 100%; z-index: 2; overflow: hidden; background: radial-gradient(circle, #050505 0%, #000 100%); }
         svg { width: 100%; height: 100%; shape-rendering: geometricPrecision; }
 
-        /* ESTADOS OTIMIZADOS */
         .state {
             fill: #080808; 
             stroke: #222; 
@@ -51,7 +69,6 @@
             pointer-events: none; text-anchor: middle; font-weight: bold;
         }
 
-        /* MENU DE SETORES - MAIS LEVE */
         #sector-menu {
             position: fixed; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
@@ -82,14 +99,6 @@
 
         .building-name { font-family: 'Orbitron'; font-size: 7px; color: #fff; margin-bottom: 4px; }
         .building-tag { font-size: 5px; font-family: 'Orbitron'; text-transform: uppercase; opacity: 0.8; }
-
-        .btn-exit {
-            position: fixed; top: 20px; left: 20px;
-            padding: 8px 20px; border: 1px solid #333;
-            color: #888; text-decoration: none; 
-            font-family: 'Orbitron'; font-size: 10px;
-            background: rgba(0,0,0,0.5); z-index: 1000;
-        }
     </style>
 </head>
 <body>
@@ -174,36 +183,19 @@
 
         const svg = d3.select("#brazil-map");
         const mapGroup = svg.select("#map-group");
-        
-        // Projeção ajustada para ser mais central e leve
-        const projection = d3.geoMercator()
-            .center([-52, -15])
-            .scale(700) // Escala inicial menor para carregar rápido
-            .translate([window.innerWidth / 2, window.innerHeight / 2]);
-
+        const projection = d3.geoMercator().center([-52, -15]).scale(700).translate([window.innerWidth / 2, window.innerHeight / 2]);
         const pathGenerator = d3.geoPath().projection(projection);
 
-        // GeoJSON simplificado (raw)
         d3.json("https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson").then(data => {
-            mapGroup.selectAll("path")
-                .data(data.features)
-                .join("path")
-                .attr("class", "state")
-                .attr("d", pathGenerator)
-                .on("click", function(e, d) { 
-                    openSector(d.properties.name, d.properties.sigla || d.id, this); 
-                });
+            mapGroup.selectAll("path").data(data.features).join("path")
+                .attr("class", "state").attr("d", pathGenerator)
+                .on("click", function(e, d) { openSector(d.properties.name, d.properties.sigla || d.id, this); });
 
-            mapGroup.selectAll("text")
-                .data(data.features)
-                .join("text")
-                .attr("class", "state-sigla")
-                .attr("transform", d => `translate(${pathGenerator.centroid(d)})`)
-                .attr("dy", ".35em")
-                .text(d => (d.properties.sigla || d.id).replace("BR_", ""));
+            mapGroup.selectAll("text").data(data.features).join("text")
+                .attr("class", "state-sigla").attr("transform", d => `translate(${pathGenerator.centroid(d)})`)
+                .attr("dy", ".35em").text(d => (d.properties.sigla || d.id).replace("BR_", ""));
         });
 
-        // Zoom ultra suave
         svg.call(d3.zoom().scaleExtent([0.8, 8]).on("zoom", (e) => {
             mapGroup.attr("transform", e.transform);
         }));
