@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NexusVL - Social District</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --user-neon-color: #00f2ff;
+            --bg-dark: #020202;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: var(--bg-dark);
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            overflow: hidden;
+            height: 100vh; width: 100vw;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        /* FUNDO DA CIDADE */
+        #city-map {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background: 
+                linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
+                repeating-linear-gradient(0deg, transparent 0, transparent 49px, rgba(0, 242, 255, 0.05) 50px),
+                repeating-linear-gradient(90deg, transparent 0, transparent 49px, rgba(0, 242, 255, 0.05) 50px);
+            background-size: 100% 100%, 50px 50px, 50px 50px;
+            overflow: hidden;
+        }
+
+        /* ELEMENTOS DECORATIVOS DA CIDADE */
+        .building-block {
+            position: absolute;
+            background: #080808;
+            border: 1px solid #1a1a1a;
+            box-shadow: inset 0 0 15px rgba(0,0,0,1);
+        }
+
+        /* BOTÕES DE DISTRITO */
+        .district-node {
+            position: absolute;
+            width: 120px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.8);
+            border: 1px solid var(--user-neon-color);
+            color: #fff;
+            text-decoration: none;
+            font-family: 'Orbitron';
+            font-size: 10px;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 10;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+        }
+
+        .district-node::before {
+            content: '';
+            position: absolute;
+            width: 100%; height: 100%;
+            background: var(--user-neon-color);
+            opacity: 0.1;
+            transition: 0.3s;
+        }
+
+        .district-node:hover {
+            transform: scale(1.1) translateY(-5px);
+            box-shadow: 0 0 20px var(--user-neon-color);
+            background: var(--user-neon-color);
+            color: #000;
+        }
+
+        /* POSICIONAMENTO DOS BOTÕES */
+        .cafeteria { top: 20%; left: 15%; border-color: #ff00ff; --user-neon-color: #ff00ff; }
+        .cinema { top: 15%; left: 65%; border-color: #ffcc00; --user-neon-color: #ffcc00; }
+        .bar { top: 50%; left: 45%; border-color: #ff0044; --user-neon-color: #ff0044; }
+        .parque { top: 75%; left: 10%; border-color: #00ff88; --user-neon-color: #00ff88; }
+        .cidade { top: 45%; left: 80%; border-color: #00f2ff; --user-neon-color: #00f2ff; }
+        .livraria { top: 80%; left: 60%; border-color: #bd00ff; --user-neon-color: #bd00ff; }
+
+        /* HEADER */
+        .social-header {
+            position: fixed; top: 30px; width: 100%;
+            text-align: center; z-index: 100;
+            pointer-events: none;
+        }
+        .social-header h1 {
+            font-family: 'Orbitron'; font-size: 1.5rem;
+            letter-spacing: 8px; text-shadow: 0 0 10px var(--user-neon-color);
+        }
+
+        /* BOTÃO VOLTAR */
+        .btn-exit {
+            position: fixed; bottom: 30px; left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 40px; border: 1px solid #333;
+            color: #666; text-decoration: none; 
+            font-family: 'Orbitron'; font-size: 11px;
+            background: rgba(0,0,0,0.9); z-index: 99999;
+            transition: 0.3s;
+        }
+        .btn-exit:hover { border-color: #fff; color: #fff; }
+
+        /* ANIMAÇÃO DE SCANNER */
+        .scanner-line {
+            position: absolute; width: 100%; height: 2px;
+            background: rgba(0, 242, 255, 0.2);
+            top: 0; left: 0; animation: scan 4s linear infinite;
+            z-index: 5;
+        }
+
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="social-header">
+        <h1>SOCIAL DISTRICT</h1>
+        <p style="font-size: 10px; opacity: 0.5; letter-spacing: 4px;">CONECTANDO UNIDADES VIRTUAIS</p>
+    </div>
+
+    <div id="city-map">
+        <div class="scanner-line"></div>
+        
+        <div class="building-block" style="width: 200px; height: 150px; top: 10%; left: 5%;"></div>
+        <div class="building-block" style="width: 100px; height: 100px; top: 40%; left: 60%;"></div>
+        <div class="building-block" style="width: 300px; height: 80px; bottom: 15%; right: 5%;"></div>
+
+        <a href="cafeteria.html" class="district-node cafeteria">CAFETERIA</a>
+        <a href="cinema.html" class="district-node cinema">CINEMA</a>
+        <a href="bar.html" class="district-node bar">BAR</a>
+        <a href="parque.html" class="district-node parque">PARQUE</a>
+        <a href="cidade.html" class="district-node cidade">CIDADE</a>
+        <a href="livraria.html" class="district-node livraria">LIVRARIA</a>
+    </div>
+
+    <a href="index.html" class="btn-exit">RETORNAR AO DASHBOARD</a>
+
+    <script type="module">
+        // Recupera a cor neon do usuário
+        const userColor = localStorage.getItem('userNeonColor') || '#00f2ff';
+        document.documentElement.style.setProperty('--user-neon-color', userColor);
+
+        // Pequeno efeito de movimento no fundo com o mouse
+        const map = document.getElementById('city-map');
+        window.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth) * 20;
+            const y = (e.clientY / window.innerHeight) * 20;
+            map.style.backgroundPosition = `${x}px ${y}px`;
+        });
+    </script>
+    <script type="module" src="nexus-overlay.js"></script>
+</body>
+</html>
