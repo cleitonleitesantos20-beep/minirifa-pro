@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusVL - Lazer Integrado</title>
+    <title>NexusVL - Lazer</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --neon-blue: #00f2ff;
-            --neon-purple: #bc13fe;
+            --neon-cyan: #00f2ff;
+            --neon-pink: #ff00ff;
         }
 
         body, html {
@@ -19,119 +19,117 @@
             font-family: 'Rajdhani', sans-serif;
         }
 
-        /* Container da Imagem de Fundo */
+        /* CONTAINER DA IMAGEM CORRIGIDO */
         .city-view {
             position: relative;
             width: 100vw; height: 100vh;
-            background: url('SUA_IMAGEM_AQUI.jpg') no-repeat center center;
+            background: url('https://i.postimg.cc/HsYpr1wD/038bc4f0-a03b-4936-9baa-bb106f38602c.jpg') no-repeat center center;
             background-size: cover;
             display: flex;
             align-items: center; justify-content: center;
         }
 
-        /* Pontos de Interação (Hotspots) */
-        .hotspot {
-            position: absolute;
-            width: 40px; height: 40px;
-            cursor: pointer;
-            z-index: 10;
-        }
-
-        /* Efeito de Brilho no Ponto */
-        .hotspot::before {
+        /* Camada de escurecimento leve para destacar os pontos */
+        .city-view::before {
             content: '';
             position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 15px; height: 15px;
-            background: var(--neon-blue);
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.2);
+            pointer-events: none;
+        }
+
+        /* Pontos de Interação */
+        .hotspot {
+            position: absolute;
+            width: 50px; height: 50px;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center; justify-content: center;
+        }
+
+        /* Círculo pulsante visual para indicar interatividade */
+        .hotspot::after {
+            content: '';
+            width: 20px; height: 20px;
+            border: 2px solid var(--neon-cyan);
             border-radius: 50%;
-            box-shadow: 0 0 15px var(--neon-blue), 0 0 30px var(--neon-blue);
+            box-shadow: 0 0 15px var(--neon-cyan);
             animation: pulse 2s infinite;
         }
 
         @keyframes pulse {
-            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(2.5); opacity: 0; }
         }
 
-        /* Tooltip (Legenda ao passar o mouse) */
+        /* Legenda Flutuante */
         .tooltip {
             position: absolute;
-            bottom: 50px; left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.85);
-            border: 1px solid var(--neon-blue);
+            bottom: 60px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid var(--neon-cyan);
             color: #fff;
-            padding: 8px 15px;
-            border-radius: 4px;
+            padding: 8px 16px;
+            border-radius: 2px;
             font-family: 'Orbitron';
             font-size: 12px;
             white-space: nowrap;
             opacity: 0;
             pointer-events: none;
             transition: 0.3s;
-            text-transform: uppercase;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+            letter-spacing: 1px;
         }
 
         .hotspot:hover .tooltip {
             opacity: 1;
-            bottom: 60px;
+            bottom: 70px;
         }
 
-        /* Posicionamento dos pontos baseados na sua imagem */
-        /* Estes valores de % devem ser ajustados para casar com os pontos da imagem */
-        #ponto-cinema { top: 40%; left: 15%; }
-        #ponto-park   { top: 52%; left: 30%; }
-        #ponto-tower  { top: 35%; left: 50%; }
-        #ponto-cafe   { top: 45%; left: 78%; }
+        /* AJUSTE FINO DAS POSIÇÕES NA IMAGEM */
+        #ponto-tower  { top: 35%; left: 50%; width: 80px; height: 120px; } /* Prédio Central */
+        #ponto-cafe   { top: 38%; left: 81%; }  /* Ícone Rosa Direita */
+        #ponto-cinema { top: 48%; left: 11%; }  /* Ícone Esquerda */
+        #ponto-park   { top: 43%; left: 59%; }  /* Ícone Central-Direita */
 
-        .btn-back {
-            position: fixed; bottom: 30px; left: 30px;
-            padding: 10px 25px;
-            background: rgba(0,0,0,0.7);
-            border: 1px solid var(--neon-blue);
-            color: var(--neon-blue);
-            text-decoration: none;
-            font-family: 'Orbitron';
-            font-size: 0.8rem;
+        .btn-exit {
+            position: fixed; top: 30px; left: 30px;
+            padding: 10px 20px; border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan); text-decoration: none; font-family: 'Orbitron';
+            background: rgba(0,0,0,0.8); z-index: 1000; font-size: 0.7rem;
             transition: 0.3s;
         }
 
-        .btn-back:hover { background: var(--neon-blue); color: #000; }
+        .btn-exit:hover {
+            background: var(--neon-cyan);
+            color: #000;
+        }
     </style>
 </head>
 <body>
 
     <div class="city-view">
-        <a href="cinema.html" class="hotspot" id="ponto-cinema">
-            <div class="tooltip">Nexus Cinema - Filmes & VR</div>
-        </a>
-
-        <a href="park.html" class="hotspot" id="ponto-park">
-            <div class="tooltip">Central Park - Área Verde</div>
-        </a>
-
         <a href="dashboard.html" class="hotspot" id="ponto-tower">
-            <div class="tooltip">Nexus Tower - Matriz</div>
+            <div class="tooltip">NEXUS TOWER - HQ</div>
         </a>
 
         <a href="cafeteria.html" class="hotspot" id="ponto-cafe">
-            <div class="tooltip">Cyber Café - Social</div>
+            <div class="tooltip">NEON CAFÉ - SOCIAL</div>
+        </a>
+
+        <a href="cinema.html" class="hotspot" id="ponto-cinema">
+            <div class="tooltip">VR CINEMA - LAZER</div>
+        </a>
+
+        <a href="cidade.html" class="hotspot" id="ponto-park">
+            <div class="tooltip">NEXUS PARK - SISTEMA</div>
         </a>
     </div>
 
-    <a href="index.html" class="btn-back">VOLTAR AO MENU</a>
+    <a href="index.html" class="btn-exit">VOLTAR</a>
 
     <script type="module" src="nexus-overlay.js"></script>
 
-    <script>
-        // Log de telemetria simples para o dashboard
-        document.querySelectorAll('.hotspot').forEach(item => {
-            item.addEventListener('click', (e) => {
-                console.log(`Navegando para: ${item.querySelector('.tooltip').innerText}`);
-            });
-        });
-    </script>
 </body>
 </html>
