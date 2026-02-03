@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexusVL - Urban Satellite</title>
+    <title>NexusVL - Urban District</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --user-neon-color: #00f2ff;
             --road-neon: #0088ff;
             --bg-void: #020408;
+            --grass: #002211;
+            --lake: #00ffff;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -24,66 +26,79 @@
 
         #viewport { width: 100vw; height: 100vh; position: relative; overflow: hidden; }
 
-        /* MAPA COMPACTO - 2500px */
+        /* MAPA FIXO - 1800px por 1200px (Grade 3x2) */
         #city-map {
             position: absolute;
-            width: 2500px; height: 2500px;
+            width: 1800px; height: 1200px;
             background-color: var(--bg-void);
             transform-origin: 0 0;
             will-change: transform;
-            background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
-            background-size: 50px 50px;
         }
 
-        /* RUAS ESTREITAS E BRILHANTES */
-        .street {
-            position: absolute;
-            background: #000;
-            box-shadow: 0 0 15px var(--road-neon);
-            z-index: 5;
-        }
-        .h-street { width: 100%; height: 30px; }
-        .v-street { height: 100%; width: 30px; }
+        /* RUAS ESTRUTURAIS FIXAS */
+        .street { position: absolute; background: #000; box-shadow: 0 0 15px var(--road-neon); z-index: 5; }
+        .h-street { width: 100%; height: 30px; left: 0; }
+        .v-street { height: 100%; width: 30px; top: 0; }
 
-        /* PRÉDIOS PRINCIPAIS */
-        .main-block {
+        /* QUARTEIRÕES */
+        .block-area {
             position: absolute;
-            background: #050505;
-            border: 4px solid var(--n-color);
+            width: 570px; height: 570px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 40px;
+            padding: 40px;
+        }
+
+        /* PRÉDIOS PADRONIZADOS */
+        .building {
+            background: #0a0a0a;
+            border: 2px solid #333;
+            border-bottom: 4px solid var(--p-color, #fff);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
             display: flex; align-items: center; justify-content: center;
-            z-index: 100;
-            box-shadow: 0 0 30px var(--n-color), inset 0 0 20px rgba(0,0,0,0.8);
             text-decoration: none;
             transition: 0.3s;
         }
-        .main-block:hover { transform: scale(1.05); z-index: 101; }
-
+        .building:hover { transform: translateY(-5px); filter: brightness(1.3); }
+        
         .label {
-            color: #fff; font-family: 'Orbitron'; font-weight: bold;
-            text-align: center; text-shadow: 0 0 10px #fff;
-            font-size: 18px; pointer-events: none;
+            color: #fff; font-family: 'Orbitron'; font-size: 14px;
+            text-align: center; font-weight: bold; pointer-events: none;
         }
 
-        /* PRÉDIOS DECORATIVOS (SATELLITE VIEW) */
-        .decor {
-            position: absolute;
-            z-index: 10;
-            background: #0a0a0a;
-            border-top: 2px solid rgba(255,255,255,0.1);
+        /* PARQUE NATURAL */
+        .park {
+            background: var(--grass);
+            border: 2px solid #004422;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 50px rgba(0,255,100,0.1);
         }
-        /* Estilos de janelas/néon */
-        .purple { border-bottom: 3px solid #bc13fe; box-shadow: 0 5px 15px rgba(188, 19, 254, 0.3); }
-        .white  { border-bottom: 3px solid #ffffff; box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2); }
-        .red    { border-bottom: 3px solid #ff0000; box-shadow: 0 5px 15px rgba(255, 0, 0, 0.3); }
-        .baby   { border-bottom: 3px solid #89cff0; box-shadow: 0 5px 15px rgba(137, 207, 240, 0.3); }
+        .lake {
+            position: absolute;
+            width: 150px; height: 100px;
+            background: var(--lake);
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; /* Formato orgânico */
+            box-shadow: 0 0 30px var(--lake);
+            filter: blur(2px);
+        }
+        .tree {
+            position: absolute;
+            width: 10px; height: 10px;
+            background: #00ff66;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00ff66;
+        }
 
         /* UI */
         .ui-fixed { position: fixed; width: 100%; z-index: 1000; pointer-events: none; }
         .social-header { top: 20px; text-align: center; }
-        .social-header h1 { 
-            font-family: 'Orbitron'; letter-spacing: 5px; 
-            text-shadow: 0 0 10px var(--user-neon-color); font-size: 1rem; 
-        }
+        .social-header h1 { font-family: 'Orbitron'; letter-spacing: 5px; text-shadow: 0 0 10px var(--user-neon-color); font-size: 1rem; }
         .btn-exit {
             position: fixed; bottom: 20px; right: 20px;
             padding: 10px 20px; border: 1px solid var(--user-neon-color);
@@ -95,36 +110,65 @@
 <body>
 
     <div class="ui-fixed social-header">
-        <h1>NEXUS CITY CORE</h1>
+        <h1>NEXUS DISTRICT - 6 BLOCKS</h1>
     </div>
 
     <div id="viewport">
         <div id="city-map">
-            <div class="street h-street" style="top: 800px;"></div>
-            <div class="street h-street" style="top: 1200px;"></div>
-            <div class="street h-street" style="top: 1600px;"></div>
-            <div class="street v-street" style="left: 800px;"></div>
+            <div class="street h-street" style="top: 0px;"></div>
+            <div class="street h-street" style="top: 600px;"></div>
+            <div class="street h-street" style="top: 1170px;"></div>
+            
+            <div class="street v-street" style="left: 0px;"></div>
+            <div class="street v-street" style="left: 600px;"></div>
             <div class="street v-street" style="left: 1200px;"></div>
-            <div class="street v-street" style="left: 1600px;"></div>
+            <div class="street v-street" style="left: 1770px;"></div>
 
-            <a href="cidade.html" class="main-block" style="top: 1230px; left: 1230px; width: 340px; height: 340px; --n-color: #00f2ff;">
-                <div class="label" style="font-size: 30px;">DOWNTOWN</div>
-            </a>
+            <div class="block-area" style="top: 30px; left: 30px;">
+                <a href="#" class="building" style="--p-color: #bc13fe;"><div class="label">OFFICE A1</div></a>
+                <a href="cafeteria.html" class="building" style="--p-color: #ff00ff;"><div class="label">CAFE</div></a>
+                <a href="#" class="building" style="--p-color: #ffffff;"><div class="label">RESIDENCE A2</div></a>
+                <a href="#" class="building" style="--p-color: #89cff0;"><div class="label">LAB 01</div></a>
+            </div>
 
-            <a href="cafeteria.html" class="main-block" style="top: 900px; left: 1250px; width: 150px; height: 150px; --n-color: #ff00ff;">
-                <div class="label">CAFE</div>
-            </a>
-            <a href="cinema.html" class="main-block" style="top: 1300px; left: 1650px; width: 200px; height: 150px; --n-color: #ffcc00;">
-                <div class="label">CINEMA</div>
-            </a>
-            <a href="bar.html" class="main-block" style="top: 1650px; left: 1300px; width: 180px; height: 150px; --n-color: #ff0044;">
-                <div class="label">BAR</div>
-            </a>
-            <a href="livraria.html" class="main-block" style="top: 1300px; left: 950px; width: 150px; height: 200px; --n-color: #bd00ff;">
-                <div class="label">BOOKS</div>
-            </a>
+            <div class="block-area" style="top: 30px; left: 630px;">
+                <a href="cidade.html" class="building" style="--p-color: #00f2ff; border-width: 4px;"><div class="label">CENTER</div></a>
+                <a href="#" class="building" style="--p-color: #ff0000;"><div class="label">MALL</div></a>
+                <a href="#" class="building" style="--p-color: #ffffff;"><div class="label">OFFICE B1</div></a>
+                <a href="livraria.html" class="building" style="--p-color: #bd00ff;"><div class="label">BOOKS</div></a>
+            </div>
 
-            <div id="decor-layer"></div>
+            <div class="block-area" style="top: 30px; left: 1230px;">
+                <a href="cinema.html" class="building" style="--p-color: #ffcc00;"><div class="label">CINEMA</div></a>
+                <a href="#" class="building" style="--p-color: #89cff0;"><div class="label">TECH HUB</div></a>
+                <a href="#" class="building" style="--p-color: #ffffff;"><div class="label">RETAIL C1</div></a>
+                <a href="#" class="building" style="--p-color: #ff0000;"><div class="label">CLINIC</div></a>
+            </div>
+
+            <div class="block-area" style="top: 630px; left: 30px;">
+                <a href="#" class="building" style="--p-color: #bc13fe;"><div class="label">SQUAD 04</div></a>
+                <a href="bar.html" class="building" style="--p-color: #ff0044;"><div class="label">BAR</div></a>
+                <a href="#" class="building" style="--p-color: #ffffff;"><div class="label">HOTEL</div></a>
+                <a href="#" class="building" style="--p-color: #89cff0;"><div class="label">DATA CTR</div></a>
+            </div>
+
+            <div class="block-area" style="top: 630px; left: 630px;">
+                <div class="park" style="grid-column: span 2; grid-row: span 2;">
+                    <div class="lake"></div>
+                    <div class="tree" style="top: 20%; left: 20%;"></div>
+                    <div class="tree" style="top: 70%; left: 15%;"></div>
+                    <div class="tree" style="top: 30%; left: 80%;"></div>
+                    <div class="tree" style="top: 80%; left: 75%;"></div>
+                    <div class="label" style="position:absolute; bottom:20px; width:100%">NEXUS NATURE RESERVE</div>
+                </div>
+            </div>
+
+            <div class="block-area" style="top: 630px; left: 1230px;">
+                <a href="#" class="building" style="--p-color: #bc13fe;"><div class="label">FACTORY</div></a>
+                <a href="#" class="building" style="--p-color: #ff0000;"><div class="label">STATION</div></a>
+                <a href="#" class="building" style="--p-color: #ffffff;"><div class="label">SHELTER</div></a>
+                <a href="#" class="building" style="--p-color: #89cff0;"><div class="label">POWER</div></a>
+            </div>
         </div>
     </div>
 
@@ -132,41 +176,18 @@
 
     <script type="module">
         const cityMap = document.getElementById('city-map');
-        const decorLayer = document.getElementById('decor-layer');
-        const zoomScale = 0.45; // Visão de satélite próxima
-        const mapSize = 2500;
+        const zoomScale = 0.6; // Proporção ideal para ver a cidade toda
+        const mapW = 1800;
+        const mapH = 1200;
 
-        // Gerador de Prédios Decorativos para parecer cidade real
-        const colors = ['purple', 'white', 'red', 'baby'];
-        
-        for(let i=0; i < 300; i++) {
-            const d = document.createElement('div');
-            const color = colors[Math.floor(Math.random() * colors.length)];
-            d.className = `decor ${color}`;
-            
-            let x = Math.random() * 2400;
-            let y = Math.random() * 2400;
-
-            // Evitar spawn em cima dos principais e ruas (simplificado)
-            if (x > 850 && x < 1650 && y > 850 && y < 1650) continue;
-
-            d.style.left = x + 'px';
-            d.style.top = y + 'px';
-            d.style.width = (Math.random() * 60 + 20) + 'px';
-            d.style.height = (Math.random() * 80 + 30) + 'px';
-            d.style.opacity = Math.random() * 0.7 + 0.3;
-            
-            decorLayer.appendChild(d);
-        }
-
-        let currentX = window.innerWidth / 2 - (1250 * zoomScale);
-        let currentY = window.innerHeight / 2 - (1250 * zoomScale);
+        let currentX = window.innerWidth / 2 - (mapW * zoomScale) / 2;
+        let currentY = window.innerHeight / 2 - (mapH * zoomScale) / 2;
         let isDragging = false;
         let startX, startY;
 
         function updateTransform() {
-            const minX = window.innerWidth - (mapSize * zoomScale);
-            const minY = window.innerHeight - (mapSize * zoomScale);
+            const minX = window.innerWidth - (mapW * zoomScale);
+            const minY = window.innerHeight - (mapH * zoomScale);
             if (currentX > 0) currentX = 0;
             if (currentY > 0) currentY = 0;
             if (currentX < minX) currentX = minX;
