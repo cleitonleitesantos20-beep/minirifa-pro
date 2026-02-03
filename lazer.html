@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusVL - Lazer Mobile Optimized</title>
+    <title>NexusVL - Lazer Dynamic</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -14,24 +14,23 @@
             margin: 0; padding: 0;
             width: 100%; height: 100%;
             overflow: hidden;
-            background: #000; /* Fundo preto para as bordas no celular */
+            background: #000;
             font-family: 'Rajdhani', sans-serif;
             display: flex;
             align-items: center; justify-content: center;
         }
 
-        /* Container que mantém a proporção da imagem (1:1 no caso da sua imagem quadrada) */
         .city-view {
             position: relative;
             width: 100vw;
-            height: 100vw; /* Mantém quadrado */
-            max-width: 100vh; /* Não deixa passar da altura da tela */
+            height: 100vw;
+            max-width: 100vh;
             max-height: 100vh;
             background: url('https://i.postimg.cc/HsYpr1wD/038bc4f0-a03b-4936-9baa-bb106f38602c.jpg') no-repeat center center;
             background-size: contain;
         }
 
-        /* Overlay de escaneamento para estética Cyberpunk */
+        /* Scanlines */
         .city-view::after {
             content: '';
             position: absolute;
@@ -43,49 +42,53 @@
 
         .hotspot {
             position: absolute;
-            width: 8%; height: 8%; /* Tamanho relativo à imagem */
+            width: 8%; height: 8%;
             cursor: pointer;
             z-index: 10;
             display: flex;
             align-items: center; justify-content: center;
+            text-decoration: none;
         }
 
-        .hotspot::after {
-            content: '';
-            width: 40%; height: 40%;
-            border: 2px solid var(--neon-cyan);
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--neon-cyan);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(2); opacity: 0; }
-        }
-
-        .tooltip {
+        /* Estilo da Label Pulsante (Sempre Visível) */
+        .label-pulsing {
             position: absolute;
-            bottom: 120%;
-            background: rgba(0, 0, 0, 0.9);
+            bottom: 110%;
+            background: rgba(0, 0, 0, 0.75);
             border: 1px solid var(--neon-cyan);
-            color: #fff;
-            padding: 5px 10px;
+            color: var(--neon-cyan);
+            padding: 4px 8px;
             font-family: 'Orbitron';
-            font-size: 10px;
+            font-size: 9px;
             white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: 0.3s;
+            letter-spacing: 1px;
+            text-shadow: 0 0 5px var(--neon-cyan);
+            animation: textGlow 1.5s ease-in-out infinite alternate;
         }
 
-        .hotspot:hover .tooltip { opacity: 1; }
+        @keyframes textGlow {
+            from { box-shadow: 0 0 2px var(--neon-cyan); opacity: 0.7; }
+            to { box-shadow: 0 0 10px var(--neon-cyan); opacity: 1; }
+        }
 
-        /* POSIÇÕES PERCENTUAIS (Funcionam em qualquer tamanho de tela) */
+        /* Pontos Vazios (Invisíveis) */
+        .empty-point {
+            position: absolute;
+            width: 6%; height: 6%;
+            z-index: 5;
+            cursor: crosshair;
+        }
+
+        /* Posicionamento dos Pontos Reais */
         #ponto-tower  { top: 32%; left: 46%; width: 10%; height: 15%; } 
         #ponto-cafe   { top: 38%; left: 81%; }
         #ponto-cinema { top: 48%; left: 10%; }
         #ponto-park   { top: 43%; left: 59%; }
+
+        /* Posicionamento dos Pontos Vazios (Exemplos) */
+        #empty-1 { top: 20%; left: 20%; }
+        #empty-2 { top: 70%; left: 80%; }
+        #empty-3 { top: 15%; left: 75%; }
 
         .btn-exit {
             position: fixed; top: 20px; left: 20px;
@@ -98,14 +101,31 @@
 <body>
 
     <div class="city-view">
-        <a href="dashboard.html" class="hotspot" id="ponto-tower"><div class="tooltip">HQ TOWER</div></a>
-        <a href="cafeteria.html" class="hotspot" id="ponto-cafe"><div class="tooltip">NEON CAFÉ</div></a>
-        <a href="cinema.html" class="hotspot" id="ponto-cinema"><div class="tooltip">VR CINEMA</div></a>
-        <a href="cidade.html" class="hotspot" id="ponto-park"><div class="tooltip">PARK SYSTEM</div></a>
+        <a href="dashboard.html" class="hotspot" id="ponto-tower">
+            <div class="label-pulsing">HQ TOWER</div>
+        </a>
+        <a href="cafeteria.html" class="hotspot" id="ponto-cafe">
+            <div class="label-pulsing">NEON CAFÉ</div>
+        </a>
+        <a href="cinema.html" class="hotspot" id="ponto-cinema">
+            <div class="label-pulsing">VR CINEMA</div>
+        </a>
+        <a href="cidade.html" class="hotspot" id="ponto-park">
+            <div class="label-pulsing">PARK SYSTEM</div>
+        </a>
+
+        <div class="empty-point" id="empty-1" onclick="voidAction()"></div>
+        <div class="empty-point" id="empty-2" onclick="voidAction()"></div>
+        <div class="empty-point" id="empty-3" onclick="voidAction()"></div>
     </div>
 
     <a href="index.html" class="btn-exit">VOLTAR</a>
 
     <script type="module" src="nexus-overlay.js"></script>
+    <script>
+        function voidAction() {
+            alert("SISTEMA: (ND ACONTECEU)");
+        }
+    </script>
 </body>
 </html>
