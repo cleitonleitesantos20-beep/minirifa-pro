@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexusVL - Strategic Map</title>
+    <title>NexusVL - Infinite Metropolis</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --user-neon-color: #00f2ff;
-            --bg-void: #000205;
-            --road-dark: #050505;
-            --road-glow: rgba(0, 242, 255, 0.15);
-            --building-decor: #0d1117;
+            --road-neon: #0088ff; /* Azul Neon para as ruas */
+            --bg-void: #000103;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -32,90 +30,66 @@
             background: #000;
         }
 
-        /* MAPA DE ALTA ESCALA - 8000px */
+        /* MAPA GIGANTE - 15000px */
         #city-map {
             position: absolute;
-            width: 8000px; 
-            height: 8000px;
+            width: 15000px; 
+            height: 15000px;
             background-color: var(--bg-void);
-            background-image: 
-                linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px);
-            background-size: 100px 100px;
             transform-origin: 0 0;
             will-change: transform;
         }
 
-        /* AVENIDAS (Atrás de tudo, pretas com borda brilhante) */
+        /* RUAS COM NEON AZUL */
         .street-h, .street-v {
             position: absolute;
-            background: var(--road-dark);
+            background: #050505;
             z-index: 1;
-            border: 2px solid var(--road-glow);
+            box-shadow: 0 0 20px var(--road-neon);
+            border: 1px solid var(--road-neon);
         }
-        .street-h { width: 100%; height: 200px; }
-        .street-v { height: 100%; width: 200px; }
+        .street-h { width: 100%; height: 140px; }
+        .street-v { height: 100%; width: 140px; }
 
-        /* PRÉDIOS INTERATIVOS (Destaque Máximo) */
+        /* PRÉDIOS INTERATIVOS (Centro denso) */
         .block {
             position: absolute;
             background: #000;
-            border: 8px solid var(--neon-color);
+            border: 10px solid var(--neon-color);
             display: flex; align-items: center; justify-content: center;
-            z-index: 10; /* Sempre no topo */
-            box-shadow: 0 0 100px rgba(0,0,0,1), 0 0 40px var(--neon-color);
-        }
-
-        /* PRÉDIOS DECORATIVOS (Sóbrios para dar profundidade) */
-        .decor {
-            position: absolute;
-            background: var(--building-decor);
-            border: 1px solid rgba(255,255,255,0.05);
-            z-index: 5;
-        }
-        .decor::after {
-            content: ''; position: absolute; width: 100%; height: 100%;
-            background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
-            background-size: 20px 20px;
+            z-index: 10;
+            box-shadow: 0 0 60px var(--neon-color);
         }
 
         .district-node {
-            padding: 40px;
+            padding: 20px;
             text-decoration: none;
             color: #fff;
             font-family: 'Orbitron';
-            font-size: 70px; /* Grande para leitura orbital */
+            font-size: 80px;
             font-weight: bold;
             text-align: center;
-            text-shadow: 0 0 30px var(--neon-color);
+            text-shadow: 0 0 30px #fff;
         }
 
-        /* CONFIGURAÇÃO DA SEED (Nenhum prédio toca nas ruas em 3000px e 6000px) */
-        /* RUAS CENTRAIS */
-        .r-h1 { top: 2900px; }
-        .r-h2 { top: 5900px; }
-        .r-v1 { left: 2900px; }
-        .r-v2 { left: 5900px; }
+        /* PRÉDIOS DECORATIVOS COM CORES SOLICITADAS */
+        .decor { position: absolute; z-index: 5; background: #080808; border-width: 2px; border-style: solid; }
+        .decor.purple { border-color: #bc13fe; box-shadow: 0 0 15px #bc13fe; }
+        .decor.white  { border-color: #ffffff; box-shadow: 0 0 15px #ffffff; }
+        .decor.red    { border-color: #ff0000; box-shadow: 0 0 15px #ff0000; }
+        .decor.baby   { border-color: #89cff0; box-shadow: 0 0 15px #89cff0; }
 
-        /* POSIÇÕES DOS PRÉDIOS (Ajustadas para os vãos entre ruas) */
-        .pos-cafeteria { top: 1000px; left: 1000px; width: 1000px; height: 600px; }
-        .pos-cinema    { top: 1000px; left: 6500px; width: 1100px; height: 700px; }
-        .pos-centro    { top: 4000px; left: 4000px; width: 1500px; height: 1200px; border-width: 15px; }
-        .pos-bar       { top: 7000px; left: 1000px; width: 1000px; height: 600px; }
-        .pos-livraria  { top: 7000px; left: 6500px; width: 1100px; height: 700px; }
-        .pos-parque    { top: 3500px; left: 500px; width: 1200px; height: 2000px; background: #020a02; border-color: #00ff88; }
-
-        /* UI FIXA */
+        /* HEADER */
         .ui-fixed { position: fixed; width: 100%; z-index: 1000; pointer-events: none; }
         .social-header { top: 30px; text-align: center; }
         .social-header h1 { 
             font-family: 'Orbitron'; letter-spacing: 20px; 
-            text-shadow: 0 0 20px var(--user-neon-color); font-size: 1.8rem; 
+            text-shadow: 0 0 20px var(--user-neon-color); font-size: 1.5rem; 
         }
         
         .btn-exit {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            padding: 20px 60px; border: 2px solid var(--user-neon-color);
+            padding: 15px 40px; border: 1px solid var(--user-neon-color);
             color: var(--user-neon-color); text-decoration: none; font-family: 'Orbitron';
             background: #000; z-index: 1000; pointer-events: auto;
         }
@@ -124,29 +98,40 @@
 <body>
 
     <div class="ui-fixed social-header">
-        <h1>NEXUS STRATEGIC MAP</h1>
+        <h1>NEXUS MEGA CITY SEED</h1>
     </div>
 
     <div id="viewport">
         <div id="city-map">
-            <div class="street-h r-h1"></div>
-            <div class="street-h r-h2"></div>
-            <div class="street-v r-v1"></div>
-            <div class="street-v r-v2"></div>
+            <div class="street-h" style="top: 7000px;"></div>
+            <div class="street-h" style="top: 7500px;"></div>
+            <div class="street-h" style="top: 8000px;"></div>
+            <div class="street-v" style="left: 7000px;"></div>
+            <div class="street-v" style="left: 7500px;"></div>
+            <div class="street-v" style="left: 8000px;"></div>
 
-            <div class="block pos-cafeteria"><a href="cafeteria.html" class="district-node" style="--neon-color: #ff00ff;">CAFETERIA</a></div>
-            <div class="block pos-cinema"><a href="cinema.html" class="district-node" style="--neon-color: #ffcc00;">CINEMA</a></div>
-            <div class="block pos-centro"><a href="cidade.html" class="district-node" style="--neon-color: #00f2ff;">CENTRO</a></div>
-            <div class="block pos-bar"><a href="bar.html" class="district-node" style="--neon-color: #ff0044;">NEXUS BAR</a></div>
-            <div class="block pos-livraria"><a href="livraria.html" class="district-node" style="--neon-color: #bd00ff;">LIVRARIA</a></div>
-            <div class="block pos-parque"><a href="parque.html" class="district-node" style="--neon-color: #00ff88;">PARQUE</a></div>
+            <div class="block" style="top: 7150px; left: 7150px; width: 300px; height: 300px;"><a href="cafeteria.html" class="district-node" style="--neon-color: #ff00ff; font-size: 30px;">☕</a></div>
+            <div class="block" style="top: 7150px; left: 7650px; width: 300px; height: 300px;"><a href="cinema.html" class="district-node" style="--neon-color: #ffcc00; font-size: 30px;">🎬</a></div>
+            <div class="block" style="top: 7650px; left: 7150px; width: 300px; height: 300px;"><a href="bar.html" class="district-node" style="--neon-color: #ff0044; font-size: 30px;">🍸</a></div>
+            <div class="block" style="top: 7650px; left: 7650px; width: 300px; height: 300px;"><a href="livraria.html" class="district-node" style="--neon-color: #bd00ff; font-size: 30px;">📖</a></div>
+            
+            <div class="block" style="top: 7350px; left: 7350px; width: 800px; height: 800px; border-width: 20px; z-index: 15;">
+                <a href="cidade.html" class="district-node" style="--neon-color: #00f2ff; font-size: 60px;">CENTRO<br>NEXUS</a>
+            </div>
 
-            <div class="decor" style="top: 500px; left: 3500px; width: 800px; height: 800px;"></div>
-            <div class="decor" style="top: 4000px; left: 2000px; width: 600px; height: 900px;"></div>
-            <div class="decor" style="top: 7000px; left: 4000px; width: 1200px; height: 500px;"></div>
-            <div class="decor" style="top: 2000px; left: 6500px; width: 700px; height: 700px;"></div>
-            <div class="decor" style="top: 5000px; left: 7000px; width: 500px; height: 500px;"></div>
-            <div class="decor" style="top: 1500px; left: 500px; width: 400px; height: 800px;"></div>
+            <div class="decor purple" style="top: 6000px; left: 6500px; width: 400px; height: 400px;"></div>
+            <div class="decor purple" style="top: 9000px; left: 8500px; width: 200px; height: 600px;"></div>
+            <div class="decor white" style="top: 6500px; left: 8000px; width: 300px; height: 300px;"></div>
+            <div class="decor white" style="top: 8500px; left: 6000px; width: 500px; height: 200px;"></div>
+            <div class="decor red" style="top: 7200px; left: 9000px; width: 250px; height: 450px;"></div>
+            <div class="decor red" style="top: 10000px; left: 7500px; width: 400px; height: 400px;"></div>
+            <div class="decor baby" style="top: 5500px; left: 7500px; width: 600px; height: 150px;"></div>
+            <div class="decor baby" style="top: 8000px; left: 9500px; width: 300px; height: 300px;"></div>
+
+            <div class="decor white" style="top: 2000px; left: 2000px; width: 800px; height: 800px;"></div>
+            <div class="decor purple" style="top: 12000px; left: 12000px; width: 800px; height: 800px;"></div>
+            <div class="decor red" style="top: 2000px; left: 12000px; width: 800px; height: 800px;"></div>
+            <div class="decor baby" style="top: 12000px; left: 2000px; width: 800px; height: 800px;"></div>
         </div>
     </div>
 
@@ -154,11 +139,12 @@
 
     <script type="module">
         const cityMap = document.getElementById('city-map');
-        const zoomScale = 0.08; // Visão de Satélite Extrema
-        const mapSize = 8000;
+        const zoomScale = 0.05; // VISÃO AINDA MAIS LONGE (ESPACIAL)
+        const mapSize = 15000;
 
-        let currentX = window.innerWidth / 2 - (4000 * zoomScale);
-        let currentY = window.innerHeight / 2 - (4000 * zoomScale);
+        // Inicia centralizado na coordenada 7500 (metade do mapa de 15k)
+        let currentX = window.innerWidth / 2 - (7500 * zoomScale);
+        let currentY = window.innerHeight / 2 - (7500 * zoomScale);
         let isDragging = false;
         let startX, startY;
 
@@ -176,15 +162,15 @@
 
         const startMove = (e) => {
             isDragging = true;
-            startX = (e.pageX || e.touches[0].pageX) - currentX;
-            startY = (e.pageY || e.touches[0].pageY) - currentY;
+            startX = (e.pageX || (e.touches ? e.touches[0].pageX : 0)) - currentX;
+            startY = (e.pageY || (e.touches ? e.touches[0].pageY : 0)) - currentY;
         };
 
         const move = (e) => {
             if (!isDragging) return;
             e.preventDefault();
-            currentX = (e.pageX || e.touches[0].pageX) - startX;
-            currentY = (e.pageY || e.touches[0].pageY) - startY;
+            currentX = (e.pageX || (e.touches ? e.touches[0].pageX : 0)) - startX;
+            currentY = (e.pageY || (e.touches ? e.touches[0].pageY : 0)) - startY;
             updateTransform();
         };
 
@@ -196,9 +182,6 @@
         window.addEventListener('touchstart', startMove);
         window.addEventListener('touchmove', move, { passive: false });
         window.addEventListener('touchend', stopMove);
-
-        const userColor = localStorage.getItem('userNeonColor') || '#00f2ff';
-        document.documentElement.style.setProperty('--user-neon-color', userColor);
     </script>
     <script type="module" src="nexus-overlay.js"></script>
 </body>
