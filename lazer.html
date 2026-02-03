@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexusVL - Mega City Grid</title>
+    <title>NexusVL - Organized District</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --user-neon-color: #00f2ff;
             --road-neon: #0088ff;
-            --bg-void: #000103;
+            --bg-void: #010204;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -24,93 +24,112 @@
 
         #viewport { width: 100vw; height: 100vh; position: relative; overflow: hidden; background: #000; }
 
-        /* MAPA GIGANTE 15.000px */
+        /* MAPA OTIMIZADO - 4000px */
         #city-map {
             position: absolute;
-            width: 15000px; height: 15000px;
+            width: 4000px; height: 4000px;
             background-color: var(--bg-void);
-            /* Malha de ruas em Azul Neon */
-            background-image: 
-                linear-gradient(var(--road-neon) 2px, transparent 2px),
-                linear-gradient(90deg, var(--road-neon) 2px, transparent 2px);
-            background-size: 500px 500px; /* Tamanho do quarteirão */
             transform-origin: 0 0;
             will-change: transform;
         }
 
-        /* PRÉDIOS PRINCIPAIS (Z-index alto) */
+        /* RUAS ESTRUTURADAS */
+        .street {
+            position: absolute;
+            background: #050505;
+            box-shadow: inset 0 0 15px var(--road-neon), 0 0 10px var(--road-neon);
+            z-index: 1;
+        }
+        .h-street { width: 100%; height: 60px; }
+        .v-street { height: 100%; width: 60px; }
+
+        /* PRÉDIOS PRINCIPAIS */
         .main-block {
             position: absolute;
             background: #000;
-            border: 15px solid var(--n-color);
+            border: 8px solid var(--n-color);
             display: flex; align-items: center; justify-content: center;
             z-index: 100;
-            box-shadow: 0 0 80px var(--n-color);
+            box-shadow: 0 0 40px var(--n-color);
             text-decoration: none;
-            transition: transform 0.3s;
         }
-        .main-block:hover { transform: scale(1.05); }
 
         .label {
             color: #fff; font-family: 'Orbitron'; font-weight: bold;
-            text-align: center; text-shadow: 0 0 20px #fff;
+            text-align: center; text-shadow: 0 0 10px #fff;
+            font-size: 24px;
         }
 
-        /* PRÉDIOS DECORATIVOS (Cores solicitadas) */
+        /* PRÉDIOS DECORATIVOS */
         .decor {
             position: absolute;
             z-index: 10;
-            background: #0a0a0a;
-            border-width: 4px;
+            background: #080808;
+            border-width: 2px;
             border-style: solid;
-            opacity: 0.6;
         }
-        .purple { border-color: #bc13fe; box-shadow: 0 0 20px #bc13fe; }
-        .white  { border-color: #ffffff; box-shadow: 0 0 20px #ffffff; }
-        .red    { border-color: #ff0000; box-shadow: 0 0 20px #ff0000; }
-        .baby   { border-color: #89cff0; box-shadow: 0 0 20px #89cff0; }
+        .purple { border-color: #bc13fe; box-shadow: 0 0 15px #bc13fe; }
+        .white  { border-color: #ffffff; box-shadow: 0 0 10px #ffffff; }
+        .red    { border-color: #ff0000; box-shadow: 0 0 15px #ff0000; }
+        .baby   { border-color: #89cff0; box-shadow: 0 0 15px #89cff0; }
 
         /* UI */
         .ui-fixed { position: fixed; width: 100%; z-index: 1000; pointer-events: none; }
-        .social-header { top: 30px; text-align: center; }
+        .social-header { top: 20px; text-align: center; }
         .social-header h1 { 
-            font-family: 'Orbitron'; letter-spacing: 15px; 
-            text-shadow: 0 0 20px var(--user-neon-color); font-size: 1.5rem; 
+            font-family: 'Orbitron'; letter-spacing: 10px; 
+            text-shadow: 0 0 15px var(--user-neon-color); font-size: 1.2rem; 
         }
         .btn-exit {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            padding: 15px 40px; border: 2px solid var(--user-neon-color);
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            padding: 10px 30px; border: 2px solid var(--user-neon-color);
             color: var(--user-neon-color); text-decoration: none; font-family: 'Orbitron';
-            background: #000; z-index: 1000; pointer-events: auto;
+            background: #000; z-index: 1000; pointer-events: auto; font-size: 0.9rem;
         }
     </style>
 </head>
 <body>
 
     <div class="ui-fixed social-header">
-        <h1>NEXUS GLOBAL GRID</h1>
+        <h1>NEXUS DISTRICT</h1>
     </div>
 
     <div id="viewport">
         <div id="city-map">
-            <a href="cidade.html" class="main-block" style="top: 7250px; left: 7250px; width: 500px; height: 500px; --n-color: #00f2ff;">
-                <div class="label" style="font-size: 60px;">CENTRO</div>
+            <div class="street h-street" style="top: 1500px;"></div>
+            <div class="street h-street" style="top: 2000px;"></div>
+            <div class="street h-street" style="top: 2500px;"></div>
+            
+            <div class="street v-street" style="left: 1500px;"></div>
+            <div class="street v-street" style="left: 2000px;"></div>
+            <div class="street v-street" style="left: 2500px;"></div>
+
+            <a href="cidade.html" class="main-block" style="top: 2060px; left: 2060px; width: 380px; height: 380px; --n-color: #00f2ff;">
+                <div class="label" style="font-size: 40px;">CENTRO</div>
             </a>
 
-            <a href="cafeteria.html" class="main-block" style="top: 6850px; left: 7350px; width: 300px; height: 250px; --n-color: #ff00ff;">
-                <div class="label" style="font-size: 30px;">CAFETERIA</div>
+            <a href="cafeteria.html" class="main-block" style="top: 1600px; left: 2100px; width: 300px; height: 300px; --n-color: #ff00ff;">
+                <div class="label">CAFETERIA</div>
             </a>
-            <a href="cinema.html" class="main-block" style="top: 7350px; left: 7850px; width: 350px; height: 300px; --n-color: #ffcc00;">
-                <div class="label" style="font-size: 30px;">CINEMA</div>
+            <a href="cinema.html" class="main-block" style="top: 2100px; left: 2600px; width: 300px; height: 300px; --n-color: #ffcc00;">
+                <div class="label">CINEMA</div>
             </a>
-            <a href="bar.html" class="main-block" style="top: 7850px; left: 7350px; width: 300px; height: 250px; --n-color: #ff0044;">
-                <div class="label" style="font-size: 30px;">BAR</div>
+            <a href="bar.html" class="main-block" style="top: 2600px; left: 2100px; width: 300px; height: 300px; --n-color: #ff0044;">
+                <div class="label">BAR</div>
             </a>
-            <a href="livraria.html" class="main-block" style="top: 7350px; left: 6800px; width: 350px; height: 300px; --n-color: #bd00ff;">
-                <div class="label" style="font-size: 30px;">LIVRARIA</div>
+            <a href="livraria.html" class="main-block" style="top: 2100px; left: 1600px; width: 300px; height: 300px; --n-color: #bd00ff;">
+                <div class="label">LIVRARIA</div>
             </a>
 
-            <div id="decor-container"></div>
+            <div class="decor purple" style="top: 1650px; left: 1650px; width: 200px; height: 200px;"></div>
+            <div class="decor white" style="top: 1650px; left: 2650px; width: 200px; height: 200px;"></div>
+            <div class="decor red" style="top: 2650px; left: 1650px; width: 200px; height: 200px;"></div>
+            <div class="decor baby" style="top: 2650px; left: 2650px; width: 200px; height: 200px;"></div>
+            
+            <div class="decor purple" style="top: 500px; left: 500px; width: 300px; height: 500px;"></div>
+            <div class="decor white" style="top: 500px; left: 3200px; width: 400px; height: 200px;"></div>
+            <div class="decor red" style="top: 3200px; left: 500px; width: 200px; height: 400px;"></div>
+            <div class="decor baby" style="top: 3200px; left: 3200px; width: 300px; height: 300px;"></div>
         </div>
     </div>
 
@@ -118,32 +137,12 @@
 
     <script type="module">
         const cityMap = document.getElementById('city-map');
-        const decorContainer = document.getElementById('decor-container');
-        const zoomScale = 0.06;
-        const mapSize = 15000;
+        const zoomScale = 0.25; // Zoom mais próximo para ver os detalhes
+        const mapSize = 4000;
 
-        // Gerar prédios decorativos aleatórios nas cores solicitadas
-        const colors = ['purple', 'white', 'red', 'baby'];
-        for(let i=0; i < 150; i++) {
-            const d = document.createElement('div');
-            d.className = `decor ${colors[Math.floor(Math.random()*colors.length)]}`;
-            
-            // Posiciona longe do centro para não bagunçar os principais
-            let x = Math.random() * 14000 + 500;
-            let y = Math.random() * 14000 + 500;
-            
-            // Evita a área do centro (7000 a 8500)
-            if (x > 6500 && x < 8500 && y > 6500 && y < 8500) { x += 2000; }
-
-            d.style.left = x + 'px';
-            d.style.top = y + 'px';
-            d.style.width = (Math.random() * 300 + 100) + 'px';
-            d.style.height = (Math.random() * 300 + 100) + 'px';
-            decorContainer.appendChild(d);
-        }
-
-        let currentX = window.innerWidth / 2 - (7500 * zoomScale);
-        let currentY = window.innerHeight / 2 - (7500 * zoomScale);
+        // Inicia focado no Centro (2000px)
+        let currentX = window.innerWidth / 2 - (2000 * zoomScale);
+        let currentY = window.innerHeight / 2 - (2000 * zoomScale);
         let isDragging = false;
         let startX, startY;
 
