@@ -9,157 +9,205 @@
         :root {
             --user-neon-color: #00f2ff;
             --bg-dark: #02040a;
-            --road-color: #1a1e26;
-            --line-color: rgba(255, 255, 255, 0.1);
+            --road-color: #0d1117;
+            --line-color: rgba(0, 242, 255, 0.05);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
         body {
-            background-color: var(--bg-dark);
+            background-color: #000;
             color: #fff;
             font-family: 'Rajdhani', sans-serif;
-            overflow: hidden;
+            overflow: hidden; /* Impede o scroll padrão do navegador */
             height: 100vh; width: 100vw;
+            cursor: grab;
         }
 
-        /* MAPA ESTILO CIDADE VISTA DE CIMA */
-        #city-map {
+        body:active { cursor: grabbing; }
+
+        /* CONTAINER QUE PERMITE O MOVIMENTO */
+        #viewport {
+            width: 100vw;
+            height: 100vh;
             position: relative;
-            width: 100%; height: 100%;
+            overflow: hidden;
+        }
+
+        /* O MAPA REAL - MAIOR QUE A TELA */
+        #city-map {
+            position: absolute;
+            width: 2000px; /* Tamanho da cidade */
+            height: 2000px;
             background-color: var(--bg-dark);
-            /* Desenho das ruas e quadras */
             background-image: 
-                /* Faixas das ruas (horizontais e verticais) */
-                linear-gradient(90deg, var(--road-color) 40px, transparent 40px),
-                linear-gradient(0deg, var(--road-color) 40px, transparent 40px),
-                /* Linhas de grade/quadras */
                 linear-gradient(var(--line-color) 1px, transparent 1px),
                 linear-gradient(90deg, var(--line-color) 1px, transparent 1px);
-            background-size: 25% 100%, 100% 25%, 50px 50px, 50px 50px;
-            background-position: center;
+            background-size: 100px 100px;
+            transform: translate(-25%, -25%); /* Começa centralizado */
+            will-change: transform;
         }
 
-        /* PRÉDIOS E QUADRAS */
+        /* RUAS PRINCIPAIS */
+        .street-h, .street-v {
+            position: absolute;
+            background: var(--road-color);
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
+        .street-h { width: 100%; height: 40px; }
+        .street-v { height: 100%; width: 40px; }
+
+        /* BLOCOS DE PRÉDIOS */
         .block {
             position: absolute;
             background: #080a0f;
             border: 1px solid #1a2233;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: border-color 0.3s;
         }
 
-        /* ESTILO DOS BOTÕES NÉON (LETREIROS) */
+        /* LETREIROS NÉON */
         .district-node {
-            padding: 10px 15px;
+            padding: 12px 20px;
             text-decoration: none;
             color: #fff;
             font-family: 'Orbitron';
-            font-size: 10px;
+            font-size: 12px;
             font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 2px;
             border: 2px solid var(--neon-color);
-            background: rgba(0, 0, 0, 0.8);
-            box-shadow: 0 0 10px var(--neon-color), inset 0 0 5px var(--neon-color);
-            transition: 0.3s;
+            background: rgba(0, 0, 0, 0.85);
+            box-shadow: 0 0 15px var(--neon-color);
             text-align: center;
             white-space: nowrap;
         }
 
-        .district-node:hover {
-            transform: scale(1.1);
-            background: var(--neon-color);
-            color: #000;
-            box-shadow: 0 0 25px var(--neon-color);
-        }
+        /* POSICIONAMENTO ORGANIZADO (GRID DE AVENIDAS) */
+        .pos-cafeteria { top: 400px; left: 400px; width: 250px; height: 180px; }
+        .pos-cinema    { top: 400px; left: 1100px; width: 300px; height: 200px; }
+        .pos-centro    { top: 850px; left: 750px; width: 500px; height: 350px; border-width: 2px; }
+        .pos-bar       { top: 1300px; left: 450px; width: 220px; height: 150px; }
+        .pos-livraria  { top: 1350px; left: 1200px; width: 240px; height: 180px; }
+        .pos-parque    { top: 880px; left: 100px; width: 200px; height: 300px; background: #050a05; }
 
-        /* POSICIONAMENTO BASEADO NO LAYOUT DA FOTO */
-        /* Cafeteria (Canto Superior Esquerdo) */
-        .pos-cafeteria { top: 15%; left: 10%; width: 180px; height: 120px; }
-        
-        /* Cinema (Canto Superior Direito) */
-        .pos-cinema { top: 10%; right: 15%; width: 220px; height: 150px; }
-        
-        /* Centro Cidade (Meio) */
-        .pos-centro { top: 35%; left: 35%; width: 30%; height: 25%; border: 2px solid #2a334d; }
-        
-        /* Bar (Lado Esquerdo Meio) */
-        .pos-bar { top: 55%; left: 5%; width: 150px; height: 100px; }
-        
-        /* Livraria (Canto Inferior Direito) */
-        .pos-livraria { bottom: 15%; right: 10%; width: 200px; height: 120px; }
-        
-        /* Parque (Lado de baixo) */
-        .pos-parque { bottom: 10%; left: 30%; width: 250px; height: 80px; background: #050a05; border-color: #0a220a; }
-
-        /* HEADER */
-        .social-header {
-            position: fixed; top: 20px; width: 100%;
-            text-align: center; z-index: 100;
+        /* INTERFACE FIXA */
+        .ui-fixed {
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
             pointer-events: none;
         }
-        .social-header h1 {
-            font-family: 'Orbitron'; font-size: 1.5rem;
-            letter-spacing: 12px; color: #fff;
+        .social-header { top: 20px; text-align: center; }
+        .social-header h1 { 
+            font-family: 'Orbitron'; letter-spacing: 10px; 
             text-shadow: 0 0 10px var(--user-neon-color);
         }
-
-        /* BOTÃO VOLTAR */
+        
         .btn-exit {
-            position: fixed; bottom: 20px; left: 50%;
+            position: fixed; bottom: 30px; left: 50%;
             transform: translateX(-50%);
-            padding: 10px 30px; border: 1px solid var(--user-neon-color);
+            padding: 12px 40px; border: 1px solid var(--user-neon-color);
             color: var(--user-neon-color); text-decoration: none; 
-            font-family: 'Orbitron'; font-size: 10px;
-            background: rgba(0,0,0,0.9); z-index: 99999;
-            transition: 0.3s;
-            box-shadow: 0 0 10px rgba(0, 242, 255, 0.2);
+            font-family: 'Orbitron'; font-size: 11px;
+            background: #000; z-index: 1000;
+            pointer-events: auto;
         }
-        .btn-exit:hover { background: var(--user-neon-color); color: #000; box-shadow: 0 0 20px var(--user-neon-color); }
 
+        /* DICA DE MOVIMENTO */
+        .drag-hint {
+            position: fixed; bottom: 80px; width: 100%; text-align: center;
+            font-size: 10px; color: #444; letter-spacing: 2px;
+        }
     </style>
 </head>
 <body>
 
-    <div class="social-header">
-        <h1>NEXUS CITY MAP</h1>
+    <div class="ui-fixed social-header">
+        <h1>NEXUS DISTRICT</h1>
     </div>
 
-    <div id="city-map">
-        
-        <div class="block pos-cafeteria">
-            <a href="cafeteria.html" class="district-node" style="--neon-color: #ff00ff;">☕ Cafeteria</a>
-        </div>
+    <div id="viewport">
+        <div id="city-map">
+            <div class="street-h" style="top: 800px;"></div>
+            <div class="street-h" style="top: 1250px;"></div>
+            <div class="street-v" style="left: 700px;"></div>
+            <div class="street-v" style="left: 1050px;"></div>
 
-        <div class="block pos-cinema">
-            <a href="cinema.html" class="district-node" style="--neon-color: #ffcc00;">🎬 Cinema</a>
-        </div>
+            <div class="block pos-cafeteria">
+                <a href="cafeteria.html" class="district-node" style="--neon-color: #ff00ff;">CAFETERIA</a>
+            </div>
 
-        <div class="block pos-centro">
-            <a href="cidade.html" class="district-node" style="--neon-color: #00f2ff;">🏢 Centro Cidade</a>
-        </div>
+            <div class="block pos-cinema">
+                <a href="cinema.html" class="district-node" style="--neon-color: #ffcc00;">CINEMA</a>
+            </div>
 
-        <div class="block pos-bar">
-            <a href="bar.html" class="district-node" style="--neon-color: #ff0044;">🍸 Nexus Bar</a>
-        </div>
+            <div class="block pos-centro">
+                <a href="cidade.html" class="district-node" style="--neon-color: #00f2ff; font-size: 18px;">CENTRO CIDADE</a>
+            </div>
 
-        <div class="block pos-livraria">
-            <a href="livraria.html" class="district-node" style="--neon-color: #bd00ff;">📖 Livraria</a>
-        </div>
+            <div class="block pos-bar">
+                <a href="bar.html" class="district-node" style="--neon-color: #ff0044;">NEXUS BAR</a>
+            </div>
 
-        <div class="block pos-parque">
-            <a href="parque.html" class="district-node" style="--neon-color: #00ff88;">🌳 Parque</a>
-        </div>
+            <div class="block pos-livraria">
+                <a href="livraria.html" class="district-node" style="--neon-color: #bd00ff;">LIVRARIA</a>
+            </div>
 
+            <div class="block pos-parque">
+                <a href="parque.html" class="district-node" style="--neon-color: #00ff88;">PARQUE</a>
+            </div>
+        </div>
     </div>
 
-    <a href="index.html" class="btn-exit">VOLTAR AO DASHBOARD</a>
+    <div class="drag-hint">ARRASTE PARA NAVEGAR</div>
+    <a href="index.html" class="btn-exit">SAIR DO MAPA</a>
 
     <script type="module">
-        // Sincroniza a cor néon principal do usuário
+        const cityMap = document.getElementById('city-map');
+        let isDragging = false;
+        let startX, startY, scrollLeft, scrollTop;
+
+        // Posição inicial (Centralizar no Centro Cidade)
+        let currentX = -450;
+        let currentY = -700;
+        updateTransform();
+
+        // Lógica de Arrastar (Mouse e Touch)
+        const startMove = (e) => {
+            isDragging = true;
+            startX = (e.pageX || e.touches[0].pageX) - currentX;
+            startY = (e.pageY || e.touches[0].pageY) - currentY;
+        };
+
+        const move = (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            currentX = (e.pageX || e.touches[0].pageX) - startX;
+            currentY = (e.pageY || e.touches[0].pageY) - startY;
+            
+            // Limites para não fugir do mapa
+            currentX = Math.min(0, Math.max(currentX, -1200));
+            currentY = Math.min(0, Math.max(currentY, -1200));
+            
+            updateTransform();
+        };
+
+        const stopMove = () => { isDragging = false; };
+
+        function updateTransform() {
+            cityMap.style.transform = `translate(${currentX}px, ${currentY}px)`;
+        }
+
+        // Listeners
+        window.addEventListener('mousedown', startMove);
+        window.addEventListener('mousemove', move);
+        window.addEventListener('mouseup', stopMove);
+        window.addEventListener('touchstart', startMove);
+        window.addEventListener('touchmove', move, { passive: false });
+        window.addEventListener('touchend', stopMove);
+
+        // Cor do Usuário
         const userColor = localStorage.getItem('userNeonColor') || '#00f2ff';
         document.documentElement.style.setProperty('--user-neon-color', userColor);
     </script>
