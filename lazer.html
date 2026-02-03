@@ -2,267 +2,136 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexusVL - Elite 3x3 Grid</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusVL - Lazer Integrado</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --user-neon-color: #00f2ff;
-            --road-neon: #0066ff;
-            --bg-void: #010205;
-            --grass: #002211;
-            --lake: #00e5ff;
-            --grey-neon: #aaaaaa;
+            --neon-blue: #00f2ff;
+            --neon-purple: #bc13fe;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            background-color: #000;
-            color: #fff;
-            font-family: 'Rajdhani', sans-serif;
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
             overflow: hidden;
-            height: 100vh; width: 100vw;
-            cursor: grab;
-            touch-action: none; /* Previne scroll acidental no mobile */
+            background: #000;
+            font-family: 'Rajdhani', sans-serif;
         }
 
-        #viewport { width: 100vw; height: 100vh; position: relative; overflow: hidden; }
-
-        #city-map {
-            position: absolute;
-            width: 2100px; height: 2100px;
-            background-color: var(--bg-void);
-            transform-origin: 0 0;
-            will-change: transform;
-            background-image: 
-                linear-gradient(rgba(0, 102, 255, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 102, 255, 0.05) 1px, transparent 1px);
-            background-size: 50px 50px;
-        }
-
-        .street { position: absolute; background: #000; box-shadow: 0 0 15px var(--road-neon); z-index: 5; }
-        .h-street { width: 1950px; height: 12px; left: 75px; }
-        .v-street { height: 1950px; width: 12px; top: 75px; }
-
-        .block-area {
-            position: absolute;
-            width: 600px; height: 600px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
-            gap: 45px;
-            padding: 45px;
-        }
-
-        /* PRÉDIOS COM NEON EM VOLTA */
-        .building {
-            background: #0a0a0a;
-            border: 1px solid rgba(255,255,255,0.1);
+        /* Container da Imagem de Fundo */
+        .city-view {
             position: relative;
-            display: flex; align-items: center; justify-content: center;
-            text-decoration: none;
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            /* Neon cinza padrão para todos */
-            box-shadow: 15px 15px 25px rgba(0,0,0,0.8), 0 0 8px var(--grey-neon);
+            width: 100vw; height: 100vh;
+            background: url('SUA_IMAGEM_AQUI.jpg') no-repeat center center;
+            background-size: cover;
+            display: flex;
+            align-items: center; justify-content: center;
         }
 
-        /* Prédios Principais */
-        .building.alive {
-            animation: glow-pulse 3s infinite alternate;
-        }
-
-        @keyframes glow-pulse {
-            from { box-shadow: 15px 15px 25px rgba(0,0,0,0.8), 0 0 10px var(--p-color); }
-            to { box-shadow: 15px 15px 35px rgba(0,0,0,0.9), 0 0 25px var(--p-color); }
-        }
-
-        .building:hover { 
-            transform: translate(-5px, -5px); 
-            filter: brightness(1.2); 
+        /* Pontos de Interação (Hotspots) */
+        .hotspot {
+            position: absolute;
+            width: 40px; height: 40px;
+            cursor: pointer;
             z-index: 10;
         }
 
-        .label {
-            color: #fff; font-family: 'Orbitron'; font-size: 11px;
-            letter-spacing: 2px; text-align: center; font-weight: bold;
-            text-shadow: 0 0 5px #000; z-index: 2;
-        }
-
-        /* PARQUE DETALHADO */
-        .park {
-            background: var(--grass);
-            border: 1px solid #004422;
-            border-radius: 4px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 10px 10px 20px rgba(0,0,0,0.5);
-            /* Caminhos pedonais (grid interno do parque) */
-            background-image: 
-                linear-gradient(45deg, transparent 48%, #113322 49%, #113322 51%, transparent 52%),
-                linear-gradient(-45deg, transparent 48%, #113322 49%, #113322 51%, transparent 52%);
-            background-size: 100px 100px;
-        }
-
-        .lake {
+        /* Efeito de Brilho no Ponto */
+        .hotspot::before {
+            content: '';
             position: absolute;
-            width: 250px; height: 180px;
-            background: radial-gradient(circle, var(--lake) 0%, #008899 100%);
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
-            box-shadow: 0 0 50px rgba(0, 229, 255, 0.4), inset 0 0 30px rgba(0,0,0,0.5);
-        }
-
-        .tree-dot {
-            position: absolute;
-            width: 8px; height: 8px;
-            background: #00ff88;
+            width: 15px; height: 15px;
+            background: var(--neon-blue);
             border-radius: 50%;
-            box-shadow: 0 0 8px #00ff88;
+            box-shadow: 0 0 15px var(--neon-blue), 0 0 30px var(--neon-blue);
+            animation: pulse 2s infinite;
         }
 
-        .ui-fixed { position: fixed; width: 100%; z-index: 1000; pointer-events: none; }
-        .social-header { top: 20px; text-align: center; }
-        .social-header h1 { font-family: 'Orbitron'; letter-spacing: 8px; text-shadow: 0 0 10px var(--user-neon-color); font-size: 0.8rem; }
-        .btn-exit {
-            position: fixed; bottom: 25px; right: 25px;
-            padding: 10px 20px; border: 1px solid var(--user-neon-color);
-            color: var(--user-neon-color); text-decoration: none; font-family: 'Orbitron';
-            background: rgba(0,0,0,0.9); z-index: 1000; pointer-events: auto; font-size: 0.7rem;
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
         }
+
+        /* Tooltip (Legenda ao passar o mouse) */
+        .tooltip {
+            position: absolute;
+            bottom: 50px; left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.85);
+            border: 1px solid var(--neon-blue);
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-family: 'Orbitron';
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+
+        .hotspot:hover .tooltip {
+            opacity: 1;
+            bottom: 60px;
+        }
+
+        /* Posicionamento dos pontos baseados na sua imagem */
+        /* Estes valores de % devem ser ajustados para casar com os pontos da imagem */
+        #ponto-cinema { top: 40%; left: 15%; }
+        #ponto-park   { top: 52%; left: 30%; }
+        #ponto-tower  { top: 35%; left: 50%; }
+        #ponto-cafe   { top: 45%; left: 78%; }
+
+        .btn-back {
+            position: fixed; bottom: 30px; left: 30px;
+            padding: 10px 25px;
+            background: rgba(0,0,0,0.7);
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-blue);
+            text-decoration: none;
+            font-family: 'Orbitron';
+            font-size: 0.8rem;
+            transition: 0.3s;
+        }
+
+        .btn-back:hover { background: var(--neon-blue); color: #000; }
     </style>
 </head>
 <body>
 
-    <div class="ui-fixed social-header">
-        <h1>NEXUS DISTRICT - STRATEGIC OVERVIEW</h1>
+    <div class="city-view">
+        <a href="cinema.html" class="hotspot" id="ponto-cinema">
+            <div class="tooltip">Nexus Cinema - Filmes & VR</div>
+        </a>
+
+        <a href="park.html" class="hotspot" id="ponto-park">
+            <div class="tooltip">Central Park - Área Verde</div>
+        </a>
+
+        <a href="dashboard.html" class="hotspot" id="ponto-tower">
+            <div class="tooltip">Nexus Tower - Matriz</div>
+        </a>
+
+        <a href="cafeteria.html" class="hotspot" id="ponto-cafe">
+            <div class="tooltip">Cyber Café - Social</div>
+        </a>
     </div>
 
-    <div id="viewport">
-        <div id="city-map">
-            <div class="street h-street" style="top: 75px;"></div>
-            <div class="street h-street" style="top: 725px;"></div>
-            <div class="street h-street" style="top: 1375px;"></div>
-            <div class="street h-street" style="top: 2025px;"></div>
-            
-            <div class="street v-street" style="left: 75px;"></div>
-            <div class="street v-street" style="left: 725px;"></div>
-            <div class="street v-street" style="left: 1375px;"></div>
-            <div class="street v-street" style="left: 2025px;"></div>
+    <a href="index.html" class="btn-back">VOLTAR AO MENU</a>
 
-            <div id="grid-container"></div>
-        </div>
-    </div>
-
-    <a href="index.html" class="btn-exit">VOLTAR</a>
-
-    <script type="module">
-        const container = document.getElementById('grid-container');
-        
-        const mainBuildings = {
-            "0,1": { name: "CAFE NEON", color: "#ff00ff", link: "cafeteria.html" },
-            "1,0": { name: "LIBRARY", color: "#bd00ff", link: "livraria.html" },
-            "1,2": { name: "THE BAR", color: "#ff0044", link: "bar.html" },
-            "2,1": { name: "CINEMA", color: "#ffcc00", link: "cinema.html" },
-            "0,0": { name: "NEXUS CORE", color: "#00f2ff", link: "cidade.html" }
-        };
-
-        const randomNames = ["VORTEX", "APEX", "ZENITH", "COBALT", "MATRIX", "VECTOR", "OZONE", "TITAN", "NEO-DOME"];
-
-        // Gerar Grade 3x3
-        for(let r=0; r<3; r++) {
-            for(let c=0; c<3; c++) {
-                const block = document.createElement('div');
-                block.className = 'block-area';
-                block.style.top = (75 + r * 650) + 'px';
-                block.style.left = (75 + c * 650) + 'px';
-
-                if(r === 1 && c === 1) { // Parque Central
-                    block.innerHTML = `
-                        <div class="park" style="grid-column: span 2; grid-row: span 2;">
-                            <div class="lake"></div>
-                            ${Array.from({length: 20}).map(() => `
-                                <div class="tree-dot" style="top:${Math.random()*90}%; left:${Math.random()*90}%"></div>
-                            `).join('')}
-                            <div class="label" style="position:absolute; bottom:15px; width:100%; opacity: 0.7">NEXUS CENTRAL PARK</div>
-                        </div>`;
-                } else {
-                    for(let p=0; p<4; p++) {
-                        const bKey = `${r},${c}`;
-                        const mainData = mainBuildings[bKey];
-                        const isMain = mainData && p === 0;
-                        
-                        const a = document.createElement('a');
-                        a.href = isMain ? mainData.link : "#";
-                        a.className = isMain ? "building alive" : "building";
-                        
-                        if(isMain) {
-                            a.style.setProperty('--p-color', mainData.color);
-                            a.style.boxShadow = `15px 15px 25px rgba(0,0,0,0.8), 0 0 15px ${mainData.color}`;
-                            a.innerHTML = `<div class="label">${mainData.name}</div>`;
-                        } else {
-                            const name = randomNames[Math.floor(Math.random()*randomNames.length)];
-                            a.innerHTML = `<div class="label" style="opacity:0.5">${name}</div>`;
-                        }
-                        block.appendChild(a);
-                    }
-                }
-                container.appendChild(block);
-            }
-        }
-
-        // --- SISTEMA DE CÂMERA CORRIGIDO ---
-        const cityMap = document.getElementById('city-map');
-        const zoomScale = 0.45;
-        let currentX = window.innerWidth/2 - (1050 * zoomScale);
-        let currentY = window.innerHeight/2 - (1050 * zoomScale);
-        let isDragging = false;
-        let startX, startY;
-
-        function updateTransform() {
-            const minX = window.innerWidth - (2100 * zoomScale);
-            const minY = window.innerHeight - (2100 * zoomScale);
-            
-            if (currentX > 0) currentX = 0;
-            if (currentY > 0) currentY = 0;
-            if (currentX < minX) currentX = minX;
-            if (currentY < minY) currentY = minY;
-            
-            cityMap.style.transform = `translate(${currentX}px, ${currentY}px) scale(${zoomScale})`;
-        }
-
-        const handleStart = (e) => {
-            isDragging = true;
-            document.body.style.cursor = 'grabbing';
-            const pageX = e.pageX || e.touches[0].pageX;
-            const pageY = e.pageY || e.touches[0].pageY;
-            startX = pageX - currentX;
-            startY = pageY - currentY;
-        };
-
-        const handleMove = (e) => {
-            if (!isDragging) return;
-            const pageX = e.pageX || e.touches[0].pageX;
-            const pageY = e.pageY || e.touches[0].pageY;
-            currentX = pageX - startX;
-            currentY = pageY - startY;
-            updateTransform();
-        };
-
-        const handleEnd = () => {
-            isDragging = false;
-            document.body.style.cursor = 'grab';
-        };
-
-        window.addEventListener('mousedown', handleStart);
-        window.addEventListener('mousemove', handleMove);
-        window.addEventListener('mouseup', handleEnd);
-        window.addEventListener('touchstart', handleStart);
-        window.addEventListener('touchmove', handleMove, { passive: false });
-        window.addEventListener('touchend', handleEnd);
-
-        updateTransform();
-    </script>
     <script type="module" src="nexus-overlay.js"></script>
+
+    <script>
+        // Log de telemetria simples para o dashboard
+        document.querySelectorAll('.hotspot').forEach(item => {
+            item.addEventListener('click', (e) => {
+                console.log(`Navegando para: ${item.querySelector('.tooltip').innerText}`);
+            });
+        });
+    </script>
 </body>
 </html>
