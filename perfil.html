@@ -52,8 +52,11 @@
         .building-asset {
             width: 90px; background: #080808; border: 2px solid var(--accent-color); 
             border-bottom: none; display: flex; flex-wrap: wrap; padding: 10px; gap: 5px; 
-            justify-content: center; position: relative;
+            justify-content: center; position: relative; cursor: pointer; transition: 0.3s;
         }
+        .building-asset:hover { transform: scale(1.05); filter: brightness(1.2); }
+        .building-label { position: absolute; top: -30px; font-family: 'Orbitron'; font-size: 0.5rem; white-space: nowrap; color: var(--accent-color); text-shadow: 0 0 5px #000; }
+
         .building-door { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 20px; height: 25px; background: #111; border: 1px solid var(--accent-color); border-bottom: none; }
         .window { width: 9px; height: 9px; background: #111; border-radius: 1px; }
         .active-win { background: var(--accent-color); box-shadow: 0 0 5px var(--accent-color); }
@@ -81,7 +84,7 @@
             <a href="index.html" class="btn-nav">VOLTAR</a>
             <a href="mapa.html" class="btn-nav">MUNDO</a>
         </div>
-        <div id="user-balance" style="color:var(--gold); font-family:Orbitron; font-size:0.7rem;">0.00 NP</div>
+        <div id="user-level-top" style="color:var(--gold); font-family:Orbitron; font-size:0.7rem;">LVL 1</div>
     </nav>
 
     <div class="habitat-header">
@@ -92,7 +95,9 @@
 
     <div class="world-view">
         <div id="user-cube" class="identity-cube"></div>
-        <div id="user-building" class="building-asset"></div>
+        <div id="user-building" class="building-asset" onclick="openSocial()">
+            <div id="building-name" class="building-label"></div>
+        </div>
     </div>
 
     <div class="action-bar">
@@ -101,29 +106,25 @@
 
     <div id="niche-modal" class="niche-modal" onclick="closeModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <p style="font-size:0.6rem; font-family:Orbitron; color:#555; text-align:center;">IDENTIDADE VISUAL</p>
+            <p style="font-size:0.6rem; font-family:Orbitron; color:#555; text-align:center;">DADOS DA UNIDADE</p>
+            
+            <input type="text" id="input-store-name" placeholder="Nome do seu Prédio/Loja">
+            <input type="text" id="input-social" placeholder="Link (Instagram/Face/Site)">
+
+            <p style="font-size:0.6rem; font-family:Orbitron; color:#555; text-align:center; margin-top:15px;">IDENTIDADE VISUAL</p>
             <div class="selector-grid">
                 <div class="opt-btn" style="border-bottom: 2px solid #00d9ff" onclick="setGender('masc')">MASCULINO</div>
                 <div class="opt-btn" style="border-bottom: 2px solid #ff00ea" onclick="setGender('fem')">FEMININO</div>
                 <div class="opt-btn" style="background: linear-gradient(90deg, red, blue); border:none;" onclick="setGender('other')">OUTROS</div>
             </div>
 
-            <p style="font-size:0.6rem; font-family:Orbitron; color:#555; text-align:center;">PROTOCOLO (OCUPAÇÃO)</p>
-            <div class="selector-grid" id="role-selector">
-                </div>
+            <p style="font-size:0.6rem; font-family:Orbitron; color:#555; text-align:center;">PROTOCOLO</p>
+            <div class="selector-grid" id="role-selector"></div>
 
             <input type="text" id="input-city" placeholder="Sua Cidade">
             <select id="input-state">
-                <option value="">Selecione o Estado</option>
-                <option value="AC">Acre</option><option value="AL">Alagoas</option><option value="AP">Amapá</option>
-                <option value="AM">Amazonas</option><option value="BA">Bahia</option><option value="CE">Ceará</option>
-                <option value="DF">Distrito Federal</option><option value="ES">Espírito Santo</option><option value="GO">Goiás</option>
-                <option value="MA">Maranhão</option><option value="MT">Mato Grosso</option><option value="MS">Mato Grosso do Sul</option>
-                <option value="MG">Minas Gerais</option><option value="PA">Pará</option><option value="PB">Paraíba</option>
-                <option value="PR">Paraná</option><option value="PE">Pernambuco</option><option value="PI">Piauí</option>
-                <option value="RJ">Rio de Janeiro</option><option value="RN">Rio Grande do Norte</option><option value="RS">Rio Grande do Sul</option>
-                <option value="RO">Rondônia</option><option value="RR">Roraima</option><option value="SC">Santa Catarina</option>
-                <option value="SP">São Paulo</option><option value="SE">Sergipe</option><option value="TO">Tocantins</option>
+                <option value="">Estado</option>
+                <option value="AC">Acre</option><option value="AL">Alagoas</option><option value="AP">Amapá</option><option value="AM">Amazonas</option><option value="BA">Bahia</option><option value="CE">Ceará</option><option value="DF">Distrito Federal</option><option value="ES">Espírito Santo</option><option value="GO">Goiás</option><option value="MA">Maranhão</option><option value="MT">Mato Grosso</option><option value="MS">Mato Grosso do Sul</option><option value="MG">Minas Gerais</option><option value="PA">Pará</option><option value="PB">Paraíba</option><option value="PR">Paraná</option><option value="PE">Pernambuco</option><option value="PI">Piauí</option><option value="RJ">Rio de Janeiro</option><option value="RN">Rio Grande do Norte</option><option value="RS">Rio Grande do Sul</option><option value="RO">Rondônia</option><option value="RR">Roraima</option><option value="SC">Santa Catarina</option><option value="SP">São Paulo</option><option value="SE">Sergipe</option><option value="TO">Tocantins</option>
             </select>
 
             <button onclick="saveAll()" style="width:100%; margin-top:10px; background:var(--gold); border:none; padding:12px; font-family:Orbitron; font-weight:bold; cursor:pointer;">SALVAR ALTERAÇÕES</button>
@@ -145,8 +146,8 @@
         let isOwner = false;
         let selectedRole = 'citizen';
         let selectedGender = 'masc';
+        let currentSocialLink = "";
 
-        // OBJETO ROLES RESTAURADO
         const roles = {
             citizen: { label: "CIDADÃO", color: "#555" },
             clothes: { label: "MODA", color: "#00f2ff" },
@@ -159,7 +160,7 @@
 
         const genders = { masc: "#00d9ff", fem: "#ff00ea", other: "rainbow" };
 
-        // Renderizar botões de Role no Modal
+        // Renderizar botões de Role
         const roleContainer = document.getElementById('role-selector');
         Object.keys(roles).forEach(key => {
             const btn = document.createElement('div');
@@ -181,14 +182,16 @@
 
         window.toggleNicheMenu = () => { if(isOwner) document.getElementById('niche-modal').style.display = 'flex'; };
         window.closeModal = (e) => { if(e.target.id === 'niche-modal') e.target.style.display = 'none'; };
-
-        window.setRole = (r) => {
-            selectedRole = r;
-            // Feedback visual simples
-            document.querySelectorAll('#role-selector .opt-btn').forEach(b => b.style.borderColor = '#333');
-            event.target.style.borderColor = roles[r].color;
-        };
+        window.setRole = (r) => selectedRole = r;
         window.setGender = (g) => selectedGender = g;
+
+        window.openSocial = () => {
+            if(currentSocialLink) {
+                window.open(currentSocialLink.startsWith('http') ? currentSocialLink : 'https://' + currentSocialLink, '_blank');
+            } else if(isOwner) {
+                toggleNicheMenu();
+            }
+        };
 
         window.saveAll = async () => {
             if(!auth.currentUser) return;
@@ -201,7 +204,9 @@
                 gender: selectedGender,
                 userNeonColor: color,
                 cidade: document.getElementById('input-city').value,
-                estado: document.getElementById('input-state').value
+                estado: document.getElementById('input-state').value,
+                storeName: document.getElementById('input-store-name').value,
+                socialLink: document.getElementById('input-social').value
             });
             document.getElementById('niche-modal').style.display = 'none';
         };
@@ -210,39 +215,37 @@
             const roleKey = data.role || 'citizen';
             const config = roles[roleKey] || roles.citizen;
             const gender = data.gender || 'masc';
+            const level = Math.floor((data.xp || 0) / 1000) + 1;
 
-            // Atualiza as cores globais baseadas na role
             document.documentElement.style.setProperty('--accent-color', config.color);
+            document.getElementById('user-level-top').innerText = `LVL ${level}`;
             
             const cube = document.getElementById('user-cube');
             cube.classList.remove('rainbow-mode');
-            if(gender === 'other') {
-                cube.classList.add('rainbow-mode');
-            } else {
-                document.documentElement.style.setProperty('--identity-color', genders[gender] || config.color);
-            }
+            if(gender === 'other') cube.classList.add('rainbow-mode');
+            else document.documentElement.style.setProperty('--identity-color', genders[gender] || config.color);
 
-            // Preenchimento de dados garantido
             document.getElementById('display-name').innerText = (data.nome || "NEXUS").toUpperCase();
             document.getElementById('display-city').innerText = (data.cidade || "CIDADE").toUpperCase();
             document.getElementById('display-state').innerText = (data.estado || "---").toUpperCase();
             document.getElementById('display-role').innerText = config.label;
-            document.getElementById('user-balance').innerText = `${(data.saldo || 0).toFixed(2)} NP`;
             
-            // Sincronizar inputs do modal com os dados atuais
+            // Dados da Loja/Social
+            currentSocialLink = data.socialLink || "";
+            document.getElementById('building-name').innerText = (data.storeName || "").toUpperCase();
+
             if(isOwner){
                 document.getElementById('input-city').value = data.cidade || "";
                 document.getElementById('input-state').value = data.estado || "";
-                selectedRole = data.role || 'citizen';
-                selectedGender = data.gender || 'masc';
+                document.getElementById('input-store-name').value = data.storeName || "";
+                document.getElementById('input-social').value = data.socialLink || "";
             }
 
             // Construir Prédio
-            const level = Math.floor((data.xp || 0) / 1000) + 1;
             const b = document.getElementById('user-building');
             b.style.height = (70 + (level * 15)) + "px";
             b.style.borderColor = config.color;
-            b.innerHTML = '<div class="building-door"></div>'; 
+            b.innerHTML = `<div id="building-name" class="building-label">${(data.storeName || "").toUpperCase()}</div><div class="building-door"></div>`; 
             for(let i=0; i < Math.min(level * 3, 24); i++){
                 const w = document.createElement('div');
                 w.className = "window active-win";
