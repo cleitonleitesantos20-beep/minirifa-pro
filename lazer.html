@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexusVL - Infinite Metropolis</title>
+    <title>NexusVL - Mega City Grid</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --user-neon-color: #00f2ff;
-            --road-neon: #0088ff; /* Azul Neon para as ruas */
+            --road-neon: #0088ff;
             --bg-void: #000103;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        
         body {
             background-color: #000;
             color: #fff;
@@ -23,73 +22,64 @@
             cursor: grab;
         }
 
-        #viewport {
-            width: 100vw; height: 100vh;
-            position: relative;
-            overflow: hidden;
-            background: #000;
-        }
+        #viewport { width: 100vw; height: 100vh; position: relative; overflow: hidden; background: #000; }
 
-        /* MAPA GIGANTE - 15000px */
+        /* MAPA GIGANTE 15.000px */
         #city-map {
             position: absolute;
-            width: 15000px; 
-            height: 15000px;
+            width: 15000px; height: 15000px;
             background-color: var(--bg-void);
+            /* Malha de ruas em Azul Neon */
+            background-image: 
+                linear-gradient(var(--road-neon) 2px, transparent 2px),
+                linear-gradient(90deg, var(--road-neon) 2px, transparent 2px);
+            background-size: 500px 500px; /* Tamanho do quarteirão */
             transform-origin: 0 0;
             will-change: transform;
         }
 
-        /* RUAS COM NEON AZUL */
-        .street-h, .street-v {
-            position: absolute;
-            background: #050505;
-            z-index: 1;
-            box-shadow: 0 0 20px var(--road-neon);
-            border: 1px solid var(--road-neon);
-        }
-        .street-h { width: 100%; height: 140px; }
-        .street-v { height: 100%; width: 140px; }
-
-        /* PRÉDIOS INTERATIVOS (Centro denso) */
-        .block {
+        /* PRÉDIOS PRINCIPAIS (Z-index alto) */
+        .main-block {
             position: absolute;
             background: #000;
-            border: 10px solid var(--neon-color);
+            border: 15px solid var(--n-color);
             display: flex; align-items: center; justify-content: center;
-            z-index: 10;
-            box-shadow: 0 0 60px var(--neon-color);
-        }
-
-        .district-node {
-            padding: 20px;
+            z-index: 100;
+            box-shadow: 0 0 80px var(--n-color);
             text-decoration: none;
-            color: #fff;
-            font-family: 'Orbitron';
-            font-size: 80px;
-            font-weight: bold;
-            text-align: center;
-            text-shadow: 0 0 30px #fff;
+            transition: transform 0.3s;
+        }
+        .main-block:hover { transform: scale(1.05); }
+
+        .label {
+            color: #fff; font-family: 'Orbitron'; font-weight: bold;
+            text-align: center; text-shadow: 0 0 20px #fff;
         }
 
-        /* PRÉDIOS DECORATIVOS COM CORES SOLICITADAS */
-        .decor { position: absolute; z-index: 5; background: #080808; border-width: 2px; border-style: solid; }
-        .decor.purple { border-color: #bc13fe; box-shadow: 0 0 15px #bc13fe; }
-        .decor.white  { border-color: #ffffff; box-shadow: 0 0 15px #ffffff; }
-        .decor.red    { border-color: #ff0000; box-shadow: 0 0 15px #ff0000; }
-        .decor.baby   { border-color: #89cff0; box-shadow: 0 0 15px #89cff0; }
+        /* PRÉDIOS DECORATIVOS (Cores solicitadas) */
+        .decor {
+            position: absolute;
+            z-index: 10;
+            background: #0a0a0a;
+            border-width: 4px;
+            border-style: solid;
+            opacity: 0.6;
+        }
+        .purple { border-color: #bc13fe; box-shadow: 0 0 20px #bc13fe; }
+        .white  { border-color: #ffffff; box-shadow: 0 0 20px #ffffff; }
+        .red    { border-color: #ff0000; box-shadow: 0 0 20px #ff0000; }
+        .baby   { border-color: #89cff0; box-shadow: 0 0 20px #89cff0; }
 
-        /* HEADER */
+        /* UI */
         .ui-fixed { position: fixed; width: 100%; z-index: 1000; pointer-events: none; }
         .social-header { top: 30px; text-align: center; }
         .social-header h1 { 
-            font-family: 'Orbitron'; letter-spacing: 20px; 
+            font-family: 'Orbitron'; letter-spacing: 15px; 
             text-shadow: 0 0 20px var(--user-neon-color); font-size: 1.5rem; 
         }
-        
         .btn-exit {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            padding: 15px 40px; border: 1px solid var(--user-neon-color);
+            padding: 15px 40px; border: 2px solid var(--user-neon-color);
             color: var(--user-neon-color); text-decoration: none; font-family: 'Orbitron';
             background: #000; z-index: 1000; pointer-events: auto;
         }
@@ -98,40 +88,29 @@
 <body>
 
     <div class="ui-fixed social-header">
-        <h1>NEXUS MEGA CITY SEED</h1>
+        <h1>NEXUS GLOBAL GRID</h1>
     </div>
 
     <div id="viewport">
         <div id="city-map">
-            <div class="street-h" style="top: 7000px;"></div>
-            <div class="street-h" style="top: 7500px;"></div>
-            <div class="street-h" style="top: 8000px;"></div>
-            <div class="street-v" style="left: 7000px;"></div>
-            <div class="street-v" style="left: 7500px;"></div>
-            <div class="street-v" style="left: 8000px;"></div>
+            <a href="cidade.html" class="main-block" style="top: 7250px; left: 7250px; width: 500px; height: 500px; --n-color: #00f2ff;">
+                <div class="label" style="font-size: 60px;">CENTRO</div>
+            </a>
 
-            <div class="block" style="top: 7150px; left: 7150px; width: 300px; height: 300px;"><a href="cafeteria.html" class="district-node" style="--neon-color: #ff00ff; font-size: 30px;">☕</a></div>
-            <div class="block" style="top: 7150px; left: 7650px; width: 300px; height: 300px;"><a href="cinema.html" class="district-node" style="--neon-color: #ffcc00; font-size: 30px;">🎬</a></div>
-            <div class="block" style="top: 7650px; left: 7150px; width: 300px; height: 300px;"><a href="bar.html" class="district-node" style="--neon-color: #ff0044; font-size: 30px;">🍸</a></div>
-            <div class="block" style="top: 7650px; left: 7650px; width: 300px; height: 300px;"><a href="livraria.html" class="district-node" style="--neon-color: #bd00ff; font-size: 30px;">📖</a></div>
-            
-            <div class="block" style="top: 7350px; left: 7350px; width: 800px; height: 800px; border-width: 20px; z-index: 15;">
-                <a href="cidade.html" class="district-node" style="--neon-color: #00f2ff; font-size: 60px;">CENTRO<br>NEXUS</a>
-            </div>
+            <a href="cafeteria.html" class="main-block" style="top: 6850px; left: 7350px; width: 300px; height: 250px; --n-color: #ff00ff;">
+                <div class="label" style="font-size: 30px;">CAFETERIA</div>
+            </a>
+            <a href="cinema.html" class="main-block" style="top: 7350px; left: 7850px; width: 350px; height: 300px; --n-color: #ffcc00;">
+                <div class="label" style="font-size: 30px;">CINEMA</div>
+            </a>
+            <a href="bar.html" class="main-block" style="top: 7850px; left: 7350px; width: 300px; height: 250px; --n-color: #ff0044;">
+                <div class="label" style="font-size: 30px;">BAR</div>
+            </a>
+            <a href="livraria.html" class="main-block" style="top: 7350px; left: 6800px; width: 350px; height: 300px; --n-color: #bd00ff;">
+                <div class="label" style="font-size: 30px;">LIVRARIA</div>
+            </a>
 
-            <div class="decor purple" style="top: 6000px; left: 6500px; width: 400px; height: 400px;"></div>
-            <div class="decor purple" style="top: 9000px; left: 8500px; width: 200px; height: 600px;"></div>
-            <div class="decor white" style="top: 6500px; left: 8000px; width: 300px; height: 300px;"></div>
-            <div class="decor white" style="top: 8500px; left: 6000px; width: 500px; height: 200px;"></div>
-            <div class="decor red" style="top: 7200px; left: 9000px; width: 250px; height: 450px;"></div>
-            <div class="decor red" style="top: 10000px; left: 7500px; width: 400px; height: 400px;"></div>
-            <div class="decor baby" style="top: 5500px; left: 7500px; width: 600px; height: 150px;"></div>
-            <div class="decor baby" style="top: 8000px; left: 9500px; width: 300px; height: 300px;"></div>
-
-            <div class="decor white" style="top: 2000px; left: 2000px; width: 800px; height: 800px;"></div>
-            <div class="decor purple" style="top: 12000px; left: 12000px; width: 800px; height: 800px;"></div>
-            <div class="decor red" style="top: 2000px; left: 12000px; width: 800px; height: 800px;"></div>
-            <div class="decor baby" style="top: 12000px; left: 2000px; width: 800px; height: 800px;"></div>
+            <div id="decor-container"></div>
         </div>
     </div>
 
@@ -139,10 +118,30 @@
 
     <script type="module">
         const cityMap = document.getElementById('city-map');
-        const zoomScale = 0.05; // VISÃO AINDA MAIS LONGE (ESPACIAL)
+        const decorContainer = document.getElementById('decor-container');
+        const zoomScale = 0.06;
         const mapSize = 15000;
 
-        // Inicia centralizado na coordenada 7500 (metade do mapa de 15k)
+        // Gerar prédios decorativos aleatórios nas cores solicitadas
+        const colors = ['purple', 'white', 'red', 'baby'];
+        for(let i=0; i < 150; i++) {
+            const d = document.createElement('div');
+            d.className = `decor ${colors[Math.floor(Math.random()*colors.length)]}`;
+            
+            // Posiciona longe do centro para não bagunçar os principais
+            let x = Math.random() * 14000 + 500;
+            let y = Math.random() * 14000 + 500;
+            
+            // Evita a área do centro (7000 a 8500)
+            if (x > 6500 && x < 8500 && y > 6500 && y < 8500) { x += 2000; }
+
+            d.style.left = x + 'px';
+            d.style.top = y + 'px';
+            d.style.width = (Math.random() * 300 + 100) + 'px';
+            d.style.height = (Math.random() * 300 + 100) + 'px';
+            decorContainer.appendChild(d);
+        }
+
         let currentX = window.innerWidth / 2 - (7500 * zoomScale);
         let currentY = window.innerHeight / 2 - (7500 * zoomScale);
         let isDragging = false;
