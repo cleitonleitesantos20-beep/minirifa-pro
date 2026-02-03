@@ -3,133 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusVL - Lazer</title>
+    <title>NexusVL - Lazer Mobile Optimized</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --neon-cyan: #00f2ff;
-            --neon-pink: #ff00ff;
         }
 
         body, html {
             margin: 0; padding: 0;
             width: 100%; height: 100%;
             overflow: hidden;
-            background: #000;
+            background: #000; /* Fundo preto para as bordas no celular */
             font-family: 'Rajdhani', sans-serif;
-        }
-
-        /* CONTAINER DA IMAGEM CORRIGIDO */
-        .city-view {
-            position: relative;
-            width: 100vw; height: 100vh;
-            background: url('https://i.postimg.cc/HsYpr1wD/038bc4f0-a03b-4936-9baa-bb106f38602c.jpg') no-repeat center center;
-            background-size: cover;
             display: flex;
             align-items: center; justify-content: center;
         }
 
-        /* Camada de escurecimento leve para destacar os pontos */
-        .city-view::before {
+        /* Container que mantém a proporção da imagem (1:1 no caso da sua imagem quadrada) */
+        .city-view {
+            position: relative;
+            width: 100vw;
+            height: 100vw; /* Mantém quadrado */
+            max-width: 100vh; /* Não deixa passar da altura da tela */
+            max-height: 100vh;
+            background: url('https://i.postimg.cc/HsYpr1wD/038bc4f0-a03b-4936-9baa-bb106f38602c.jpg') no-repeat center center;
+            background-size: contain;
+        }
+
+        /* Overlay de escaneamento para estética Cyberpunk */
+        .city-view::after {
             content: '';
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.2);
+            background: linear-gradient(rgba(0, 242, 255, 0.03) 50%, transparent 50%);
+            background-size: 100% 4px;
             pointer-events: none;
         }
 
-        /* Pontos de Interação */
         .hotspot {
             position: absolute;
-            width: 50px; height: 50px;
+            width: 8%; height: 8%; /* Tamanho relativo à imagem */
             cursor: pointer;
             z-index: 10;
             display: flex;
             align-items: center; justify-content: center;
         }
 
-        /* Círculo pulsante visual para indicar interatividade */
         .hotspot::after {
             content: '';
-            width: 20px; height: 20px;
+            width: 40%; height: 40%;
             border: 2px solid var(--neon-cyan);
             border-radius: 50%;
-            box-shadow: 0 0 15px var(--neon-cyan);
+            box-shadow: 0 0 10px var(--neon-cyan);
             animation: pulse 2s infinite;
         }
 
         @keyframes pulse {
             0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(2.5); opacity: 0; }
+            100% { transform: scale(2); opacity: 0; }
         }
 
-        /* Legenda Flutuante */
         .tooltip {
             position: absolute;
-            bottom: 60px;
+            bottom: 120%;
             background: rgba(0, 0, 0, 0.9);
             border: 1px solid var(--neon-cyan);
             color: #fff;
-            padding: 8px 16px;
-            border-radius: 2px;
+            padding: 5px 10px;
             font-family: 'Orbitron';
-            font-size: 12px;
+            font-size: 10px;
             white-space: nowrap;
             opacity: 0;
             pointer-events: none;
             transition: 0.3s;
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
-            letter-spacing: 1px;
         }
 
-        .hotspot:hover .tooltip {
-            opacity: 1;
-            bottom: 70px;
-        }
+        .hotspot:hover .tooltip { opacity: 1; }
 
-        /* AJUSTE FINO DAS POSIÇÕES NA IMAGEM */
-        #ponto-tower  { top: 35%; left: 50%; width: 80px; height: 120px; } /* Prédio Central */
-        #ponto-cafe   { top: 38%; left: 81%; }  /* Ícone Rosa Direita */
-        #ponto-cinema { top: 48%; left: 11%; }  /* Ícone Esquerda */
-        #ponto-park   { top: 43%; left: 59%; }  /* Ícone Central-Direita */
+        /* POSIÇÕES PERCENTUAIS (Funcionam em qualquer tamanho de tela) */
+        #ponto-tower  { top: 32%; left: 46%; width: 10%; height: 15%; } 
+        #ponto-cafe   { top: 38%; left: 81%; }
+        #ponto-cinema { top: 48%; left: 10%; }
+        #ponto-park   { top: 43%; left: 59%; }
 
         .btn-exit {
-            position: fixed; top: 30px; left: 30px;
-            padding: 10px 20px; border: 1px solid var(--neon-cyan);
+            position: fixed; top: 20px; left: 20px;
+            padding: 8px 15px; border: 1px solid var(--neon-cyan);
             color: var(--neon-cyan); text-decoration: none; font-family: 'Orbitron';
-            background: rgba(0,0,0,0.8); z-index: 1000; font-size: 0.7rem;
-            transition: 0.3s;
-        }
-
-        .btn-exit:hover {
-            background: var(--neon-cyan);
-            color: #000;
+            background: rgba(0,0,0,0.8); z-index: 1000; font-size: 0.6rem;
         }
     </style>
 </head>
 <body>
 
     <div class="city-view">
-        <a href="dashboard.html" class="hotspot" id="ponto-tower">
-            <div class="tooltip">NEXUS TOWER - HQ</div>
-        </a>
-
-        <a href="cafeteria.html" class="hotspot" id="ponto-cafe">
-            <div class="tooltip">NEON CAFÉ - SOCIAL</div>
-        </a>
-
-        <a href="cinema.html" class="hotspot" id="ponto-cinema">
-            <div class="tooltip">VR CINEMA - LAZER</div>
-        </a>
-
-        <a href="cidade.html" class="hotspot" id="ponto-park">
-            <div class="tooltip">NEXUS PARK - SISTEMA</div>
-        </a>
+        <a href="dashboard.html" class="hotspot" id="ponto-tower"><div class="tooltip">HQ TOWER</div></a>
+        <a href="cafeteria.html" class="hotspot" id="ponto-cafe"><div class="tooltip">NEON CAFÉ</div></a>
+        <a href="cinema.html" class="hotspot" id="ponto-cinema"><div class="tooltip">VR CINEMA</div></a>
+        <a href="cidade.html" class="hotspot" id="ponto-park"><div class="tooltip">PARK SYSTEM</div></a>
     </div>
 
     <a href="index.html" class="btn-exit">VOLTAR</a>
 
     <script type="module" src="nexus-overlay.js"></script>
-
 </body>
 </html>
