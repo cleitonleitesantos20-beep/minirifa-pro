@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexusVL - 9-Block Strategic Grid</title>
+    <title>NexusVL - Elite 3x3 Grid</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --user-neon-color: #00f2ff;
             --road-neon: #0066ff;
             --bg-void: #010205;
-            --grass: #001a0d;
+            --grass: #002211;
             --lake: #00e5ff;
-            --grey-neon: #555555;
+            --grey-neon: #aaaaaa;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -23,27 +23,27 @@
             overflow: hidden;
             height: 100vh; width: 100vw;
             cursor: grab;
+            touch-action: none; /* Previne scroll acidental no mobile */
         }
 
         #viewport { width: 100vw; height: 100vh; position: relative; overflow: hidden; }
 
-        /* MAPA AMPLIADO PARA 3x3 - 2100x2100 */
         #city-map {
             position: absolute;
             width: 2100px; height: 2100px;
             background-color: var(--bg-void);
             transform-origin: 0 0;
             will-change: transform;
-            background-image: radial-gradient(circle, rgba(255,255,255,0.02) 1px, transparent 1px);
-            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(rgba(0, 102, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 102, 255, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
         }
 
-        /* RUAS */
-        .street { position: absolute; background: #000; box-shadow: 0 0 12px var(--road-neon); z-index: 5; }
+        .street { position: absolute; background: #000; box-shadow: 0 0 15px var(--road-neon); z-index: 5; }
         .h-street { width: 1950px; height: 12px; left: 75px; }
         .v-street { height: 1950px; width: 12px; top: 75px; }
 
-        /* QUARTEIRÕES */
         .block-area {
             position: absolute;
             width: 600px; height: 600px;
@@ -54,64 +54,88 @@
             padding: 45px;
         }
 
-        /* ESTILO DOS PRÉDIOS */
+        /* PRÉDIOS COM NEON EM VOLTA */
         .building {
-            background: #080808;
-            border: 1px solid rgba(255,255,255,0.05);
+            background: #0a0a0a;
+            border: 1px solid rgba(255,255,255,0.1);
             position: relative;
-            box-shadow: 18px 18px 30px rgba(0,0,0,0.85);
             display: flex; align-items: center; justify-content: center;
             text-decoration: none;
-            transition: 0.3s;
-            border-top: 3px solid var(--p-color, var(--grey-neon));
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            /* Neon cinza padrão para todos */
+            box-shadow: 15px 15px 25px rgba(0,0,0,0.8), 0 0 8px var(--grey-neon);
         }
 
-        /* PRÉDIOS VIVOS (Principais) */
+        /* Prédios Principais */
         .building.alive {
-            animation: pulse-neon 3s infinite alternate;
-        }
-        @keyframes pulse-neon {
-            from { box-shadow: 18px 18px 30px rgba(0,0,0,0.85), 0 0 5px var(--p-color); }
-            to { box-shadow: 18px 18px 35px rgba(0,0,0,0.9), 0 0 15px var(--p-color); }
+            animation: glow-pulse 3s infinite alternate;
         }
 
-        .building:hover { transform: translate(-4px, -4px); filter: brightness(1.3); }
+        @keyframes glow-pulse {
+            from { box-shadow: 15px 15px 25px rgba(0,0,0,0.8), 0 0 10px var(--p-color); }
+            to { box-shadow: 15px 15px 35px rgba(0,0,0,0.9), 0 0 25px var(--p-color); }
+        }
+
+        .building:hover { 
+            transform: translate(-5px, -5px); 
+            filter: brightness(1.2); 
+            z-index: 10;
+        }
 
         .label {
-            color: #fff; font-family: 'Orbitron'; font-size: 12px;
-            letter-spacing: 1.5px; text-align: center; font-weight: bold;
-            text-shadow: 0 2px 4px #000; padding: 5px;
+            color: #fff; font-family: 'Orbitron'; font-size: 11px;
+            letter-spacing: 2px; text-align: center; font-weight: bold;
+            text-shadow: 0 0 5px #000; z-index: 2;
         }
 
-        /* PARQUE CENTRAL */
+        /* PARQUE DETALHADO */
         .park {
-            background: linear-gradient(135deg, #001a0d 0%, #002e1a 100%);
-            border-radius: 4px; position: relative; overflow: hidden;
-            box-shadow: 15px 15px 30px rgba(0,0,0,0.7);
-        }
-        .lake {
-            position: absolute; width: 220px; height: 160px;
-            background: var(--lake); top: 50%; left: 50%; transform: translate(-50%, -50%);
-            border-radius: 45% 55% 70% 30% / 40% 40% 60% 60%;
-            box-shadow: 0 0 40px rgba(0, 229, 255, 0.3), inset 0 0 30px rgba(0,0,0,0.4);
+            background: var(--grass);
+            border: 1px solid #004422;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 10px 10px 20px rgba(0,0,0,0.5);
+            /* Caminhos pedonais (grid interno do parque) */
+            background-image: 
+                linear-gradient(45deg, transparent 48%, #113322 49%, #113322 51%, transparent 52%),
+                linear-gradient(-45deg, transparent 48%, #113322 49%, #113322 51%, transparent 52%);
+            background-size: 100px 100px;
         }
 
-        /* UI */
+        .lake {
+            position: absolute;
+            width: 250px; height: 180px;
+            background: radial-gradient(circle, var(--lake) 0%, #008899 100%);
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+            box-shadow: 0 0 50px rgba(0, 229, 255, 0.4), inset 0 0 30px rgba(0,0,0,0.5);
+        }
+
+        .tree-dot {
+            position: absolute;
+            width: 8px; height: 8px;
+            background: #00ff88;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #00ff88;
+        }
+
         .ui-fixed { position: fixed; width: 100%; z-index: 1000; pointer-events: none; }
         .social-header { top: 20px; text-align: center; }
-        .social-header h1 { font-family: 'Orbitron'; letter-spacing: 10px; text-shadow: 0 0 15px var(--user-neon-color); font-size: 0.8rem; }
+        .social-header h1 { font-family: 'Orbitron'; letter-spacing: 8px; text-shadow: 0 0 10px var(--user-neon-color); font-size: 0.8rem; }
         .btn-exit {
             position: fixed; bottom: 25px; right: 25px;
             padding: 10px 20px; border: 1px solid var(--user-neon-color);
             color: var(--user-neon-color); text-decoration: none; font-family: 'Orbitron';
-            background: rgba(0,0,0,0.9); z-index: 1000; pointer-events: auto;
+            background: rgba(0,0,0,0.9); z-index: 1000; pointer-events: auto; font-size: 0.7rem;
         }
     </style>
 </head>
 <body>
 
     <div class="ui-fixed social-header">
-        <h1>NEXUS CITY MONITORING - 3x3 GRID</h1>
+        <h1>NEXUS DISTRICT - STRATEGIC OVERVIEW</h1>
     </div>
 
     <div id="viewport">
@@ -135,16 +159,15 @@
     <script type="module">
         const container = document.getElementById('grid-container');
         
-        // Configuração dos Prédios Principais
         const mainBuildings = {
-            "1,1": { name: "DOWNTOWN", color: "#00f2ff", link: "cidade.html" },
             "0,1": { name: "CAFE NEON", color: "#ff00ff", link: "cafeteria.html" },
-            "2,1": { name: "CINEMA", color: "#ffcc00", link: "cinema.html" },
+            "1,0": { name: "LIBRARY", color: "#bd00ff", link: "livraria.html" },
             "1,2": { name: "THE BAR", color: "#ff0044", link: "bar.html" },
-            "1,0": { name: "LIBRARY", color: "#bd00ff", link: "livraria.html" }
+            "2,1": { name: "CINEMA", color: "#ffcc00", link: "cinema.html" },
+            "0,0": { name: "NEXUS CORE", color: "#00f2ff", link: "cidade.html" }
         };
 
-        const randomNames = ["VORTEX", "APEX", "ZENITH", "COBALT", "MATRIX", "VECTOR", "OZONE", "TITAN", "NEO-DOME", "VOID-LAB", "SHELTER-9", "PULSE-X"];
+        const randomNames = ["VORTEX", "APEX", "ZENITH", "COBALT", "MATRIX", "VECTOR", "OZONE", "TITAN", "NEO-DOME"];
 
         // Gerar Grade 3x3
         for(let r=0; r<3; r++) {
@@ -154,28 +177,32 @@
                 block.style.top = (75 + r * 650) + 'px';
                 block.style.left = (75 + c * 650) + 'px';
 
-                // Se for o quarteirão central (1,1) -> Parque
-                if(r === 1 && c === 1) {
-                    block.innerHTML = `<div class="park" style="grid-column: span 2; grid-row: span 2;">
-                                        <div class="lake"></div>
-                                        <div class="label" style="position:absolute; bottom:15px; width:100%">NEXUS CENTRAL PARK</div>
-                                       </div>`;
+                if(r === 1 && c === 1) { // Parque Central
+                    block.innerHTML = `
+                        <div class="park" style="grid-column: span 2; grid-row: span 2;">
+                            <div class="lake"></div>
+                            ${Array.from({length: 20}).map(() => `
+                                <div class="tree-dot" style="top:${Math.random()*90}%; left:${Math.random()*90}%"></div>
+                            `).join('')}
+                            <div class="label" style="position:absolute; bottom:15px; width:100%; opacity: 0.7">NEXUS CENTRAL PARK</div>
+                        </div>`;
                 } else {
-                    // Adicionar 4 prédios por quarteirão
                     for(let p=0; p<4; p++) {
                         const bKey = `${r},${c}`;
-                        const isMain = mainBuildings[bKey] && p === 0; // Coloca o principal no primeiro slot do quarteirão designado
+                        const mainData = mainBuildings[bKey];
+                        const isMain = mainData && p === 0;
                         
                         const a = document.createElement('a');
-                        a.href = isMain ? mainBuildings[bKey].link : "#";
+                        a.href = isMain ? mainData.link : "#";
                         a.className = isMain ? "building alive" : "building";
                         
                         if(isMain) {
-                            a.style.setProperty('--p-color', mainBuildings[bKey].color);
-                            a.innerHTML = `<div class="label">${mainBuildings[bKey].name}</div>`;
+                            a.style.setProperty('--p-color', mainData.color);
+                            a.style.boxShadow = `15px 15px 25px rgba(0,0,0,0.8), 0 0 15px ${mainData.color}`;
+                            a.innerHTML = `<div class="label">${mainData.name}</div>`;
                         } else {
-                            const randName = randomNames[Math.floor(Math.random() * randomNames.length)];
-                            a.innerHTML = `<div class="label" style="opacity:0.6">${randName} ${p+1}</div>`;
+                            const name = randomNames[Math.floor(Math.random()*randomNames.length)];
+                            a.innerHTML = `<div class="label" style="opacity:0.5">${name}</div>`;
                         }
                         block.appendChild(a);
                     }
@@ -184,25 +211,57 @@
             }
         }
 
-        // Sistema de Câmera (Drag)
+        // --- SISTEMA DE CÂMERA CORRIGIDO ---
         const cityMap = document.getElementById('city-map');
-        const zoomScale = 0.4;
+        const zoomScale = 0.45;
         let currentX = window.innerWidth/2 - (1050 * zoomScale);
         let currentY = window.innerHeight/2 - (1050 * zoomScale);
-        let isDragging = false, startX, startY;
+        let isDragging = false;
+        let startX, startY;
 
         function updateTransform() {
             const minX = window.innerWidth - (2100 * zoomScale);
             const minY = window.innerHeight - (2100 * zoomScale);
-            if (currentX > 0) currentX = 0; if (currentY > 0) currentY = 0;
-            if (currentX < minX) currentX = minX; if (currentY < minY) currentY = minY;
+            
+            if (currentX > 0) currentX = 0;
+            if (currentY > 0) currentY = 0;
+            if (currentX < minX) currentX = minX;
+            if (currentY < minY) currentY = minY;
+            
             cityMap.style.transform = `translate(${currentX}px, ${currentY}px) scale(${zoomScale})`;
         }
 
+        const handleStart = (e) => {
+            isDragging = true;
+            document.body.style.cursor = 'grabbing';
+            const pageX = e.pageX || e.touches[0].pageX;
+            const pageY = e.pageY || e.touches[0].pageY;
+            startX = pageX - currentX;
+            startY = pageY - currentY;
+        };
+
+        const handleMove = (e) => {
+            if (!isDragging) return;
+            const pageX = e.pageX || e.touches[0].pageX;
+            const pageY = e.pageY || e.touches[0].pageY;
+            currentX = pageX - startX;
+            currentY = pageY - startY;
+            updateTransform();
+        };
+
+        const handleEnd = () => {
+            isDragging = false;
+            document.body.style.cursor = 'grab';
+        };
+
+        window.addEventListener('mousedown', handleStart);
+        window.addEventListener('mousemove', handleMove);
+        window.addEventListener('mouseup', handleEnd);
+        window.addEventListener('touchstart', handleStart);
+        window.addEventListener('touchmove', handleMove, { passive: false });
+        window.addEventListener('touchend', handleEnd);
+
         updateTransform();
-        window.addEventListener('mousedown', (e) => { isDragging = true; startX = e.pageX - currentX; startY = e.pageY - currentY; });
-        window.addEventListener('mousemove', (e) => { if(!isDragging) return; currentX = e.pageX - startX; currentY = e.pageY - startY; updateTransform(); });
-        window.addEventListener('mouseup', () => isDragging = false);
     </script>
     <script type="module" src="nexus-overlay.js"></script>
 </body>
