@@ -8,10 +8,13 @@
     <style>
         :root {
             --user-neon-color: #00f2ff;
-            --bg-dark: #050505;
+            --bg-dark: #02040a;
+            --road-color: #1a1e26;
+            --line-color: rgba(255, 255, 255, 0.1);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        
         body {
             background-color: var(--bg-dark);
             color: #fff;
@@ -20,110 +23,102 @@
             height: 100vh; width: 100vw;
         }
 
-        /* FUNDO DA CIDADE - GRID MAIS DISCRETO */
+        /* MAPA ESTILO CIDADE VISTA DE CIMA */
         #city-map {
             position: relative;
             width: 100%; height: 100%;
-            background: 
-                radial-gradient(circle at center, #111 0%, #000 100%),
-                repeating-linear-gradient(0deg, transparent 0, transparent 99px, rgba(255,255,255,0.02) 100px),
-                repeating-linear-gradient(90deg, transparent 0, transparent 99px, rgba(255,255,255,0.02) 100px);
-            display: flex; justify-content: center; align-items: center;
+            background-color: var(--bg-dark);
+            /* Desenho das ruas e quadras */
+            background-image: 
+                /* Faixas das ruas (horizontais e verticais) */
+                linear-gradient(90deg, var(--road-color) 40px, transparent 40px),
+                linear-gradient(0deg, var(--road-color) 40px, transparent 40px),
+                /* Linhas de grade/quadras */
+                linear-gradient(var(--line-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--line-color) 1px, transparent 1px);
+            background-size: 25% 100%, 100% 25%, 50px 50px, 50px 50px;
+            background-position: center;
         }
 
-        /* CONTAINER DOS PRÉDIOS/BOTÕES */
-        .building-container {
+        /* PRÉDIOS E QUADRAS */
+        .block {
             position: absolute;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* BLOCO DO PRÉDIO */
-        .building-block {
-            width: 140px;
-            height: 140px;
-            background: #0a0a0a;
-            border: 2px solid #1a1a1a;
+            background: #080a0f;
+            border: 1px solid #1a2233;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
-            transition: 0.3s;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
 
-        /* JANELAS DOS PRÉDIOS (EFEITO VISUAL) */
-        .building-block::after {
-            content: '';
-            position: absolute;
-            width: 80%; height: 80%;
-            background-image: radial-gradient(#1a1a1a 1px, transparent 1px);
-            background-size: 10px 10px;
-            opacity: 0.3;
-        }
-
-        /* BOTÃO DENTRO DO PRÉDIO */
+        /* ESTILO DOS BOTÕES NÉON (LETREIROS) */
         .district-node {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 10px 15px;
             text-decoration: none;
             color: #fff;
             font-family: 'Orbitron';
-            font-size: 11px;
+            font-size: 10px;
             font-weight: bold;
-            letter-spacing: 1px;
-            z-index: 2;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border: 2px solid var(--neon-color);
+            background: rgba(0, 0, 0, 0.8);
+            box-shadow: 0 0 10px var(--neon-color), inset 0 0 5px var(--neon-color);
             transition: 0.3s;
-            border: 1px solid transparent;
+            text-align: center;
+            white-space: nowrap;
         }
 
-        /* HOVER NOS PRÉDIOS */
-        .building-container:hover .building-block {
-            border-color: var(--user-neon-color);
-            transform: translateY(-5px);
-            box-shadow: 0 0 30px var(--user-neon-color);
+        .district-node:hover {
+            transform: scale(1.1);
+            background: var(--neon-color);
+            color: #000;
+            box-shadow: 0 0 25px var(--neon-color);
         }
 
-        .building-container:hover .district-node {
-            background: rgba(0, 242, 255, 0.1);
-            color: var(--user-neon-color);
-        }
-
-        /* POSICIONAMENTO ESPECÍFICO */
-        .pos-1 { top: 15%; left: 15%; }
-        .pos-2 { top: 15%; right: 15%; }
-        .pos-3 { top: 40%; left: 45%; } /* Centro */
-        .pos-4 { bottom: 20%; left: 10%; }
-        .pos-5 { bottom: 20%; right: 10%; }
-        .pos-6 { bottom: 45%; right: 15%; }
+        /* POSICIONAMENTO BASEADO NO LAYOUT DA FOTO */
+        /* Cafeteria (Canto Superior Esquerdo) */
+        .pos-cafeteria { top: 15%; left: 10%; width: 180px; height: 120px; }
+        
+        /* Cinema (Canto Superior Direito) */
+        .pos-cinema { top: 10%; right: 15%; width: 220px; height: 150px; }
+        
+        /* Centro Cidade (Meio) */
+        .pos-centro { top: 35%; left: 35%; width: 30%; height: 25%; border: 2px solid #2a334d; }
+        
+        /* Bar (Lado Esquerdo Meio) */
+        .pos-bar { top: 55%; left: 5%; width: 150px; height: 100px; }
+        
+        /* Livraria (Canto Inferior Direito) */
+        .pos-livraria { bottom: 15%; right: 10%; width: 200px; height: 120px; }
+        
+        /* Parque (Lado de baixo) */
+        .pos-parque { bottom: 10%; left: 30%; width: 250px; height: 80px; background: #050a05; border-color: #0a220a; }
 
         /* HEADER */
         .social-header {
-            position: fixed; top: 40px; width: 100%;
+            position: fixed; top: 20px; width: 100%;
             text-align: center; z-index: 100;
             pointer-events: none;
         }
         .social-header h1 {
-            font-family: 'Orbitron'; font-size: 1.2rem;
-            letter-spacing: 10px; color: #fff;
+            font-family: 'Orbitron'; font-size: 1.5rem;
+            letter-spacing: 12px; color: #fff;
+            text-shadow: 0 0 10px var(--user-neon-color);
         }
 
         /* BOTÃO VOLTAR */
         .btn-exit {
-            position: fixed; bottom: 30px; left: 50%;
+            position: fixed; bottom: 20px; left: 50%;
             transform: translateX(-50%);
-            padding: 12px 35px; border: 1px solid #222;
-            color: #444; text-decoration: none; 
+            padding: 10px 30px; border: 1px solid var(--user-neon-color);
+            color: var(--user-neon-color); text-decoration: none; 
             font-family: 'Orbitron'; font-size: 10px;
-            background: #000; z-index: 99999;
+            background: rgba(0,0,0,0.9); z-index: 99999;
             transition: 0.3s;
+            box-shadow: 0 0 10px rgba(0, 242, 255, 0.2);
         }
-        .btn-exit:hover { border-color: var(--user-neon-color); color: #fff; }
+        .btn-exit:hover { background: var(--user-neon-color); color: #000; box-shadow: 0 0 20px var(--user-neon-color); }
 
     </style>
 </head>
@@ -131,45 +126,32 @@
 
     <div class="social-header">
         <h1>NEXUS CITY MAP</h1>
-        <div style="width: 50px; height: 2px; background: var(--user-neon-color); margin: 10px auto;"></div>
     </div>
 
     <div id="city-map">
         
-        <div class="building-container pos-1">
-            <div class="building-block">
-                <a href="cafeteria.html" class="district-node" style="--user-neon-color: #ff00ff;">CAFETERIA</a>
-            </div>
+        <div class="block pos-cafeteria">
+            <a href="cafeteria.html" class="district-node" style="--neon-color: #ff00ff;">☕ Cafeteria</a>
         </div>
 
-        <div class="building-container pos-2">
-            <div class="building-block">
-                <a href="cinema.html" class="district-node" style="--user-neon-color: #ffcc00;">CINEMA</a>
-            </div>
+        <div class="block pos-cinema">
+            <a href="cinema.html" class="district-node" style="--neon-color: #ffcc00;">🎬 Cinema</a>
         </div>
 
-        <div class="building-container pos-3">
-            <div class="building-block" style="width: 180px; height: 180px; border-style: double;">
-                <a href="cidade.html" class="district-node" style="--user-neon-color: #00f2ff;">CENTRO CIDADE</a>
-            </div>
+        <div class="block pos-centro">
+            <a href="cidade.html" class="district-node" style="--neon-color: #00f2ff;">🏢 Centro Cidade</a>
         </div>
 
-        <div class="building-container pos-4">
-            <div class="building-block">
-                <a href="bar.html" class="district-node" style="--user-neon-color: #ff0044;">NEXUS BAR</a>
-            </div>
+        <div class="block pos-bar">
+            <a href="bar.html" class="district-node" style="--neon-color: #ff0044;">🍸 Nexus Bar</a>
         </div>
 
-        <div class="building-container pos-5">
-            <div class="building-block">
-                <a href="livraria.html" class="district-node" style="--user-neon-color: #bd00ff;">LIVRARIA</a>
-            </div>
+        <div class="block pos-livraria">
+            <a href="livraria.html" class="district-node" style="--neon-color: #bd00ff;">📖 Livraria</a>
         </div>
 
-        <div class="building-container pos-6">
-            <div class="building-block">
-                <a href="parque.html" class="district-node" style="--user-neon-color: #00ff88;">PARQUE</a>
-            </div>
+        <div class="block pos-parque">
+            <a href="parque.html" class="district-node" style="--neon-color: #00ff88;">🌳 Parque</a>
         </div>
 
     </div>
@@ -177,9 +159,9 @@
     <a href="index.html" class="btn-exit">VOLTAR AO DASHBOARD</a>
 
     <script type="module">
+        // Sincroniza a cor néon principal do usuário
         const userColor = localStorage.getItem('userNeonColor') || '#00f2ff';
-        // Aplica a cor do usuário apenas ao botão voltar e elementos neutros
-        document.querySelector('.btn-exit').style.setProperty('--user-neon-color', userColor);
+        document.documentElement.style.setProperty('--user-neon-color', userColor);
     </script>
     <script type="module" src="nexus-overlay.js"></script>
 </body>
