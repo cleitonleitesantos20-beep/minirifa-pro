@@ -19,45 +19,47 @@
             background-color: #000;
             color: #fff;
             font-family: 'Rajdhani', sans-serif;
-            overflow: hidden; /* Impede o scroll padrão do navegador */
+            overflow: hidden;
             height: 100vh; width: 100vw;
             cursor: grab;
         }
 
         body:active { cursor: grabbing; }
 
-        /* CONTAINER QUE PERMITE O MOVIMENTO */
         #viewport {
             width: 100vw;
             height: 100vh;
             position: relative;
             overflow: hidden;
+            background: radial-gradient(circle at center, #050a0f 0%, #000 100%);
         }
 
-        /* O MAPA REAL - MAIOR QUE A TELA */
+        /* MAPA COM ESCALA REDUZIDA (ZOOM DISTANTE) */
         #city-map {
             position: absolute;
-            width: 2000px; /* Tamanho da cidade */
-            height: 2000px;
+            width: 2500px; 
+            height: 2500px;
             background-color: var(--bg-dark);
             background-image: 
                 linear-gradient(var(--line-color) 1px, transparent 1px),
                 linear-gradient(90deg, var(--line-color) 1px, transparent 1px);
             background-size: 100px 100px;
-            transform: translate(-25%, -25%); /* Começa centralizado */
+            /* Zoom de 0.7 para parecer mais distante */
+            transform-origin: 0 0;
             will-change: transform;
         }
 
-        /* RUAS PRINCIPAIS */
+        /* RUAS COM MARGENS DE SEGURANÇA */
         .street-h, .street-v {
             position: absolute;
             background: var(--road-color);
-            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            z-index: 1;
         }
-        .street-h { width: 100%; height: 40px; }
-        .street-v { height: 100%; width: 40px; }
+        .street-h { width: 100%; height: 60px; }
+        .street-v { height: 100%; width: 60px; }
 
-        /* BLOCOS DE PRÉDIOS */
+        /* BLOCOS DE PRÉDIOS - AGORA FORA DAS RUAS */
         .block {
             position: absolute;
             background: #080a0f;
@@ -65,59 +67,46 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: border-color 0.3s;
+            z-index: 2;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
         }
 
-        /* LETREIROS NÉON */
         .district-node {
-            padding: 12px 20px;
+            padding: 15px 25px;
             text-decoration: none;
             color: #fff;
             font-family: 'Orbitron';
-            font-size: 12px;
+            font-size: 14px;
             font-weight: bold;
             border: 2px solid var(--neon-color);
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.9);
             box-shadow: 0 0 15px var(--neon-color);
             text-align: center;
             white-space: nowrap;
+            transition: 0.3s;
         }
 
-        /* POSICIONAMENTO ORGANIZADO (GRID DE AVENIDAS) */
-        .pos-cafeteria { top: 400px; left: 400px; width: 250px; height: 180px; }
-        .pos-cinema    { top: 400px; left: 1100px; width: 300px; height: 200px; }
-        .pos-centro    { top: 850px; left: 750px; width: 500px; height: 350px; border-width: 2px; }
-        .pos-bar       { top: 1300px; left: 450px; width: 220px; height: 150px; }
-        .pos-livraria  { top: 1350px; left: 1200px; width: 240px; height: 180px; }
-        .pos-parque    { top: 880px; left: 100px; width: 200px; height: 300px; background: #050a05; }
+        /* COORDENADAS AJUSTADAS PARA NÃO TOCAR NAS RUAS (Avenidas em 800px e 1600px) */
+        .pos-cafeteria { top: 300px; left: 300px; width: 280px; height: 200px; }
+        .pos-cinema    { top: 300px; left: 1100px; width: 320px; height: 220px; }
+        
+        /* Centro fica no quadrante central, longe das bordas das ruas */
+        .pos-centro    { top: 1000px; left: 950px; width: 550px; height: 400px; border-width: 2px; }
+        
+        .pos-bar       { top: 1800px; left: 400px; width: 250px; height: 180px; }
+        .pos-livraria  { top: 1800px; left: 1800px; width: 260px; height: 200px; }
+        .pos-parque    { top: 1000px; left: 200px; width: 300px; height: 450px; background: #040d04; border-color: #0f260f; }
 
-        /* INTERFACE FIXA */
-        .ui-fixed {
-            position: fixed;
-            width: 100%;
-            z-index: 1000;
-            pointer-events: none;
-        }
-        .social-header { top: 20px; text-align: center; }
-        .social-header h1 { 
-            font-family: 'Orbitron'; letter-spacing: 10px; 
-            text-shadow: 0 0 10px var(--user-neon-color);
-        }
+        /* UI */
+        .ui-fixed { position: fixed; width: 100%; z-index: 1000; pointer-events: none; }
+        .social-header { top: 30px; text-align: center; }
+        .social-header h1 { font-family: 'Orbitron'; letter-spacing: 15px; text-shadow: 0 0 15px var(--user-neon-color); font-size: 1.8rem; }
         
         .btn-exit {
-            position: fixed; bottom: 30px; left: 50%;
-            transform: translateX(-50%);
-            padding: 12px 40px; border: 1px solid var(--user-neon-color);
-            color: var(--user-neon-color); text-decoration: none; 
-            font-family: 'Orbitron'; font-size: 11px;
-            background: #000; z-index: 1000;
-            pointer-events: auto;
-        }
-
-        /* DICA DE MOVIMENTO */
-        .drag-hint {
-            position: fixed; bottom: 80px; width: 100%; text-align: center;
-            font-size: 10px; color: #444; letter-spacing: 2px;
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            padding: 15px 45px; border: 1px solid var(--user-neon-color);
+            color: var(--user-neon-color); text-decoration: none; font-family: 'Orbitron';
+            background: #000; z-index: 1000; pointer-events: auto;
         }
     </style>
 </head>
@@ -130,9 +119,9 @@
     <div id="viewport">
         <div id="city-map">
             <div class="street-h" style="top: 800px;"></div>
-            <div class="street-h" style="top: 1250px;"></div>
-            <div class="street-v" style="left: 700px;"></div>
-            <div class="street-v" style="left: 1050px;"></div>
+            <div class="street-h" style="top: 1600px;"></div>
+            <div class="street-v" style="left: 800px;"></div>
+            <div class="street-v" style="left: 1600px;"></div>
 
             <div class="block pos-cafeteria">
                 <a href="cafeteria.html" class="district-node" style="--neon-color: #ff00ff;">CAFETERIA</a>
@@ -143,7 +132,7 @@
             </div>
 
             <div class="block pos-centro">
-                <a href="cidade.html" class="district-node" style="--neon-color: #00f2ff; font-size: 18px;">CENTRO CIDADE</a>
+                <a href="cidade.html" class="district-node" style="--neon-color: #00f2ff; font-size: 22px;">CENTRO CIDADE</a>
             </div>
 
             <div class="block pos-bar">
@@ -160,20 +149,24 @@
         </div>
     </div>
 
-    <div class="drag-hint">ARRASTE PARA NAVEGAR</div>
-    <a href="index.html" class="btn-exit">SAIR DO MAPA</a>
+    <a href="index.html" class="btn-exit">VOLTAR</a>
 
     <script type="module">
         const cityMap = document.getElementById('city-map');
         let isDragging = false;
-        let startX, startY, scrollLeft, scrollTop;
+        let startX, startY;
+        
+        // Configurações de Zoom e Posição
+        const zoomScale = 0.6; // Tela mais distante (menor = mais longe)
+        let currentX = window.innerWidth / 2 - (1250 * zoomScale);
+        let currentY = window.innerHeight / 2 - (1250 * zoomScale);
 
-        // Posição inicial (Centralizar no Centro Cidade)
-        let currentX = -450;
-        let currentY = -700;
+        function updateTransform() {
+            cityMap.style.transform = `translate(${currentX}px, ${currentY}px) scale(${zoomScale})`;
+        }
+
         updateTransform();
 
-        // Lógica de Arrastar (Mouse e Touch)
         const startMove = (e) => {
             isDragging = true;
             startX = (e.pageX || e.touches[0].pageX) - currentX;
@@ -185,21 +178,17 @@
             e.preventDefault();
             currentX = (e.pageX || e.touches[0].pageX) - startX;
             currentY = (e.pageY || e.touches[0].pageY) - startY;
-            
-            // Limites para não fugir do mapa
-            currentX = Math.min(0, Math.max(currentX, -1200));
-            currentY = Math.min(0, Math.max(currentY, -1200));
+
+            // Limites baseados no tamanho do mapa e zoom
+            const limit = 2500 * zoomScale - window.innerWidth;
+            // Bloqueio opcional de limites removido para permitir navegação livre no "vazio" se desejar, 
+            // ou pode ser reativado conforme necessidade.
             
             updateTransform();
         };
 
         const stopMove = () => { isDragging = false; };
 
-        function updateTransform() {
-            cityMap.style.transform = `translate(${currentX}px, ${currentY}px)`;
-        }
-
-        // Listeners
         window.addEventListener('mousedown', startMove);
         window.addEventListener('mousemove', move);
         window.addEventListener('mouseup', stopMove);
@@ -207,7 +196,6 @@
         window.addEventListener('touchmove', move, { passive: false });
         window.addEventListener('touchend', stopMove);
 
-        // Cor do Usuário
         const userColor = localStorage.getItem('userNeonColor') || '#00f2ff';
         document.documentElement.style.setProperty('--user-neon-color', userColor);
     </script>
