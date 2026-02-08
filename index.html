@@ -20,7 +20,7 @@
             color: #fff; 
             font-family: 'Rajdhani'; 
             margin: 0; 
-            padding: 85px 0 80px 0 !important;
+            padding: 85px 0 100px 0 !important;
             min-height: 100vh; 
             display: flex; 
             flex-direction: column; 
@@ -30,23 +30,23 @@
         .app-drawer {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 25px 15px;
+            gap: 20px 15px;
             padding: 20px;
             max-width: 500px;
             margin: 0 auto;
             width: 100%;
         }
 
-        .dev-divider {
+        /* Divisores de Categoria */
+        .category-divider {
             grid-column: span 3;
             display: flex;
             align-items: center;
             gap: 10px;
-            margin: 10px 0;
+            margin: 15px 0 5px 0;
         }
-
         .dev-line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); }
-        .dev-text { font-family: 'Orbitron'; font-size: 0.5rem; color: #444; letter-spacing: 2px; text-transform: uppercase; white-space: nowrap; }
+        .dev-text { font-family: 'Orbitron'; font-size: 0.5rem; color: var(--neon); opacity: 0.6; letter-spacing: 2px; text-transform: uppercase; white-space: nowrap; }
 
         .app-icon-container {
             display: flex;
@@ -68,30 +68,33 @@
             background: var(--glass);
             border: 1px solid var(--border);
             backdrop-filter: blur(10px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
             position: relative;
             overflow: hidden;
         }
         
-        /* Gradientes dos ícones */
+        /* Estilo para Apps Bloqueados */
+        .locked {
+            opacity: 0.4;
+            filter: grayscale(1);
+            cursor: not-allowed !important;
+        }
+        .locked:active { transform: none; }
+
+        /* Gradientes dos ícones ativos */
         .icon-news { background: linear-gradient(135deg, #ff4b1f, #ff9068); }
         .icon-games { background: linear-gradient(135deg, #11998e, #38ef7d); }
         .icon-market { background: linear-gradient(135deg, #FDC830, #F37335); }
-        .icon-global { background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); border: 1px solid #00f2ff44; }
-        .icon-chat { background: linear-gradient(135deg, #000428, #004e92); border: 1px solid #00f2ff22; }
+        .icon-global { background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); }
+        .icon-chat { background: linear-gradient(135deg, #000428, #004e92); }
         .icon-quests { background: linear-gradient(135deg, #00c6ff, #0072ff); }
         .icon-config { background: linear-gradient(135deg, #bdc3c7, #2c3e50); }
-        
-        /* Novos Ícones */
         .icon-apt { background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045); }
         .icon-leisure { background: linear-gradient(135deg, #00f2ff, #0061ff); }
-
-        .icon-rifas, .icon-drops, .icon-multi { background: linear-gradient(135deg, #444, #222); opacity: 0.6; }
 
         .app-label {
             font-family: 'Orbitron';
             font-weight: bold;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: #888;
             text-align: center;
             letter-spacing: 0.5px;
@@ -101,7 +104,7 @@
             content: '';
             position: absolute;
             top: 0; left: 0; width: 100%; height: 50%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0.2), transparent);
+            background: linear-gradient(to bottom, rgba(255,255,255,0.15), transparent);
             border-radius: 20px 20px 0 0;
         }
 
@@ -120,29 +123,37 @@
 <body>
 
     <div class="app-drawer">
+        
+        <div class="category-divider">
+            <div class="dev-line"></div>
+            <div class="dev-text">Social & Info</div>
+            <div class="dev-line"></div>
+        </div>
+
         <a href="noticias.html" class="app-icon-container">
             <div class="app-box icon-news">📰</div>
-            <span class="app-label">Notícias VL</span>
-        </a>
-
-        <a href="minigames.html" class="app-icon-container">
-            <div class="app-box icon-games">🎮</div>
-            <span class="app-label">Games</span>
-        </a>
-
-        <a href="market.html" class="app-icon-container">
-            <div class="app-box icon-market">🛒</div>
-            <span class="app-label">Market</span>
-        </a>
-
-        <a href="global.html" class="app-icon-container">
-            <div class="app-box icon-global">🪐</div>
-            <span class="app-label">mundo</span>
+            <span class="app-label">Notícias</span>
         </a>
 
         <a href="chat.html" class="app-icon-container">
             <div class="app-box icon-chat">📡</div>
-            <span class="app-label">global</span>
+            <span class="app-label">Global</span>
+        </a>
+
+        <div class="app-icon-container locked">
+            <div class="app-box">👥</div>
+            <span class="app-label">Nexus Hub</span>
+        </div>
+
+        <div class="category-divider">
+            <div class="dev-line"></div>
+            <div class="dev-text">Market & Ativos</div>
+            <div class="dev-line"></div>
+        </div>
+
+        <a href="market.html" class="app-icon-container">
+            <div class="app-box icon-market">🛒</div>
+            <span class="app-label">Market</span>
         </a>
 
         <a href="ativos.html" class="app-icon-container">
@@ -150,14 +161,46 @@
             <span class="app-label">Ativos</span>
         </a>
 
-        <a href="lazer.html" class="app-icon-container">
-            <div class="app-box icon-leisure">🎡</div>
-            <span class="app-label">social</span>
+        <div class="app-icon-container locked">
+            <div class="app-box">📈</div>
+            <span class="app-label">Exchange</span>
+        </div>
+
+        <div class="category-divider">
+            <div class="dev-line"></div>
+            <div class="dev-text">Desenvolvimento</div>
+            <div class="dev-line"></div>
+        </div>
+
+        <div class="app-icon-container locked">
+            <div class="app-box">🎟️</div>
+            <span class="app-label">Campanhas</span>
+        </div>
+
+        <div class="app-icon-container locked">
+            <div class="app-box">🔨</div>
+            <span class="app-label">Drops</span>
+        </div>
+
+        <div class="app-icon-container locked">
+            <div class="app-box">🧬</div>
+            <span class="app-label">Bio-Labs</span>
+        </div>
+
+        <div class="category-divider">
+            <div class="dev-line"></div>
+            <div class="dev-text">Sistema</div>
+            <div class="dev-line"></div>
+        </div>
+
+        <a href="minigames.html" class="app-icon-container">
+            <div class="app-box icon-games">🎮</div>
+            <span class="app-label">Games</span>
         </a>
 
-        <a href="quests.html" class="app-icon-container">
-            <div class="app-box icon-quests">📝</div>
-            <span class="app-label">Nexus Quest</span>
+        <a href="lazer.html" class="app-icon-container">
+            <div class="app-box icon-leisure">🎡</div>
+            <span class="app-label">Lazer</span>
         </a>
 
         <a href="config.html" class="app-icon-container">
@@ -165,31 +208,11 @@
             <span class="app-label">Ajustes</span>
         </a>
 
-        <div class="dev-divider">
-            <div class="dev-line"></div>
-            <div class="dev-text">Em Desenvolvimento</div>
-            <div class="dev-line"></div>
-        </div>
-
-        <a href="#" class="app-icon-container">
-            <div class="app-box icon-rifas">🎟️</div>
-            <span class="app-label">Campanhas</span>
-        </a>
-
-        <a href="#" class="app-icon-container">
-            <div class="app-box icon-drops">🔨</div>
-            <span class="app-label">Drops</span>
-        </a>
-
-        <a href="#" class="app-icon-container">
-            <div class="app-box icon-multi">👥</div>
-            <span class="app-label">Multiplayer</span>
-        </a>
     </div>
 
     <div class="nexus-ticker">
         <div class="ticker-track">
-            ••• BEM-VINDO AO SISTEMA NEXUS VL ••• COMPLETE O NEXUS QUEST E GANHE NP HOJE ••• NOVOS DROPS DISPONÍVEIS NA PRÓXIMA HORA •••
+            ••• ACESSO RESTRITO ÀS CATEGORIAS EM DESENVOLVIMENTO ••• AGUARDE A PRÓXIMA ATUALIZAÇÃO DO SISTEMA NEXUS ••• NP DISPONÍVEL PARA RESGATE EM QUESTS •••
         </div>
     </div>
 
@@ -197,4 +220,3 @@
 
 </body>
 </html>
-
