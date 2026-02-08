@@ -14,15 +14,10 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 function initOverlay() {
-    const savedTheme = localStorage.getItem('nexusTheme');
-    if (savedTheme === 'light') { document.body.classList.add('light-mode'); }
-
     const style = document.createElement('style');
     style.textContent = `
         * { box-sizing: border-box; }
-        body { margin: 0; padding-top: 75px; transition: background 0.3s; background: #050505; color: #fff; font-family: 'Rajdhani', sans-serif; }
-        body.light-mode { background: #f5f5f5 !important; color: #111 !important; }
-        body.light-mode .nexus-header { background: #fff !important; color: #000 !important; border-bottom: 1px solid #ccc; }
+        body { margin: 0; padding-top: 75px; background: #050505; color: #fff; font-family: 'Rajdhani', sans-serif; }
         
         .nexus-header {
             position: fixed; top: 0; left: 0; width: 100%; height: 75px;
@@ -36,7 +31,6 @@ function initOverlay() {
         .u-det { font-family: 'Orbitron'; font-size: 0.58rem; line-height: 1.2; }
         .stats-row { display: flex; gap: 6px; font-weight: 700; }
         .u-np { color: #00ff88; }
-        .u-bids { color: #ffcc00; }
         
         .xp-group { display: flex; align-items: center; gap: 4px; margin-top: 2px; }
         .xp-container { width: 70px; height: 5px; background: #222; border-radius: 4px; overflow: hidden; border: 1px solid #333; }
@@ -59,10 +53,6 @@ function initOverlay() {
         .btn-recarga { background: linear-gradient(135deg, #00ff88, #009955); color: #000; }
         .btn-perfil { background: #222; color: #fff; border: 1px solid #333; }
         .btn-perfil:hover { background: #00f2ff; color: #000; border-color: #00f2ff; }
-
-        .mode-toggle { width: 32px; height: 16px; background: #333; border-radius: 10px; position: relative; cursor: pointer; border: 1px solid #444; }
-        .mode-toggle::after { content: '🌙'; position: absolute; left: 2px; top: 1px; font-size: 8px; transition: 0.3s; }
-        body.light-mode .mode-toggle::after { content: '☀️'; left: 18px; }
     `;
     document.head.appendChild(style);
 
@@ -79,7 +69,6 @@ function initOverlay() {
                     </div>
                     <div class="stats-row">
                         <span class="u-np" id="nav-np">0 NP</span>
-                        <span class="u-bids" id="nav-bids">0 BIDS</span>
                     </div>
                     <div class="xp-group">
                         <div class="xp-container"><div class="xp-bar" id="nav-xp"></div></div>
@@ -90,13 +79,11 @@ function initOverlay() {
             <div class="ctrl-group">
                 <button class="btn-header btn-perfil" id="btn-goto-perfil">PERFIL</button>
                 <button class="btn-header btn-recarga" onclick="window.location.href='deposito.html'">RECARGA</button>
-                <div class="mode-toggle" id="theme-btn"></div>
             </div>
         </div>
     `;
     document.body.prepend(ui);
 
-    // Lista ampliada de emojis
     const emojisDisponiveis = [
         "👤", "🔥", "🐱", "🐶", "🦊", 
         "💎", "⚡", "👑", "🚀", "🎮",
@@ -104,13 +91,7 @@ function initOverlay() {
         "🍀", "🐯", "🦁", "🐉", "👻",
         "🦾", "🕶️", "🎩", "🧿", "🧬"
     ];
-    // Emojis liberados inicialmente
     const emojisIniciais = ["👤", "🔥", "🐱", "🐶", "🦊", "💎", "⚡", "🚀"];
-
-    document.getElementById('theme-btn').onclick = () => {
-        document.body.classList.toggle('light-mode');
-        localStorage.setItem('nexusTheme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
-    };
 
     const navAv = document.getElementById('nav-av');
     const picker = document.getElementById('emoji-picker');
@@ -134,7 +115,6 @@ function initOverlay() {
                     document.getElementById('nav-name').innerText = (d.nome || "PLAYER").toUpperCase().split(' ')[0];
                     document.getElementById('nav-av').innerText = d.avatarEmoji || "👤";
                     document.getElementById('nav-np').innerText = Math.floor(d.saldo || 0) + " NP";
-                    document.getElementById('nav-bids').innerText = (d.bids || 0) + " BIDS";
                     document.getElementById('nav-lvl').innerText = "LVL " + level;
                     document.getElementById('nav-xp').style.width = (xpNoNivel / 10) + "%";
                     document.getElementById('xp-val').innerText = `${xpNoNivel}/1000`;
